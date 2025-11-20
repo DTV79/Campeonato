@@ -15,36 +15,61 @@ function mostrarClasificacion(lista) {
     const div = document.getElementById("clasificacion");
     div.innerHTML = "<h2>Clasificación</h2>";
 
-    lista.forEach(eq => {
-        div.innerHTML += `
-            <div class="tarjeta">
-                <h3>${eq.equipo}</h3>
-                <p><strong>Puntos:</strong> ${eq.puntos_totales}</p>
-                <p><strong>Partidos:</strong> ${eq.pj} jugados · ${eq.pg} ganados</p>
-                <p><strong>Sets:</strong> ${eq.sets_ganados}-${eq.sets_perdidos}</p>
-            </div>
+    let html = `
+        <div class="tabla-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>POS</th>
+                        <th>EQUIPO</th>
+                        <th>PTOS</th>
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PP</th>
+                        <th>D</th>
+                        <th>SG</th>
+                        <th>SP</th>
+                        <th>SD</th>
+                        <th>PGan</th>
+                        <th>PPer</th>
+                        <th>PDif</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    lista.forEach((eq, index) => {
+        html += `
+            <tr>
+                <td><strong>${index + 1}</strong></td>
+                <td><strong>${eq.equipo}</strong></td>
+                <td><strong>${eq.puntos_totales}</strong></td>
+                <td>${eq.pj}</td>
+                <td>${eq.pg}</td>
+                <td>${eq.pp}</td>
+                <td>${eq.descanso}</td>
+                <td>${eq.sets_ganados}</td>
+                <td>${eq.sets_perdidos}</td>
+                <td>${eq.sets_diff}</td>
+                <td>${eq.puntos_ganados}</td>
+                <td>${eq.puntos_perdidos}</td>
+                <td>${eq.puntos_diff}</td>
+            </tr>
         `;
     });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    div.innerHTML += html;
 }
 
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
     div.innerHTML = "<h2>Partidos</h2>";
-
-    lista.forEach(p => {
-        let sets = p.resultado.join(" | ");
-        if (sets === "") sets = "—";
-
-        div.innerHTML += `
-            <div class="tarjeta">
-                <h3>Jornada ${p.jornada}</h3>
-                <p><strong>${p.local}</strong> vs <strong>${p.visitante}</strong></p>
-                <p><strong>Resultado:</strong> ${sets}</p>
-                <p><em>${p.estado}</em></p>
-            </div>
-        `;
-    });
 }
 
 cargarDatos();
-
