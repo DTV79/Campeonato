@@ -1,15 +1,16 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f5f5f5;
+    background: #f3f3f3;
 }
 
 header {
     background: #1e88e5;
     color: white;
-    padding: 18px;
+    padding: 20px;
     text-align: center;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 nav {
@@ -32,19 +33,54 @@ nav button:hover {
 }
 
 main {
-    padding: 15px;
+    padding: 10px;
 }
 
-.tarjeta {
-    background: white;
-    padding: 15px;
-    margin-bottom: 12px;
+
+/* === TABLA DE CLASIFICACIÓN === */
+
+.tabla-container {
+    overflow-x: auto;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    background: white;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-.tarjeta h3 {
-    margin-top: 0;
+table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 800px;
+    font-size: 14px;
+}
+
+th {
+    background: #e0e0e0;
+    padding: 8px 12px;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+td {
+    padding: 8px 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid #ddd;
+}
+
+td strong {
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background: #f7f7f7;
+}
+
+tr:nth-child(odd) {
+    background: #ffffff;
 }
 
 footer {
@@ -53,4 +89,3 @@ footer {
     font-size: 12px;
     color: #555;
 }
-
