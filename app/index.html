@@ -1,1 +1,35 @@
-App en construcción
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campeonato Pádel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Campeonato Pádel</h1>
+    </header>
+
+    <nav>
+        <button onclick="mostrar('clasificacion')">Clasificación</button>
+        <button onclick="mostrar('partidos')">Partidos</button>
+    </nav>
+
+    <main>
+        <section id="clasificacion" class="pagina"></section>
+        <section id="partidos" class="pagina" style="display:none;"></section>
+    </main>
+
+    <footer>
+        <p>Actualizado automáticamente desde Excel</p>
+    </footer>
+
+    <script>
+        const DATA_URL = "https://DTV79.github.io/Campeonato/estado_torneo.json";
+    </script>
+    <script src="app.js"></script>
+
+</body>
+</html>
