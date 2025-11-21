@@ -116,7 +116,7 @@ footer {
 }
 
 .escudo {
-    width: 28px;            /* tamaño pequeño */
-    height: 28px;
+    width: 18px;            /* tamaño pequeño */
+    height: 18px;
     object-fit: contain;
 }
