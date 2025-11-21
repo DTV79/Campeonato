@@ -61,7 +61,7 @@ lista.forEach(eq => {
     const anterior = Number(eq.posicion_anterior || 0);
 
     if (!anterior || anterior === actual) {
-        eq.mov = "→";
+        eq.mov = "=";
         eq.movClass = "igual";
     } else if (actual < anterior) {
         // Ha SUBIDO posiciones (está más arriba en la tabla)
