@@ -55,8 +55,25 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // === Flechas (de momento →) ===
-    lista.forEach(e => e.mov = "→");
+    // === Flechas según posición actual vs anterior ===
+lista.forEach(eq => {
+    const actual = Number(eq.posicion_actual || 0);
+    const anterior = Number(eq.posicion_anterior || 0);
+
+    if (!anterior || anterior === actual) {
+        eq.mov = "→";
+        eq.movClass = "igual";
+    } else if (actual < anterior) {
+        // Ha SUBIDO posiciones (está más arriba en la tabla)
+        eq.mov = "▲";
+        eq.movClass = "sube";
+    } else {
+        // Ha BAJADO posiciones
+        eq.mov = "▼";
+        eq.movClass = "baja";
+    }
+});
+
 
     // === INICIO TABLA ===
     let html = `
@@ -88,7 +105,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 
         html += `
             <tr>
-                <td class="mov">${eq.mov}</td>
+                <td class="mov ${eq.movClass}">${eq.mov}</td>
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
                 <td><strong>${eq.puntos_totales}</strong></td>
