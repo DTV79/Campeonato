@@ -1,10 +1,9 @@
-// ========================================
-// Cargar datos desde el JSON público
-// ========================================
-
+// =====================================================
+//   Cargar datos desde el JSON
+// =====================================================
 async function cargarDatos() {
     try {
-        const res = await fetch(DATA_URL + "?v=" + Date.now()); // evita caché
+        const res = await fetch(DATA_URL + "?v=" + Date.now());
         const data = await res.json();
 
         mostrarClasificacion(data.clasificacion, data.ultima_actualizacion);
@@ -17,23 +16,23 @@ async function cargarDatos() {
     }
 }
 
-// ========================================
-// Mostrar páginas
-// ========================================
-
+// =====================================================
+//   Cambiar de pestaña
+// =====================================================
 function mostrar(pagina) {
-    document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.pagina')
+        .forEach(p => p.style.display = 'none');
+
     document.getElementById(pagina).style.display = 'block';
 }
 
-// ========================================
-// CLASIFICACIÓN
-// ========================================
-
+// =====================================================
+//   CLASIFICACIÓN — TABLA COMPLETA
+// =====================================================
 function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
 
-    // ========= 1) FORMATEAR FECHA =========
+    // === FORMATEAR FECHA A dd/mm/aaaa hh:mm ===
     let fechaFormateada = "Fecha desconocida";
 
     if (fechaActualizacion && fechaActualizacion.trim() !== "") {
@@ -50,16 +49,16 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         }
     }
 
-    // ========= 2) Cabecera + fecha =========
+    // === Cabecera + Fecha ===
     div.innerHTML = `
         <h2>Clasificación</h2>
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // ========= 3) Flechas (por ahora todas →) =========
+    // === Flechas (de momento →) ===
     lista.forEach(e => e.mov = "→");
 
-    // ========= 4) TABLA =========
+    // === INICIO TABLA ===
     let html = `
         <div class="tabla-container">
             <table>
@@ -84,7 +83,9 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <tbody>
     `;
 
+    // === Filas de clasificación ===
     lista.forEach((eq, index) => {
+
         html += `
             <tr>
                 <td class="mov">${eq.mov}</td>
@@ -105,14 +106,14 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         `;
     });
 
+    // === Final tabla ===
     html += `
                 </tbody>
             </table>
         </div>
     `;
 
-    // ========= 5) LEYENDA =========
-
+    // === Leyenda pequeña y en cursiva ===
     html += `
         <div class="leyenda">
             <em>
@@ -129,14 +130,15 @@ function mostrarClasificacion(lista, fechaActualizacion) {
     div.innerHTML += html;
 }
 
-// ========================================
-// PARTIDOS (se rellenará más adelante)
-// ========================================
-
+// =====================================================
+//   PARTIDOS (se completará más adelante)
+// =====================================================
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
     div.innerHTML = "<h2>Partidos</h2>";
 }
 
-// Ejecutar carga inicial
+// =====================================================
+//   Ejecutar carga inicial
+// =====================================================
 cargarDatos();
