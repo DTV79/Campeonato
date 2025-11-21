@@ -15,13 +15,21 @@ function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
 
     // Convertir fecha de ISO a dd/mm/aaaa hh:mm
-    const fecha = new Date(fechaActualizacion);
-    const fechaFormateada =
-        ("0" + fecha.getDate()).slice(2) + "/" +
-        ("0" + (fecha.getMonth() + 1)).slice(2) + "/" +
-        fecha.getFullYear() + " " +
-        ("0" + fecha.getHours()).slice(2) + ":" +
-        ("0" + fecha.getMinutes()).slice(2);
+    let fechaFormateada = "Fecha desconocida";
+
+if (fechaActualizacion && fechaActualizacion.trim() !== "") {
+    const f = new Date(fechaActualizacion);
+
+    if (!isNaN(f.getTime())) {
+        const dd = String(f.getDate()).padStart(2, "0");
+        const mm = String(f.getMonth() + 1).padStart(2, "0");
+        const yyyy = f.getFullYear();
+        const hh = String(f.getHours()).padStart(2, "0");
+        const min = String(f.getMinutes()).padStart(2, "0");
+
+        fechaFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+    }
+}
 
     div.innerHTML = `
         <h2>Clasificación</h2>
@@ -83,19 +91,14 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         </div>
 
         <div class="leyenda">
-            <strong>Leyenda:</strong><br>
-            PTOS: Puntos Totales / 
-            PJ: Partidos Jugados / 
-            PG: Partidos Ganados /  
-            PP: Partidos Perdidos /  
-            Des: Descanso / 
-            SG: Sets Ganados / 
-            SP: Sets Perdidos / 
-            SD: Diferencia de Sets / 
-            PGan: Puntos Ganados / 
-            PPer: Puntos Perdidos / 
-            PDif: Diferencia de Puntos
-        </div>
+    <em>
+    PTOS: Puntos Totales / PJ: Partidos Jugados / PG: Partidos Ganados / 
+    PP: Partidos Perdidos / Des: Descanso / SG: Sets Ganados / 
+    SP: Sets Perdidos / SD: Diferencia de Sets / PGan: Puntos Ganados / 
+    PPer: Puntos Perdidos / PDif: Diferencia de Puntos
+    </em>
+</div>
+
     `;
 
     div.innerHTML += html;
