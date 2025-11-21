@@ -105,3 +105,18 @@ footer {
     margin-bottom: 10px;
     color: #555;
 }
+
+.titulo-con-escudo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;               /* separa escudos del título */
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.escudo {
+    width: 28px;            /* tamaño pequeño */
+    height: 28px;
+    object-fit: contain;
+}
