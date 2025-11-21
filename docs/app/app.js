@@ -1,6 +1,8 @@
 // =====================================================
 //   Cargar datos desde el JSON
 // =====================================================
+const DATA_URL = "https://dtv79.github.io/Campeonato/docs/estado_torneo.json";
+
 async function cargarDatos() {
     try {
         const res = await fetch(DATA_URL + "?v=" + Date.now());
