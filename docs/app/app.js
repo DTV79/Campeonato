@@ -13,7 +13,7 @@ function mostrar(pagina) {
 
 function mostrarClasificacion(lista) {
     const div = document.getElementById("clasificacion");
-    div.innerHTML = "<h2>Clasificación</h2>";
+    
 
     let html = `
         <div class="tabla-container">
@@ -26,7 +26,7 @@ function mostrarClasificacion(lista) {
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
-                        <th>D</th>
+                        <th>Des</th>
                         <th>SG</th>
                         <th>SP</th>
                         <th>SD</th>
