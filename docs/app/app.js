@@ -1,11 +1,14 @@
 // =====================================================
-//   Cargar datos desde el JSON
+//   URL donde se encuentra el JSON generado por Excel
 // =====================================================
 const DATA_URL = "https://dtv79.github.io/Campeonato/docs/estado_torneo.json";
 
+// =====================================================
+//   Cargar datos desde el JSON
+// =====================================================
 async function cargarDatos() {
     try {
-        const res = await fetch(DATA_URL + "?v=" + Date.now());
+        const res = await fetch(DATA_URL + "?v=" + Date.now()); // evitar caché
         const data = await res.json();
 
         mostrarClasificacion(data.clasificacion, data.ultima_actualizacion);
@@ -58,24 +61,21 @@ function mostrarClasificacion(lista, fechaActualizacion) {
     `;
 
     // === Flechas según posición actual vs anterior ===
-lista.forEach(eq => {
-    const actual = Number(eq.posicion_actual || 0);
-    const anterior = Number(eq.posicion_anterior || 0);
+    lista.forEach(eq => {
+        const actual = Number(eq.posicion_actual || 0);
+        const anterior = Number(eq.posicion_anterior || 0);
 
-    if (!anterior || anterior === actual) {
-        eq.mov = "=";
-        eq.movClass = "igual";
-    } else if (actual < anterior) {
-        // Ha SUBIDO posiciones (está más arriba en la tabla)
-        eq.mov = "▲";
-        eq.movClass = "sube";
-    } else {
-        // Ha BAJADO posiciones
-        eq.mov = "▼";
-        eq.movClass = "baja";
-    }
-});
-
+        if (!anterior || anterior === actual) {
+            eq.mov = "=";
+            eq.movClass = "igual";
+        } else if (actual < anterior) {
+            eq.mov = "▲";
+            eq.movClass = "sube";
+        } else {
+            eq.mov = "▼";
+            eq.movClass = "baja";
+        }
+    });
 
     // === INICIO TABLA ===
     let html = `
@@ -104,7 +104,6 @@ lista.forEach(eq => {
 
     // === Filas de clasificación ===
     lista.forEach((eq, index) => {
-
         html += `
             <tr>
                 <td class="mov ${eq.movClass}">${eq.mov}</td>
@@ -150,7 +149,7 @@ lista.forEach(eq => {
 }
 
 // =====================================================
-//   PARTIDOS (se completará más adelante)
+//   PARTIDOS — (más adelante lo completaremos)
 // =====================================================
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
