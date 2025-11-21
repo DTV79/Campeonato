@@ -120,3 +120,8 @@ footer {
     height: 22px;
     object-fit: contain;
 }
+header img.escudo {
+    width: 22px !important;
+    height: 22px !important;
+    margin-top: -2px;     /* opcional: alinea con el texto */
+}
