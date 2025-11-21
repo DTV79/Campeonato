@@ -1,44 +1,65 @@
-async function cargarDatos() {
-    const res = await fetch(DATA_URL);
-    const data = await res.json();
+// ========================================
+// Cargar datos desde el JSON público
+// ========================================
 
-    mostrarClasificacion(data.clasificacion);
-    mostrarPartidos(data.partidos);
+async function cargarDatos() {
+    try {
+        const res = await fetch(DATA_URL + "?v=" + Date.now()); // evita caché
+        const data = await res.json();
+
+        mostrarClasificacion(data.clasificacion, data.ultima_actualizacion);
+        mostrarPartidos(data.partidos);
+
+    } catch (err) {
+        console.error("Error cargando JSON:", err);
+        document.getElementById("clasificacion").innerHTML =
+            "<p>Error cargando datos del servidor.</p>";
+    }
 }
+
+// ========================================
+// Mostrar páginas
+// ========================================
 
 function mostrar(pagina) {
     document.querySelectorAll('.pagina').forEach(p => p.style.display = 'none');
     document.getElementById(pagina).style.display = 'block';
 }
 
+// ========================================
+// CLASIFICACIÓN
+// ========================================
+
 function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
 
-    // Convertir fecha de ISO a dd/mm/aaaa hh:mm
+    // ========= 1) FORMATEAR FECHA =========
     let fechaFormateada = "Fecha desconocida";
 
-if (fechaActualizacion && fechaActualizacion.trim() !== "") {
-    const f = new Date(fechaActualizacion);
+    if (fechaActualizacion && fechaActualizacion.trim() !== "") {
+        const f = new Date(fechaActualizacion);
 
-    if (!isNaN(f.getTime())) {
-        const dd = String(f.getDate()).padStart(2, "0");
-        const mm = String(f.getMonth() + 1).padStart(2, "0");
-        const yyyy = f.getFullYear();
-        const hh = String(f.getHours()).padStart(2, "0");
-        const min = String(f.getMinutes()).padStart(2, "0");
+        if (!isNaN(f.getTime())) {
+            const dd = String(f.getDate()).padStart(2, "0");
+            const mm = String(f.getMonth() + 1).padStart(2, "0");
+            const yyyy = f.getFullYear();
+            const hh = String(f.getHours()).padStart(2, "0");
+            const min = String(f.getMinutes()).padStart(2, "0");
 
-        fechaFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+            fechaFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+        }
     }
-}
 
+    // ========= 2) Cabecera + fecha =========
     div.innerHTML = `
         <h2>Clasificación</h2>
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // Por ahora flechas estáticas
-    lista.forEach((e) => e.mov = "→");
+    // ========= 3) Flechas (por ahora todas →) =========
+    lista.forEach(e => e.mov = "→");
 
+    // ========= 4) TABLA =========
     let html = `
         <div class="tabla-container">
             <table>
@@ -64,7 +85,6 @@ if (fechaActualizacion && fechaActualizacion.trim() !== "") {
     `;
 
     lista.forEach((eq, index) => {
-
         html += `
             <tr>
                 <td class="mov">${eq.mov}</td>
@@ -89,25 +109,34 @@ if (fechaActualizacion && fechaActualizacion.trim() !== "") {
                 </tbody>
             </table>
         </div>
+    `;
 
+    // ========= 5) LEYENDA =========
+
+    html += `
         <div class="leyenda">
-    <em>
-    PTOS: Puntos Totales / PJ: Partidos Jugados / PG: Partidos Ganados / 
-    PP: Partidos Perdidos / Des: Descanso / SG: Sets Ganados / 
-    SP: Sets Perdidos / SD: Diferencia de Sets / PGan: Puntos Ganados / 
-    PPer: Puntos Perdidos / PDif: Diferencia de Puntos
-    </em>
-</div>
-
+            <em>
+            PTOS: Puntos Totales / PJ: Partidos Jugados /
+            PG: Partidos Ganados / PP: Partidos Perdidos /
+            Des: Descanso / SG: Sets Ganados /
+            SP: Sets Perdidos / SD: Diferencia de Sets /
+            PGan: Puntos Ganados / PPer: Puntos Perdidos /
+            PDif: Diferencia de Puntos
+            </em>
+        </div>
     `;
 
     div.innerHTML += html;
 }
 
+// ========================================
+// PARTIDOS (se rellenará más adelante)
+// ========================================
 
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
     div.innerHTML = "<h2>Partidos</h2>";
 }
 
+// Ejecutar carga inicial
 cargarDatos();
