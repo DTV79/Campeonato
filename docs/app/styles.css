@@ -125,3 +125,21 @@ header img.escudo {
     height: 22px !important;
     margin-top: -2px;     /* opcional: alinea con el texto */
 }
+
+.mov {
+    text-align: center;
+    font-size: 16px;
+    width: 24px;
+}
+
+.mov.sube {
+    color: #008000; /* verde */
+}
+
+.mov.baja {
+    color: #c00000; /* rojo */
+}
+
+.mov.igual {
+    color: #555555; /* gris neutro */
+}
