@@ -11,15 +11,32 @@ function mostrar(pagina) {
     document.getElementById(pagina).style.display = 'block';
 }
 
-function mostrarClasificacion(lista) {
+function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
-    
+
+    // Convertir fecha de ISO a dd/mm/aaaa hh:mm
+    const fecha = new Date(fechaActualizacion);
+    const fechaFormateada =
+        ("0" + fecha.getDate()).slice(2) + "/" +
+        ("0" + (fecha.getMonth() + 1)).slice(2) + "/" +
+        fecha.getFullYear() + " " +
+        ("0" + fecha.getHours()).slice(2) + ":" +
+        ("0" + fecha.getMinutes()).slice(2);
+
+    div.innerHTML = `
+        <h2>Clasificación</h2>
+        <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
+    `;
+
+    // Por ahora flechas estáticas
+    lista.forEach((e) => e.mov = "→");
 
     let html = `
         <div class="tabla-container">
             <table>
                 <thead>
                     <tr>
+                        <th></th>
                         <th>POS</th>
                         <th>EQUIPO</th>
                         <th>PTOS</th>
@@ -39,8 +56,10 @@ function mostrarClasificacion(lista) {
     `;
 
     lista.forEach((eq, index) => {
+
         html += `
             <tr>
+                <td class="mov">${eq.mov}</td>
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
                 <td><strong>${eq.puntos_totales}</strong></td>
@@ -62,10 +81,26 @@ function mostrarClasificacion(lista) {
                 </tbody>
             </table>
         </div>
+
+        <div class="leyenda">
+            <strong>Leyenda:</strong><br>
+            PTOS: Puntos Totales / 
+            PJ: Partidos Jugados / 
+            PG: Partidos Ganados /  
+            PP: Partidos Perdidos /  
+            Des: Descanso / 
+            SG: Sets Ganados / 
+            SP: Sets Perdidos / 
+            SD: Diferencia de Sets / 
+            PGan: Puntos Ganados / 
+            PPer: Puntos Perdidos / 
+            PDif: Diferencia de Puntos
+        </div>
     `;
 
     div.innerHTML += html;
 }
+
 
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
