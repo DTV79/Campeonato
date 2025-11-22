@@ -63,18 +63,23 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         eq.mov = "";
         eq.movClass = "";
 
-        if (anterior > 0 && eq.pj > 0) {
-            if (actual < anterior) {
-                eq.mov = "▲";
-                eq.movClass = "sube";
-            } else if (actual > anterior) {
-                eq.mov = "▼";
-                eq.movClass = "baja";
-            } else {
-                eq.mov = "=";
-                eq.movClass = "igual";
-            }
-        }
+    if (anterior > 0 && eq.pj > 0) {
+    if (actual < anterior) {
+        eq.mov = "▲";
+        eq.movClass = "sube";
+    } else if (actual > anterior) {
+        eq.mov = "▼";
+        eq.movClass = "baja";
+    } else {
+        // Mismo puesto pero NO es jornada 1
+        eq.mov = "=";
+        eq.movClass = "igual";
+    }
+} else {
+    // Jornada 1 → NO mostrar nada
+    eq.mov = "";
+    eq.movClass = "";
+}
     });
 
     // Generar HTML de la tabla
