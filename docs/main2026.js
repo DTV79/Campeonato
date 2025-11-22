@@ -115,10 +115,11 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <td>${eq.descanso}</td>
                 <td>${eq.sets_ganados}</td>
                 <td>${eq.sets_perdidos}</td>
-                <td>${eq.sets_diff}</strong></td>
+                <td>${eq.sets_diff}</td>
                 <td>${eq.puntos_ganados}</td>
                 <td>${eq.puntos_perdidos}</td>
                 <td>${eq.puntos_diff}</td>
+
             </tr>
         `;
     });
