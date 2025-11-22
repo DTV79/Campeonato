@@ -71,9 +71,14 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         eq.mov = "▼";
         eq.movClass = "baja";
     } else {
+        // Mismo puesto pero NO es jornada 1
         eq.mov = "=";
         eq.movClass = "igual";
     }
+    } else {
+    // Jornada 1 → NO mostrar nada
+    eq.mov = "";
+    eq.movClass = "";
     }
     });
 
