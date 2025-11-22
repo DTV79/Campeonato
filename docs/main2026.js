@@ -37,63 +37,47 @@ function mostrar(pagina) {
 function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
 
-    // === FORMATEAR FECHA A dd/mm/aaaa hh:mm ===
+    // Formatear fecha
     let fechaFormateada = "Fecha desconocida";
-
     if (fechaActualizacion && fechaActualizacion.trim() !== "") {
         const f = new Date(fechaActualizacion);
-
         if (!isNaN(f.getTime())) {
             const dd = String(f.getDate()).padStart(2, "0");
             const mm = String(f.getMonth() + 1).padStart(2, "0");
             const yyyy = f.getFullYear();
             const hh = String(f.getHours()).padStart(2, "0");
             const min = String(f.getMinutes()).padStart(2, "0");
-
             fechaFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
         }
     }
 
-    // === Cabecera + Fecha ===
     div.innerHTML = `
         <h2>Clasificación</h2>
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // =====================================================
-    //   FLECHAS SEGÚN POSICIÓN – VERSIÓN DEFINITIVA
-    // =====================================================
+    // Calcular flechas sin eliminar filas
     lista.forEach(eq => {
         const actual = Number(eq.posicion_actual || 0);
         const anterior = Number(eq.posicion_anterior || 0);
+        eq.mov = "";
+        eq.movClass = "";
 
-        // ⛔ PRIMERA JORNADA O REINICIO — NO MOSTRAR NADA
-        if (eq.pj === 0 || anterior === 0) {
-            eq.mov = "";
-            eq.movClass = "";
-            return;
-        }
-
-        // === IGUAL POSICIÓN ===
-        if (actual === anterior) {
-            eq.mov = "=";
-            eq.movClass = "igual";
-        }
-        // === SUBE ===
-        else if (actual < anterior) {
-            eq.mov = "▲";
-            eq.movClass = "sube";
-        }
-        // === BAJA ===
-        else {
-            eq.mov = "▼";
-            eq.movClass = "baja";
+        if (anterior > 0 && eq.pj > 0) {
+            if (actual < anterior) {
+                eq.mov = "▲";
+                eq.movClass = "sube";
+            } else if (actual > anterior) {
+                eq.mov = "▼";
+                eq.movClass = "baja";
+            } else {
+                eq.mov = "=";
+                eq.movClass = "igual";
+            }
         }
     });
 
-    // =====================================================
-    //   TABLA — ESTRUCTURA
-    // =====================================================
+    // Generar HTML de la tabla
     let html = `
         <div class="tabla-container">
             <table>
@@ -118,9 +102,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <tbody>
     `;
 
-    // === Filas ===
     lista.forEach((eq, index) => {
-
         html += `
             <tr>
                 <td class="mov ${eq.movClass}">${eq.mov}</td>
@@ -133,7 +115,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <td>${eq.descanso}</td>
                 <td>${eq.sets_ganados}</td>
                 <td>${eq.sets_perdidos}</td>
-                <td>${eq.sets_diff}</td>
+                <td>${eq.sets_diff}</strong></td>
                 <td>${eq.puntos_ganados}</td>
                 <td>${eq.puntos_perdidos}</td>
                 <td>${eq.puntos_diff}</td>
@@ -147,7 +129,6 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         </div>
     `;
 
-    // Leyenda pequeña
     html += `
         <div class="leyenda">
             <em>
