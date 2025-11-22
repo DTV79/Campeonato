@@ -1,14 +1,14 @@
 // =====================================================
 //   URL donde se encuentra el JSON generado por Excel
 // =====================================================
-// const DATA_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json?v=" + Date.now();
+const DATA_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
 
 // =====================================================
 //   Cargar datos desde el JSON
 // =====================================================
 async function cargarDatos() {
     try {
-        const res = await fetch(DATA_URL + "?v=" + Date.now()); // evitar caché
+        const res = await fetch(DATA_URL + "?v=" + Date.now());
         const data = await res.json();
 
         mostrarClasificacion(data.clasificacion, data.ultima_actualizacion);
@@ -60,24 +60,40 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // === Flechas según posición actual vs anterior ===
+    // =====================================================
+    //   FLECHAS SEGÚN POSICIÓN – VERSIÓN DEFINITIVA
+    // =====================================================
     lista.forEach(eq => {
         const actual = Number(eq.posicion_actual || 0);
         const anterior = Number(eq.posicion_anterior || 0);
 
-        if (!anterior || anterior === actual) {
+        // ⛔ PRIMERA JORNADA O REINICIO — NO MOSTRAR NADA
+        if (eq.pj === 0 || anterior === 0) {
+            eq.mov = "";
+            eq.movClass = "";
+            return;
+        }
+
+        // === IGUAL POSICIÓN ===
+        if (actual === anterior) {
             eq.mov = "=";
             eq.movClass = "igual";
-        } else if (actual < anterior) {
+        }
+        // === SUBE ===
+        else if (actual < anterior) {
             eq.mov = "▲";
             eq.movClass = "sube";
-        } else {
+        }
+        // === BAJA ===
+        else {
             eq.mov = "▼";
             eq.movClass = "baja";
         }
     });
 
-    // === INICIO TABLA ===
+    // =====================================================
+    //   TABLA — ESTRUCTURA
+    // =====================================================
     let html = `
         <div class="tabla-container">
             <table>
@@ -102,8 +118,9 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <tbody>
     `;
 
-    // === Filas de clasificación ===
+    // === Filas ===
     lista.forEach((eq, index) => {
+
         html += `
             <tr>
                 <td class="mov ${eq.movClass}">${eq.mov}</td>
@@ -124,14 +141,13 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         `;
     });
 
-    // === Final tabla ===
     html += `
                 </tbody>
             </table>
         </div>
     `;
 
-    // === Leyenda pequeña y en cursiva ===
+    // Leyenda pequeña
     html += `
         <div class="leyenda">
             <em>
@@ -149,14 +165,17 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 }
 
 // =====================================================
-//   PARTIDOS — (más adelante lo completaremos)
+//   PARTIDOS — (estructura básica)
 // =====================================================
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
     div.innerHTML = "<h2>Partidos</h2>";
+
+    // SE PUEDE AMPLIAR MÁS ADELANTE
 }
 
 // =====================================================
 //   Ejecutar carga inicial
 // =====================================================
 cargarDatos();
+
