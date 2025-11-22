@@ -1,7 +1,7 @@
 // =====================================================
 //   URL donde se encuentra el JSON generado por Excel
 // =====================================================
-const DATA_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
+const DATA_URL = "./estado_torneo.json";
 
 // =====================================================
 //   Cargar datos desde el JSON
