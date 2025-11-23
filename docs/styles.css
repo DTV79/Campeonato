@@ -1,3 +1,7 @@
+/* =========================
+   ESTILOS GENERALES
+   ========================= */
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -36,7 +40,41 @@ main {
     padding: 10px;
 }
 
-/* === CLASIFICACIÓN === */
+footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    color: #555;
+}
+
+/* =========================
+   CABECERA CON ESCUDO
+   ========================= */
+
+.titulo-con-escudo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.escudo {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+header img.escudo {
+    width: 22px !important;
+    height: 22px !important;
+    margin-top: -2px;
+}
+
+/* =========================
+   CLASIFICACIÓN (DEJAR TAL CUAL)
+   ========================= */
 
 .tabla-container {
     overflow-x: auto;
@@ -82,13 +120,6 @@ tr:nth-child(odd) {
     background: #ffffff;
 }
 
-footer {
-    text-align: center;
-    padding: 10px;
-    font-size: 12px;
-    color: #555;
-}
-
 .leyenda {
     margin-top: 10px;
     font-size: 9px;
@@ -104,26 +135,6 @@ footer {
     margin-top: -10px;
     margin-bottom: 10px;
     color: #555;
-}
-
-.titulo-con-escudo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;               /* separa escudos del título */
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.escudo {
-    width: 22px;            /* tamaño pequeño */
-    height: 22px;
-    object-fit: contain;
-}
-header img.escudo {
-    width: 22px !important;
-    height: 22px !important;
-    margin-top: -2px;     /* opcional: alinea con el texto */
 }
 
 .mov {
@@ -144,103 +155,21 @@ header img.escudo {
     color: #555555; /* gris neutro */
 }
 
-
-/* ====== Partidos ====== */
+/* =========================
+   PARTIDOS
+   ========================= */
 
 #partidos {
     padding-bottom: 2rem;
 }
 
-.titulo-jornada {
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-    text-align: left;
-}
-
-.contenedor-jornada {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.partido-card {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 0.5rem 0.8rem;
-    background-color: #fdfdfd;
-}
-
-.partido-descanso {
-    background-color: #f5f5f5;
-    font-style: italic;
-}
-
-.partido-encabezado {
-    font-weight: bold;
-    margin-bottom: 0.4rem;
-    text-align: center;
-}
-
-.tabla-partido {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0.3rem;
-    table-layout: fixed;
-}
-
-.tabla-partido th,
-.tabla-partido td {
-    border: 1px solid #ccc;
-    padding: 3px 4px;
-    text-align: center;
-    font-size: 0.85rem;
-}
-
-.tabla-partido th:first-child,
-.tabla-partido td:first-child {
-    width: 40%;
-}
-
-.tabla-partido td.equipo {
-    text-align: left;
-    font-weight: bold;
-}
-
-/* Ganador en verde + negrita */
-.tabla-partido td.equipo.ganador {
-    color: #008000;
-    font-weight: 700;
-}
-
-.partido-estado {
-    font-size: 0.8rem;
-    text-align: right;
-    color: #555;
-}
-
-.partido-estado-jugado {
-    color: #006400;
-}
-
-.partido-estado-pendiente {
-    color: #b36b00;
-}
-
-.ganador {
-    font-weight: bold;
-    color: #00a000;
-}
-
-.perdedor {
-    opacity: 0.7;
-}
-
+/* --- Pestañas de jornadas --- */
 
 .tabs {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -249,6 +178,7 @@ header img.escudo {
     background: #ddd;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .tab-btn.activa {
@@ -257,80 +187,13 @@ header img.escudo {
     font-weight: bold;
 }
 
-.partido {
-    border-bottom: 1px solid #ccc;
-    padding: 10px 0;
+/* --- Contenido de cada jornada --- */
+
+.jornada-contenido {
+    margin-top: 5px;
 }
 
-.fila-header {
-    font-size: 13px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #666;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 4px;
-}
-
-.fila {
-    display: flex;
-    justify-content: space-between;
-    font-size: 16px;
-    padding: 3px 0;
-}
-
-.ganador {
-    font-weight: bold;
-    color: #00a000;
-}
-
-.perdedor {
-    opacity: 0.6;
-}
-.fila-header-sets, .fila-sets {
-    display: grid;
-    grid-template-columns: 1.5fr repeat(5, 1fr);
-    gap: 6px;
-    padding: 4px 0;
-    font-size: 15px;
-    align-items: center;
-}
-
-.fila-header-sets {
-    font-weight: bold;
-    color: #555;
-    margin-top: 10px;
-    text-transform: uppercase;
-    font-size: 13px;
-}
-
-.col-equipos {
-    font-weight: normal;
-}
-
-.colset {
-    text-align: center;
-    font-weight: bold;
-}
-
-.ganador {
-    color: #00a000;
-    font-weight: bold;
-}
-
-.perdedor {
-    opacity: 0.6;
-}
-
-.estado-partido {
-    margin-top: 4px;
-    font-size: 13px;
-    color: #c08000;
-}
-
-.pendiente {
-    font-style: italic;
-}
+/* --- Cada partido --- */
 
 .partido {
     padding: 8px 0 14px 0;
@@ -338,19 +201,25 @@ header img.escudo {
     margin-bottom: 10px;
 }
 
+/* Cabecera: EQUIPOS / SET1 / SET2 ... */
+
+.fila-head {
+    display: grid;
+    grid-template-columns: 3fr repeat(5, 1fr);
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: #555;
+}
+
+/* Fila de datos (cada equipo) */
+
 .fila {
     display: grid;
     grid-template-columns: 3fr repeat(5, 1fr);
     font-size: 15px;
     padding: 2px 0;
-}
-
-.fila-head {
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-    color: #555;
-    font-size: 13px;
 }
 
 .equipo-col {
@@ -362,6 +231,8 @@ header img.escudo {
     font-weight: bold;
 }
 
+/* Ganador / perdedor */
+
 .ganador {
     font-weight: bold;
     color: #00a000;
@@ -371,6 +242,8 @@ header img.escudo {
     opacity: 0.6;
 }
 
+/* Texto de pendiente */
+
 .pendiente-line {
     margin-top: 4px;
     font-size: 13px;
@@ -378,3 +251,22 @@ header img.escudo {
     font-style: italic;
     padding-left: 4px;
 }
+
+/* Línea de descanso */
+
+.descanso-line {
+    margin-top: 6px;
+    font-size: 14px;
+    padding-left: 4px;
+}
+
+.descanso-label {
+    color: #c00000;   /* rojo SOLO para la palabra DESCANSA */
+    font-weight: bold;
+}
+
+.descanso-equipo {
+    font-weight: bold;
+    margin-left: 4px;
+}
+
