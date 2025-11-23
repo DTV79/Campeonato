@@ -258,7 +258,7 @@ function generarHTMLJornada(partidos) {
         let localSets = 0;
         let visitSets = 0;
 
-        // Contar sets ganados si el partido está jugado
+        // Contar sets ganados
         sets.forEach(s => {
             let [a, b] = s.split("-").map(Number);
             if (a > b) localSets++;
@@ -267,7 +267,6 @@ function generarHTMLJornada(partidos) {
 
         let claseLocal = "";
         let claseVisit = "";
-        let iconoEstado = "";
 
         if (p.estado === "jugado") {
             if (localSets > visitSets) {
@@ -277,49 +276,57 @@ function generarHTMLJornada(partidos) {
                 claseVisit = "ganador";
                 claseLocal = "perdedor";
             }
-        } else {
-            iconoEstado = `<span class="pendiente">⏳ Pendiente</span>`;
         }
 
-        // Crear columnas de sets
-        let htmlSetsLocal = "";
-        let htmlSetsVisit = "";
-
-        for (let i = 0; i < 5; i++) {
-            if (sets[i]) {
-                let [a, b] = sets[i].split("-");
-                htmlSetsLocal += `<span class="colset">${a}</span>`;
-                htmlSetsVisit += `<span class="colset">${b}</span>`;
-            } else {
-                htmlSetsLocal += `<span class="colset">-</span>`;
-                htmlSetsVisit += `<span class="colset">-</span>`;
+        // Crear sets separados por columnas
+        const getColumns = (index) => {
+            if (sets[index]) {
+                return sets[index].split("-").map(Number);
             }
-        }
+            return ["", ""];
+        };
+
+        let col1 = getColumns(0);
+        let col2 = getColumns(1);
+        let col3 = getColumns(2);
+        let col4 = getColumns(3);
+        let col5 = getColumns(4);
 
         // ---- BLOQUE DEL PARTIDO ----
         html += `
         <div class="partido">
 
-            <div class="fila-header-sets">
-                <span class="col-equipos">EQUIPOS</span>
-                <span class="colset">SET1</span>
-                <span class="colset">SET2</span>
-                <span class="colset">SET3</span>
-                <span class="colset">SET4</span>
-                <span class="colset">SET5</span>
+            <!-- CABECERA -->
+            <div class="fila fila-head">
+                <span class="equipo-col">EQUIPOS</span>
+                <span class="set-col">SET1</span>
+                <span class="set-col">SET2</span>
+                <span class="set-col">SET3</span>
+                <span class="set-col">SET4</span>
+                <span class="set-col">SET5</span>
             </div>
 
-            <div class="fila-sets">
-                <span class="col-equipos ${claseLocal}">${p.local}</span>
-                ${htmlSetsLocal}
+            <!-- EQUIPO LOCAL -->
+            <div class="fila">
+                <span class="equipo-col ${claseLocal}">${p.local}</span>
+                <span class="set-col">${col1[0]}</span>
+                <span class="set-col">${col2[0]}</span>
+                <span class="set-col">${col3[0]}</span>
+                <span class="set-col">${col4[0]}</span>
+                <span class="set-col">${col5[0]}</span>
             </div>
 
-            <div class="fila-sets">
-                <span class="col-equipos ${claseVisit}">${p.visitante}</span>
-                ${htmlSetsVisit}
+            <!-- EQUIPO VISITANTE -->
+            <div class="fila">
+                <span class="equipo-col ${claseVisit}">${p.visitante}</span>
+                <span class="set-col">${col1[1]}</span>
+                <span class="set-col">${col2[1]}</span>
+                <span class="set-col">${col3[1]}</span>
+                <span class="set-col">${col4[1]}</span>
+                <span class="set-col">${col5[1]}</span>
             </div>
 
-            <div class="estado-partido">${iconoEstado}</div>
+            ${p.estado === "pendiente" ? `<div class="pendiente-line">⏳ Pendiente</div>` : ""}
 
         </div>
         `;
@@ -327,6 +334,7 @@ function generarHTMLJornada(partidos) {
 
     return html;
 }
+
 
 
 // =====================================================
