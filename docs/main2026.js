@@ -255,12 +255,10 @@ function generarHTMLJornada(partidos) {
     partidos.forEach(p => {
 
         let sets = p.resultado;
-        let ganador = "";
-
-        // Calcular ganador (primer equipo que gane más sets)
         let localSets = 0;
         let visitSets = 0;
 
+        // Contar sets ganados si el partido está jugado
         sets.forEach(s => {
             let [a, b] = s.split("-").map(Number);
             if (a > b) localSets++;
@@ -269,34 +267,60 @@ function generarHTMLJornada(partidos) {
 
         let claseLocal = "";
         let claseVisit = "";
+        let iconoEstado = "";
 
         if (p.estado === "jugado") {
             if (localSets > visitSets) {
                 claseLocal = "ganador";
                 claseVisit = "perdedor";
-            } else if (visitSets > localSets) {
+            } else {
                 claseVisit = "ganador";
                 claseLocal = "perdedor";
             }
+        } else {
+            iconoEstado = `<span class="pendiente">⏳ Pendiente</span>`;
         }
 
-        // Construcción del bloque del partido
+        // Crear columnas de sets
+        let htmlSetsLocal = "";
+        let htmlSetsVisit = "";
+
+        for (let i = 0; i < 5; i++) {
+            if (sets[i]) {
+                let [a, b] = sets[i].split("-");
+                htmlSetsLocal += `<span class="colset">${a}</span>`;
+                htmlSetsVisit += `<span class="colset">${b}</span>`;
+            } else {
+                htmlSetsLocal += `<span class="colset">-</span>`;
+                htmlSetsVisit += `<span class="colset">-</span>`;
+            }
+        }
+
+        // ---- BLOQUE DEL PARTIDO ----
         html += `
         <div class="partido">
-            <div class="fila-header">
-                <span>EQUIPOS</span>
-                <span>Sets</span>
+
+            <div class="fila-header-sets">
+                <span class="col-equipos">EQUIPOS</span>
+                <span class="colset">SET1</span>
+                <span class="colset">SET2</span>
+                <span class="colset">SET3</span>
+                <span class="colset">SET4</span>
+                <span class="colset">SET5</span>
             </div>
 
-            <div class="fila">
-                <span class="${claseLocal}">${p.local}</span>
-                <span>${sets.join(" | ")}</span>
+            <div class="fila-sets">
+                <span class="col-equipos ${claseLocal}">${p.local}</span>
+                ${htmlSetsLocal}
             </div>
 
-            <div class="fila">
-                <span class="${claseVisit}">${p.visitante}</span>
-                <span></span>
+            <div class="fila-sets">
+                <span class="col-equipos ${claseVisit}">${p.visitante}</span>
+                ${htmlSetsVisit}
             </div>
+
+            <div class="estado-partido">${iconoEstado}</div>
+
         </div>
         `;
     });
