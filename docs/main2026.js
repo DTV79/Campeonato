@@ -220,17 +220,16 @@ function generarHTMLJornada(partidos) {
 
         // Si es descanso
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
-            html += `
-                <div class="partido">
-                    <div class="descansa-line">
-                        <span class="rojo">DESCANSA:</span> ${p.local}
-                    </div>
-                </div>
-                <div class="separador-fino"></div>
-                <div class="separador-fino"></div>
-            `;
-            return;
-        }
+    html += `
+        <div class="partido">
+            <div class="descanso-line">
+                <span class="descanso-label">DESCANSA:</span>
+                <span class="descanso-equipo">${p.local}</span>
+            </div>
+        </div>
+    `;
+    return;
+}
 
         // Procesar sets
         const sets = p.resultado;
