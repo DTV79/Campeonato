@@ -223,7 +223,7 @@ function generarHTMLJornada(partidos) {
     html += `
         <div class="partido">
             <div class="descanso-line">
-                <span class="descanso-label">DESCANSA:</span>
+                <span class="descanso-label">DESCANSAN:</span>
                 <span class="descanso-equipo">${p.local}</span>
             </div>
         </div>
