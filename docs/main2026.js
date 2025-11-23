@@ -22,13 +22,13 @@ async function cargarDatos() {
 }
 
 // =====================================================
-//   Cambiar de pestaña
+//   Cambiar de pestaña (Clasificación / Partidos)
 // =====================================================
 function mostrar(pagina) {
-    document.querySelectorAll('.pagina')
-        .forEach(p => p.style.display = 'none');
+    document.querySelectorAll(".pagina")
+        .forEach(p => p.style.display = "none");
 
-    document.getElementById(pagina).style.display = 'block';
+    document.getElementById(pagina).style.display = "block";
 }
 
 // =====================================================
@@ -63,23 +63,22 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         eq.mov = "";
         eq.movClass = "";
 
-    if (anterior > 0 && eq.pj > 0) {
-    if (actual < anterior) {
-        eq.mov = "▲";
-        eq.movClass = "sube";
-    } else if (actual > anterior) {
-        eq.mov = "▼";
-        eq.movClass = "baja";
-    } else {
-        // Mismo puesto pero NO es jornada 1
-        eq.mov = "=";
-        eq.movClass = "igual";
-    }
-    } else {
-    // Jornada 1 → NO mostrar nada
-    eq.mov = "";
-    eq.movClass = "";
-    }
+        if (anterior > 0 && eq.pj > 0) {
+            if (actual < anterior) {
+                eq.mov = "▲";
+                eq.movClass = "sube";
+            } else if (actual > anterior) {
+                eq.mov = "▼";
+                eq.movClass = "baja";
+            } else {
+                eq.mov = "=";
+                eq.movClass = "igual";
+            }
+        } else {
+            // Jornada 1 → sin flecha
+            eq.mov = "";
+            eq.movClass = "";
+        }
     });
 
     // Generar HTML de la tabla
@@ -124,7 +123,6 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <td>${eq.puntos_ganados}</td>
                 <td>${eq.puntos_perdidos}</td>
                 <td>${eq.puntos_diff}</td>
-
             </tr>
         `;
     });
@@ -152,146 +150,132 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 }
 
 // =====================================================
-//   PARTIDOS — (Mostrarlos)
+//   PARTIDOS — pestañas por jornada + tabla de sets
 // =====================================================
-
-// Devuelve arrays de juegos por set para local y visitante
-function desglosarResultado(resultadoArr) {
-    const maxSets = 5;
-    const localSets = new Array(maxSets).fill("");
-    const visitSets = new Array(maxSets).fill("");
-
-    if (!Array.isArray(resultadoArr)) return { localSets, visitSets };
-
-    resultadoArr.forEach((s, idx) => {
-        if (idx >= maxSets) return;
-        const partes = String(s).split("-");
-        if (partes.length === 2) {
-            localSets[idx] = partes[0].trim();
-            visitSets[idx] = partes[1].trim();
-        }
-    });
-
-    return { localSets, visitSets };
-}
-
-// Calcula el ganador a partir de los sets
-function calcularGanador(partido, localSets, visitSets) {
-    let setsLocal = 0;
-    let setsVisit = 0;
-
-    for (let i = 0; i < localSets.length; i++) {
-        const a = Number(localSets[i]);
-        const b = Number(visitSets[i]);
-        if (Number.isNaN(a) || Number.isNaN(b)) continue;
-        if (a > b) setsLocal++;
-        else if (b > a) setsVisit++;
-    }
-
-    if (setsLocal === 0 && setsVisit === 0) return null;
-    if (setsLocal > setsVisit) return partido.local || null;
-    if (setsVisit > setsLocal) return partido.visitante || null;
-    return null; // empate raro o datos incompletos
-}
-
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
 
     // 1) Agrupar por jornada
     const jornadas = {};
     lista.forEach(p => {
-        if (!jornadas[p.jornada]) jornadas[p.jornada] = [];
-        jornadas[p.jornada].push(p);
+        const j = Number(p.jornada || 0);
+        if (!jornadas[j]) jornadas[j] = [];
+        jornadas[j].push(p);
     });
+
+    const jornadasOrdenadas = Object.keys(jornadas)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    if (jornadasOrdenadas.length === 0) {
+        div.innerHTML = "<p>No hay partidos.</p>";
+        return;
+    }
 
     // 2) Crear pestañas
     let tabs = `<div class="tabs">`;
-    let first = true;
-
-    Object.keys(jornadas).forEach(j => {
+    jornadasOrdenadas.forEach((j, idx) => {
         tabs += `
-            <button class="tab-btn ${first ? "activa" : ""}" onclick="cambiarJornada(${j})">
+            <button class="tab-btn ${idx === 0 ? "activa" : ""}"
+                    onclick="cambiarJornada(${j}, event)">
                 Jornada ${j}
             </button>`;
-        first = false;
     });
-
     tabs += `</div>`;
 
     // 3) Crear contenedores de cada jornada
     let contenido = "";
-
-    Object.keys(jornadas).forEach((j, index) => {
+    jornadasOrdenadas.forEach((j, idx) => {
         contenido += `
-        <div id="jornada_${j}" class="jornada-contenido" style="display:${index === 0 ? "block" : "none"};">
-            ${generarHTMLJornada(jornadas[j])}
-        </div>`;
+            <div id="jornada_${j}" class="jornada-contenido"
+                 style="display:${idx === 0 ? "block" : "none"};">
+                ${generarHTMLJornada(jornadas[j])}
+            </div>`;
     });
 
     div.innerHTML = tabs + contenido;
 }
 
-// =============================================================
-//   Cambiar entre jornadas
-// =============================================================
-function cambiarJornada(num) {
+// Cambiar entre jornadas
+function cambiarJornada(num, ev) {
     document.querySelectorAll(".jornada-contenido")
         .forEach(x => x.style.display = "none");
 
-    document.getElementById("jornada_" + num).style.display = "block";
+    const cont = document.getElementById("jornada_" + num);
+    if (cont) cont.style.display = "block";
 
     document.querySelectorAll(".tab-btn")
         .forEach(btn => btn.classList.remove("activa"));
 
-    event.target.classList.add("activa");
+    if (ev && ev.target) {
+        ev.target.classList.add("activa");
+    }
 }
 
-// =============================================================
-//   Generar HTML de una jornada completa
-// =============================================================
+// Generar HTML de todos los partidos de una jornada
 function generarHTMLJornada(partidos) {
     let html = "";
+    let equipoDescanso = null;
 
     partidos.forEach(p => {
-
-        // === Desglosar sets ===
-        const sets = p.resultado || [];
-        const maxSets = 5;
-
-        function getSet(n) {
-            if (!sets[n]) return ["", ""];
-            const s = sets[n].split("-");
-            return [s[0] || "", s[1] || ""];
+        // Detectar descanso
+        if (p.estado === "descanso" || String(p.descanso).toLowerCase() === "sí") {
+            // El equipo que descansa viene en local (o visitante si algún día cambias)
+            equipoDescanso = p.local || p.visitante || null;
+            return; // no pintamos como partido normal
         }
 
-        let col = [];
-        for (let i = 0; i < maxSets; i++) col.push(getSet(i));
+        const sets = Array.isArray(p.resultado) ? p.resultado : [];
 
-        // === Calcular ganador ===
-        let localSets = 0, visitSets = 0;
+        // Contar sets ganados
+        let localSetsGanados = 0;
+        let visitSetsGanados = 0;
+
         sets.forEach(s => {
-            let [a, b] = s.split("-").map(Number);
-            if (a > b) localSets++;
-            if (b > a) visitSets++;
+            const [aStr, bStr] = String(s).split("-");
+            const a = Number(aStr);
+            const b = Number(bStr);
+            if (!Number.isNaN(a) && !Number.isNaN(b)) {
+                if (a > b) localSetsGanados++;
+                else if (b > a) visitSetsGanados++;
+            }
         });
 
         let claseLocal = "";
         let claseVisit = "";
 
         if (p.estado === "jugado") {
-            if (localSets > visitSets) {
+            if (localSetsGanados > visitSetsGanados) {
                 claseLocal = "ganador";
                 claseVisit = "perdedor";
-            } else {
+            } else if (visitSetsGanados > localSetsGanados) {
                 claseVisit = "ganador";
                 claseLocal = "perdedor";
             }
         }
 
+        // Crear columnas de sets (hasta 5)
+        const getColumns = (index) => {
+            if (sets[index]) {
+                const [aStr, bStr] = String(sets[index]).split("-");
+                const a = aStr !== undefined ? aStr.trim() : "";
+                const b = bStr !== undefined ? bStr.trim() : "";
+                return [a, b];
+            }
+            return ["", ""];
+        };
+
+        const col1 = getColumns(0);
+        const col2 = getColumns(1);
+        const col3 = getColumns(2);
+        const col4 = getColumns(3);
+        const col5 = getColumns(4);
+
+        // ---- BLOQUE DEL PARTIDO ----
         html += `
         <div class="partido">
 
-            <!-- CABECERA DE TABLA -->
+            <!-- CABECERA -->
             <div class="fila fila-head">
                 <span class="equipo-col">EQUIPOS</span>
                 <span class="set-col">SET1</span>
@@ -301,40 +285,50 @@ function generarHTMLJornada(partidos) {
                 <span class="set-col">SET5</span>
             </div>
 
-            <!-- FILA LOCAL -->
+            <!-- EQUIPO LOCAL -->
             <div class="fila">
                 <span class="equipo-col ${claseLocal}">${p.local}</span>
-                <span class="set-col">${col[0][0]}</span>
-                <span class="set-col">${col[1][0]}</span>
-                <span class="set-col">${col[2][0]}</span>
-                <span class="set-col">${col[3][0]}</span>
-                <span class="set-col">${col[4][0]}</span>
+                <span class="set-col">${col1[0]}</span>
+                <span class="set-col">${col2[0]}</span>
+                <span class="set-col">${col3[0]}</span>
+                <span class="set-col">${col4[0]}</span>
+                <span class="set-col">${col5[0]}</span>
             </div>
 
-            <!-- FILA VISITANTE -->
+            <!-- EQUIPO VISITANTE -->
             <div class="fila">
                 <span class="equipo-col ${claseVisit}">${p.visitante}</span>
-                <span class="set-col">${col[0][1]}</span>
-                <span class="set-col">${col[1][1]}</span>
-                <span class="set-col">${col[2][1]}</span>
-                <span class="set-col">${col[3][1]}</span>
-                <span class="set-col">${col[4][1]}</span>
+                <span class="set-col">${col1[1]}</span>
+                <span class="set-col">${col2[1]}</span>
+                <span class="set-col">${col3[1]}</span>
+                <span class="set-col">${col4[1]}</span>
+                <span class="set-col">${col5[1]}</span>
             </div>
 
-            ${p.estado === "pendiente" ? `<div class="pendiente-line">⏳ Pendiente</div>` : ""}
+            ${p.estado === "pendiente"
+                ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                : ""}
 
         </div>
         `;
     });
 
+    // Línea de descanso al final de la jornada
+    if (equipoDescanso) {
+        html += `
+        <div class="descanso-line">
+            <span class="descanso-label">DESCANSA:</span>
+            <span class="descanso-equipo">${equipoDescanso}</span>
+        </div>
+        `;
+    }
+
     return html;
 }
-
-
-
 
 // =====================================================
 //   Ejecutar carga inicial
 // =====================================================
 cargarDatos();
+
 
