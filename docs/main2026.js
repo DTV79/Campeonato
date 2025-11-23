@@ -215,63 +215,50 @@ function cambiarJornada(num, ev) {
 // Generar HTML de todos los partidos de una jornada
 function generarHTMLJornada(partidos) {
     let html = "";
-    let equipoDescanso = null;
 
     partidos.forEach(p => {
-        // Detectar descanso
-        if (p.estado === "descanso" || String(p.descanso).toLowerCase() === "sí") {
-            // El equipo que descansa viene en local (o visitante si algún día cambias)
-            equipoDescanso = p.local || p.visitante || null;
-            return; // no pintamos como partido normal
+
+        // Si es descanso
+        if (p.estado === "descanso" || p.visitante === "DESCANSO") {
+            html += `
+                <div class="partido">
+                    <div class="descansa-line">
+                        <span class="rojo">DESCANSA:</span> ${p.local}
+                    </div>
+                </div>
+                <div class="separador-fino"></div>
+                <div class="separador-fino"></div>
+            `;
+            return;
         }
 
-        const sets = Array.isArray(p.resultado) ? p.resultado : [];
+        // Procesar sets
+        const sets = p.resultado;
+        const getSet = (i, pos) => {
+            if (!sets[i]) return "";
+            const partes = sets[i].split("-");
+            return partes[pos] || "";
+        };
 
-        // Contar sets ganados
-        let localSetsGanados = 0;
-        let visitSetsGanados = 0;
-
+        // Calcular ganador
+        let localGanados = 0;
+        let visitGanados = 0;
         sets.forEach(s => {
-            const [aStr, bStr] = String(s).split("-");
-            const a = Number(aStr);
-            const b = Number(bStr);
-            if (!Number.isNaN(a) && !Number.isNaN(b)) {
-                if (a > b) localSetsGanados++;
-                else if (b > a) visitSetsGanados++;
-            }
+            if (!s) return;
+            const [a, b] = s.split("-").map(Number);
+            if (a > b) localGanados++;
+            if (b > a) visitGanados++;
         });
 
         let claseLocal = "";
         let claseVisit = "";
-
         if (p.estado === "jugado") {
-            if (localSetsGanados > visitSetsGanados) {
-                claseLocal = "ganador";
-                claseVisit = "perdedor";
-            } else if (visitSetsGanados > localSetsGanados) {
-                claseVisit = "ganador";
-                claseLocal = "perdedor";
-            }
+            if (localGanados > visitGanados) claseLocal = "ganador";
+            else claseVisit = "ganador";
+        } else {
+            claseLocal = claseVisit = "";
         }
 
-        // Crear columnas de sets (hasta 5)
-        const getColumns = (index) => {
-            if (sets[index]) {
-                const [aStr, bStr] = String(sets[index]).split("-");
-                const a = aStr !== undefined ? aStr.trim() : "";
-                const b = bStr !== undefined ? bStr.trim() : "";
-                return [a, b];
-            }
-            return ["", ""];
-        };
-
-        const col1 = getColumns(0);
-        const col2 = getColumns(1);
-        const col3 = getColumns(2);
-        const col4 = getColumns(3);
-        const col5 = getColumns(4);
-
-        // ---- BLOQUE DEL PARTIDO ----
         html += `
         <div class="partido">
 
@@ -285,46 +272,39 @@ function generarHTMLJornada(partidos) {
                 <span class="set-col">V</span>
             </div>
 
+            <div class="separador-grueso"></div>
+
             <!-- EQUIPO LOCAL -->
             <div class="fila">
                 <span class="equipo-col ${claseLocal}">${p.local}</span>
-                <span class="set-col">${col1[0]}</span>
-                <span class="set-col">${col2[0]}</span>
-                <span class="set-col">${col3[0]}</span>
-                <span class="set-col">${col4[0]}</span>
-                <span class="set-col">${col5[0]}</span>
+                <span class="set-col">${getSet(0,0)}</span>
+                <span class="set-col">${getSet(1,0)}</span>
+                <span class="set-col">${getSet(2,0)}</span>
+                <span class="set-col">${getSet(3,0)}</span>
+                <span class="set-col">${getSet(4,0)}</span>
             </div>
 
             <!-- EQUIPO VISITANTE -->
             <div class="fila">
                 <span class="equipo-col ${claseVisit}">${p.visitante}</span>
-                <span class="set-col">${col1[1]}</span>
-                <span class="set-col">${col2[1]}</span>
-                <span class="set-col">${col3[1]}</span>
-                <span class="set-col">${col4[1]}</span>
-                <span class="set-col">${col5[1]}</span>
+                <span class="set-col">${getSet(0,1)}</span>
+                <span class="set-col">${getSet(1,1)}</span>
+                <span class="set-col">${getSet(2,1)}</span>
+                <span class="set-col">${getSet(3,1)}</span>
+                <span class="set-col">${getSet(4,1)}</span>
             </div>
 
-            ${p.estado === "pendiente"
-                ? `<div class="pendiente-line">⏳ Pendiente</div>`
-                : ""}
+            ${p.estado === "pendiente" ? `<div class="pendiente-line">⏳ Pendiente</div>` : ""}
 
+            <div class="separador-fino"></div>
+            <div class="separador-fino"></div>
         </div>
         `;
     });
 
-    // Línea de descanso al final de la jornada
-    if (equipoDescanso) {
-        html += `
-        <div class="descanso-line">
-            <span class="descanso-label">DESCANSA:</span>
-            <span class="descanso-equipo">${equipoDescanso}</span>
-        </div>
-        `;
-    }
-
     return html;
 }
+
 
 // =====================================================
 //   Ejecutar carga inicial
