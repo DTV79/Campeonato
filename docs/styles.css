@@ -196,10 +196,16 @@ tr:nth-child(odd) {
 /* --- Cada partido --- */
 
 .partido {
-    padding: 8px 0 14px 0;
+    padding: 12px 0 20px 0;
+
+    /* Primera línea fina */
     border-bottom: 1px solid #ccc;
-    margin-bottom: 10px;
+
+    /* Segunda línea fina debajo */
+    box-shadow: 0 2px 0 #ccc;
+    margin-bottom: 14px;
 }
+
 
 /* Cabecera: EQUIPOS / SET1 / SET2 ... */
 
@@ -209,9 +215,12 @@ tr:nth-child(odd) {
     font-size: 13px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 4px;
     color: #555;
+    padding-bottom: 6px;
+    border-bottom: 3px solid #000; /* ← línea negra gruesa */
+    margin-bottom: 6px;
 }
+
 
 /* Fila de datos (cada equipo) */
 
