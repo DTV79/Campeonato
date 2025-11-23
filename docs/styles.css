@@ -143,3 +143,86 @@ header img.escudo {
 .mov.igual {
     color: #555555; /* gris neutro */
 }
+
+
+/* ====== Partidos ====== */
+
+#partidos {
+    padding-bottom: 2rem;
+}
+
+.titulo-jornada {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    text-align: left;
+}
+
+.contenedor-jornada {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.partido-card {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.5rem 0.8rem;
+    background-color: #fdfdfd;
+}
+
+.partido-descanso {
+    background-color: #f5f5f5;
+    font-style: italic;
+}
+
+.partido-encabezado {
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+    text-align: center;
+}
+
+.tabla-partido {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.3rem;
+    table-layout: fixed;
+}
+
+.tabla-partido th,
+.tabla-partido td {
+    border: 1px solid #ccc;
+    padding: 3px 4px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.tabla-partido th:first-child,
+.tabla-partido td:first-child {
+    width: 40%;
+}
+
+.tabla-partido td.equipo {
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Ganador en verde + negrita */
+.tabla-partido td.equipo.ganador {
+    color: #008000;
+    font-weight: 700;
+}
+
+.partido-estado {
+    font-size: 0.8rem;
+    text-align: right;
+    color: #555;
+}
+
+.partido-estado-jugado {
+    color: #006400;
+}
+
+.partido-estado-pendiente {
+    color: #b36b00;
+}
