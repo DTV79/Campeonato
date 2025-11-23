@@ -197,106 +197,111 @@ function calcularGanador(partido, localSets, visitSets) {
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
 
-    if (!Array.isArray(lista) || lista.length === 0) {
-        div.innerHTML = "<h2>Partidos</h2><p>No hay partidos cargados.</p>";
-        return;
-    }
-
-    // Agrupar por jornada
-    const porJornada = {};
+    // 1) Agrupar por jornada
+    const jornadas = {};
     lista.forEach(p => {
-        const j = Number(p.jornada) || 0;
-        if (!porJornada[j]) porJornada[j] = [];
-        porJornada[j].push(p);
+        if (!jornadas[p.jornada]) jornadas[p.jornada] = [];
+        jornadas[p.jornada].push(p);
     });
 
-    // Ordenar jornadas
-    const jornadas = Object.keys(porJornada)
-        .map(Number)
-        .sort((a, b) => a - b);
+    // 2) Crear pestañas
+    let tabs = `<div class="tabs">`;
+    let first = true;
 
-    let html = "<h2>Partidos</h2>";
+    Object.keys(jornadas).forEach(j => {
+        tabs += `
+            <button class="tab-btn ${first ? "activa" : ""}" onclick="cambiarJornada(${j})">
+                Jornada ${j}
+            </button>`;
+        first = false;
+    });
 
-    jornadas.forEach(j => {
-        const partidosJ = porJornada[j].slice().sort((a, b) => a.id - b.id);
+    tabs += `</div>`;
 
-        html += `<h3 class="titulo-jornada">Jornada ${j}</h3>`;
-        html += `<div class="contenedor-jornada">`;
+    // 3) Crear contenedores de cada jornada
+    let contenido = "";
 
-        partidosJ.forEach(p => {
-            // Caso DESCANSO
-            if ((p.estado || "").toLowerCase() === "descanso") {
-                html += `
-                    <div class="partido-card partido-descanso">
-                        <div class="partido-encabezado">
-                            <strong>${p.local}</strong> DESCANSA
-                        </div>
-                    </div>
-                `;
-                return;
-            }
+    Object.keys(jornadas).forEach((j, index) => {
+        contenido += `
+        <div id="jornada_${j}" class="jornada-contenido" style="display:${index === 0 ? "block" : "none"};">
+            ${generarHTMLJornada(jornadas[j])}
+        </div>`;
+    });
 
-            const { localSets, visitSets } = desglosarResultado(p.resultado);
-            const ganador = calcularGanador(p, localSets, visitSets);
-            const ganadorLocal = ganador && ganador === p.local;
-            const ganadorVisit = ganador && ganador === p.visitante;
+    div.innerHTML = tabs + contenido;
+}
 
-            // Cabecera tipo "JUGADOR A - JUGADOR B"
-            html += `
-                <div class="partido-card">
-                    <div class="partido-encabezado">
-                        ${p.local} - ${p.visitante}
-                    </div>
-                    <table class="tabla-partido">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>I</th>
-                                <th>II</th>
-                                <th>III</th>
-                                <th>IV</th>
-                                <th>V</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="equipo ${ganadorLocal ? "ganador" : ""}">
-                                    ${p.local}
-                                </td>
-                                <td>${localSets[0]}</td>
-                                <td>${localSets[1]}</td>
-                                <td>${localSets[2]}</td>
-                                <td>${localSets[3]}</td>
-                                <td>${localSets[4]}</td>
-                            </tr>
-                            <tr>
-                                <td class="equipo ${ganadorVisit ? "ganador" : ""}">
-                                    ${p.visitante}
-                                </td>
-                                <td>${visitSets[0]}</td>
-                                <td>${visitSets[1]}</td>
-                                <td>${visitSets[2]}</td>
-                                <td>${visitSets[3]}</td>
-                                <td>${visitSets[4]}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="partido-estado partido-estado-${(p.estado || "").toLowerCase()}">
-                        ${ (p.estado || "").toLowerCase() === "jugado"
-                            ? "Partido jugado"
-                            : ( (p.estado || "").toLowerCase() === "pendiente"
-                                ? "Pendiente de jugar"
-                                : p.estado || "" )
-                        }
-                    </div>
-                </div>
-            `;
+// =============================================================
+//   Cambiar entre jornadas
+// =============================================================
+function cambiarJornada(num) {
+    document.querySelectorAll(".jornada-contenido")
+        .forEach(x => x.style.display = "none");
+
+    document.getElementById("jornada_" + num).style.display = "block";
+
+    document.querySelectorAll(".tab-btn")
+        .forEach(btn => btn.classList.remove("activa"));
+
+    event.target.classList.add("activa");
+}
+
+// =============================================================
+//   Generar HTML de una jornada completa
+// =============================================================
+function generarHTMLJornada(partidos) {
+    let html = "";
+
+    partidos.forEach(p => {
+
+        let sets = p.resultado;
+        let ganador = "";
+
+        // Calcular ganador (primer equipo que gane más sets)
+        let localSets = 0;
+        let visitSets = 0;
+
+        sets.forEach(s => {
+            let [a, b] = s.split("-").map(Number);
+            if (a > b) localSets++;
+            if (b > a) visitSets++;
         });
 
-        html += `</div>`; // contenedor-jornada
+        let claseLocal = "";
+        let claseVisit = "";
+
+        if (p.estado === "jugado") {
+            if (localSets > visitSets) {
+                claseLocal = "ganador";
+                claseVisit = "perdedor";
+            } else if (visitSets > localSets) {
+                claseVisit = "ganador";
+                claseLocal = "perdedor";
+            }
+        }
+
+        // Construcción del bloque del partido
+        html += `
+        <div class="partido">
+            <div class="fila-header">
+                <span>EQUIPOS</span>
+                <span>Sets</span>
+            </div>
+
+            <div class="fila">
+                <span class="${claseLocal}">${p.local}</span>
+                <span>${sets.join(" | ")}</span>
+            </div>
+
+            <div class="fila">
+                <span class="${claseVisit}">${p.visitante}</span>
+                <span></span>
+            </div>
+        </div>
+        `;
     });
 
-    div.innerHTML = html;
+    return html;
 }
 
 
