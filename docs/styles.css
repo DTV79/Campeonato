@@ -331,3 +331,50 @@ header img.escudo {
 .pendiente {
     font-style: italic;
 }
+
+.partido {
+    padding: 8px 0 14px 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.fila {
+    display: grid;
+    grid-template-columns: 3fr repeat(5, 1fr);
+    font-size: 15px;
+    padding: 2px 0;
+}
+
+.fila-head {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    color: #555;
+    font-size: 13px;
+}
+
+.equipo-col {
+    padding-left: 4px;
+}
+
+.set-col {
+    text-align: center;
+    font-weight: bold;
+}
+
+.ganador {
+    font-weight: bold;
+    color: #00a000;
+}
+
+.perdedor {
+    opacity: 0.6;
+}
+
+.pendiente-line {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #c08000;
+    font-style: italic;
+    padding-left: 4px;
+}
