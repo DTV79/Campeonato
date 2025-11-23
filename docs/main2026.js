@@ -254,11 +254,21 @@ function generarHTMLJornada(partidos) {
 
     partidos.forEach(p => {
 
-        let sets = p.resultado;
-        let localSets = 0;
-        let visitSets = 0;
+        // === Desglosar sets ===
+        const sets = p.resultado || [];
+        const maxSets = 5;
 
-        // Contar sets ganados
+        function getSet(n) {
+            if (!sets[n]) return ["", ""];
+            const s = sets[n].split("-");
+            return [s[0] || "", s[1] || ""];
+        }
+
+        let col = [];
+        for (let i = 0; i < maxSets; i++) col.push(getSet(i));
+
+        // === Calcular ganador ===
+        let localSets = 0, visitSets = 0;
         sets.forEach(s => {
             let [a, b] = s.split("-").map(Number);
             if (a > b) localSets++;
@@ -278,25 +288,10 @@ function generarHTMLJornada(partidos) {
             }
         }
 
-        // Crear sets separados por columnas
-        const getColumns = (index) => {
-            if (sets[index]) {
-                return sets[index].split("-").map(Number);
-            }
-            return ["", ""];
-        };
-
-        let col1 = getColumns(0);
-        let col2 = getColumns(1);
-        let col3 = getColumns(2);
-        let col4 = getColumns(3);
-        let col5 = getColumns(4);
-
-        // ---- BLOQUE DEL PARTIDO ----
         html += `
         <div class="partido">
 
-            <!-- CABECERA -->
+            <!-- CABECERA DE TABLA -->
             <div class="fila fila-head">
                 <span class="equipo-col">EQUIPOS</span>
                 <span class="set-col">SET1</span>
@@ -306,24 +301,24 @@ function generarHTMLJornada(partidos) {
                 <span class="set-col">SET5</span>
             </div>
 
-            <!-- EQUIPO LOCAL -->
+            <!-- FILA LOCAL -->
             <div class="fila">
                 <span class="equipo-col ${claseLocal}">${p.local}</span>
-                <span class="set-col">${col1[0]}</span>
-                <span class="set-col">${col2[0]}</span>
-                <span class="set-col">${col3[0]}</span>
-                <span class="set-col">${col4[0]}</span>
-                <span class="set-col">${col5[0]}</span>
+                <span class="set-col">${col[0][0]}</span>
+                <span class="set-col">${col[1][0]}</span>
+                <span class="set-col">${col[2][0]}</span>
+                <span class="set-col">${col[3][0]}</span>
+                <span class="set-col">${col[4][0]}</span>
             </div>
 
-            <!-- EQUIPO VISITANTE -->
+            <!-- FILA VISITANTE -->
             <div class="fila">
                 <span class="equipo-col ${claseVisit}">${p.visitante}</span>
-                <span class="set-col">${col1[1]}</span>
-                <span class="set-col">${col2[1]}</span>
-                <span class="set-col">${col3[1]}</span>
-                <span class="set-col">${col4[1]}</span>
-                <span class="set-col">${col5[1]}</span>
+                <span class="set-col">${col[0][1]}</span>
+                <span class="set-col">${col[1][1]}</span>
+                <span class="set-col">${col[2][1]}</span>
+                <span class="set-col">${col[3][1]}</span>
+                <span class="set-col">${col[4][1]}</span>
             </div>
 
             ${p.estado === "pendiente" ? `<div class="pendiente-line">⏳ Pendiente</div>` : ""}
@@ -334,6 +329,7 @@ function generarHTMLJornada(partidos) {
 
     return html;
 }
+
 
 
 
