@@ -278,11 +278,11 @@ function generarHTMLJornada(partidos) {
             <!-- CABECERA -->
             <div class="fila fila-head">
                 <span class="equipo-col">EQUIPOS</span>
-                <span class="set-col">SET1</span>
-                <span class="set-col">SET2</span>
-                <span class="set-col">SET3</span>
-                <span class="set-col">SET4</span>
-                <span class="set-col">SET5</span>
+                <span class="set-col">I</span>
+                <span class="set-col">II</span>
+                <span class="set-col">III</span>
+                <span class="set-col">IV</span>
+                <span class="set-col">V</span>
             </div>
 
             <!-- EQUIPO LOCAL -->
