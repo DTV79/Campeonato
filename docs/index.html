@@ -27,8 +27,11 @@
         <section id="partidos" class="pagina" style="display:none;"></section>
     </main>
 
-   <script src="main2026.js?v=1"></script>
-
+   <script>
+    const script = document.createElement("script");
+    script.src = "main2026.js?v=" + Date.now();
+    document.body.appendChild(script);
+    </script>
 </body>
 </html>
 
