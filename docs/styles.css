@@ -287,3 +287,47 @@ header img.escudo {
 .perdedor {
     opacity: 0.6;
 }
+.fila-header-sets, .fila-sets {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(5, 1fr);
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 15px;
+    align-items: center;
+}
+
+.fila-header-sets {
+    font-weight: bold;
+    color: #555;
+    margin-top: 10px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.col-equipos {
+    font-weight: normal;
+}
+
+.colset {
+    text-align: center;
+    font-weight: bold;
+}
+
+.ganador {
+    color: #00a000;
+    font-weight: bold;
+}
+
+.perdedor {
+    opacity: 0.6;
+}
+
+.estado-partido {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #c08000;
+}
+
+.pendiente {
+    font-style: italic;
+}
