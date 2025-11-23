@@ -152,14 +152,153 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 }
 
 // =====================================================
-//   PARTIDOS — (estructura básica)
+//   PARTIDOS — (Mostrarlos)
 // =====================================================
+
+// Devuelve arrays de juegos por set para local y visitante
+function desglosarResultado(resultadoArr) {
+    const maxSets = 5;
+    const localSets = new Array(maxSets).fill("");
+    const visitSets = new Array(maxSets).fill("");
+
+    if (!Array.isArray(resultadoArr)) return { localSets, visitSets };
+
+    resultadoArr.forEach((s, idx) => {
+        if (idx >= maxSets) return;
+        const partes = String(s).split("-");
+        if (partes.length === 2) {
+            localSets[idx] = partes[0].trim();
+            visitSets[idx] = partes[1].trim();
+        }
+    });
+
+    return { localSets, visitSets };
+}
+
+// Calcula el ganador a partir de los sets
+function calcularGanador(partido, localSets, visitSets) {
+    let setsLocal = 0;
+    let setsVisit = 0;
+
+    for (let i = 0; i < localSets.length; i++) {
+        const a = Number(localSets[i]);
+        const b = Number(visitSets[i]);
+        if (Number.isNaN(a) || Number.isNaN(b)) continue;
+        if (a > b) setsLocal++;
+        else if (b > a) setsVisit++;
+    }
+
+    if (setsLocal === 0 && setsVisit === 0) return null;
+    if (setsLocal > setsVisit) return partido.local || null;
+    if (setsVisit > setsLocal) return partido.visitante || null;
+    return null; // empate raro o datos incompletos
+}
+
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
-    div.innerHTML = "<h2>Partidos</h2>";
 
-    // SE PUEDE AMPLIAR MÁS ADELANTE
+    if (!Array.isArray(lista) || lista.length === 0) {
+        div.innerHTML = "<h2>Partidos</h2><p>No hay partidos cargados.</p>";
+        return;
+    }
+
+    // Agrupar por jornada
+    const porJornada = {};
+    lista.forEach(p => {
+        const j = Number(p.jornada) || 0;
+        if (!porJornada[j]) porJornada[j] = [];
+        porJornada[j].push(p);
+    });
+
+    // Ordenar jornadas
+    const jornadas = Object.keys(porJornada)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    let html = "<h2>Partidos</h2>";
+
+    jornadas.forEach(j => {
+        const partidosJ = porJornada[j].slice().sort((a, b) => a.id - b.id);
+
+        html += `<h3 class="titulo-jornada">Jornada ${j}</h3>`;
+        html += `<div class="contenedor-jornada">`;
+
+        partidosJ.forEach(p => {
+            // Caso DESCANSO
+            if ((p.estado || "").toLowerCase() === "descanso") {
+                html += `
+                    <div class="partido-card partido-descanso">
+                        <div class="partido-encabezado">
+                            <strong>${p.local}</strong> DESCANSA
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const { localSets, visitSets } = desglosarResultado(p.resultado);
+            const ganador = calcularGanador(p, localSets, visitSets);
+            const ganadorLocal = ganador && ganador === p.local;
+            const ganadorVisit = ganador && ganador === p.visitante;
+
+            // Cabecera tipo "JUGADOR A - JUGADOR B"
+            html += `
+                <div class="partido-card">
+                    <div class="partido-encabezado">
+                        ${p.local} - ${p.visitante}
+                    </div>
+                    <table class="tabla-partido">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>I</th>
+                                <th>II</th>
+                                <th>III</th>
+                                <th>IV</th>
+                                <th>V</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="equipo ${ganadorLocal ? "ganador" : ""}">
+                                    ${p.local}
+                                </td>
+                                <td>${localSets[0]}</td>
+                                <td>${localSets[1]}</td>
+                                <td>${localSets[2]}</td>
+                                <td>${localSets[3]}</td>
+                                <td>${localSets[4]}</td>
+                            </tr>
+                            <tr>
+                                <td class="equipo ${ganadorVisit ? "ganador" : ""}">
+                                    ${p.visitante}
+                                </td>
+                                <td>${visitSets[0]}</td>
+                                <td>${visitSets[1]}</td>
+                                <td>${visitSets[2]}</td>
+                                <td>${visitSets[3]}</td>
+                                <td>${visitSets[4]}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="partido-estado partido-estado-${(p.estado || "").toLowerCase()}">
+                        ${ (p.estado || "").toLowerCase() === "jugado"
+                            ? "Partido jugado"
+                            : ( (p.estado || "").toLowerCase() === "pendiente"
+                                ? "Pendiente de jugar"
+                                : p.estado || "" )
+                        }
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`; // contenedor-jornada
+    });
+
+    div.innerHTML = html;
 }
+
 
 // =====================================================
 //   Ejecutar carga inicial
