@@ -137,23 +137,41 @@ tr:nth-child(odd) {
     color: #555;
 }
 
+/* =========================================================
+   MOVIMIENTOS PROFESIONALES (estilo LaLiga / ATP)
+   ========================================================= */
+
 .mov {
+    font-weight: bold;
+    width: 55px;
     text-align: center;
-    font-size: 16px;
-    width: 24px;
+    padding-right: 4px;
 }
 
-.mov.sube {
-    color: #008000; /* verde */
+.mov-icon {
+    margin-right: 3px;
+    font-size: 18px;
 }
 
-.mov.baja {
-    color: #c00000; /* rojo */
+.mov-val {
+    font-size: 13px;
 }
 
-.mov.igual {
-    color: #555555; /* gris neutro */
+/* Sube */
+.mov-sube {
+    color: #1EBE5F;  /* verde profesional */
 }
+
+/* Baja */
+.mov-baja {
+    color: #FF4D4D;  /* rojo profesional */
+}
+
+/* Igual */
+.mov-igual {
+    color: #C0C0C0;  /* gris neutro */
+}
+
 
 /* =========================
    PARTIDOS
