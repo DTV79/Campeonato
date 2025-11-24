@@ -137,41 +137,6 @@ tr:nth-child(odd) {
     color: #555;
 }
 
-/* =========================================================
-   MOVIMIENTOS PROFESIONALES (estilo LaLiga / ATP)
-   ========================================================= */
-
-.mov {
-    font-weight: bold;
-    width: 55px;
-    text-align: center;
-    padding-right: 4px;
-}
-
-.mov-icon {
-    margin-right: 3px;
-    font-size: 18px;
-}
-
-.mov-val {
-    font-size: 13px;
-}
-
-/* Sube */
-.mov-sube {
-    color: #1EBE5F;  /* verde profesional */
-}
-
-/* Baja */
-.mov-baja {
-    color: #FF4D4D;  /* rojo profesional */
-}
-
-/* Igual */
-.mov-igual {
-    color: #C0C0C0;  /* gris neutro */
-}
-
 
 /* =========================
    PARTIDOS
@@ -294,6 +259,12 @@ tr:nth-child(odd) {
 
 .descanso-equipo {
     font-weight: bold;
+    margin-left: 4px;
+}
+
+/* =========================================================
+   MOVIMIENTOS PROFESIONALES (estilo LaLiga / ATP)
+   ========================================================= */
 
 .mov {
     font-weight: bold;
@@ -314,7 +285,3 @@ tr:nth-child(odd) {
 .mov-sube  { color: #1EBE5F; }
 .mov-baja  { color: #FF4D4D; }
 .mov-igual { color: #C0C0C0; }
-
-    margin-left: 4px;
-}
-
