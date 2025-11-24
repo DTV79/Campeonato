@@ -117,7 +117,10 @@ function mostrarClasificacion(lista, fechaActualizacion) {
     lista.forEach((eq, index) => {
         html += `
             <tr>
-                <td class="mov ${eq.movClass}">${eq.mov}</td>
+                <td class="mov ${eq.movClass}">
+                <span class="mov-icon">${eq.movIcon}</span>
+                <span class="mov-val">${eq.movVal}</span>
+                </td>
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
                 <td><strong>${eq.puntos_totales}</strong></td>
