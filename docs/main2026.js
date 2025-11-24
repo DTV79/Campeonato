@@ -226,7 +226,7 @@ function generarHTMLJornada(partidos) {
 
     partidos.forEach(p => {
 
-        // DESCANSO
+        // === DESCANSO ===
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
             html += `
                 <div class="partido">
@@ -238,15 +238,24 @@ function generarHTMLJornada(partidos) {
             return;
         }
 
-        // PROCESAR SETS
+        // === PROCESAR SETS ===
         const sets = p.resultado || [];
+
         const getSet = (i, pos) => {
             if (!sets[i]) return "";
             const partes = sets[i].split("-");
             return partes[pos] || "";
         };
 
-        // GANADOR
+        // === Saber si existen set IV y V ===
+        const haySet4 = sets.length >= 4 && sets[3] && sets[3] !== "";
+        const haySet5 = sets.length >= 5 && sets[4] && sets[4] !== "";
+
+        // Total columnas dinámicas
+        const totalCols = 3 + (haySet4 ? 1 : 0) + (haySet5 ? 1 : 0);
+        const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
+
+        // === Calcular ganador ===
         let localGan = 0, visitGan = 0;
         sets.forEach(s => {
             if (!s) return;
@@ -263,39 +272,46 @@ function generarHTMLJornada(partidos) {
             claseVisit = visitGan > localGan ? "ganador" : "";
         }
 
+        // === DIBUJAR HTML DEL PARTIDO ===
         html += `
         <div class="partido">
 
-            <div class="fila fila-head">
+            <!-- CABECERA -->
+            <div class="fila fila-head" style="${gridStyle}">
                 <span class="equipo-col">EQUIPOS</span>
                 <span class="set-col">I</span>
                 <span class="set-col">II</span>
                 <span class="set-col">III</span>
-                <span class="set-col">IV</span>
-                <span class="set-col">V</span>
+                ${haySet4 ? `<span class="set-col">IV</span>` : ""}
+                ${haySet5 ? `<span class="set-col">V</span>` : ""}
             </div>
 
             <div class="separador-grueso"></div>
 
-            <div class="fila">
+            <!-- EQUIPO LOCAL -->
+            <div class="fila" style="${gridStyle}">
                 <span class="equipo-col ${claseLocal}">${p.local}</span>
                 <span class="set-col">${getSet(0,0)}</span>
                 <span class="set-col">${getSet(1,0)}</span>
                 <span class="set-col">${getSet(2,0)}</span>
-                <span class="set-col">${getSet(3,0)}</span>
-                <span class="set-col">${getSet(4,0)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,0)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
             </div>
 
-            <div class="fila">
+            <!-- EQUIPO VISITANTE -->
+            <div class="fila" style="${gridStyle}">
                 <span class="equipo-col ${claseVisit}">${p.visitante}</span>
                 <span class="set-col">${getSet(0,1)}</span>
                 <span class="set-col">${getSet(1,1)}</span>
                 <span class="set-col">${getSet(2,1)}</span>
-                <span class="set-col">${getSet(3,1)}</span>
-                <span class="set-col">${getSet(4,1)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
             </div>
 
-            ${p.estado === "pendiente" ? `<div class="pendiente-line">⏳ Pendiente</div>` : ""}
+            ${p.estado === "pendiente"
+                ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                : ""
+            }
 
             <div class="separador-fino"></div>
             <div class="separador-fino"></div>
