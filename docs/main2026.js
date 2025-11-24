@@ -58,27 +58,35 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 
     // Calcular flechas sin eliminar filas
     lista.forEach(eq => {
-        const actual = Number(eq.posicion_actual || 0);
-        const anterior = Number(eq.posicion_anterior || 0);
-        eq.mov = "";
-        eq.movClass = "";
 
-        if (anterior > 0 && eq.pj > 0) {
-            if (actual < anterior) {
-                eq.mov = "▲";
-                eq.movClass = "sube";
-            } else if (actual > anterior) {
-                eq.mov = "▼";
-                eq.movClass = "baja";
-            } else {
-                eq.mov = "=";
-                eq.movClass = "igual";
-            }
-        } else {
-            // Jornada 1 → sin flecha
-            eq.mov = "";
-            eq.movClass = "";
-        }
+    const actual   = Number(eq.posicion_actual || 0);
+    const anterior = Number(eq.posicion_anterior || 0);
+
+    eq.movIcon = "";
+    eq.movValue = "";
+    eq.movClass = "";
+
+    // Jornada 1 → sin movimiento
+    if (anterior === 0) return;
+
+    const diff = anterior - actual;  // positivo = sube, negativo = baja
+
+    if (diff > 0) {
+        eq.movIcon = "▲";            // flecha subida
+        eq.movValue = `+${diff}`;
+        eq.movClass = "mov-sube";
+    }
+    else if (diff < 0) {
+        eq.movIcon = "▼";            // flecha bajada
+        eq.movValue = `${diff}`;     // ejemplo: -1
+        eq.movClass = "mov-baja";
+    }
+    else {
+        eq.movIcon = "•";            // igual
+        eq.movValue = "=";
+        eq.movClass = "mov-igual";
+    }
+
     });
 
     // Generar HTML de la tabla
