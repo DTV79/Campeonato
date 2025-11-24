@@ -4,7 +4,7 @@
 const DATA_URL = "./estado_torneo.json";
 
 // =====================================================
-//   Cargar datos desde el JSON
+//   Cargar datos desde JSON
 // =====================================================
 async function cargarDatos() {
     try {
@@ -22,7 +22,7 @@ async function cargarDatos() {
 }
 
 // =====================================================
-//   Cambiar de pestaña (Clasificación / Partidos)
+//   Cambiar pestañas
 // =====================================================
 function mostrar(pagina) {
     document.querySelectorAll(".pagina")
@@ -32,22 +32,22 @@ function mostrar(pagina) {
 }
 
 // =====================================================
-//   CLASIFICACIÓN — TABLA COMPLETA
+//   CLASIFICACIÓN — TABLA
 // =====================================================
 function mostrarClasificacion(lista, fechaActualizacion) {
     const div = document.getElementById("clasificacion");
 
-    // Formatear fecha
+    // --- Formateo de fecha ---
     let fechaFormateada = "Fecha desconocida";
-    if (fechaActualizacion && fechaActualizacion.trim() !== "") {
+    if (fechaActualizacion) {
         const f = new Date(fechaActualizacion);
-        if (!isNaN(f.getTime())) {
-            const dd = String(f.getDate()).padStart(2, "0");
-            const mm = String(f.getMonth() + 1).padStart(2, "0");
-            const yyyy = f.getFullYear();
-            const hh = String(f.getHours()).padStart(2, "0");
-            const min = String(f.getMinutes()).padStart(2, "0");
-            fechaFormateada = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+        if (!isNaN(f)) {
+            fechaFormateada =
+                `${String(f.getDate()).padStart(2,"0")}/` +
+                `${String(f.getMonth()+1).padStart(2,"0")}/` +
+                `${f.getFullYear()} ` +
+                `${String(f.getHours()).padStart(2,"0")}:` +
+                `${String(f.getMinutes()).padStart(2,"0")}`;
         }
     }
 
@@ -56,40 +56,44 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // Calcular flechas sin eliminar filas
+    // ============================================================
+    //   CALCULAR MOVIMIENTOS: ▲ ▼ =
+    // ============================================================
     lista.forEach(eq => {
+        const actual = Number(eq.posicion_actual || 0);
+        const anterior = Number(eq.posicion_anterior || 0);
 
-    const actual   = Number(eq.posicion_actual || 0);
-    const anterior = Number(eq.posicion_anterior || 0);
+        eq.movIcon = "";
+        eq.movVal = "";
+        eq.movClass = "";
 
-    eq.movIcon = "";
-    eq.movValue = "";
-    eq.movClass = "";
+        if (anterior === 0 || eq.pj === 0) {
+            // Jornada 1 → sin iconos
+            return;
+        }
 
-    // Jornada 1 → sin movimiento
-    if (anterior === 0) return;
+        const dif = anterior - actual;
 
-    const diff = anterior - actual;  // positivo = sube, negativo = baja
+        if (dif > 0) {
+            eq.movIcon = "▲";      // sube
+            eq.movVal = dif;
+            eq.movClass = "mov-sube";
 
-    if (diff > 0) {
-        eq.movIcon = "▲";            // flecha subida
-        eq.movValue = `+${diff}`;
-        eq.movClass = "mov-sube";
-    }
-    else if (diff < 0) {
-        eq.movIcon = "▼";            // flecha bajada
-        eq.movValue = `${diff}`;     // ejemplo: -1
-        eq.movClass = "mov-baja";
-    }
-    else {
-        eq.movIcon = "•";            // igual
-        eq.movValue = "=";
-        eq.movClass = "mov-igual";
-    }
+        } else if (dif < 0) {
+            eq.movIcon = "▼";      // baja
+            eq.movVal = Math.abs(dif);
+            eq.movClass = "mov-baja";
 
+        } else {
+            eq.movIcon = "=";      // igual
+            eq.movVal = "";
+            eq.movClass = "mov-igual";
+        }
     });
 
-    // Generar HTML de la tabla
+    // ============================================================
+    //   GENERAR TABLA HTML
+    // ============================================================
     let html = `
         <div class="tabla-container">
             <table>
@@ -118,8 +122,8 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         html += `
             <tr>
                 <td class="mov ${eq.movClass}">
-                <span class="mov-icon">${eq.movIcon}</span>
-                <span class="mov-val">${eq.movVal}</span>
+                    <span class="mov-icon">${eq.movIcon}</span>
+                    <span class="mov-val">${eq.movVal}</span>
                 </td>
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
@@ -142,9 +146,6 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 </tbody>
             </table>
         </div>
-    `;
-
-    html += `
         <div class="leyenda">
             <em>
             PTOS: Puntos Totales / PJ: Partidos Jugados /
@@ -161,15 +162,15 @@ function mostrarClasificacion(lista, fechaActualizacion) {
 }
 
 // =====================================================
-//   PARTIDOS — pestañas por jornada + tabla de sets
+//   PARTIDOS
 // =====================================================
 function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
 
-    // 1) Agrupar por jornada
+    // Agrupar por jornada
     const jornadas = {};
     lista.forEach(p => {
-        const j = Number(p.jornada || 0);
+        const j = Number(p.jornada);
         if (!jornadas[j]) jornadas[j] = [];
         jornadas[j].push(p);
     });
@@ -178,12 +179,12 @@ function mostrarPartidos(lista) {
         .map(Number)
         .sort((a, b) => a - b);
 
-    if (jornadasOrdenadas.length === 0) {
+    if (!jornadasOrdenadas.length) {
         div.innerHTML = "<p>No hay partidos.</p>";
         return;
     }
 
-    // 2) Crear pestañas
+    // Pestañas
     let tabs = `<div class="tabs">`;
     jornadasOrdenadas.forEach((j, idx) => {
         tabs += `
@@ -194,7 +195,7 @@ function mostrarPartidos(lista) {
     });
     tabs += `</div>`;
 
-    // 3) Crear contenedores de cada jornada
+    // Contenido
     let contenido = "";
     jornadasOrdenadas.forEach((j, idx) => {
         contenido += `
@@ -207,72 +208,64 @@ function mostrarPartidos(lista) {
     div.innerHTML = tabs + contenido;
 }
 
-// Cambiar entre jornadas
 function cambiarJornada(num, ev) {
     document.querySelectorAll(".jornada-contenido")
         .forEach(x => x.style.display = "none");
 
-    const cont = document.getElementById("jornada_" + num);
-    if (cont) cont.style.display = "block";
+    document.getElementById("jornada_" + num).style.display = "block";
 
     document.querySelectorAll(".tab-btn")
         .forEach(btn => btn.classList.remove("activa"));
 
-    if (ev && ev.target) {
-        ev.target.classList.add("activa");
-    }
+    if (ev?.target) ev.target.classList.add("activa");
 }
 
-// Generar HTML de todos los partidos de una jornada
+// Render de cada jornada
 function generarHTMLJornada(partidos) {
     let html = "";
 
     partidos.forEach(p => {
 
-        // Si es descanso
+        // DESCANSO
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
-    html += `
-        <div class="partido">
-            <div class="descanso-line">
-                <span class="descanso-label">DESCANSAN:</span>
-                <span class="descanso-equipo">${p.local}</span>
-            </div>
-        </div>
-    `;
-    return;
-}
+            html += `
+                <div class="partido">
+                    <div class="descanso-line">
+                        <span class="descanso-label">DESCANSAN:</span>
+                        <span class="descanso-equipo">${p.local}</span>
+                    </div>
+                </div>`;
+            return;
+        }
 
-        // Procesar sets
-        const sets = p.resultado;
+        // PROCESAR SETS
+        const sets = p.resultado || [];
         const getSet = (i, pos) => {
             if (!sets[i]) return "";
             const partes = sets[i].split("-");
             return partes[pos] || "";
         };
 
-        // Calcular ganador
-        let localGanados = 0;
-        let visitGanados = 0;
+        // GANADOR
+        let localGan = 0, visitGan = 0;
         sets.forEach(s => {
             if (!s) return;
             const [a, b] = s.split("-").map(Number);
-            if (a > b) localGanados++;
-            if (b > a) visitGanados++;
+            if (a > b) localGan++;
+            if (b > a) visitGan++;
         });
 
         let claseLocal = "";
         let claseVisit = "";
+
         if (p.estado === "jugado") {
-            if (localGanados > visitGanados) claseLocal = "ganador";
-            else claseVisit = "ganador";
-        } else {
-            claseLocal = claseVisit = "";
+            claseLocal = localGan > visitGan ? "ganador" : "";
+            claseVisit = visitGan > localGan ? "ganador" : "";
         }
 
         html += `
         <div class="partido">
 
-            <!-- CABECERA -->
             <div class="fila fila-head">
                 <span class="equipo-col">EQUIPOS</span>
                 <span class="set-col">I</span>
@@ -284,7 +277,6 @@ function generarHTMLJornada(partidos) {
 
             <div class="separador-grueso"></div>
 
-            <!-- EQUIPO LOCAL -->
             <div class="fila">
                 <span class="equipo-col ${claseLocal}">${p.local}</span>
                 <span class="set-col">${getSet(0,0)}</span>
@@ -294,7 +286,6 @@ function generarHTMLJornada(partidos) {
                 <span class="set-col">${getSet(4,0)}</span>
             </div>
 
-            <!-- EQUIPO VISITANTE -->
             <div class="fila">
                 <span class="equipo-col ${claseVisit}">${p.visitante}</span>
                 <span class="set-col">${getSet(0,1)}</span>
@@ -315,10 +306,7 @@ function generarHTMLJornada(partidos) {
     return html;
 }
 
-
 // =====================================================
-//   Ejecutar carga inicial
+//   Carga inicial
 // =====================================================
 cargarDatos();
-
-
