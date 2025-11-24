@@ -294,6 +294,27 @@ tr:nth-child(odd) {
 
 .descanso-equipo {
     font-weight: bold;
+
+.mov {
+    font-weight: bold;
+    width: 55px;
+    text-align: center;
+    padding-right: 4px;
+}
+
+.mov-icon {
+    margin-right: 3px;
+    font-size: 18px;
+}
+
+.mov-val {
+    font-size: 13px;
+}
+
+.mov-sube  { color: #1EBE5F; }
+.mov-baja  { color: #FF4D4D; }
+.mov-igual { color: #C0C0C0; }
+
     margin-left: 4px;
 }
 
