@@ -99,7 +99,7 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
                         <th>POS</th>
                         <th>EQUIPO</th>
                         <th>PTOS</th>
-                        ${mostrarCoef ? `<th>EFIC</th>` : ""}
+                        ${mostrarCoef ? `<th>COEF</th>` : ""}
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
