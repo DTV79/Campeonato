@@ -35,6 +35,7 @@ function mostrar(pagina) {
 //   CLASIFICACIÓN — TABLA
 // =====================================================
 function mostrarClasificacion(lista, fechaActualizacion) {
+    const modo = window.__modoOrden;
     const div = document.getElementById("clasificacion");
 
     // --- Formateo de fecha ---
@@ -103,6 +104,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                         <th>POS</th>
                         <th>EQUIPO</th>
                         <th>PTOS</th>
+                        ${window.__modoOrden === "C" ? `<th>COEF EF.</th>` : ""}
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
@@ -128,6 +130,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
                 <td><strong>${eq.puntos_totales}</strong></td>
+                ${window.__modoOrden === "C" ? `<td>${eq.coeficiente ?? ""}</td>` : ""}
                 <td>${eq.pj}</td>
                 <td>${eq.pg}</td>
                 <td>${eq.pp}</td>
