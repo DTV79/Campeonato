@@ -11,7 +11,11 @@ async function cargarDatos() {
         const res = await fetch(DATA_URL + "?v=" + Date.now());
         const data = await res.json();
 
-        mostrarClasificacion(data.clasificacion, data.ultima_actualizacion);
+        mostrarClasificacion(
+        data.clasificacion,
+        data.ultima_actualizacion,
+        data.modo_orden
+        );
         mostrarPartidos(data.partidos);
 
     } catch (err) {
@@ -34,11 +38,10 @@ function mostrar(pagina) {
 // =====================================================
 //   CLASIFICACIÓN — TABLA
 // =====================================================
-function mostrarClasificacion(lista, fechaActualizacion) {
-    const modo = window.__modoOrden;
+function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
     const div = document.getElementById("clasificacion");
 
-    // --- Formateo de fecha ---
+    // --- Fecha formateada ---
     let fechaFormateada = "Fecha desconocida";
     if (fechaActualizacion) {
         const f = new Date(fechaActualizacion);
@@ -52,14 +55,17 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         }
     }
 
+    // ¿Se debe mostrar el coeficiente?
+    const mostrarCoef = (modoOrden === "Opción C");
+
     div.innerHTML = `
         <h2>Clasificación</h2>
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // ============================================================
-    //   CALCULAR MOVIMIENTOS: ▲ ▼ =
-    // ============================================================
+    // ================================
+    // Cálculo de movimientos ▲ ▼ =
+    // ================================
     lista.forEach(eq => {
         const actual = Number(eq.posicion_actual || 0);
         const anterior = Number(eq.posicion_anterior || 0);
@@ -68,33 +74,22 @@ function mostrarClasificacion(lista, fechaActualizacion) {
         eq.movVal = "";
         eq.movClass = "";
 
-        if (anterior === 0 || eq.pj === 0) {
-            // Jornada 1 → sin iconos
-            return;
-        }
+        if (anterior === 0 || eq.pj === 0) return;
 
         const dif = anterior - actual;
 
         if (dif > 0) {
-            eq.movIcon = "▲";      // sube
-            eq.movVal = dif;
-            eq.movClass = "mov-sube";
-
+            eq.movIcon = "▲"; eq.movVal = dif; eq.movClass = "mov-sube";
         } else if (dif < 0) {
-            eq.movIcon = "▼";      // baja
-            eq.movVal = Math.abs(dif);
-            eq.movClass = "mov-baja";
-
+            eq.movIcon = "▼"; eq.movVal = -dif; eq.movClass = "mov-baja";
         } else {
-            eq.movIcon = "=";      // igual
-            eq.movVal = "";
-            eq.movClass = "mov-igual";
+            eq.movIcon = "="; eq.movVal = ""; eq.movClass = "mov-igual";
         }
     });
 
-    // ============================================================
-    //   GENERAR TABLA HTML
-    // ============================================================
+    // ================================
+    //   CABECERA DE TABLA
+    // ================================
     let html = `
         <div class="tabla-container">
             <table>
@@ -104,7 +99,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                         <th>POS</th>
                         <th>EQUIPO</th>
                         <th>PTOS</th>
-                        ${window.__modoOrden === "C" ? `<th>COEF EF.</th>` : ""}
+                        ${mostrarCoef ? `<th>EFIC</th>` : ""}
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
@@ -120,7 +115,11 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <tbody>
     `;
 
+    // ================================
+    //   Filas de datos
+    // ================================
     lista.forEach((eq, index) => {
+
         html += `
             <tr>
                 <td class="mov ${eq.movClass}">
@@ -130,7 +129,7 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 <td><strong>${index + 1}</strong></td>
                 <td><strong>${eq.equipo}</strong></td>
                 <td><strong>${eq.puntos_totales}</strong></td>
-                ${window.__modoOrden === "C" ? `<td>${eq.coeficiente ?? ""}</td>` : ""}
+                ${mostrarCoef ? `<td>${Number(eq.coeficiente).toFixed(2)}</td>` : ""}
                 <td>${eq.pj}</td>
                 <td>${eq.pg}</td>
                 <td>${eq.pp}</td>
@@ -149,20 +148,11 @@ function mostrarClasificacion(lista, fechaActualizacion) {
                 </tbody>
             </table>
         </div>
-        <div class="leyenda">
-            <em>
-            PTOS: Puntos Totales / PJ: Partidos Jugados /
-            PG: Partidos Ganados / PP: Partidos Perdidos /
-            Des: Descanso / SG: Sets Ganados /
-            SP: Sets Perdidos / SD: Diferencia de Sets /
-            PGan: Puntos Ganados / PPer: Puntos Perdidos /
-            PDif: Diferencia de Puntos
-            </em>
-        </div>
     `;
 
     div.innerHTML += html;
 }
+
 
 // =====================================================
 //   PARTIDOS
