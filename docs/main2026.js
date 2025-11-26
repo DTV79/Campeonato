@@ -151,6 +151,24 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
     `;
 
     div.innerHTML += html;
+    div.innerHTML += `
+    <div class="leyenda">
+        <em>
+        PTOS: Puntos Totales /
+        COEF: Coeficiente Eficacia /
+        PJ: Partidos Jugados /
+        PG: Partidos Ganados /
+        PP: Partidos Perdidos /
+        Des: Descansos /
+        SG: Sets Ganados /
+        SP: Sets Perdidos /
+        SD: Diferencia de Sets /
+        PGan: Puntos Ganados /
+        PPer: Puntos Perdidos /
+        PDif: Diferencia de Puntos
+        </em>
+    </div>
+`;
 }
 
 
