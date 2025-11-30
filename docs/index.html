@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sprint Pádel Tui 2026</title>
-    <link rel="stylesheet" href="styles.css?v=2001">
+    <link rel="stylesheet" href="styles.css?v=2003">
 </head>
 
 <body>
 
 <!-- ===========================
-     TOP BAR + MENÚ HAMBURGUESA
+     TOP BAR (solo icono menú)
 =========================== -->
-<header class="topbar">
-    <div class="topbar-title">Sprint Pádel Tui 2026</div>
-    <div class="hamburger" onclick="toggleMenu()">☰</div>
+<header class="topbar simple">
+    <div class="hamburger left" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- MENÚ LATERAL (drawer) -->
+<!-- MENÚ LATERAL -->
 <nav id="drawer" class="drawer">
     <a href="index.html">🏠 Inicio</a>
     <a href="clasificacion.html">📊 Clasificación</a>
@@ -30,29 +29,19 @@
 <div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
 
 <!-- ===========================
-     HERO PRINCIPAL
+     HERO LIMPIO (Sin botones)
 =========================== -->
 <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <h1>II Campeonato Sprint Pádel Tui 2026</h1>
-
-        <div class="hero-buttons">
-            <a href="clasificacion.html" class="btn-primary">Ver Clasificación</a>
-            <a href="partidos.html" class="btn-secondary">Ver Partidos</a>
-            <a href="normas.html" class="btn-tertiary">Normas</a>
-        </div>
+        <h1>II Campeonato Sprint Pádel<br>Tui 2026</h1>
     </div>
 </section>
 
-<!-- ===========================
-     JS DEL MENÚ
-=========================== -->
 <script>
 function toggleMenu() {
     const drawer = document.getElementById("drawer");
     const overlay = document.getElementById("drawer-overlay");
-
     drawer.classList.toggle("open");
     overlay.classList.toggle("visible");
 }
@@ -60,6 +49,7 @@ function toggleMenu() {
 
 </body>
 </html>
+
 
 
 
