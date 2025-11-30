@@ -3,95 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campeonato Pádel</title>
-    <link rel="stylesheet" href="styles.css?v=2000">
-    <meta name="format-detection" content="address=no">
+    <title>Sprint Pádel Tui 2026</title>
+    <link rel="stylesheet" href="styles.css?v=2001">
 </head>
 
 <body>
 
-<!-- =======================
-     NAVBAR SUPERIOR FIJO
-======================== -->
-<header class="navbar">
-    <div class="nav-container">
-        <div class="nav-title">Sprint Pádel Tui 2026</div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#normas">Normas</a></li>
-                <li><a href="#historico">Histórico</a></li>
-                <li><a href="#clasificacion">Clasificación</a></li>
-                <li><a href="#partidos">Partidos</a></li>
-                <li><a href="#jornadas">Jornadas</a></li>
-                <li><a href="#fotos">Fotos</a></li>
-            </ul>
-        </nav>
-    </div>
+<!-- ===========================
+     TOP BAR + MENÚ HAMBURGUESA
+=========================== -->
+<header class="topbar">
+    <div class="topbar-title">Sprint Pádel Tui 2026</div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
-<!-- =======================
-     HERO / PORTADA
-======================== -->
-<section id="inicio" class="hero">
+<!-- MENÚ LATERAL (drawer) -->
+<nav id="drawer" class="drawer">
+    <a href="index.html">🏠 Inicio</a>
+    <a href="clasificacion.html">📊 Clasificación</a>
+    <a href="partidos.html">🎾 Partidos</a>
+    <a href="normas.html">📜 Normas</a>
+    <a href="historico.html">🏆 Histórico</a>
+    <a href="fotos.html">📸 Fotos</a>
+</nav>
+
+<div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
+
+<!-- ===========================
+     HERO PRINCIPAL
+=========================== -->
+<section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
         <h1>II Campeonato Sprint Pádel Tui 2026</h1>
-        <p>Clasificación, jornadas y resultados actualizados automáticamente desde Excel.</p>
-
         <div class="hero-buttons">
-            <a href="#clasificacion" class="btn-primary">Ver Clasificación</a>
-            <a href="#partidos" class="btn-secondary">Ver Partidos</a>
-            <a href="#normas" class="btn-tertiary">Normas</a>
+            <a href="clasificacion.html" class="btn-primary">Ver Clasificación</a>
+            <a href="partidos.html" class="btn-secondary">Ver Partidos</a>
+            <a href="normas.html" class="btn-tertiary">Normas</a>
         </div>
     </div>
 </section>
 
-<!-- =======================
-     SECCIONES NUEVAS
-======================== -->
-
-<section id="normas" class="section-block">
-    <h2>Normas del Campeonato</h2>
-    <p>(Aquí pondremos el texto cuando lo tengas)</p>
-</section>
-
-<section id="historico" class="section-block">
-    <h2>Histórico de Ganadores</h2>
-    <p>(Aquí añadiremos los campeones de cada edición)</p>
-</section>
-
-<!-- =======================
-     TUS SECCIONES REALES
-======================== -->
-
-<section id="clasificacion" class="section-block">
-    <!-- CLASIFICACIÓN CARGADA POR JS -->
-</section>
-
-<section id="partidos" class="section-block">
-    <!-- PARTIDOS CARGADOS POR JS -->
-</section>
-
-<section id="jornadas" class="section-block">
-    <!-- JORNADAS (si las añades después) -->
-</section>
-
-<section id="fotos" class="section-block">
-   <h2>Fotos</h2>
-   <p>Añadiremos imágenes cuando las tengas 😊</p>
-</section>
-
-<!-- =======================
-     CARGA JS PRINCIPAL
-======================== -->
+<!-- ===========================
+     JS DEL MENÚ
+=========================== -->
 <script>
-    const script = document.createElement("script");
-    script.src = "main2026.js?v=" + Date.now();
-    document.body.appendChild(script);
+function toggleMenu() {
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("drawer-overlay");
+
+    drawer.classList.toggle("open");
+    overlay.classList.toggle("visible");
+}
 </script>
 
 </body>
 </html>
+
 
 
