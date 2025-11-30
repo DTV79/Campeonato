@@ -4,16 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partidos</title>
-    <link rel="stylesheet" href="styles.css?v=2001">
+    <link rel="stylesheet" href="styles.css?v=2003">
 </head>
 
 <body>
 
+<!-- ===========================
+     TOPBAR (solo icono ☰)
+=========================== -->
 <header class="topbar">
-    <div class="topbar-title">Partidos</div>
     <div class="hamburger" onclick="toggleMenu()">☰</div>
 </header>
 
+<!-- ===========================
+     MENÚ LATERAL
+=========================== -->
 <nav id="drawer" class="drawer">
     <a href="index.html">🏠 Inicio</a>
     <a href="clasificacion.html">📊 Clasificación</a>
@@ -25,21 +30,31 @@
 
 <div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
 
+<!-- ===========================
+     CONTENIDO
+=========================== -->
 <section class="page-content">
     <h1>Partidos</h1>
+
+    <!-- Aquí tu script inyecta todo -->
     <div id="partidos"></div>
 </section>
 
+<!-- ===========================
+     JS DEL MENÚ + CARGA DE DATOS
+=========================== -->
 <script>
-const script = document.createElement("script");
-script.src = "main2026.js?v=" + Date.now();
-document.body.appendChild(script);
-
 function toggleMenu() {
     document.getElementById("drawer").classList.toggle("open");
     document.getElementById("drawer-overlay").classList.toggle("visible");
 }
+
+// Cargar JS dinámicamente
+const script = document.createElement("script");
+script.src = "main2026.js?v=" + Date.now();
+document.body.appendChild(script);
 </script>
 
 </body>
 </html>
+
