@@ -1,6 +1,6 @@
-/* =========================
+/* =====================================================
    ESTILOS GENERALES
-   ========================= */
+===================================================== */
 
 body {
     margin: 0;
@@ -9,35 +9,9 @@ body {
 }
 
 
-
-/* =========================
-   CABECERA CON ESCUDO
-   ========================= */
-
-.titulo-con-escudo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.escudo {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-}
-
-header img.escudo {
-    width: 22px !important;
-    height: 22px !important;
-    margin-top: -2px;
-}
-
-/* =========================
-   CLASIFICACIÓN (DEJAR TAL CUAL)
-   ========================= */
+/* =====================================================
+   CLASIFICACIÓN
+===================================================== */
 
 .tabla-container {
     overflow-x: auto;
@@ -71,17 +45,8 @@ td {
     border-bottom: 1px solid #ddd;
 }
 
-td strong {
-    font-weight: bold;
-}
-
-tr:nth-child(even) {
-    background: #f7f7f7;
-}
-
-tr:nth-child(odd) {
-    background: #ffffff;
-}
+tr:nth-child(even) { background: #f7f7f7; }
+tr:nth-child(odd)  { background: #ffffff; }
 
 .leyenda {
     margin-top: 10px;
@@ -89,8 +54,6 @@ tr:nth-child(odd) {
     line-height: 1.2;
     color: #444;
     font-style: italic;
-    background: transparent;
-    padding: 0;
 }
 
 .fecha-actualizacion {
@@ -101,15 +64,13 @@ tr:nth-child(odd) {
 }
 
 
-/* =========================
+/* =====================================================
    PARTIDOS
-   ========================= */
+===================================================== */
 
 #partidos {
     padding-bottom: 2rem;
 }
-
-/* --- Pestañas de jornadas --- */
 
 .tabs {
     display: flex;
@@ -133,27 +94,16 @@ tr:nth-child(odd) {
     font-weight: bold;
 }
 
-/* --- Contenido de cada jornada --- */
-
 .jornada-contenido {
     margin-top: 5px;
 }
 
-/* --- Cada partido --- */
-
 .partido {
     padding: 12px 0 20px 0;
-
-    /* Primera línea fina */
     border-bottom: 1px solid #ccc;
-
-    /* Segunda línea fina debajo */
     box-shadow: 0 2px 0 #ccc;
     margin-bottom: 14px;
 }
-
-
-/* Cabecera: EQUIPOS / SET1 / SET2 ... */
 
 .fila-head {
     display: grid;
@@ -163,12 +113,9 @@ tr:nth-child(odd) {
     text-transform: uppercase;
     color: #555;
     padding-bottom: 6px;
-    border-bottom: 3px solid #000; /* ← línea negra gruesa */
+    border-bottom: 3px solid #000;
     margin-bottom: 6px;
 }
-
-
-/* Fila de datos (cada equipo) */
 
 .fila {
     display: grid;
@@ -177,27 +124,11 @@ tr:nth-child(odd) {
     padding: 2px 0;
 }
 
-.equipo-col {
-    padding-left: 4px;
-}
+.equipo-col { padding-left: 4px; }
+.set-col { text-align: center; font-weight: bold; }
 
-.set-col {
-    text-align: center;
-    font-weight: bold;
-}
-
-/* Ganador / perdedor */
-
-.ganador {
-    font-weight: bold;
-    color: #00a000;
-}
-
-.perdedor {
-    opacity: 0.6;
-}
-
-/* Texto de pendiente */
+.ganador { font-weight: bold; color: #00a000; }
+.perdedor { opacity: 0.6; }
 
 .pendiente-line {
     margin-top: 4px;
@@ -207,8 +138,6 @@ tr:nth-child(odd) {
     padding-left: 4px;
 }
 
-/* Línea de descanso */
-
 .descanso-line {
     margin-top: 6px;
     font-size: 14px;
@@ -216,18 +145,16 @@ tr:nth-child(odd) {
 }
 
 .descanso-label {
-    color: #c00000;   /* rojo SOLO para la palabra DESCANSA */
+    color: #c00000;
     font-weight: bold;
 }
 
-.descanso-equipo {
-    font-weight: bold;
-    margin-left: 4px;
-}
+.descanso-equipo { font-weight: bold; margin-left: 4px; }
 
-/* =========================================================
-   MOVIMIENTOS PROFESIONALES (estilo LaLiga / ATP)
-   ========================================================= */
+
+/* =====================================================
+   MOVIMIENTOS DE POSICIÓN
+===================================================== */
 
 .mov {
     font-weight: bold;
@@ -236,148 +163,18 @@ tr:nth-child(odd) {
     padding-right: 4px;
 }
 
-.mov-icon {
-    margin-right: 3px;
-    font-size: 18px;
-}
-
-.mov-val {
-    font-size: 13px;
-}
+.mov-icon { margin-right: 3px; font-size: 18px; }
+.mov-val  { font-size: 13px; }
 
 .mov-sube  { color: #1EBE5F; }
 .mov-baja  { color: #FF4D4D; }
 .mov-igual { color: #C0C0C0; }
 
 
-/* ===========================
-   NAVBAR
-=========================== */
-.navbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #000;
-    padding: 12px 0;
-    z-index: 999;
-}
-
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 92%;
-    margin: auto;
-    color: white;
-}
-
-.nav-title {
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 18px;
-}
-
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    color: #ffda2d;
-}
-
-/* ===========================
-   HERO PORTADA
-=========================== */
-.hero {
-    height: 78vh;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: white;
-    background-image: url('https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=60');
-    background-size: cover;
-    background-position: center;
-    margin-top: 60px; /* compensar navbar fija */
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.55);
-}
-
-.hero-content {
-    z-index: 2;
-    max-width: 600px;
-    padding: 20px;
-}
-
-.hero h1 {
-    font-size: 32px;
-    margin-bottom: 15px;
-    font-weight: 800;
-}
-
-.hero p {
-    font-size: 16px;
-    margin-bottom: 25px;
-}
-
-/* BOTONES */
-.hero-buttons a {
-    display: inline-block;
-    margin: 6px;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-}
-
-.btn-primary {
-    background: #ffda2d;
-    color: #000;
-}
-
-.btn-secondary {
-    background: white;
-    color: #000;
-}
-
-.btn-tertiary {
-    background: #444;
-    color: #fff;
-}
-
-/* ===========================
-   SECCIONES NUEVAS
-=========================== */
-.section-block {
-    padding: 60px 20px;
-    max-width: 900px;
-    margin: auto;
-}
-
-.section-block h2 {
-    margin-bottom: 15px;
-    font-size: 26px;
-}
-
-
 /* =====================================================
-   TOPBAR (barra superior)
+   TOPBAR – SOLO ICONO ☰
 ===================================================== */
+
 .topbar {
     position: fixed;
     top: 0;
@@ -386,17 +183,9 @@ tr:nth-child(odd) {
     background: #000;
     color: #fff;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
-    font-size: 18px;
-    font-weight: bold;
+    padding-left: 16px;
     z-index: 1000;
-}
-
-.topbar-title {
-    font-size: 18px;
-    font-weight: 600;
 }
 
 .hamburger {
@@ -405,27 +194,27 @@ tr:nth-child(odd) {
     user-select: none;
 }
 
+
 /* =====================================================
-   DRAWER (menú lateral oscuro)
+   DRAWER – MENÚ LATERAL OSCURO
 ===================================================== */
+
 .drawer {
     position: fixed;
     top: 0;
-    left: -260px; /* oculto inicialmente */
+    left: -260px;
     width: 260px;
     height: 100%;
     background: #111;
     box-shadow: 2px 0 6px rgba(0,0,0,0.5);
-    padding-top: 60px; /* espacio para la topbar */
+    padding-top: 60px;
     transition: left 0.28s ease;
     z-index: 1100;
     display: flex;
     flex-direction: column;
 }
 
-.drawer.open {
-    left: 0;
-}
+.drawer.open { left: 0; }
 
 .drawer a {
     padding: 14px 20px;
@@ -439,9 +228,11 @@ tr:nth-child(odd) {
     background: rgba(255,255,255,0.10);
 }
 
+
 /* =====================================================
-   OVERLAY OSCURO AL ABRIR MENÚ
+   OVERLAY DEL MENÚ
 ===================================================== */
+
 .drawer-overlay {
     position: fixed;
     top: 0;
@@ -460,11 +251,13 @@ tr:nth-child(odd) {
     visibility: visible;
 }
 
+
 /* =====================================================
-   AJUSTE PARA TODO EL CONTENIDO DE LAS PÁGINAS INTERNAS
+   CONTENIDO DE PÁGINAS INTERNAS
 ===================================================== */
+
 .page-content {
-    padding: 80px 16px 40px 16px; /* deja sitio para la topbar */
+    padding: 90px 16px 40px 16px; /* espacio para topbar */
     max-width: 900px;
     margin: auto;
 }
@@ -475,9 +268,11 @@ tr:nth-child(odd) {
     text-align: center;
 }
 
+
 /* =====================================================
-   HERO INICIAL (versión sencilla)
+   HERO PORTADA FINAL (SIN BOTONES)
 ===================================================== */
+
 .hero {
     height: 78vh;
     position: relative;
@@ -489,7 +284,7 @@ tr:nth-child(odd) {
     background-image: url('https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=60');
     background-size: cover;
     background-position: center;
-    margin-top: 54px; /* para no quedar debajo de la topbar */
+    margin-top: 54px; /* debajo del menú */
 }
 
 .hero-overlay {
@@ -503,51 +298,24 @@ tr:nth-child(odd) {
 
 .hero-content {
     z-index: 2;
-    max-width: 600px;
     padding: 20px;
 }
 
 .hero h1 {
-    font-size: 28px;
-    margin-bottom: 25px;
+    font-size: 36px;
+    margin: 0;
     font-weight: 800;
+    line-height: 1.3;
 }
 
-/* Botones hero */
-.hero-buttons a {
-    display: inline-block;
-    margin: 6px;
-    padding: 12px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.btn-primary {
-    background: #ffda2d;
-    color: #000;
-}
-
-.btn-secondary {
-    background: white;
-    color: #000;
-}
-
-.btn-tertiary {
-    background: #444;
-    color: #fff;
-}
 
 /* =====================================================
-   OPCIONAL: mejora visual en pantallas grandes
+   RESPONSIVE
 ===================================================== */
+
 @media (min-width: 768px) {
     .hero h1 {
-        font-size: 38px;
-    }
-    .hero-buttons a {
-        padding: 14px 26px;
-        font-size: 17px;
+        font-size: 48px;
     }
 }
 
