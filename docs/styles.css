@@ -373,3 +373,181 @@ tr:nth-child(odd) {
     margin-bottom: 15px;
     font-size: 26px;
 }
+
+
+/* =====================================================
+   TOPBAR (barra superior)
+===================================================== */
+.topbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 54px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+.topbar-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.hamburger {
+    font-size: 26px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* =====================================================
+   DRAWER (menú lateral oscuro)
+===================================================== */
+.drawer {
+    position: fixed;
+    top: 0;
+    left: -260px; /* oculto inicialmente */
+    width: 260px;
+    height: 100%;
+    background: #111;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.5);
+    padding-top: 60px; /* espacio para la topbar */
+    transition: left 0.28s ease;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer.open {
+    left: 0;
+}
+
+.drawer a {
+    padding: 14px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 17px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.drawer a:hover {
+    background: rgba(255,255,255,0.10);
+}
+
+/* =====================================================
+   OVERLAY OSCURO AL ABRIR MENÚ
+===================================================== */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s;
+    z-index: 1000;
+}
+
+.drawer-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =====================================================
+   AJUSTE PARA TODO EL CONTENIDO DE LAS PÁGINAS INTERNAS
+===================================================== */
+.page-content {
+    padding: 80px 16px 40px 16px; /* deja sitio para la topbar */
+    max-width: 900px;
+    margin: auto;
+}
+
+.page-content h1 {
+    margin-bottom: 20px;
+    font-size: 26px;
+    text-align: center;
+}
+
+/* =====================================================
+   HERO INICIAL (versión sencilla)
+===================================================== */
+.hero {
+    height: 78vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    background-image: url('https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=60');
+    background-size: cover;
+    background-position: center;
+    margin-top: 54px; /* para no quedar debajo de la topbar */
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+}
+
+.hero-content {
+    z-index: 2;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    font-weight: 800;
+}
+
+/* Botones hero */
+.hero-buttons a {
+    display: inline-block;
+    margin: 6px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.btn-primary {
+    background: #ffda2d;
+    color: #000;
+}
+
+.btn-secondary {
+    background: white;
+    color: #000;
+}
+
+.btn-tertiary {
+    background: #444;
+    color: #fff;
+}
+
+/* =====================================================
+   OPCIONAL: mejora visual en pantallas grandes
+===================================================== */
+@media (min-width: 768px) {
+    .hero h1 {
+        font-size: 38px;
+    }
+    .hero-buttons a {
+        padding: 14px 26px;
+        font-size: 17px;
+    }
+}
+
