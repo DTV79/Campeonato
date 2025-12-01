@@ -325,9 +325,15 @@ tr:nth-child(odd)  { background: #ffffff; }
         background-color: #000;
     }
 
-    .hero h1 {
+    .hero-title-line1 {
         font-size: 26px;
     }
+   
+   hero-title-line2 {
+        font-size: 22px;
+    }
+
+
 }
 
 @media (min-width: 768px) {
