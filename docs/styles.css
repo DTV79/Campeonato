@@ -278,15 +278,17 @@ tr:nth-child(odd)  { background: #ffffff; }
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* ← sube el título hacia arriba */
     text-align: center;
     color: white;
-    background-image: url('hero_padel.png'); /* ← tu nueva imagen */
+    background-image: url('hero_padel.png');
     background-size: cover;
-    background-position: left center; /* para ver entera la silueta izquierda */
+    background-position: left center;
     background-repeat: no-repeat;
-    background-color: #000; /* evita huecos */
+    background-color: #000;
     margin-top: 54px;
+
+    padding-top: 55px; /* ← controla la altura del título */ 
 }
 
 .hero-overlay {
@@ -330,7 +332,12 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 @media (min-width: 768px) {
     .hero h1 {
-        font-size: 48px;
+        font-size: 40px;
     }
+}
+.hero h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 5px;
 }
 
