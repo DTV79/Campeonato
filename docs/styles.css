@@ -326,17 +326,17 @@ tr:nth-child(odd)  { background: #ffffff; }
     }
 
     .hero h1 {
-        font-size: 30px;
+        font-size: 24px;
     }
 }
 
 @media (min-width: 768px) {
     .hero h1 {
-        font-size: 18px;
+        font-size: 43px;
     }
 }
 .hero h2 {
-    font-size: 20px;
+    font-size: 34px;
     font-weight: 700;
     margin-top: 5px;
 }
