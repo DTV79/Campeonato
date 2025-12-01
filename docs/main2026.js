@@ -75,7 +75,7 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
     const mostrarCoef = (modoOrden === "Opción C");
 
     div.innerHTML = `
-        <h2>Clasificación</h2>
+        
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
