@@ -257,7 +257,7 @@ tr:nth-child(odd)  { background: #ffffff; }
 ===================================================== */
 
 .page-content {
-    padding: 90px 16px 40px 16px; /* espacio para topbar */
+    padding: 90px 16px 40px 16px;
     max-width: 900px;
     margin: auto;
 }
@@ -270,7 +270,7 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 
 /* =====================================================
-   HERO PORTADA FINAL (SIN BOTONES)
+   HERO PORTADA FINAL (con tu imagen)
 ===================================================== */
 
 .hero {
@@ -281,10 +281,12 @@ tr:nth-child(odd)  { background: #ffffff; }
     align-items: center;
     text-align: center;
     color: white;
-    background-image: url('https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=60');
+    background-image: url('hero_padel.png'); /* ← tu nueva imagen */
     background-size: cover;
-    background-position: center;
-    margin-top: 54px; /* debajo del menú */
+    background-position: left center; /* para ver entera la silueta izquierda */
+    background-repeat: no-repeat;
+    background-color: #000; /* evita huecos */
+    margin-top: 54px;
 }
 
 .hero-overlay {
@@ -293,7 +295,7 @@ tr:nth-child(odd)  { background: #ffffff; }
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.55);
+    background: rgba(0,0,0,0.45);
 }
 
 .hero-content {
@@ -310,8 +312,21 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE – MÓVIL
 ===================================================== */
+
+@media (max-width: 600px) {
+    .hero {
+        height: 90vh;
+        background-size: contain;        /* muestra las siluetas completas */
+        background-position: center top; /* centrado perfecto */
+        background-color: #000;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+}
 
 @media (min-width: 768px) {
     .hero h1 {
