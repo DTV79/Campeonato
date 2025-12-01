@@ -288,7 +288,7 @@ tr:nth-child(odd)  { background: #ffffff; }
     background-color: #000;
     margin-top: 54px;
 
-    padding-top: 25px; /* ← controla la altura del título */ 
+    padding-top: 20px; /* ← controla la altura del título */ 
 }
 
 .hero-overlay {
