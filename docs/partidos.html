@@ -4,52 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Partidos</title>
-    <link rel="stylesheet" href="styles.css?v=2003">
+    <link rel="stylesheet" href="styles.css?v=3003">
 </head>
 
 <body>
 
 <!-- ===========================
-     TOPBAR (solo icono ☰)
+     TOP BAR
 =========================== -->
 <header class="topbar">
     <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="topbar-title">Partidos</div>
 </header>
 
 <!-- ===========================
-     MENÚ LATERAL
+     MENÚ LATERAL NUEVO
 =========================== -->
 <nav id="drawer" class="drawer">
-    <a href="index.html">🏠 Inicio</a>
-    <a href="clasificacion.html">📊 Clasificación</a>
-    <a href="partidos.html">🎾 Partidos</a>
-    <a href="normas.html">📜 Normas</a>
-    <a href="historico.html">🏆 Histórico</a>
-    <a href="fotos.html">📸 Fotos</a>
+
+    <div class="drawer-header">
+        <div class="drawer-close" onclick="toggleMenu()">✕</div>
+        <div class="drawer-avatar">🎾</div>
+        <div class="drawer-username">Sprint Pádel</div>
+        <div class="drawer-sub">Temporada 2026</div>
+    </div>
+
+    <div class="drawer-section">
+        <a href="index.html">🏠 Inicio</a>
+        <a href="historia.html">📖 Historia</a>
+        <a href="clasificacion.html">📊 Clasificación</a>
+        <a href="partidos.html">🎾 Partidos</a>
+        <a href="normas.html">📜 Normas</a>
+        <a href="campeones.html">🏆 Campeones</a>
+        <a href="fotos.html">📸 Fotos</a>
+    </div>
+
 </nav>
 
 <div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
+
 
 <!-- ===========================
      CONTENIDO
 =========================== -->
 <section class="page-content">
     <h1>Partidos</h1>
-
-    <!-- Aquí tu script inyecta todo -->
     <div id="partidos"></div>
 </section>
 
+
 <!-- ===========================
-     JS DEL MENÚ + CARGA DE DATOS
+     JS MENÚ + CARGA DINÁMICA
 =========================== -->
 <script>
 function toggleMenu() {
-    document.getElementById("drawer").classList.toggle("open");
-    document.getElementById("drawer-overlay").classList.toggle("visible");
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("drawer-overlay");
+    drawer.classList.toggle("open");
+    overlay.classList.toggle("visible");
 }
 
-// Cargar JS dinámicamente
 const script = document.createElement("script");
 script.src = "main2026.js?v=" + Date.now();
 document.body.appendChild(script);
@@ -57,4 +71,5 @@ document.body.appendChild(script);
 
 </body>
 </html>
+
 
