@@ -1,180 +1,15 @@
 /* =====================================================
    ESTILOS GENERALES
 ===================================================== */
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #f3f3f3;
 }
 
-
 /* =====================================================
-   CLASIFICACIÓN
+   TOP BAR
 ===================================================== */
-
-.tabla-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    background: white;
-    padding: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-table {
-    border-collapse: collapse;
-    width: max-content;
-    min-width: 800px;
-    font-size: 14px;
-}
-
-th {
-    background: #e0e0e0;
-    padding: 8px 12px;
-    font-weight: bold;
-    text-align: left;
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 5;
-}
-
-td {
-    padding: 8px 12px;
-    white-space: nowrap;
-    border-bottom: 1px solid #ddd;
-}
-
-tr:nth-child(even) { background: #f7f7f7; }
-tr:nth-child(odd)  { background: #ffffff; }
-
-.leyenda {
-    margin-top: 10px;
-    font-size: 9px;
-    line-height: 1.2;
-    color: #444;
-    font-style: italic;
-}
-
-.fecha-actualizacion {
-    font-size: 11px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-    color: #555;
-}
-
-
-/* =====================================================
-   PARTIDOS
-===================================================== */
-
-#partidos {
-    padding-bottom: 2rem;
-}
-
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 8px 14px;
-    border: none;
-    background: #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tab-btn.activa {
-    background: #00a000;
-    color: white;
-    font-weight: bold;
-}
-
-.jornada-contenido {
-    margin-top: 5px;
-}
-
-.partido {
-    padding: 12px 0 20px 0;
-    border-bottom: 1px solid #ccc;
-    box-shadow: 0 2px 0 #ccc;
-    margin-bottom: 14px;
-}
-
-.fila-head {
-    display: grid;
-    grid-template-columns: 3fr repeat(5, 1fr);
-    font-size: 13px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #555;
-    padding-bottom: 6px;
-    border-bottom: 3px solid #000;
-    margin-bottom: 6px;
-}
-
-.fila {
-    display: grid;
-    grid-template-columns: 3fr repeat(5, 1fr);
-    font-size: 15px;
-    padding: 2px 0;
-}
-
-.equipo-col { padding-left: 4px; }
-.set-col { text-align: center; font-weight: bold; }
-
-.ganador { font-weight: bold; color: #00a000; }
-.perdedor { opacity: 0.6; }
-
-.pendiente-line {
-    margin-top: 4px;
-    font-size: 13px;
-    color: #c08000;
-    font-style: italic;
-    padding-left: 4px;
-}
-
-.descanso-line {
-    margin-top: 6px;
-    font-size: 14px;
-    padding-left: 4px;
-}
-
-.descanso-label {
-    color: #c00000;
-    font-weight: bold;
-}
-
-.descanso-equipo { font-weight: bold; margin-left: 4px; }
-
-
-/* =====================================================
-   MOVIMIENTOS DE POSICIÓN
-===================================================== */
-
-.mov {
-    font-weight: bold;
-    width: 55px;
-    text-align: center;
-    padding-right: 4px;
-}
-
-.mov-icon { margin-right: 3px; font-size: 18px; }
-.mov-val  { font-size: 13px; }
-
-.mov-sube  { color: #1EBE5F; }
-.mov-baja  { color: #FF4D4D; }
-.mov-igual { color: #C0C0C0; }
-
-
-/* =====================================================
-   TOPBAR – SOLO ICONO ☰
-===================================================== */
-
 .topbar {
     position: fixed;
     top: 0;
@@ -184,57 +19,105 @@ tr:nth-child(odd)  { background: #ffffff; }
     color: #fff;
     display: flex;
     align-items: center;
-    padding-left: 16px;
-    z-index: 5000; /* FIX */
+    padding: 0 16px;
+    z-index: 5000;
 }
 
 .hamburger {
-    font-size: 26px;
+    font-size: 28px;
     cursor: pointer;
     user-select: none;
-    z-index: 7000 !important; /* FIX */
-    position: relative;
+    color: #fff;
 }
 
+.topbar-title {
+    margin-left: 16px;
+    font-size: 18px;
+    font-weight: 600;
+}
 
 /* =====================================================
-   DRAWER – MENÚ LATERAL OSCURO (ANTIGUO)
+   MENÚ LATERAL
 ===================================================== */
-
 .drawer {
     position: fixed;
     top: 0;
-    left: -260px;
+    left: 0;
     width: 260px;
     height: 100%;
-    background: #111;
-    box-shadow: 2px 0 6px rgba(0,0,0,0.5);
-    padding-top: 60px;
-    transition: left 0.28s ease;
-    z-index: 1100;
+    background: #000;
+    color: #fff;
+    transform: translateX(-100%);
+    transition: transform 0.28s ease;
+    z-index: 6000;
+    display: flex;
+    flex-direction: column;
+    padding-top: 65px;
+}
+
+.drawer.open {
+    transform: translateX(0);
+}
+
+/* Cabecera del menú */
+.drawer-header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px 0 12px 0;
+    text-align: center;
+    background: #000;
+}
+
+.drawer-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.drawer-avatar {
+    font-size: 40px;
+}
+
+.drawer-username {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 6px;
+}
+
+.drawer-sub {
+    font-size: 13px;
+    color: #bbb;
+    margin-top: 2px;
+}
+
+/* Enlaces del menú */
+.drawer-section {
     display: flex;
     flex-direction: column;
 }
 
-.drawer.open { left: 0; }
-
-.drawer a {
+.drawer-section a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: 14px 20px;
-    color: #fff;
     text-decoration: none;
     font-size: 17px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
-.drawer a:hover {
-    background: rgba(255,255,255,0.10);
+.drawer-section a:hover {
+    background: rgba(255,255,255,0.15);
 }
-
 
 /* =====================================================
-   OVERLAY DEL MENÚ
+   OVERLAY
 ===================================================== */
-
 .drawer-overlay {
     position: fixed;
     top: 0;
@@ -244,8 +127,8 @@ tr:nth-child(odd)  { background: #ffffff; }
     background: rgba(0,0,0,0.55);
     opacity: 0;
     visibility: hidden;
-    transition: 0.25s;
-    z-index: 1000;
+    transition: 0.25s ease;
+    z-index: 5500;
 }
 
 .drawer-overlay.visible {
@@ -253,44 +136,21 @@ tr:nth-child(odd)  { background: #ffffff; }
     visibility: visible;
 }
 
-
 /* =====================================================
-   CONTENIDO DE PÁGINAS INTERNAS
+   HERO
 ===================================================== */
-
-.page-content {
-    padding: 90px 16px 40px 16px;
-    max-width: 900px;
-    margin: auto;
-}
-
-.page-content h1 {
-    margin-bottom: 20px;
-    font-size: 26px;
-    text-align: center;
-}
-
-
-/* =====================================================
-   HERO PORTADA FINAL
-===================================================== */
-
 .hero {
     height: 78vh;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    text-align: center;
-    color: white;
     background-image: url('hero_padel.png');
     background-size: cover;
-    background-position: left center;
-    background-repeat: no-repeat;
-    background-color: #000;
+    background-position: center;
     margin-top: 54px;
     padding-top: 14px;
-    z-index: 1 !important; /* FIX */
+    color: white;
 }
 
 .hero-overlay {
@@ -304,69 +164,37 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 .hero-content {
     z-index: 2;
-    padding: 20px;
+    text-align: center;
 }
 
-.hero h1 {
-    font-size: 36px;
-    margin: 0;
+.hero-title-line1 {
+    font-size: 44px;
     font-weight: 800;
-    line-height: 1.3;
+    margin: 0;
 }
 
+.hero-title-line2 {
+    font-size: 34px;
+    margin-top: 5px;
+    font-weight: 600;
+}
 
 /* =====================================================
-   RESPONSIVE – MÓVIL
+   RESPONSIVE
 ===================================================== */
-
 @media (max-width: 600px) {
     .hero {
         height: 90vh;
         background-size: contain;
-        background-position: center top;
-        background-color: #000;
+        background-position: top center;
     }
 
     .hero-title-line1 {
-        font-size: 40px;
+        font-size: 36px;
     }
-   
-    hero-title-line2 {
-        font-size: 38px;
-    }
-}
 
-@media (min-width: 768px) {
-    .hero h1 {
-        font-size: 80px;
+    .hero-title-line2 {
+        font-size: 28px;
     }
 }
 
-.hero h2 {
-    font-size: 30px;
-    font-weight: 700;
-    margin-top: 5px;
-}
-
-
-/* =====================================================
-   NUEVO MENÚ CLARO
-===================================================== */
-
-.drawer.new-menu {
-    width: 260px;
-    background: #ffffff;
-    color: #333;
-    position: fixed !important;
-    top: 0;
-    left: 0 !important;              /* FIX */
-    height: 100%;
-    transform: translateX(-100%) !important; /* FIX */
-    transition: transform 0.28s ease;
-    box-shadow: 2px 0 12px rgba(0,0,0,0.2);
-    z-index: 6000 !important; /* FIX */
-}
-
-.drawer.new-menu.open {
-    transform: translateX(0) !important; /* FIX */
-}
