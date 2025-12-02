@@ -17,13 +17,34 @@
 </header>
 
 <!-- MENÚ LATERAL -->
-<nav id="drawer" class="drawer">
-    <a href="index.html">🏠 Inicio</a>
-    <a href="clasificacion.html">📊 Clasificación</a>
-    <a href="partidos.html">🎾 Partidos</a>
-    <a href="normas.html">📜 Normas</a>
-    <a href="historico.html">🏆 Histórico</a>
-    <a href="fotos.html">📸 Fotos</a>
+<nav id="drawer" class="drawer new-menu">
+    
+    <div class="drawer-header">
+        <div class="drawer-close" onclick="toggleMenu()">✕</div>
+        <div class="drawer-avatar">🎾</div>
+        <div class="drawer-username">Sprint Pádel</div>
+        <div class="drawer-sub">Temporada 2026</div>
+    </div>
+
+    <div class="drawer-section">
+        <a href="index.html"><span>🏠</span> Inicio</a>
+
+        <!-- NUEVO -->
+        <a href="historia.html"><span>📖</span> Historia</a>
+
+        <a href="clasificacion.html"><span>📊</span> Clasificación</a>
+        <a href="partidos.html"><span>🎾</span> Partidos</a>
+    </div>
+
+    <div class="drawer-section">
+        <a href="normas.html"><span>📜</span> Normas</a>
+
+        <!-- CAMBIADO -->
+        <a href="campeones.html"><span>🏆</span> Campeones</a>
+
+        <a href="fotos.html"><span>📸</span> Fotos</a>
+    </div>
+
 </nav>
 
 <div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
