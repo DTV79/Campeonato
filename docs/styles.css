@@ -338,7 +338,7 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 @media (min-width: 768px) {
     .hero h1 {
-        font-size: 60px;
+        font-size: 80px;
     }
 }
 .hero h2 {
