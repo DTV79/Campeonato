@@ -185,18 +185,20 @@ tr:nth-child(odd)  { background: #ffffff; }
     display: flex;
     align-items: center;
     padding-left: 16px;
-    z-index: 1000;
+    z-index: 5000; /* FIX */
 }
 
 .hamburger {
     font-size: 26px;
     cursor: pointer;
     user-select: none;
+    z-index: 7000 !important; /* FIX */
+    position: relative;
 }
 
 
 /* =====================================================
-   DRAWER – MENÚ LATERAL OSCURO
+   DRAWER – MENÚ LATERAL OSCURO (ANTIGUO)
 ===================================================== */
 
 .drawer {
@@ -270,7 +272,7 @@ tr:nth-child(odd)  { background: #ffffff; }
 
 
 /* =====================================================
-   HERO PORTADA FINAL (con tu imagen)
+   HERO PORTADA FINAL
 ===================================================== */
 
 .hero {
@@ -278,7 +280,7 @@ tr:nth-child(odd)  { background: #ffffff; }
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* ← sube el título hacia arriba */
+    align-items: flex-start;
     text-align: center;
     color: white;
     background-image: url('hero_padel.png');
@@ -287,8 +289,8 @@ tr:nth-child(odd)  { background: #ffffff; }
     background-repeat: no-repeat;
     background-color: #000;
     margin-top: 54px;
-
-    padding-top: 14px; /* ← controla la altura del título */ 
+    padding-top: 14px;
+    z-index: 1 !important; /* FIX */
 }
 
 .hero-overlay {
@@ -320,8 +322,8 @@ tr:nth-child(odd)  { background: #ffffff; }
 @media (max-width: 600px) {
     .hero {
         height: 90vh;
-        background-size: contain;        /* muestra las siluetas completas */
-        background-position: center top; /* centrado perfecto */
+        background-size: contain;
+        background-position: center top;
         background-color: #000;
     }
 
@@ -329,11 +331,9 @@ tr:nth-child(odd)  { background: #ffffff; }
         font-size: 40px;
     }
    
-   hero-title-line2 {
+    hero-title-line2 {
         font-size: 38px;
     }
-
-
 }
 
 @media (min-width: 768px) {
@@ -341,9 +341,32 @@ tr:nth-child(odd)  { background: #ffffff; }
         font-size: 80px;
     }
 }
+
 .hero h2 {
     font-size: 30px;
     font-weight: 700;
     margin-top: 5px;
 }
 
+
+/* =====================================================
+   NUEVO MENÚ CLARO
+===================================================== */
+
+.drawer.new-menu {
+    width: 260px;
+    background: #ffffff;
+    color: #333;
+    position: fixed !important;
+    top: 0;
+    left: 0 !important;              /* FIX */
+    height: 100%;
+    transform: translateX(-100%) !important; /* FIX */
+    transition: transform 0.28s ease;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.2);
+    z-index: 6000 !important; /* FIX */
+}
+
+.drawer.new-menu.open {
+    transform: translateX(0) !important; /* FIX */
+}
