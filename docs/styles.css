@@ -367,9 +367,3 @@ tr:nth-child(odd)  { background: #ffffff; }
 .drawer-section a:hover {
     background: rgba(255,255,255,0.15);
 }
-
-/* Evita que Chrome convierta fechas en enlaces automáticos */
-a[href^="http"][data-detected="true"] {
-    pointer-events: none;
-    text-decoration: none !important;
-}
