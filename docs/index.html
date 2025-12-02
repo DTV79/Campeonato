@@ -10,13 +10,16 @@
 <body>
 
 <!-- ===========================
-     TOP BAR (solo icono menú)
+     TOP BAR
 =========================== -->
 <header class="topbar simple">
     <div class="hamburger left" onclick="toggleMenu()">☰</div>
+    <div class="topbar-title">Sprint Pádel Tui 2026</div>
 </header>
 
-<!-- MENÚ LATERAL -->
+<!-- ===========================
+     MENÚ LATERAL NUEVO
+=========================== -->
 <nav id="drawer" class="drawer new-menu">
     
     <div class="drawer-header">
@@ -50,7 +53,7 @@
 <div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
 
 <!-- ===========================
-     HERO LIMPIO (Sin botones)
+     HERO LIMPIO
 =========================== -->
 <section class="hero">
     <div class="hero-overlay"></div>
@@ -60,6 +63,9 @@
     </div>
 </section>
 
+<!-- ===========================
+     SCRIPT MENÚ
+=========================== -->
 <script>
 function toggleMenu() {
     const drawer = document.getElementById("drawer");
@@ -71,6 +77,7 @@ function toggleMenu() {
 
 </body>
 </html>
+
 
 
 
