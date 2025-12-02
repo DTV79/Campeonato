@@ -1,1 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historia del Torneo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="hamburger" onclick="toggleDrawer()">☰</div>
+    </div>
+
+    <!-- MENÚ LATERAL -->
+    <nav id="drawer" class="drawer">
+        <a href="index.html">Portada</a>
+        <a href="clasificacion.html">Clasificación</a>
+        <a href="partidos.html">Partidos</a>
+        <a href="historia.html">Historia del torneo</a>
+    </nav>
+
+    <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="page-content">
+        <h1>Historia del Torneo</h1>
+
+        <p>Dicen que las grandes historias no empiezan con fanfarrias, sino con pequeñas rutinas que, sin querer, acaban construyendo algo eterno.</p>
+
+        <p>La nuestra empezó un <strong>24 de octubre de 2018</strong>, cuando cuatro jugadores —<strong>Kike, Javi, Manolo y Diego</strong>— decidieron que los partidos sueltos ya no bastaban. Ese día nació un pacto silencioso:</p>
+
+        <p><strong>“Todos los miércoles, a las 20:30, pase lo que pase.”</strong></p>
+
+        <p>Cada semana, a la misma hora, lloviese, nevase o hubiese Champions. Desde entonces, la pista se convirtió en un santuario semanal.<br>
+        Los golpes, en conversación.<br>
+        Las bromas, en combustible.<br>
+        Y las cervezas de después, en una tradición sagrada.</p>
+
+        <p>Porque, cuando el partido terminaba, comenzaba “la tercera parte”: el <strong>bar de Yoli</strong>, risas sueltas, patatas con dos salsas, oreja… Siempre las patatas, siempre la mesa de siempre.</p>
+
+        <p>Allí, entre historias de la semana y piques deportivos, fue donde germinó una idea que no sabíamos que cambiaría todo:</p>
+
+        <p><strong>“¿Y si hacemos un campeonato… con todos los que alguna vez nos sustituyeron?”</strong></p>
+
+        <p>La frase quedó en el aire, pero tenía fuerza. No era simplemente organizar un torneo: era rendir homenaje a todos los que alguna vez se habían sumado a la familia del miércoles.</p>
+
+        <p>Y así, el <strong>11 de diciembre de 2021</strong>, aquel sueño se hizo realidad. Un día de esos que no se olvidan. Ilusión desbordada y un torneo que, sin saberlo, estaba destinado a convertirse en tradición. La prueba irrefutable de aquello es esta imagen legendaria:</p>
+
+        <figure>
+            <img src="Foto_2021.jpg" alt="Foto del primer campeonato 2021" style="max-width:100%;border-radius:8px;display:block;margin:0 auto 10px auto;">
+            <figcaption style="text-align:center;font-size:14px;margin-top:4px;">
+                Primer campeonato – 11 de diciembre de 2021
+            </figcaption>
+        </figure>
+
+        <p>Pero la vida, como siempre, puso sus obstáculos. Operaciones, calendarios imposibles, pereza, compromisos… Y el torneo quedó en pausa. El pádel del miércoles siguió, pero la gran fiesta anual se apagó, esperando su momento para renacer.</p>
+
+        <p>Ese momento llegó en <strong>2025</strong>. Gracias al impulso de <strong>Carlos</strong>, la llama volvió a encenderse. Y no solo volvió… <strong>volvió más grande</strong>.</p>
+
+        <p>El <strong>27 de septiembre de 2025</strong>, el campeonato renació con más jugadores, más nivel, más emoción… y una organización que parecía hecha para quedarse.</p>
+
+        <p>Ese día no fue solo un torneo. Fue un reencuentro. Una celebración. Un recordatorio de que las mejores tradiciones no se miden en trofeos, sino en personas.</p>
+
+        <p>Y entonces se tomó la decisión que marca a los campeonatos que aspiran a transformarse en leyenda:</p>
+
+        <p><strong>“A partir de ahora, cada año, el último sábado de septiembre.”</strong></p>
+
+        <p>Así, lo que empezó como un plan entre amigos, como una quedada de miércoles, como un ritual de pádel, patatas y cervezas…</p>
+
+        <p>Hoy es un torneo con alma propia. Un torneo que crece. Que reúne. Que emociona. Y que, pase lo que pase, seguirá contándose año tras año.</p>
+
+        <p>Porque la historia del torneo no va de puntos, ni de sets. Va de amistad. De constancia. De tradiciones que se vuelven familia. Y eso, en el fondo, es lo que hace grande a este campeonato.</p>
+    </main>
+
+    <!-- SCRIPT MENÚ -->
+    <script>
+        function toggleDrawer() {
+            const drawer = document.getElementById('drawer');
+            const overlay = document.getElementById('drawerOverlay');
+            const isOpen = drawer.classList.contains('open');
+
+            if (isOpen) {
+                drawer.classList.remove('open');
+                overlay.classList.remove('visible');
+            } else {
+                drawer.classList.add('open');
+                overlay.classList.add('visible');
+            }
+        }
+    </script>
+
+</body>
+</html>
 
