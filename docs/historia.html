@@ -13,15 +13,24 @@
         <div class="hamburger" onclick="toggleDrawer()">☰</div>
     </div>
 
-    <!-- MENÚ LATERAL -->
-    <nav id="drawer" class="drawer">
-        <a href="index.html">Portada</a>
-        <a href="clasificacion.html">Clasificación</a>
-        <a href="partidos.html">Partidos</a>
-        <a href="historia.html">Historia del torneo</a>
-    </nav>
+<!-- ===========================
+     MENÚ LATERAL NUEVO
+=========================== -->
+<nav id="drawer" class="drawer">
 
-    <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer-section">
+        <a href="index.html">🏠 Inicio</a>
+        <a href="historia.html">📖 Historia</a>
+        <a href="clasificacion.html">📊 Clasificación</a>
+        <a href="partidos.html">🎾 Partidos</a>
+        <a href="normas.html">📜 Normas</a>
+        <a href="campeones.html">🏆 Campeones</a>
+        <a href="fotos.html">📸 Fotos</a>
+    </div>
+
+</nav>
+
+<div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="page-content">
