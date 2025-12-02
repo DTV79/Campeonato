@@ -347,14 +347,3 @@ tr:nth-child(odd)  { background: #ffffff; }
     margin-top: 5px;
 }
 
-.drawer.new-menu {
-    width: 260px;
-    background: #ffffff;
-    color: #333;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    transform: translateX(-100%);
-    transition: transform 0.28s ease;
-    box-shadow: 2px 0 12px rgba(0,0,0,0.2);
