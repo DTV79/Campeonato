@@ -1,34 +1,48 @@
 // docs/menu.js
 (function () {
-  // Inserta el botón ☰ y el menú al principio del <body>
-  const menuHTML = `
-    <div class="menu-btn" id="menuBtn" aria-label="Abrir menú">☰</div>
+  const topbarHTML = `
+    <div class="topbar">
+      <div class="hamburger" id="hamburger">☰</div>
+    </div>
 
-    <nav id="menu" class="menu" aria-label="Menú principal">
-      <a href="index.html">Inicio</a>
-      <a href="clasificacion.html">Clasificación</a>
-      <a href="campeones.html">Campeones</a>
-      <a href="historia.html">Historia</a>
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+
+    <nav class="drawer" id="drawer">
+      <div class="drawer-header">
+        <div class="drawer-close" id="drawerClose">✕</div>
+        <div class="drawer-avatar">🎾</div>
+        <div class="drawer-username">Campeonato Pádel</div>
+        <div class="drawer-sub">Menú</div>
+      </div>
+
+      <div class="drawer-section">
+        <a href="index.html">Inicio</a>
+        <a href="clasificacion.html">Clasificación</a>
+        <a href="partidos.html">Partidos</a>
+        <a href="campeones.html">Campeones</a>
+        <a href="historia.html">Historia</a>
+      </div>
     </nav>
   `;
 
+  function openDrawer() {
+    document.getElementById("drawer").classList.add("open");
+    document.getElementById("drawerOverlay").classList.add("visible");
+  }
+
+  function closeDrawer() {
+    document.getElementById("drawer").classList.remove("open");
+    document.getElementById("drawerOverlay").classList.remove("visible");
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
-    document.body.insertAdjacentHTML("afterbegin", menuHTML);
+    // Inserta el menú al principio del body
+    document.body.insertAdjacentHTML("afterbegin", topbarHTML);
 
-    const menu = document.getElementById("menu");
-    const btn = document.getElementById("menuBtn");
-
-    function toggleMenu() {
-      menu.classList.toggle("active");
-    }
-
-    btn.addEventListener("click", toggleMenu);
-
-    // Cierra el menú al hacer click fuera
-    document.addEventListener("click", (e) => {
-      if (!menu.classList.contains("active")) return;
-      const clickedInside = menu.contains(e.target) || btn.contains(e.target);
-      if (!clickedInside) menu.classList.remove("active");
-    });
+    // Eventos
+    document.getElementById("hamburger").addEventListener("click", openDrawer);
+    document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+    document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
   });
 })();
+
