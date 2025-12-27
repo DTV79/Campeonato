@@ -1,48 +1,43 @@
 // docs/menu.js
 (function () {
-  const topbarHTML = `
-    <div class="topbar">
-      <div class="hamburger" id="hamburger">☰</div>
-    </div>
 
-    <div class="drawer-overlay" id="drawerOverlay"></div>
+  const menuHTML = `
+  <!-- TOP BAR -->
+  <header class="topbar simple">
+      <div class="hamburger left" id="hamburger">☰</div>
+  </header>
 
-    <nav class="drawer" id="drawer">
-      <div class="drawer-header">
-        <div class="drawer-close" id="drawerClose">✕</div>
-        <div class="drawer-avatar">🎾</div>
-        <div class="drawer-username">Campeonato Pádel</div>
-        <div class="drawer-sub">Menú</div>
+  <!-- MENÚ LATERAL -->
+  <nav id="drawer" class="drawer new-menu">
+      <div class="drawer-section">
+          <a href="index.html"><span>🏠</span> Inicio</a>
+          <a href="historia.html"><span>📖</span> Historia</a>
+          <a href="clasificacion.html"><span>📊</span> Clasificación</a>
+          <a href="partidos.html"><span>🎾</span> Partidos</a>
       </div>
 
       <div class="drawer-section">
-        <a href="index.html">Inicio</a>
-        <a href="clasificacion.html">Clasificación</a>
-        <a href="partidos.html">Partidos</a>
-        <a href="campeones.html">Campeones</a>
-        <a href="historia.html">Historia</a>
+          <a href="normas.html"><span>📜</span> Normas</a>
+          <a href="campeones.html"><span>🏆</span> Campeones</a>
+          <a href="fotos.html"><span>📸</span> Fotos</a>
       </div>
-    </nav>
+  </nav>
+
+  <div id="drawer-overlay" class="drawer-overlay"></div>
   `;
 
-  function openDrawer() {
-    document.getElementById("drawer").classList.add("open");
-    document.getElementById("drawerOverlay").classList.add("visible");
-  }
-
-  function closeDrawer() {
-    document.getElementById("drawer").classList.remove("open");
-    document.getElementById("drawerOverlay").classList.remove("visible");
+  function toggleMenu() {
+      document.getElementById("drawer").classList.toggle("open");
+      document.getElementById("drawer-overlay").classList.toggle("visible");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Inserta el menú al principio del body
-    document.body.insertAdjacentHTML("afterbegin", topbarHTML);
+      document.body.insertAdjacentHTML("afterbegin", menuHTML);
 
-    // Eventos
-    document.getElementById("hamburger").addEventListener("click", openDrawer);
-    document.getElementById("drawerClose").addEventListener("click", closeDrawer);
-    document.getElementById("drawerOverlay").addEventListener("click", closeDrawer);
+      document.getElementById("hamburger").addEventListener("click", toggleMenu);
+      document.getElementById("drawer-overlay").addEventListener("click", toggleMenu);
   });
+
 })();
+
 
