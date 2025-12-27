@@ -10,36 +10,6 @@
 <body>
 
 <!-- ===========================
-     TOP BAR (BOTÓN MENÚ)
-=========================== -->
-<header class="topbar simple">
-    <div class="hamburger left" onclick="toggleMenu()">☰</div>
-</header>
-
-<!-- ===========================
-     MENÚ LATERAL NUEVO
-=========================== -->
-<nav id="drawer" class="drawer new-menu">
-    
-   
-    <div class="drawer-section">
-        <a href="index.html"><span>🏠</span> Inicio</a>
-        <a href="historia.html"><span>📖</span> Historia</a>
-        <a href="clasificacion.html"><span>📊</span> Clasificación</a>
-        <a href="partidos.html"><span>🎾</span> Partidos</a>
-    </div>
-
-    <div class="drawer-section">
-        <a href="normas.html"><span>📜</span> Normas</a>
-        <a href="campeones.html"><span>🏆</span> Campeones</a>
-        <a href="fotos.html"><span>📸</span> Fotos</a>
-    </div>
-
-</nav>
-
-<div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
-
-<!-- ===========================
      HERO LIMPIO
 =========================== -->
 <section class="hero">
@@ -51,16 +21,9 @@
 </section>
 
 <!-- ===========================
-     SCRIPT MENÚ
+     MENÚ GLOBAL
 =========================== -->
-<script>
-function toggleMenu() {
-    const drawer = document.getElementById("drawer");
-    const overlay = document.getElementById("drawer-overlay");
-    drawer.classList.toggle("open");
-    overlay.classList.toggle("visible");
-}
-</script>
+<script src="menu.js"></script>
 
 </body>
 </html>
