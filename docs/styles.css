@@ -42,8 +42,13 @@ td {
     border-bottom: 1px solid #ddd;
 }
 
-tr:nth-child(even) { background: #f7f7f7; }
-tr:nth-child(odd)  { background: #ffffff; }
+tr:nth-child(even) { 
+    background: #f7f7f7; 
+}
+
+tr:nth-child(odd)  { 
+    background: #ffffff; 
+}
 
 .leyenda {
     margin-top: 10px;
@@ -119,11 +124,23 @@ tr:nth-child(odd)  { background: #ffffff; }
     padding: 2px 0;
 }
 
-.equipo-col { padding-left: 4px; }
-.set-col { text-align: center; font-weight: bold; }
+.equipo-col { 
+    padding-left: 4px; 
+}
 
-.ganador { font-weight: bold; color: #00a000; }
-.perdedor { opacity: 0.6; }
+.set-col { 
+    text-align: center; 
+    font-weight: bold; 
+}
+
+.ganador { 
+    font-weight: bold; 
+    color: #00a000; 
+}
+
+.perdedor { 
+    opacity: 0.6; 
+}
 
 .pendiente-line {
     margin-top: 4px;
@@ -144,7 +161,10 @@ tr:nth-child(odd)  { background: #ffffff; }
     font-weight: bold;
 }
 
-.descanso-equipo { font-weight: bold; margin-left: 4px; }
+.descanso-equipo { 
+    font-weight: bold; 
+    margin-left: 4px; 
+}
 
 /* =====================================================
    MOVIMIENTOS DE POSICIÓN
@@ -156,12 +176,26 @@ tr:nth-child(odd)  { background: #ffffff; }
     padding-right: 4px;
 }
 
-.mov-icon { margin-right: 3px; font-size: 18px; }
-.mov-val  { font-size: 13px; }
+.mov-icon { 
+    margin-right: 3px; 
+    font-size: 18px; 
+}
 
-.mov-sube  { color: #1EBE5F; }
-.mov-baja  { color: #FF4D4D; }
-.mov-igual { color: #C0C0C0; }
+.mov-val  { 
+    font-size: 13px; 
+}
+
+.mov-sube  { 
+    color: #1EBE5F; 
+}
+
+.mov-baja  { 
+    color: #FF4D4D; 
+}
+
+.mov-igual { 
+    color: #C0C0C0; 
+}
 
 /* =====================================================
    TOPBAR – SOLO ICONO ☰
@@ -210,22 +244,31 @@ tr:nth-child(odd)  { background: #ffffff; }
    CONTENIDO DE PÁGINAS INTERNAS
 ===================================================== */
 .page-content {
-    padding: 90px 16px 40px 16px;
+    padding: 120px 16px 40px 16px;
     max-width: 900px;
     margin: auto;
 }
 
 .page-content h1 {
-    margin-bottom: 20px;
+    margin-top: 0;
+    margin-bottom: 28px;
     font-size: 26px;
     text-align: center;
+}
+
+/* =====================================================
+   SEPARACIÓN GENERAL ENTRE HEADER Y TÍTULOS
+===================================================== */
+main,
+section {
+    scroll-margin-top: 90px;
 }
 
 /* =====================================================
    HERO PORTADA FINAL
 ===================================================== */
 .hero {
-    height: 78vh;
+    min-height: 78vh;
     position: relative;
     display: flex;
     justify-content: center;
@@ -238,7 +281,8 @@ tr:nth-child(odd)  { background: #ffffff; }
     background-repeat: no-repeat;
     background-color: #000;
     margin-top: 54px;
-    padding-top: 14px;
+    padding-top: 70px;
+    box-sizing: border-box;
 }
 
 .hero-overlay {
@@ -262,17 +306,38 @@ tr:nth-child(odd)  { background: #ffffff; }
     line-height: 1.3;
 }
 
+.hero h2 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 @media (max-width: 600px) {
+
+    .page-content {
+        padding-top: 130px;
+    }
+
+    .page-content h1 {
+        margin-bottom: 30px;
+    }
+
     .hero {
-        height: 90vh;
+        min-height: 90vh;
         background-size: contain;
         background-position: center top;
         background-color: #000;
+        padding-top: 70px;
     }
+
     .hero-title-line1 {
         font-size: 40px;
     }
-    hero-title-line2 {
+
+    .hero-title-line2 {
         font-size: 38px;
     }
 }
@@ -283,25 +348,18 @@ tr:nth-child(odd)  { background: #ffffff; }
     }
 }
 
-.hero h2 {
-    font-size: 30px;
-    font-weight: 700;
-    margin-top: 5px;
-}
-
 /* =====================================================
-   MENÚ LATERAL NUEVO (AISLADO, NO TOCA NADA MÁS)
+   MENÚ LATERAL
 ===================================================== */
-
 .drawer {
     position: fixed;
     top: 0;
-    left: -260px;            /* oculta inicialmente */
+    left: -260px;
     width: 260px;
     height: 100%;
-    background: #000;        /* fondo negro */
+    background: #000;
     color: #fff;
-    padding-top: 70px;       
+    padding-top: 70px;
     z-index: 4000;
     transition: left 0.28s ease;
     display: flex;
@@ -309,7 +367,7 @@ tr:nth-child(odd)  { background: #ffffff; }
 }
 
 .drawer.open {
-    left: 0; /* aparece */
+    left: 0;
 }
 
 .drawer-header {
@@ -368,16 +426,9 @@ tr:nth-child(odd)  { background: #ffffff; }
     background: rgba(255,255,255,0.15);
 }
 
-
-
-/* Estilos generales */
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
+/* =====================================================
+   CAMPEONES
+===================================================== */
 header {
     background-color: #333;
     color: white;
