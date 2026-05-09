@@ -215,8 +215,10 @@ tr:nth-child(odd) {
 
 .hamburger {
     font-size: 26px;
+    line-height: 1;
     cursor: pointer;
     user-select: none;
+    color: white;
 }
 
 /* =====================================================
@@ -264,7 +266,7 @@ tr:nth-child(odd) {
     position: relative;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     text-align: center;
     color: white;
     background-image: url('hero_padel.png');
@@ -273,7 +275,7 @@ tr:nth-child(odd) {
     background-repeat: no-repeat;
     background-color: #000;
     margin-top: 54px;
-    padding-top: 110px !important;
+    padding-top: 95px !important;
     box-sizing: border-box;
 }
 
@@ -289,6 +291,7 @@ tr:nth-child(odd) {
 .hero-content {
     z-index: 2;
     padding: 20px;
+    margin-top: 20px;
 }
 
 .hero h1 {
@@ -433,25 +436,17 @@ footer {
 /* =====================================================
    ESPACIADO SUPERIOR UNIFICADO
 ===================================================== */
-
 .page-content,
 .historia-container,
 .historia,
-.contenido,
-main {
+.contenido {
     padding-top: 120px !important;
 }
 
 .page-content h1,
-.historia h1,
-main h1 {
+.historia h1 {
     margin-top: 0 !important;
     margin-bottom: 28px;
-}
-
-main,
-section {
-    scroll-margin-top: 90px;
 }
 
 /* =====================================================
@@ -462,8 +457,7 @@ section {
     .page-content,
     .historia-container,
     .historia,
-    .contenido,
-    main {
+    .contenido {
         padding-top: 115px !important;
     }
 
@@ -472,7 +466,11 @@ section {
         background-size: contain;
         background-position: center top;
         background-color: #000;
-        padding-top: 120px !important;
+        padding-top: 85px !important;
+    }
+
+    .hero-content {
+        margin-top: 25px;
     }
 
     .hero-title-line1 {
