@@ -30,7 +30,7 @@
 
 </nav>
 
-<div id="drawer-overlay" class="drawer-overlay" onclick="toggleMenu()"></div>
+<div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="page-content">
@@ -83,22 +83,7 @@
         <p>Porque la historia del torneo no va de puntos, ni de sets. Va de amistad. De constancia. De tradiciones que se vuelven familia. Y eso, en el fondo, es lo que hace grande a este campeonato.</p>
     </main>
 
-    <!-- SCRIPT MENÚ -->
-    <script>
-        function toggleDrawer() {
-            const drawer = document.getElementById('drawer');
-            const overlay = document.getElementById('drawerOverlay');
-            const isOpen = drawer.classList.contains('open');
-
-            if (isOpen) {
-                drawer.classList.remove('open');
-                overlay.classList.remove('visible');
-            } else {
-                drawer.classList.add('open');
-                overlay.classList.add('visible');
-            }
-        }
-    </script>
+    
 <script src="menu.js"></script>
 
 </body>
