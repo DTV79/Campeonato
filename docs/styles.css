@@ -464,13 +464,24 @@ footer {
     .hero {
         min-height: 90vh;
         background-size: contain;
-        background-position: center top;
+        background-position: center 140px;
+        background-repeat: no-repeat;
         background-color: #000;
-        padding-top: 85px !important;
+        padding-top: 55px !important;
     }
 
     .hero-content {
-        margin-top: 25px;
+        margin-top: 0;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+        line-height: 1.15;
+    }
+
+    .hero h2 {
+        font-size: 22px;
+        margin-top: 8px;
     }
 
     .hero-title-line1 {
