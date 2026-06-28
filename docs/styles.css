@@ -143,6 +143,7 @@ tr:nth-child(odd) {
 .ganador .equipo-col {
     color: #008000;
     font-weight: bold;
+    padding-left: 8px;
 }
 
 .perdedor {
