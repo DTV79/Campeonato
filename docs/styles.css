@@ -133,14 +133,16 @@ tr:nth-child(odd) {
     font-weight: bold;
 }
 
-.ganador {
-    background: linear-gradient(90deg,#fff8d8 0%,#ffe79a 100%);
+/* Ganador: fondo amarillo en toda la fila */
+.fila.ganador {
+    background: linear-gradient(90deg, #fff8d8 0%, #ffe79a 70%, transparent 100%) !important;
     border-left: 5px solid #d4a017;
     border-radius: 6px;
     font-weight: bold;
+    padding-left: 6px;
 }
 
-.ganador .equipo-col {
+.fila.ganador .equipo-col {
     color: #008000;
     font-weight: bold;
     padding-left: 8px;
