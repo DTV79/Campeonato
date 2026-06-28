@@ -275,7 +275,7 @@ function generarHTMLJornada(partidos) {
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
     html += `
         <div class="palas-descanso">
-            <div class="palas-descanso-label">💤 DESCANSA</div>
+            <div class="palas-descanso-label">💤 DESCANSAN</div>
             <div class="palas-descanso-equipo">${p.local}</div>
         </div>`;
     return;
