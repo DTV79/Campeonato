@@ -408,7 +408,7 @@ function generarHTMLPalasPlaya(rondas) {
         html += `
             <div class="palas-ronda">
                 <h2>🏖️ ${ronda.nombre || ("Ronda " + ronda.ronda)}</h2>
-                ${generarHTMLJornada(ronda.partidos || [])}
+                ${generarHTMLJornadaPalas(ronda.partidos || [])}
 
                 ${
                     ronda.descansa
@@ -436,6 +436,76 @@ function generarHTMLPalasPlaya(rondas) {
     }
 
     html += `</div>`;
+    return html;
+}
+
+
+function generarHTMLJornadaPalas(partidos) {
+    let html = "";
+
+    partidos.forEach(p => {
+        const sets = p.resultado || [];
+
+        const getSet = (i, pos) => {
+            if (!sets[i]) return "";
+            const partes = sets[i].split("-");
+            return partes[pos] || "";
+        };
+
+        const haySet4 = sets.length >= 4 && sets[3] !== "";
+        const haySet5 = sets.length >= 5 && sets[4] !== "";
+
+        const totalCols = 3 + (haySet4 ? 1 : 0) + (haySet5 ? 1 : 0);
+        const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
+
+        const estado = String(p.estado || "").toLowerCase();
+        const perdedor = p.perdedor || "";
+
+        const claseLocal = (estado === "jugado" || estado === "finalizado") && perdedor === p.local
+            ? "perdedor-palas"
+            : "";
+
+        const claseVisit = (estado === "jugado" || estado === "finalizado") && perdedor === p.visitante
+            ? "perdedor-palas"
+            : "";
+
+        html += `
+        <div class="partido">
+            <div class="fila fila-head" style="${gridStyle}">
+                <span class="equipo-col">EQUIPOS</span>
+                <span class="set-col">I</span>
+                <span class="set-col">II</span>
+                <span class="set-col">III</span>
+                ${haySet4 ? `<span class="set-col">IV</span>` : ""}
+                ${haySet5 ? `<span class="set-col">V</span>` : ""}
+            </div>
+
+            <div class="fila ${claseLocal}" style="${gridStyle}">
+                <span class="equipo-col">${p.local}</span>
+                <span class="set-col">${getSet(0,0)}</span>
+                <span class="set-col">${getSet(1,0)}</span>
+                <span class="set-col">${getSet(2,0)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,0)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
+            </div>
+
+            <div class="fila ${claseVisit}" style="${gridStyle}">
+                <span class="equipo-col">${p.visitante}</span>
+                <span class="set-col">${getSet(0,1)}</span>
+                <span class="set-col">${getSet(1,1)}</span>
+                <span class="set-col">${getSet(2,1)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
+            </div>
+
+            ${
+                estado === "pendiente"
+                    ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                    : ""
+            }
+        </div>`;
+    });
+
     return html;
 }
 
