@@ -20,8 +20,11 @@ async function cargarDatos() {
         }
 
         if (document.getElementById("partidos")) {
-            window.datosCruces = data.cruces || [];
-            mostrarPartidos(data.partidos || []);
+            mostrarPartidos(
+                data.partidos || [],
+                data.cruces || [],
+                data.palas_playa || []
+            );
         }
 
     } catch (err) {
@@ -171,7 +174,7 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
 // =====================================================
 //   PARTIDOS
 // =====================================================
-function mostrarPartidos(lista) {
+function mostrarPartidos(lista, cruces, palasPlaya) {
     const div = document.getElementById("partidos");
     if (!div) return;
 
@@ -187,9 +190,10 @@ function mostrarPartidos(lista) {
         .map(Number)
         .sort((a, b) => a - b);
 
-    const hayCruces = window.datosCruces && window.datosCruces.length > 0;
+    const hayCruces = cruces && cruces.length > 0;
+    const hayPalasPlaya = palasPlaya && palasPlaya.length > 0;
 
-    if (!jornadasOrdenadas.length && !hayCruces) {
+    if (!jornadasOrdenadas.length && !hayCruces && !hayPalasPlaya) {
         div.innerHTML = "<p>No hay partidos.</p>";
         return;
     }
@@ -223,7 +227,23 @@ function mostrarPartidos(lista) {
         contenido += `
             <div id="fase_final" class="jornada-contenido"
                  style="display:${activaFinal ? "block" : "none"};">
-                ${generarHTMLCruces(window.datosCruces)}
+                ${generarHTMLCruces(cruces)}
+            </div>`;
+    }
+
+    if (hayPalasPlaya) {
+        const activaPalas = jornadasOrdenadas.length === 0 && !hayCruces;
+
+        tabs += `
+            <button class="tab-btn ${activaPalas ? "activa" : ""}"
+                    onclick="cambiarJornada('palas_playa', event)">
+                🏖️ Palas de Playa
+            </button>`;
+
+        contenido += `
+            <div id="palas_playa" class="jornada-contenido"
+                 style="display:${activaPalas ? "block" : "none"};">
+                ${generarHTMLPalasPlaya(palasPlaya)}
             </div>`;
     }
 
@@ -340,9 +360,8 @@ function generarHTMLJornada(partidos) {
 }
 
 // =====================================================
-//   Fase Final
+//   Mata-Mata
 // =====================================================
-
 function generarHTMLCruces(lista) {
     const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
     let html = "";
@@ -381,7 +400,62 @@ function iconoFase(fase) {
     return "🎾";
 }
 
+// =====================================================
+//   Palas de Playa
+// =====================================================
+function generarHTMLPalasPlaya(rondas) {
+    let html = `<div class="palas-playa-box">`;
 
+    rondas.forEach(ronda => {
+        html += `
+            <div class="palas-ronda">
+                <h2>🏖️ ${ronda.nombre || ("Ronda " + ronda.ronda)}</h2>
+                ${generarHTMLJornada(ronda.partidos || [])}
+
+                ${
+                    ronda.descansa
+                        ? `
+                            <div class="palas-descanso">
+                                <div class="palas-descanso-label">💤 DESCANSA</div>
+                                <div class="palas-descanso-equipo">${ronda.descansa}</div>
+                            </div>
+                          `
+                        : ""
+                }
+            </div>
+        `;
+    });
+
+    const farolillo = detectarFarolilloRojo(rondas);
+
+    if (farolillo) {
+        html += `
+            <div class="farolillo-box">
+                <div class="farolillo-label">🥄 FAROLILLO ROJO</div>
+                <div class="farolillo-nombre">${farolillo}</div>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    return html;
+}
+
+function detectarFarolilloRojo(rondas) {
+    if (!rondas || !rondas.length) return "";
+
+    const ultima = rondas[rondas.length - 1];
+    const partidos = ultima.partidos || [];
+
+    if (partidos.length !== 1) return "";
+
+    const p = partidos[0];
+    const estado = String(p.estado || "").toLowerCase();
+
+    if (estado !== "finalizado" && estado !== "jugado") return "";
+
+    return p.perdedor || "";
+}
 
 // =====================================================
 //   Carga inicial
