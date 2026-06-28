@@ -459,15 +459,19 @@ function generarHTMLJornadaPalas(partidos) {
         const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
 
         const estado = String(p.estado || "").toLowerCase();
-        const perdedor = p.perdedor || "";
+        const perdedor = normalizarNombre(p.perdedor || "");
 
-        const claseLocal = (estado === "jugado" || estado === "finalizado") && perdedor === p.local
-            ? "perdedor-palas"
-            : "";
+        const claseLocal =
+            (estado === "jugado" || estado === "finalizado") &&
+            perdedor === normalizarNombre(p.local)
+                ? "perdedor-palas"
+                : "";
 
-        const claseVisit = (estado === "jugado" || estado === "finalizado") && perdedor === p.visitante
-            ? "perdedor-palas"
-            : "";
+        const claseVisit =
+            (estado === "jugado" || estado === "finalizado") &&
+            perdedor === normalizarNombre(p.visitante)
+                ? "perdedor-palas"
+                : "";
 
         html += `
         <div class="partido">
@@ -507,6 +511,14 @@ function generarHTMLJornadaPalas(partidos) {
     });
 
     return html;
+}
+
+function normalizarNombre(txt) {
+    return String(txt || "")
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 }
 
 function detectarFarolilloRojo(rondas) {
