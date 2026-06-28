@@ -311,8 +311,8 @@ function generarHTMLJornada(partidos) {
                 ${haySet5 ? `<span class="set-col">V</span>` : ""}
             </div>
 
-            <div class="fila" style="${gridStyle}">
-                <span class="equipo-col ${claseLocal}">${p.local}</span>
+           <div class="fila ${claseLocal}" style="${gridStyle}">
+                <span class="equipo-col">${p.local}</span>
                 <span class="set-col">${getSet(0,0)}</span>
                 <span class="set-col">${getSet(1,0)}</span>
                 <span class="set-col">${getSet(2,0)}</span>
@@ -320,15 +320,14 @@ function generarHTMLJornada(partidos) {
                 ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
             </div>
 
-            <div class="fila" style="${gridStyle}">
-                <span class="equipo-col ${claseVisit}">${p.visitante}</span>
+            <div class="fila ${claseVisit}" style="${gridStyle}">
+                <span class="equipo-col">${p.visitante}</span>
                 <span class="set-col">${getSet(0,1)}</span>
                 <span class="set-col">${getSet(1,1)}</span>
                 <span class="set-col">${getSet(2,1)}</span>
                 ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
                 ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
             </div>
-
             ${
                 estado === "pendiente"
                     ? `<div class="pendiente-line">⏳ Pendiente</div>`
