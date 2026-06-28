@@ -365,7 +365,7 @@ function generarHTMLCruces(lista) {
     if (final && final.ganador) {
         html += `
             <div class="campeon-box">
-                <div class="campeon-label">👑 CAMPEONES</div>
+                <div class="campeon-label">👑 THE CHAMPIONS OF THE 2025 SPRINT PADEL TOURNAMENT ARE …</div>
                 <div class="campeon-nombre">${final.ganador}</div>
             </div>
         `;
