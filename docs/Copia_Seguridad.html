@@ -1,620 +1,389 @@
-/* =====================================================
-   ESTILOS GENERALES
-===================================================== */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f3f3f3;
-}
-
-/* =====================================================
-   CLASIFICACIÓN
-===================================================== */
-.tabla-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    background: white;
-    padding: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-table {
-    border-collapse: collapse;
-    width: max-content;
-    min-width: 800px;
-    font-size: 14px;
-}
-
-th {
-    background: #e0e0e0;
-    padding: 8px 12px;
-    font-weight: bold;
-    text-align: left;
-    white-space: nowrap;
-    position: sticky;
-    top: 0;
-    z-index: 5;
-}
-
-td {
-    padding: 8px 12px;
-    white-space: nowrap;
-    border-bottom: 1px solid #ddd;
-}
-
-tr:nth-child(even) {
-    background: #f7f7f7;
-}
-
-tr:nth-child(odd) {
-    background: #ffffff;
-}
-
-.leyenda {
-    margin-top: 10px;
-    font-size: 9px;
-    line-height: 1.2;
-    color: #444;
-    font-style: italic;
-}
-
-.fecha-actualizacion {
-    font-size: 11px;
-    margin-top: -10px;
-    margin-bottom: 10px;
-    color: #555;
-}
-
-/* =====================================================
-   PARTIDOS
-===================================================== */
-#partidos {
-    padding-bottom: 2rem;
-}
-
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 8px 14px;
-    border: none;
-    background: #ddd;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.tab-btn.activa {
-    background: #00a000;
-    color: white;
-    font-weight: bold;
-}
-
-.jornada-contenido {
-    margin-top: 5px;
-}
-
-.partido {
-    padding: 12px 0 20px 0;
-    border-bottom: 1px solid #ccc;
-    box-shadow: 0 2px 0 #ccc;
-    margin-bottom: 14px;
-}
-
-.fila-head {
-    display: grid;
-    grid-template-columns: 3fr repeat(5, 1fr);
-    font-size: 13px;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: #555;
-    padding-bottom: 6px;
-    border-bottom: 3px solid #000;
-    margin-bottom: 6px;
-}
-
-.fila {
-    display: grid;
-    grid-template-columns: 3fr repeat(5, 1fr);
-    font-size: 15px;
-    padding: 2px 0;
-}
-
-.equipo-col {
-    padding-left: 4px;
-}
-
-.set-col {
-    text-align: center;
-    font-weight: bold;
-}
-
-.ganador {
-    font-weight: bold;
-    color: #00a000;
-}
-
-.perdedor {
-    opacity: 0.6;
-}
-
-.pendiente-line {
-    margin-top: 4px;
-    font-size: 13px;
-    color: #c08000;
-    font-style: italic;
-    padding-left: 4px;
-}
-
-.descanso-line {
-    margin-top: 6px;
-    font-size: 14px;
-    padding-left: 4px;
-}
-
-.descanso-label {
-    color: #c00000;
-    font-weight: bold;
-}
-
-.descanso-equipo {
-    font-weight: bold;
-    margin-left: 4px;
-}
-
-/* =====================================================
-   MOVIMIENTOS DE POSICIÓN
-===================================================== */
-.mov {
-    font-weight: bold;
-    width: 55px;
-    text-align: center;
-    padding-right: 4px;
-}
-
-.mov-icon {
-    margin-right: 3px;
-    font-size: 18px;
-}
-
-.mov-val {
-    font-size: 13px;
-}
-
-.mov-sube {
-    color: #1EBE5F;
-}
-
-.mov-baja {
-    color: #FF4D4D;
-}
-
-.mov-igual {
-    color: #C0C0C0;
-}
-
-/* =====================================================
-   TOPBAR
-===================================================== */
-.topbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 54px;
-    background: #000;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    padding-left: 16px;
-    z-index: 3000;
-}
-
-.hamburger {
-    font-size: 26px;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-    color: white;
-}
-
-/* =====================================================
-   OVERLAY MENÚ
-===================================================== */
-.drawer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.55);
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.25s;
-    z-index: 2500;
-}
-
-.drawer-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* =====================================================
-   CONTENIDO GENERAL
-===================================================== */
-.page-content {
-    padding: 120px 16px 40px 16px;
-    max-width: 900px;
-    margin: auto;
-}
-
-.page-content h1 {
-    margin-top: 0;
-    margin-bottom: 28px;
-    font-size: 26px;
-    text-align: center;
-}
-
-/* =====================================================
-   HERO PORTADA
-===================================================== */
-.hero {
-    min-height: 78vh;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: center;
-    color: white;
-    background-image: url('hero_padel.png');
-    background-size: cover;
-    background-position: left center;
-    background-repeat: no-repeat;
-    background-color: #000;
-    margin-top: 54px;
-    padding-top: 70px !important;
-    box-sizing: border-box;
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.45);
-}
-
-.hero-content {
-    z-index: 2;
-    padding: 20px;
-    margin-top: 20px;
-}
-
-.hero h1 {
-    font-size: 36px;
-    margin: 0;
-    font-weight: 800;
-    line-height: 1.3;
-}
-
-.hero h2 {
-    font-size: 30px;
-    font-weight: 700;
-    margin-top: 5px;
-}
-
-/* =====================================================
-   MENÚ LATERAL
-===================================================== */
-.drawer {
-    position: fixed;
-    top: 0;
-    left: -260px;
-    width: 260px;
-    height: 100%;
-    background: #000;
-    color: #fff;
-    padding-top: 70px;
-    z-index: 4000;
-    transition: left 0.28s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.drawer.open {
-    left: 0;
-}
-
-.drawer-header {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    padding: 20px 0 12px 0;
-    text-align: center;
-    background: #000;
-}
-
-.drawer-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 22px;
-    cursor: pointer;
-    color: white;
-}
-
-.drawer-avatar {
-    font-size: 40px;
-    color: white;
-}
-
-.drawer-username {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 4px;
-    color: white;
-}
-
-.drawer-sub {
-    font-size: 13px;
-    color: #bbb;
-    margin-top: 2px;
-}
-
-.drawer-section {
-    display: flex;
-    flex-direction: column;
-}
-
-.drawer-section a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    font-size: 17px;
-    color: white;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-}
-
-.drawer-section a:hover {
-    background: rgba(255,255,255,0.15);
-}
-
-/* =====================================================
-   CAMPEONES
-===================================================== */
-header {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
-}
-
-h1 {
-    margin: 0;
-    font-size: 2em;
-}
-
-.campeones {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin: 20px;
-}
-
-.campeon {
-    background: white;
-    padding: 20px;
-    margin: 10px;
-    border-radius: 8px;
-    width: 280px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.campeon img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-
-/* =====================================================
-   ESPACIADO SUPERIOR UNIFICADO
-===================================================== */
-.page-content,
-.historia-container,
-.historia,
-.contenido {
-    padding-top: 120px !important;
-}
-
-.page-content h1,
-.historia h1 {
-    margin-top: 0 !important;
-    margin-bottom: 28px;
-}
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-@media (max-width: 768px) {
-
-    .page-content,
-    .historia-container,
-    .historia,
-    .contenido {
-        padding-top: 115px !important;
-    }
-
-    .hero {
-        min-height: 90vh;
-        background-size: contain;
-        background-position: center top;
-        background-repeat: no-repeat;
-        background-color: #000;
-        padding-top: 35px !important;
-        align-items: flex-start;
-    }
-
-    .hero-content {
-        margin-top: 0;
-        padding-top: 0;
-    }
-
-    .hero h1 {
-        font-size: 38px;
-        line-height: 1.15;
-    }
-
-    .hero h2 {
-        font-size: 30px;
-        margin-top: 8px;
-    }
-
-    .page-content h1 {
-        margin-bottom: 30px;
+// =====================================================
+//   URL donde se encuentra el JSON generado por Excel
+// =====================================================
+const DATA_URL = "./estado_torneo.json";
+
+// =====================================================
+//   Cargar datos desde JSON
+// =====================================================
+async function cargarDatos() {
+    try {
+        const res = await fetch(DATA_URL + "?v=" + Date.now());
+        const data = await res.json();
+
+        if (document.getElementById("clasificacion")) {
+            mostrarClasificacion(
+                data.clasificacion || [],
+                data.ultima_actualizacion,
+                data.modo_orden
+            );
+        }
+
+        if (document.getElementById("partidos")) {
+            window.datosCruces = data.cruces || [];
+            mostrarPartidos(data.partidos || []);
+        }
+
+    } catch (err) {
+        console.error("Error cargando JSON:", err);
+
+        if (document.getElementById("clasificacion")) {
+            document.getElementById("clasificacion").innerHTML =
+                "<p>Error cargando datos del servidor.</p>";
+        }
+
+        if (document.getElementById("partidos")) {
+            document.getElementById("partidos").innerHTML =
+                "<p>Error cargando datos del servidor.</p>";
+        }
     }
 }
 
-@media (min-width: 768px) {
-    .hero h1 {
-        font-size: 80px;
+// =====================================================
+//   CLASIFICACIÓN
+// =====================================================
+function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
+    const div = document.getElementById("clasificacion");
+    if (!div) return;
+
+    let fechaFormateada = "Fecha desconocida";
+
+    if (fechaActualizacion) {
+        const f = new Date(fechaActualizacion);
+        if (!isNaN(f)) {
+            fechaFormateada =
+                `${String(f.getDate()).padStart(2,"0")}/` +
+                `${String(f.getMonth()+1).padStart(2,"0")}/` +
+                `${f.getFullYear()} ` +
+                `${String(f.getHours()).padStart(2,"0")}:` +
+                `${String(f.getMinutes()).padStart(2,"0")}`;
+        }
     }
+
+    const mostrarCoef = (modoOrden === "Opción C");
+
+    div.innerHTML = `
+        <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
+    `;
+
+    lista.forEach(eq => {
+        const actual = Number(eq.posicion_actual || 0);
+        const anterior = Number(eq.posicion_anterior || 0);
+
+        eq.movIcon = "";
+        eq.movVal = "";
+        eq.movClass = "";
+
+        if (anterior === 0 || eq.pj === 0) return;
+
+        const dif = anterior - actual;
+
+        if (dif > 0) {
+            eq.movIcon = "▲";
+            eq.movVal = dif;
+            eq.movClass = "mov-sube";
+        } else if (dif < 0) {
+            eq.movIcon = "▼";
+            eq.movVal = -dif;
+            eq.movClass = "mov-baja";
+        } else {
+            eq.movIcon = "=";
+            eq.movVal = "";
+            eq.movClass = "mov-igual";
+        }
+    });
+
+    let html = `
+        <div class="tabla-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>POS</th>
+                        <th>EQUIPO</th>
+                        <th>PTOS</th>
+                        ${mostrarCoef ? `<th>COEF</th>` : ""}
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PP</th>
+                        <th>Des</th>
+                        <th>SG</th>
+                        <th>SP</th>
+                        <th>SD</th>
+                        <th>PGan</th>
+                        <th>PPer</th>
+                        <th>PDif</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    lista.forEach((eq, index) => {
+        html += `
+            <tr>
+                <td class="mov ${eq.movClass}">
+                    <span class="mov-icon">${eq.movIcon}</span>
+                    <span class="mov-val">${eq.movVal}</span>
+                </td>
+                <td><strong>${index + 1}</strong></td>
+                <td><strong>${eq.equipo}</strong></td>
+                <td><strong>${eq.puntos_totales}</strong></td>
+                ${mostrarCoef ? `<td>${Number(eq.coeficiente).toFixed(2)}</td>` : ""}
+                <td>${eq.pj}</td>
+                <td>${eq.pg}</td>
+                <td>${eq.pp}</td>
+                <td>${eq.descanso}</td>
+                <td>${eq.sets_ganados}</td>
+                <td>${eq.sets_perdidos}</td>
+                <td>${eq.sets_diff}</td>
+                <td>${eq.puntos_ganados}</td>
+                <td>${eq.puntos_perdidos}</td>
+                <td>${eq.puntos_diff}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+        <div class="leyenda">
+            <em>
+            PTOS: Puntos Totales /
+            COEF: Coeficiente Eficacia /
+            PJ: Partidos Jugados /
+            PG: Partidos Ganados /
+            PP: Partidos Perdidos /
+            Des: Descansos /
+            SG: Sets Ganados /
+            SP: Sets Perdidos /
+            SD: Diferencia de Sets /
+            PGan: Puntos Ganados /
+            PPer: Puntos Perdidos /
+            PDif: Diferencia de Puntos
+            </em>
+        </div>
+    `;
+
+    div.innerHTML += html;
+}
+
+// =====================================================
+//   PARTIDOS
+// =====================================================
+function mostrarPartidos(lista) {
+    const div = document.getElementById("partidos");
+    if (!div) return;
+
+    const jornadas = {};
+
+    lista.forEach(p => {
+        const j = Number(p.jornada);
+        if (!jornadas[j]) jornadas[j] = [];
+        jornadas[j].push(p);
+    });
+
+    const jornadasOrdenadas = Object.keys(jornadas)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    const hayCruces = window.datosCruces && window.datosCruces.length > 0;
+
+    if (!jornadasOrdenadas.length && !hayCruces) {
+        div.innerHTML = "<p>No hay partidos.</p>";
+        return;
+    }
+
+    let tabs = `<div class="tabs">`;
+    let contenido = "";
+
+    jornadasOrdenadas.forEach((j, idx) => {
+        tabs += `
+            <button class="tab-btn ${idx === 0 ? "activa" : ""}"
+                    onclick="cambiarJornada('jornada_${j}', event)">
+                Jornada ${j}
+            </button>`;
+
+        contenido += `
+            <div id="jornada_${j}" class="jornada-contenido"
+                 style="display:${idx === 0 ? "block" : "none"};">
+                ${generarHTMLJornada(jornadas[j])}
+            </div>`;
+    });
+
+    if (hayCruces) {
+        const activaFinal = jornadasOrdenadas.length === 0;
+
+        tabs += `
+            <button class="tab-btn ${activaFinal ? "activa" : ""}"
+                    onclick="cambiarJornada('fase_final', event)">
+                Mata-Mata
+            </button>`;
+
+        contenido += `
+            <div id="fase_final" class="jornada-contenido"
+                 style="display:${activaFinal ? "block" : "none"};">
+                ${generarHTMLCruces(window.datosCruces)}
+            </div>`;
+    }
+
+    tabs += `</div>`;
+
+    div.innerHTML = tabs + contenido;
+}
+
+function cambiarJornada(id, ev) {
+    document.querySelectorAll(".jornada-contenido")
+        .forEach(x => x.style.display = "none");
+
+    const bloque = document.getElementById(id);
+    if (bloque) bloque.style.display = "block";
+
+    document.querySelectorAll(".tab-btn")
+        .forEach(btn => btn.classList.remove("activa"));
+
+    if (ev && ev.target) ev.target.classList.add("activa");
+}
+
+// =====================================================
+//   Render partidos
+// =====================================================
+function generarHTMLJornada(partidos) {
+    let html = "";
+
+    partidos.forEach(p => {
+        if (p.estado === "descanso" || p.visitante === "DESCANSO") {
+            html += `
+                <div class="partido">
+                    <div class="descanso-line">
+                        <span class="descanso-label">DESCANSAN:</span>
+                        <span class="descanso-equipo">${p.local}</span>
+                    </div>
+                </div>`;
+            return;
+        }
+
+        const sets = p.resultado || [];
+
+        const getSet = (i, pos) => {
+            if (!sets[i]) return "";
+            const partes = sets[i].split("-");
+            return partes[pos] || "";
+        };
+
+        const haySet4 = sets.length >= 4 && sets[3] !== "";
+        const haySet5 = sets.length >= 5 && sets[4] !== "";
+
+        const totalCols = 3 + (haySet4 ? 1 : 0) + (haySet5 ? 1 : 0);
+        const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
+
+        let localGan = 0;
+        let visitGan = 0;
+
+        sets.forEach(s => {
+            if (!s) return;
+            const partes = s.split("-").map(Number);
+            const a = partes[0];
+            const b = partes[1];
+
+            if (a > b) localGan++;
+            if (b > a) visitGan++;
+        });
+
+        let claseLocal = "";
+        let claseVisit = "";
+
+        const estado = String(p.estado || "").toLowerCase();
+
+        if (estado === "jugado" || estado === "finalizado") {
+            claseLocal = localGan > visitGan ? "ganador" : "";
+            claseVisit = visitGan > localGan ? "ganador" : "";
+        }
+
+        html += `
+        <div class="partido">
+            <div class="fila fila-head" style="${gridStyle}">
+                <span class="equipo-col">EQUIPOS</span>
+                <span class="set-col">I</span>
+                <span class="set-col">II</span>
+                <span class="set-col">III</span>
+                ${haySet4 ? `<span class="set-col">IV</span>` : ""}
+                ${haySet5 ? `<span class="set-col">V</span>` : ""}
+            </div>
+
+           <div class="fila ${claseLocal}" style="${gridStyle}">
+                <span class="equipo-col">${p.local}</span>
+                <span class="set-col">${getSet(0,0)}</span>
+                <span class="set-col">${getSet(1,0)}</span>
+                <span class="set-col">${getSet(2,0)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,0)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
+            </div>
+
+            <div class="fila ${claseVisit}" style="${gridStyle}">
+                <span class="equipo-col">${p.visitante}</span>
+                <span class="set-col">${getSet(0,1)}</span>
+                <span class="set-col">${getSet(1,1)}</span>
+                <span class="set-col">${getSet(2,1)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
+            </div>
+            ${
+                estado === "pendiente"
+                    ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                    : ""
+            }
+        </div>`;
+    });
+
+    return html;
+}
+
+// =====================================================
+//   Fase Final
+// =====================================================
+
+function generarHTMLCruces(lista) {
+    const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
+    let html = "";
+
+    fasesOrden.forEach(fase => {
+        const partidosFase = lista.filter(p => p.fase === fase);
+
+        if (partidosFase.length) {
+            html += `
+                <div class="mata-fase">
+                    <h2>${iconoFase(fase)} ${fase}</h2>
+                    ${generarHTMLJornada(partidosFase)}
+                </div>
+            `;
+        }
+    });
+
+    const final = lista.find(p => p.fase === "Final");
+
+    if (final && final.ganador) {
+        html += `
+            <div class="campeon-box">
+                <div class="campeon-label">THE CHAMPIONS OF THE 2025 SPRINT PADEL TOURNAMENT ARE …</div>
+                <div class="campeon-nombre">${final.ganador}</div>
+            </div>
+        `;
+    }
+
+    return html;
+}
+
+function iconoFase(fase) {
+    if (fase === "Cuartos de Final") return "⚔️";
+    if (fase === "Semifinales") return "🔥";
+    if (fase === "Final") return "👑";
+    return "🎾";
 }
 
 
-```css
-/* =====================================================
-   MATA-MATA / FASE FINAL
-===================================================== */
 
-.mata-mata-box {
-    margin-top: 18px;
-    padding: 18px;
-    border-radius: 20px;
-    background: linear-gradient(180deg, #fff7e6, #ffffff);
-    border: 2px solid #f0c36a;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
-}
-
-.mata-mata-title {
-    text-align: center;
-    font-size: 1.55rem;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: #7a1f1f;
-    margin-bottom: 4px;
-}
-
-.mata-mata-subtitle {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 18px;
-}
-
-.mata-fase {
-    margin-top: 22px;
-}
-
-.mata-fase h2 {
-    font-size: 1.15rem;
-    color: #7a1f1f;
-    border-bottom: 2px solid #e8c36a;
-    padding-bottom: 6px;
-    margin-bottom: 12px;
-}
-
-.cruce-card {
-    background: #ffffff;
-    border-radius: 16px;
-    margin-bottom: 14px;
-    padding: 12px;
-    border: 1px solid #ead8a3;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.cruce-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: center;
-    padding: 8px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    background: #f8f8f8;
-}
-
-.cruce-row.winner {
-    background: #fff1c4;
-    font-weight: 900;
-    color: #6b180f;
-    border-left: 5px solid #d6a21d;
-}
-
-.cruce-team {
-    font-size: 0.95rem;
-}
-
-.cruce-sets {
-    display: flex;
-    gap: 5px;
-}
-
-.cruce-sets span {
-    min-width: 24px;
-    text-align: center;
-    padding: 3px 6px;
-    border-radius: 7px;
-    background: #eeeeee;
-    font-weight: 700;
-}
-
-.cruce-row.winner .cruce-sets span {
-    background: #d6a21d;
-    color: white;
-}
-
-.cruce-status {
-    margin-top: 8px;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #666;
-}
-
-.campeon-box {
-    margin-top: 24px;
-    padding: 18px;
-    border-radius: 18px;
-    text-align: center;
-    background: linear-gradient(135deg, #7a1f1f, #b8860b);
-    color: white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-}
-
-.campeon-label {
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    opacity: 0.9;
-}
-
-.campeon-nombre {
-    margin-top: 6px;
-    font-size: 1.35rem;
-    font-weight: 900;
-}
+// =====================================================
+//   Carga inicial
+// =====================================================
+cargarDatos();
