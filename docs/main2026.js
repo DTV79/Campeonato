@@ -1,3 +1,4 @@
+```javascript
 // =====================================================
 //   URL donde se encuentra el JSON generado por Excel
 // =====================================================
@@ -21,12 +22,9 @@ async function cargarDatos() {
         }
 
         if (document.getElementById("partidos")) {
-            mostrarPartidos(data.partidos);
+            window.datosCruces = data.cruces || [];
+            mostrarPartidos(data.partidos || []);
         }
-        if (document.getElementById("cruces")) {
-            mostrarCruces(data.cruces);
-        }
-        
 
     } catch (err) {
         console.error("Error cargando JSON:", err);
@@ -40,12 +38,6 @@ async function cargarDatos() {
             document.getElementById("partidos").innerHTML =
                 "<p>Error cargando datos del servidor.</p>";
         }
-
-        if (document.getElementById("cruces")) {
-            document.getElementById("cruces").innerHTML =
-                "<p>Error cargando datos del servidor.</p>";
-        }
-  
     }
 }
 
@@ -67,7 +59,6 @@ function mostrar(pagina) {
 function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
     const div = document.getElementById("clasificacion");
 
-    // --- Fecha formateada ---
     let fechaFormateada = "Fecha desconocida";
     if (fechaActualizacion) {
         const f = new Date(fechaActualizacion);
@@ -81,17 +72,12 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
         }
     }
 
-    // ¿Se debe mostrar el coeficiente?
     const mostrarCoef = (modoOrden === "Opción C");
 
     div.innerHTML = `
-        
         <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
 
-    // ================================
-    // Cálculo de movimientos ▲ ▼ =
-    // ================================
     lista.forEach(eq => {
         const actual = Number(eq.posicion_actual || 0);
         const anterior = Number(eq.posicion_anterior || 0);
@@ -113,9 +99,6 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
         }
     });
 
-    // ================================
-    //   CABECERA DE TABLA
-    // ================================
     let html = `
         <div class="tabla-container">
             <table>
@@ -141,9 +124,6 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
                 <tbody>
     `;
 
-    // ================================
-    //   Filas de datos
-    // ================================
     lista.forEach((eq, index) => {
         html += `
             <tr>
@@ -175,7 +155,6 @@ function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
         </div>
     `;
 
-    // Leyenda
     html += `
     <div class="leyenda">
         <em>
@@ -206,7 +185,6 @@ function mostrarPartidos(lista) {
     const div = document.getElementById("partidos");
     if (!div) return;
 
-    // Agrupar por jornada
     const jornadas = {};
     lista.forEach(p => {
         const j = Number(p.jornada);
@@ -218,25 +196,21 @@ function mostrarPartidos(lista) {
         .map(Number)
         .sort((a, b) => a - b);
 
-    if (!jornadasOrdenadas.length) {
+    if (!jornadasOrdenadas.length && (!window.datosCruces || !window.datosCruces.length)) {
         div.innerHTML = "<p>No hay partidos.</p>";
         return;
     }
 
-    // Pestañas
     let tabs = `<div class="tabs">`;
+    let contenido = "";
+
     jornadasOrdenadas.forEach((j, idx) => {
         tabs += `
             <button class="tab-btn ${idx === 0 ? "activa" : ""}"
-                    onclick="cambiarJornada(${j}, event)">
+                    onclick="cambiarJornada('jornada_${j}', event)">
                 Jornada ${j}
             </button>`;
-    });
-    tabs += `</div>`;
 
-    // Contenido
-    let contenido = "";
-    jornadasOrdenadas.forEach((j, idx) => {
         contenido += `
             <div id="jornada_${j}" class="jornada-contenido"
                  style="display:${idx === 0 ? "block" : "none"};">
@@ -244,14 +218,34 @@ function mostrarPartidos(lista) {
             </div>`;
     });
 
+    if (window.datosCruces && window.datosCruces.length) {
+        const activarFaseFinal = jornadasOrdenadas.length === 0;
+
+        tabs += `
+            <button class="tab-btn ${activarFaseFinal ? "activa" : ""}"
+                    onclick="cambiarJornada('fase_final', event)">
+                Fase Final
+            </button>`;
+
+        contenido += `
+            <div id="fase_final" class="jornada-contenido"
+                 style="display:${activarFaseFinal ? "block" : "none"};">
+                ${generarHTMLCruces(window.datosCruces)}
+            </div>`;
+    }
+
+    tabs += `</div>`;
+
     div.innerHTML = tabs + contenido;
 }
 
-function cambiarJornada(num, ev) {
+
+function cambiarJornada(id, ev) {
     document.querySelectorAll(".jornada-contenido")
         .forEach(x => x.style.display = "none");
 
-    document.getElementById("jornada_" + num).style.display = "block";
+    const bloque = document.getElementById(id);
+    if (bloque) bloque.style.display = "block";
 
     document.querySelectorAll(".tab-btn")
         .forEach(btn => btn.classList.remove("activa"));
@@ -259,13 +253,13 @@ function cambiarJornada(num, ev) {
     if (ev?.target) ev.target.classList.add("activa");
 }
 
-// Render de cada jornada
+
+// Render de cada jornada o partido de cruces
 function generarHTMLJornada(partidos) {
     let html = "";
 
     partidos.forEach(p => {
 
-        // === DESCANSO ===
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
             html += `
                 <div class="partido">
@@ -277,7 +271,6 @@ function generarHTMLJornada(partidos) {
             return;
         }
 
-        // === PROCESAR SETS ===
         const sets = p.resultado || [];
 
         const getSet = (i, pos) => {
@@ -303,7 +296,11 @@ function generarHTMLJornada(partidos) {
         let claseLocal = "";
         let claseVisit = "";
 
-        if (p.estado === "jugado") {
+        if (
+            p.estado === "jugado" ||
+            p.estado === "Finalizado" ||
+            p.estado === "finalizado"
+        ) {
             claseLocal = localGan > visitGan ? "ganador" : "";
             claseVisit = visitGan > localGan ? "ganador" : "";
         }
@@ -338,9 +335,10 @@ function generarHTMLJornada(partidos) {
                 ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
             </div>
 
-            ${p.estado === "pendiente"
-                ? `<div class="pendiente-line">⏳ Pendiente</div>`
-                : ""
+            ${
+                p.estado === "pendiente" || p.estado === "Pendiente"
+                    ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                    : ""
             }
         </div>
         `;
@@ -351,37 +349,30 @@ function generarHTMLJornada(partidos) {
 
 
 // =====================================================
-//   CRUCES
+//   CRUCES / FASE FINAL
 // =====================================================
-function mostrarCruces(lista) {
-    const div = document.getElementById("cruces");
-    if (!div) return;
-
-    if (!lista || !lista.length) {
-        div.innerHTML = "<p>No hay cruces generados.</p>";
-        return;
-    }
-
-    const fases = {};
-
-    lista.forEach(p => {
-        if (!fases[p.fase]) fases[p.fase] = [];
-        fases[p.fase].push(p);
-    });
-
+function generarHTMLCruces(lista) {
+    const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
     let html = "";
 
-    Object.keys(fases).forEach(fase => {
-        html += `<h2>${fase}</h2>`;
-        html += generarHTMLJornada(fases[fase]);
+    fasesOrden.forEach(fase => {
+        const partidosFase = lista.filter(p => p.fase === fase);
+
+        if (partidosFase.length) {
+            html += `<h2>${fase}</h2>`;
+            html += generarHTMLJornada(partidosFase);
+        }
     });
 
-    div.innerHTML = html;
+    return html;
 }
+
 
 // =====================================================
 //   Carga inicial
 // =====================================================
 cargarDatos();
+```
+
 
 
