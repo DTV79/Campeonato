@@ -23,6 +23,10 @@ async function cargarDatos() {
         if (document.getElementById("partidos")) {
             mostrarPartidos(data.partidos);
         }
+        if (document.getElementById("cruces")) {
+            mostrarCruces(data.cruces);
+        }
+        
 
     } catch (err) {
         console.error("Error cargando JSON:", err);
@@ -36,6 +40,12 @@ async function cargarDatos() {
             document.getElementById("partidos").innerHTML =
                 "<p>Error cargando datos del servidor.</p>";
         }
+
+        if (document.getElementById("cruces")) {
+            document.getElementById("cruces").innerHTML =
+                "<p>Error cargando datos del servidor.</p>";
+        }
+  
     }
 }
 
@@ -339,6 +349,35 @@ function generarHTMLJornada(partidos) {
     return html;
 }
 
+
+// =====================================================
+//   CRUCES
+// =====================================================
+function mostrarCruces(lista) {
+    const div = document.getElementById("cruces");
+    if (!div) return;
+
+    if (!lista || !lista.length) {
+        div.innerHTML = "<p>No hay cruces generados.</p>";
+        return;
+    }
+
+    const fases = {};
+
+    lista.forEach(p => {
+        if (!fases[p.fase]) fases[p.fase] = [];
+        fases[p.fase].push(p);
+    });
+
+    let html = "";
+
+    Object.keys(fases).forEach(fase => {
+        html += `<h2>${fase}</h2>`;
+        html += generarHTMLJornada(fases[fase]);
+    });
+
+    div.innerHTML = html;
+}
 
 // =====================================================
 //   Carga inicial
