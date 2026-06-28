@@ -656,16 +656,16 @@ footer {
     margin-top: 0;
 }
 
-/* En Palas de Playa se destaca el perdedor porque sigue jugando */
+/* Palas de Playa: perdedor marcado en rojo */
 .palas-ronda .fila.perdedor-palas {
-    background: linear-gradient(90deg, #ffe5e5 0%, #ffb3b3 65%, transparent 100%);
-    border-left: 5px solid #c0392b;
+    background: linear-gradient(90deg, #ffe5e5 0%, #ffb3b3 70%, transparent 100%) !important;
+    border-left: 5px solid #c0392b !important;
     border-radius: 6px;
     font-weight: bold;
 }
 
 .palas-ronda .fila.perdedor-palas .equipo-col {
-    color: #9b1c1c;
+    color: #9b1c1c !important;
     font-weight: bold;
     padding-left: 8px;
 }
