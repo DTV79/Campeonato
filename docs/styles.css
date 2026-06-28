@@ -669,3 +669,36 @@ footer {
     font-weight: bold;
     padding-left: 8px;
 }
+
+
+/* Mata-Mata: fases en cajones */
+.mata-fase {
+    margin-top: 36px;
+    margin-bottom: 42px;
+    padding: 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fffdf6, #ffffff);
+    border: 2px solid #d6a21d;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+}
+
+.mata-fase:first-child {
+    margin-top: 10px;
+}
+
+.mata-fase h2 {
+    margin-top: 0;
+    font-size: 22px;
+    color: #7a1f1f;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d6a21d;
+}
+
+.mata-fase .partido {
+    background: #fffdf6;
+    border-radius: 12px;
+    padding: 14px 12px 20px 12px;
+    border: 1px solid #ead8a3;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
