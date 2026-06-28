@@ -416,7 +416,7 @@ function generarHTMLPalasPlaya(rondas) {
                     ronda.descansa
                         ? `
                             <div class="palas-descanso">
-                                <div class="palas-descanso-label">💤 DESCANSA</div>
+                                <div class="palas-descanso-label">💤 DESCANSAN</div>
                                 <div class="palas-descanso-equipo">${ronda.descansa}</div>
                             </div>
                           `
