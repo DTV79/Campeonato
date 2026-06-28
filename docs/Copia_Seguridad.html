@@ -1,0 +1,620 @@
+/* =====================================================
+   ESTILOS GENERALES
+===================================================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+}
+
+/* =====================================================
+   CLASIFICACIÓN
+===================================================== */
+.tabla-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    background: white;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 800px;
+    font-size: 14px;
+}
+
+th {
+    background: #e0e0e0;
+    padding: 8px 12px;
+    font-weight: bold;
+    text-align: left;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+td {
+    padding: 8px 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background: #f7f7f7;
+}
+
+tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+.leyenda {
+    margin-top: 10px;
+    font-size: 9px;
+    line-height: 1.2;
+    color: #444;
+    font-style: italic;
+}
+
+.fecha-actualizacion {
+    font-size: 11px;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* =====================================================
+   PARTIDOS
+===================================================== */
+#partidos {
+    padding-bottom: 2rem;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 8px 14px;
+    border: none;
+    background: #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tab-btn.activa {
+    background: #00a000;
+    color: white;
+    font-weight: bold;
+}
+
+.jornada-contenido {
+    margin-top: 5px;
+}
+
+.partido {
+    padding: 12px 0 20px 0;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 2px 0 #ccc;
+    margin-bottom: 14px;
+}
+
+.fila-head {
+    display: grid;
+    grid-template-columns: 3fr repeat(5, 1fr);
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #555;
+    padding-bottom: 6px;
+    border-bottom: 3px solid #000;
+    margin-bottom: 6px;
+}
+
+.fila {
+    display: grid;
+    grid-template-columns: 3fr repeat(5, 1fr);
+    font-size: 15px;
+    padding: 2px 0;
+}
+
+.equipo-col {
+    padding-left: 4px;
+}
+
+.set-col {
+    text-align: center;
+    font-weight: bold;
+}
+
+.ganador {
+    font-weight: bold;
+    color: #00a000;
+}
+
+.perdedor {
+    opacity: 0.6;
+}
+
+.pendiente-line {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #c08000;
+    font-style: italic;
+    padding-left: 4px;
+}
+
+.descanso-line {
+    margin-top: 6px;
+    font-size: 14px;
+    padding-left: 4px;
+}
+
+.descanso-label {
+    color: #c00000;
+    font-weight: bold;
+}
+
+.descanso-equipo {
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+/* =====================================================
+   MOVIMIENTOS DE POSICIÓN
+===================================================== */
+.mov {
+    font-weight: bold;
+    width: 55px;
+    text-align: center;
+    padding-right: 4px;
+}
+
+.mov-icon {
+    margin-right: 3px;
+    font-size: 18px;
+}
+
+.mov-val {
+    font-size: 13px;
+}
+
+.mov-sube {
+    color: #1EBE5F;
+}
+
+.mov-baja {
+    color: #FF4D4D;
+}
+
+.mov-igual {
+    color: #C0C0C0;
+}
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+.topbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 54px;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    z-index: 3000;
+}
+
+.hamburger {
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    color: white;
+}
+
+/* =====================================================
+   OVERLAY MENÚ
+===================================================== */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s;
+    z-index: 2500;
+}
+
+.drawer-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* =====================================================
+   CONTENIDO GENERAL
+===================================================== */
+.page-content {
+    padding: 120px 16px 40px 16px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.page-content h1 {
+    margin-top: 0;
+    margin-bottom: 28px;
+    font-size: 26px;
+    text-align: center;
+}
+
+/* =====================================================
+   HERO PORTADA
+===================================================== */
+.hero {
+    min-height: 78vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    color: white;
+    background-image: url('hero_padel.png');
+    background-size: cover;
+    background-position: left center;
+    background-repeat: no-repeat;
+    background-color: #000;
+    margin-top: 54px;
+    padding-top: 70px !important;
+    box-sizing: border-box;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.45);
+}
+
+.hero-content {
+    z-index: 2;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.hero h1 {
+    font-size: 36px;
+    margin: 0;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.hero h2 {
+    font-size: 30px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+
+/* =====================================================
+   MENÚ LATERAL
+===================================================== */
+.drawer {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 260px;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    padding-top: 70px;
+    z-index: 4000;
+    transition: left 0.28s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer.open {
+    left: 0;
+}
+
+.drawer-header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px 0 12px 0;
+    text-align: center;
+    background: #000;
+}
+
+.drawer-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    color: white;
+}
+
+.drawer-avatar {
+    font-size: 40px;
+    color: white;
+}
+
+.drawer-username {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 4px;
+    color: white;
+}
+
+.drawer-sub {
+    font-size: 13px;
+    color: #bbb;
+    margin-top: 2px;
+}
+
+.drawer-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.drawer-section a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    font-size: 17px;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.drawer-section a:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* =====================================================
+   CAMPEONES
+===================================================== */
+header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.campeones {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 20px;
+}
+
+.campeon {
+    background: white;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 8px;
+    width: 280px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.campeon img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* =====================================================
+   ESPACIADO SUPERIOR UNIFICADO
+===================================================== */
+.page-content,
+.historia-container,
+.historia,
+.contenido {
+    padding-top: 120px !important;
+}
+
+.page-content h1,
+.historia h1 {
+    margin-top: 0 !important;
+    margin-bottom: 28px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 768px) {
+
+    .page-content,
+    .historia-container,
+    .historia,
+    .contenido {
+        padding-top: 115px !important;
+    }
+
+    .hero {
+        min-height: 90vh;
+        background-size: contain;
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-color: #000;
+        padding-top: 35px !important;
+        align-items: flex-start;
+    }
+
+    .hero-content {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+        line-height: 1.15;
+    }
+
+    .hero h2 {
+        font-size: 30px;
+        margin-top: 8px;
+    }
+
+    .page-content h1 {
+        margin-bottom: 30px;
+    }
+}
+
+@media (min-width: 768px) {
+    .hero h1 {
+        font-size: 80px;
+    }
+}
+
+
+```css
+/* =====================================================
+   MATA-MATA / FASE FINAL
+===================================================== */
+
+.mata-mata-box {
+    margin-top: 18px;
+    padding: 18px;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #fff7e6, #ffffff);
+    border: 2px solid #f0c36a;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+}
+
+.mata-mata-title {
+    text-align: center;
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    color: #7a1f1f;
+    margin-bottom: 4px;
+}
+
+.mata-mata-subtitle {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 18px;
+}
+
+.mata-fase {
+    margin-top: 22px;
+}
+
+.mata-fase h2 {
+    font-size: 1.15rem;
+    color: #7a1f1f;
+    border-bottom: 2px solid #e8c36a;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+.cruce-card {
+    background: #ffffff;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    padding: 12px;
+    border: 1px solid #ead8a3;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.cruce-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    background: #f8f8f8;
+}
+
+.cruce-row.winner {
+    background: #fff1c4;
+    font-weight: 900;
+    color: #6b180f;
+    border-left: 5px solid #d6a21d;
+}
+
+.cruce-team {
+    font-size: 0.95rem;
+}
+
+.cruce-sets {
+    display: flex;
+    gap: 5px;
+}
+
+.cruce-sets span {
+    min-width: 24px;
+    text-align: center;
+    padding: 3px 6px;
+    border-radius: 7px;
+    background: #eeeeee;
+    font-weight: 700;
+}
+
+.cruce-row.winner .cruce-sets span {
+    background: #d6a21d;
+    color: white;
+}
+
+.cruce-status {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.campeon-box {
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 18px;
+    text-align: center;
+    background: linear-gradient(135deg, #7a1f1f, #b8860b);
+    color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+.campeon-label {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.campeon-nombre {
+    margin-top: 6px;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
