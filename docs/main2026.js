@@ -1,227 +1,240 @@
-// =====//   URL donde se encuentra el JSON generado por Excel// ===const DATA_URL = "./estado_torneo.json";
+// =====================================================
+//   URL donde se encuentra el JSON generado por Excel
+// =====================================================
+const DATA_URL = "./estado_torneo.json";
 
-// =====//   Cargar datos desde JSON (adaptado a páginas separadas)// ===async function cargarDatos() {try {const res = await fetch(DATA_URL + "?v=" + Date.now());const data = await res.json();
+// =====================================================
+//   Cargar datos desde JSON
+// =====================================================
+async function cargarDatos() {
+    try {
+        const res = await fetch(DATA_URL + "?v=" + Date.now());
+        const data = await res.json();
 
-    // Cargar solo lo que corresponda según el HTML
-    if (document.getElementById("clasificacion")) {
-        mostrarClasificacion(
-            data.clasificacion,
-            data.ultima_actualizacion,
-            data.modo_orden
-        );
-    }
+        if (document.getElementById("clasificacion")) {
+            mostrarClasificacion(
+                data.clasificacion || [],
+                data.ultima_actualizacion,
+                data.modo_orden
+            );
+        }
 
-    if (document.getElementById("partidos")) {
-        mostrarPartidos(data.partidos);
-    }
+        if (document.getElementById("partidos")) {
+            window.datosCruces = data.cruces || [];
+            mostrarPartidos(data.partidos || []);
+        }
 
-} catch (err) {
-    console.error("Error cargando JSON:", err);
+    } catch (err) {
+        console.error("Error cargando JSON:", err);
 
-    if (document.getElementById("clasificacion")) {
-        document.getElementById("clasificacion").innerHTML =
-            "<p>Error cargando datos del servidor.</p>";
-    }
+        if (document.getElementById("clasificacion")) {
+            document.getElementById("clasificacion").innerHTML =
+                "<p>Error cargando datos del servidor.</p>";
+        }
 
-    if (document.getElementById("partidos")) {
-        document.getElementById("partidos").innerHTML =
-            "<p>Error cargando datos del servidor.</p>";
-    }
-}
-
-}
-
-// =====//   Cambiar pestañas de jornadas// ===function mostrar(pagina) {document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
-
-document.getElementById(pagina).style.display = "block";
-
-}
-
-// =====//   CLASIFICACIÓN — TABLA// ===function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {const div = document.getElementById("clasificacion");
-
-// --- Fecha formateada ---
-let fechaFormateada = "Fecha desconocida";
-if (fechaActualizacion) {
-    const f = new Date(fechaActualizacion);
-    if (!isNaN(f)) {
-        fechaFormateada =
-            `${String(f.getDate()).padStart(2,"0")}/` +
-            `${String(f.getMonth()+1).padStart(2,"0")}/` +
-            `${f.getFullYear()} ` +
-            `${String(f.getHours()).padStart(2,"0")}:` +
-            `${String(f.getMinutes()).padStart(2,"0")}`;
+        if (document.getElementById("partidos")) {
+            document.getElementById("partidos").innerHTML =
+                "<p>Error cargando datos del servidor.</p>";
+        }
     }
 }
 
-// ¿Se debe mostrar el coeficiente?
-const mostrarCoef = (modoOrden === "Opción C");
+// =====================================================
+//   CLASIFICACIÓN
+// =====================================================
+function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {
+    const div = document.getElementById("clasificacion");
+    if (!div) return;
 
-div.innerHTML = `
-    
-    <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
-`;
+    let fechaFormateada = "Fecha desconocida";
 
-// ================================
-// Cálculo de movimientos ▲ ▼ =
-// ================================
-lista.forEach(eq => {
-    const actual = Number(eq.posicion_actual || 0);
-    const anterior = Number(eq.posicion_anterior || 0);
-
-    eq.movIcon = "";
-    eq.movVal = "";
-    eq.movClass = "";
-
-    if (anterior === 0 || eq.pj === 0) return;
-
-    const dif = anterior - actual;
-
-    if (dif > 0) {
-        eq.movIcon = "▲"; eq.movVal = dif; eq.movClass = "mov-sube";
-    } else if (dif < 0) {
-        eq.movIcon = "▼"; eq.movVal = -dif; eq.movClass = "mov-baja";
-    } else {
-        eq.movIcon = "="; eq.movVal = ""; eq.movClass = "mov-igual";
+    if (fechaActualizacion) {
+        const f = new Date(fechaActualizacion);
+        if (!isNaN(f)) {
+            fechaFormateada =
+                `${String(f.getDate()).padStart(2,"0")}/` +
+                `${String(f.getMonth()+1).padStart(2,"0")}/` +
+                `${f.getFullYear()} ` +
+                `${String(f.getHours()).padStart(2,"0")}:` +
+                `${String(f.getMinutes()).padStart(2,"0")}`;
+        }
     }
-});
 
-// ================================
-//   CABECERA DE TABLA
-// ================================
-let html = `
-    <div class="tabla-container">
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>POS</th>
-                    <th>EQUIPO</th>
-                    <th>PTOS</th>
-                    ${mostrarCoef ? `<th>COEF</th>` : ""}
-                    <th>PJ</th>
-                    <th>PG</th>
-                    <th>PP</th>
-                    <th>Des</th>
-                    <th>SG</th>
-                    <th>SP</th>
-                    <th>SD</th>
-                    <th>PGan</th>
-                    <th>PPer</th>
-                    <th>PDif</th>
-                </tr>
-            </thead>
-            <tbody>
-`;
+    const mostrarCoef = (modoOrden === "Opción C");
 
-// ================================
-//   Filas de datos
-// ================================
-lista.forEach((eq, index) => {
-    html += `
-        <tr>
-            <td class="mov ${eq.movClass}">
-                <span class="mov-icon">${eq.movIcon}</span>
-                <span class="mov-val">${eq.movVal}</span>
-            </td>
-            <td><strong>${index + 1}</strong></td>
-            <td><strong>${eq.equipo}</strong></td>
-            <td><strong>${eq.puntos_totales}</strong></td>
-            ${mostrarCoef ? `<td>${Number(eq.coeficiente).toFixed(2)}</td>` : ""}
-            <td>${eq.pj}</td>
-            <td>${eq.pg}</td>
-            <td>${eq.pp}</td>
-            <td>${eq.descanso}</td>
-            <td>${eq.sets_ganados}</td>
-            <td>${eq.sets_perdidos}</td>
-            <td>${eq.sets_diff}</td>
-            <td>${eq.puntos_ganados}</td>
-            <td>${eq.puntos_perdidos}</td>
-            <td>${eq.puntos_diff}</td>
-        </tr>
+    div.innerHTML = `
+        <p class="fecha-actualizacion"><em>Actualizado: ${fechaFormateada}</em></p>
     `;
-});
 
-html += `
-            </tbody>
-        </table>
-    </div>
-`;
+    lista.forEach(eq => {
+        const actual = Number(eq.posicion_actual || 0);
+        const anterior = Number(eq.posicion_anterior || 0);
 
-// Leyenda
-html += `
-<div class="leyenda">
-    <em>
-    PTOS: Puntos Totales /
-    COEF: Coeficiente Eficacia /
-    PJ: Partidos Jugados /
-    PG: Partidos Ganados /
-    PP: Partidos Perdidos /
-    Des: Descansos /
-    SG: Sets Ganados /
-    SP: Sets Perdidos /
-    SD: Diferencia de Sets /
-    PGan: Puntos Ganados /
-    PPer: Puntos Perdidos /
-    PDif: Diferencia de Puntos
-    </em>
-</div>
-`;
+        eq.movIcon = "";
+        eq.movVal = "";
+        eq.movClass = "";
 
-div.innerHTML += html;
+        if (anterior === 0 || eq.pj === 0) return;
 
+        const dif = anterior - actual;
+
+        if (dif > 0) {
+            eq.movIcon = "▲";
+            eq.movVal = dif;
+            eq.movClass = "mov-sube";
+        } else if (dif < 0) {
+            eq.movIcon = "▼";
+            eq.movVal = -dif;
+            eq.movClass = "mov-baja";
+        } else {
+            eq.movIcon = "=";
+            eq.movVal = "";
+            eq.movClass = "mov-igual";
+        }
+    });
+
+    let html = `
+        <div class="tabla-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>POS</th>
+                        <th>EQUIPO</th>
+                        <th>PTOS</th>
+                        ${mostrarCoef ? `<th>COEF</th>` : ""}
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PP</th>
+                        <th>Des</th>
+                        <th>SG</th>
+                        <th>SP</th>
+                        <th>SD</th>
+                        <th>PGan</th>
+                        <th>PPer</th>
+                        <th>PDif</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    lista.forEach((eq, index) => {
+        html += `
+            <tr>
+                <td class="mov ${eq.movClass}">
+                    <span class="mov-icon">${eq.movIcon}</span>
+                    <span class="mov-val">${eq.movVal}</span>
+                </td>
+                <td><strong>${index + 1}</strong></td>
+                <td><strong>${eq.equipo}</strong></td>
+                <td><strong>${eq.puntos_totales}</strong></td>
+                ${mostrarCoef ? `<td>${Number(eq.coeficiente).toFixed(2)}</td>` : ""}
+                <td>${eq.pj}</td>
+                <td>${eq.pg}</td>
+                <td>${eq.pp}</td>
+                <td>${eq.descanso}</td>
+                <td>${eq.sets_ganados}</td>
+                <td>${eq.sets_perdidos}</td>
+                <td>${eq.sets_diff}</td>
+                <td>${eq.puntos_ganados}</td>
+                <td>${eq.puntos_perdidos}</td>
+                <td>${eq.puntos_diff}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+        <div class="leyenda">
+            <em>
+            PTOS: Puntos Totales /
+            COEF: Coeficiente Eficacia /
+            PJ: Partidos Jugados /
+            PG: Partidos Ganados /
+            PP: Partidos Perdidos /
+            Des: Descansos /
+            SG: Sets Ganados /
+            SP: Sets Perdidos /
+            SD: Diferencia de Sets /
+            PGan: Puntos Ganados /
+            PPer: Puntos Perdidos /
+            PDif: Diferencia de Puntos
+            </em>
+        </div>
+    `;
+
+    div.innerHTML += html;
 }
 
-// =====//   PARTIDOS// ===function mostrarPartidos(lista) {const div = document.getElementById("partidos");if (!div) return;
+// =====================================================
+//   PARTIDOS
+// =====================================================
+function mostrarPartidos(lista) {
+    const div = document.getElementById("partidos");
+    if (!div) return;
 
-// Agrupar por jornada
-const jornadas = {};
-lista.forEach(p => {
-    const j = Number(p.jornada);
-    if (!jornadas[j]) jornadas[j] = [];
-    jornadas[j].push(p);
-});
+    const jornadas = {};
 
-const jornadasOrdenadas = Object.keys(jornadas)
-    .map(Number)
-    .sort((a, b) => a - b);
+    lista.forEach(p => {
+        const j = Number(p.jornada);
+        if (!jornadas[j]) jornadas[j] = [];
+        jornadas[j].push(p);
+    });
 
-if (!jornadasOrdenadas.length) {
-    div.innerHTML = "<p>No hay partidos.</p>";
-    return;
+    const jornadasOrdenadas = Object.keys(jornadas)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    const hayCruces = window.datosCruces && window.datosCruces.length > 0;
+
+    if (!jornadasOrdenadas.length && !hayCruces) {
+        div.innerHTML = "<p>No hay partidos.</p>";
+        return;
+    }
+
+    let tabs = `<div class="tabs">`;
+    let contenido = "";
+
+    jornadasOrdenadas.forEach((j, idx) => {
+        tabs += `
+            <button class="tab-btn ${idx === 0 ? "activa" : ""}"
+                    onclick="cambiarJornada('jornada_${j}', event)">
+                Jornada ${j}
+            </button>`;
+
+        contenido += `
+            <div id="jornada_${j}" class="jornada-contenido"
+                 style="display:${idx === 0 ? "block" : "none"};">
+                ${generarHTMLJornada(jornadas[j])}
+            </div>`;
+    });
+
+    if (hayCruces) {
+        const activaFinal = jornadasOrdenadas.length === 0;
+
+        tabs += `
+            <button class="tab-btn ${activaFinal ? "activa" : ""}"
+                    onclick="cambiarJornada('fase_final', event)">
+                Fase Final
+            </button>`;
+
+        contenido += `
+            <div id="fase_final" class="jornada-contenido"
+                 style="display:${activaFinal ? "block" : "none"};">
+                ${generarHTMLCruces(window.datosCruces)}
+            </div>`;
+    }
+
+    tabs += `</div>`;
+
+    div.innerHTML = tabs + contenido;
 }
 
-// Pestañas
-let tabs = `<div class="tabs">`;
-jornadasOrdenadas.forEach((j, idx) => {
-    tabs += `
-        <button class="tab-btn ${idx === 0 ? "activa" : ""}"
-                onclick="cambiarJornada(${j}, event)">
-            Jornada ${j}
-        </button>`;
-});
-tabs += `</div>`;
-
-// Contenido
-let contenido = "";
-jornadasOrdenadas.forEach((j, idx) => {
-    contenido += `
-        <div id="jornada_${j}" class="jornada-contenido"
-             style="display:${idx === 0 ? "block" : "none"};">
-            ${generarHTMLJornada(jornadas[j])}
-        </div>`;
-});
-
-div.innerHTML = tabs + contenido;
-
-}
-
-function cambiarJornada(num, ev) {
+function cambiarJornada(id, ev) {
     document.querySelectorAll(".jornada-contenido")
         .forEach(x => x.style.display = "none");
-
-    const id = String(num).startsWith("jornada_") || String(num) === "fase_final"
-        ? String(num)
-        : "jornada_" + num;
 
     const bloque = document.getElementById(id);
     if (bloque) bloque.style.display = "block";
@@ -229,94 +242,107 @@ function cambiarJornada(num, ev) {
     document.querySelectorAll(".tab-btn")
         .forEach(btn => btn.classList.remove("activa"));
 
-    if (ev?.target) ev.target.classList.add("activa");
+    if (ev && ev.target) ev.target.classList.add("activa");
 }
 
-// Render de cada jornadafunction generarHTMLJornada(partidos) {let html = "";
+// =====================================================
+//   Render partidos
+// =====================================================
+function generarHTMLJornada(partidos) {
+    let html = "";
 
-partidos.forEach(p => {
+    partidos.forEach(p => {
+        if (p.estado === "descanso" || p.visitante === "DESCANSO") {
+            html += `
+                <div class="partido">
+                    <div class="descanso-line">
+                        <span class="descanso-label">DESCANSAN:</span>
+                        <span class="descanso-equipo">${p.local}</span>
+                    </div>
+                </div>`;
+            return;
+        }
 
-    // === DESCANSO ===
-    if (p.estado === "descanso" || p.visitante === "DESCANSO") {
+        const sets = p.resultado || [];
+
+        const getSet = (i, pos) => {
+            if (!sets[i]) return "";
+            const partes = sets[i].split("-");
+            return partes[pos] || "";
+        };
+
+        const haySet4 = sets.length >= 4 && sets[3] !== "";
+        const haySet5 = sets.length >= 5 && sets[4] !== "";
+
+        const totalCols = 3 + (haySet4 ? 1 : 0) + (haySet5 ? 1 : 0);
+        const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
+
+        let localGan = 0;
+        let visitGan = 0;
+
+        sets.forEach(s => {
+            if (!s) return;
+            const partes = s.split("-").map(Number);
+            const a = partes[0];
+            const b = partes[1];
+
+            if (a > b) localGan++;
+            if (b > a) visitGan++;
+        });
+
+        let claseLocal = "";
+        let claseVisit = "";
+
+        const estado = String(p.estado || "").toLowerCase();
+
+        if (estado === "jugado" || estado === "finalizado") {
+            claseLocal = localGan > visitGan ? "ganador" : "";
+            claseVisit = visitGan > localGan ? "ganador" : "";
+        }
+
         html += `
-            <div class="partido">
-                <div class="descanso-line">
-                    <span class="descanso-label">DESCANSAN:</span>
-                    <span class="descanso-equipo">${p.local}</span>
-                </div>
-            </div>`;
-        return;
-    }
+        <div class="partido">
+            <div class="fila fila-head" style="${gridStyle}">
+                <span class="equipo-col">EQUIPOS</span>
+                <span class="set-col">I</span>
+                <span class="set-col">II</span>
+                <span class="set-col">III</span>
+                ${haySet4 ? `<span class="set-col">IV</span>` : ""}
+                ${haySet5 ? `<span class="set-col">V</span>` : ""}
+            </div>
 
-    // === PROCESAR SETS ===
-    const sets = p.resultado || [];
+            <div class="fila" style="${gridStyle}">
+                <span class="equipo-col ${claseLocal}">${p.local}</span>
+                <span class="set-col">${getSet(0,0)}</span>
+                <span class="set-col">${getSet(1,0)}</span>
+                <span class="set-col">${getSet(2,0)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,0)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
+            </div>
 
-    const getSet = (i, pos) => {
-        if (!sets[i]) return "";
-        const partes = sets[i].split("-");
-        return partes[pos] || "";
-    };
+            <div class="fila" style="${gridStyle}">
+                <span class="equipo-col ${claseVisit}">${p.visitante}</span>
+                <span class="set-col">${getSet(0,1)}</span>
+                <span class="set-col">${getSet(1,1)}</span>
+                <span class="set-col">${getSet(2,1)}</span>
+                ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
+                ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
+            </div>
 
-    const haySet4 = sets.length >= 4 && sets[3] !== "";
-    const haySet5 = sets.length >= 5 && sets[4] !== "";
-
-    const totalCols = 3 + (haySet4 ? 1 : 0) + (haySet5 ? 1 : 0);
-    const gridStyle = `grid-template-columns: 3fr repeat(${totalCols}, 1fr);`;
-
-    let localGan = 0, visitGan = 0;
-    sets.forEach(s => {
-        if (!s) return;
-        const [a, b] = s.split("-").map(Number);
-        if (a > b) localGan++;
-        if (b > a) visitGan++;
+            ${
+                estado === "pendiente"
+                    ? `<div class="pendiente-line">⏳ Pendiente</div>`
+                    : ""
+            }
+        </div>`;
     });
 
-    let claseLocal = "";
-    let claseVisit = "";
+    return html;
+}
 
-    if (p.estado === "jugado") {
-        claseLocal = localGan > visitGan ? "ganador" : "";
-        claseVisit = visitGan > localGan ? "ganador" : "";
-    }
-
-    html += `
-    <div class="partido">
-
-        <div class="fila fila-head" style="${gridStyle}">
-            <span class="equipo-col">EQUIPOS</span>
-            <span class="set-col">I</span>
-            <span class="set-col">II</span>
-            <span class="set-col">III</span>
-            ${haySet4 ? `<span class="set-col">IV</span>` : ""}
-            ${haySet5 ? `<span class="set-col">V</span>` : ""}
-        </div>
-
-        <div class="fila" style="${gridStyle}">
-            <span class="equipo-col ${claseLocal}">${p.local}</span>
-            <span class="set-col">${getSet(0,0)}</span>
-            <span class="set-col">${getSet(1,0)}</span>
-            <span class="set-col">${getSet(2,0)}</span>
-            ${haySet4 ? `<span class="set-col">${getSet(3,0)}</span>` : ""}
-            ${haySet5 ? `<span class="set-col">${getSet(4,0)}</span>` : ""}
-        </div>
-
-        <div class="fila" style="${gridStyle}">
-            <span class="equipo-col ${claseVisit}">${p.visitante}</span>
-            <span class="set-col">${getSet(0,1)}</span>
-            <span class="set-col">${getSet(1,1)}</span>
-            <span class="set-col">${getSet(2,1)}</span>
-            ${haySet4 ? `<span class="set-col">${getSet(3,1)}</span>` : ""}
-            ${haySet5 ? `<span class="set-col">${getSet(4,1)}</span>` : ""}
-        </div>
-
-        ${p.estado === "pendiente"
-            ? `<div class="pendiente-line">⏳ Pendiente</div>`
-            : ""
-        }
-    </div>
-    `;
-});
-
+// =====================================================
+//   Fase Final
+// =====================================================
 function generarHTMLCruces(lista) {
     const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
     let html = "";
@@ -330,11 +356,10 @@ function generarHTMLCruces(lista) {
         }
     });
 
-
-
-return html;
-
+    return html;
 }
 
-// =====//   Carga inicial// ===
+// =====================================================
+//   Carga inicial
+// =====================================================
 cargarDatos();
