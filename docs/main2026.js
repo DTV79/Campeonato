@@ -1,6 +1,6 @@
-// =====================================================//   URL donde se encuentra el JSON generado por Excel// =====================================================const DATA_URL = "./estado_torneo.json";
+// =====//   URL donde se encuentra el JSON generado por Excel// ===const DATA_URL = "./estado_torneo.json";
 
-// =====================================================//   Cargar datos desde JSON (adaptado a páginas separadas)// =====================================================async function cargarDatos() {try {const res = await fetch(DATA_URL + "?v=" + Date.now());const data = await res.json();
+// =====//   Cargar datos desde JSON (adaptado a páginas separadas)// ===async function cargarDatos() {try {const res = await fetch(DATA_URL + "?v=" + Date.now());const data = await res.json();
 
     // Cargar solo lo que corresponda según el HTML
     if (document.getElementById("clasificacion")) {
@@ -31,13 +31,13 @@
 
 }
 
-// =====================================================//   Cambiar pestañas de jornadas// =====================================================function mostrar(pagina) {document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
+// =====//   Cambiar pestañas de jornadas// ===function mostrar(pagina) {document.querySelectorAll(".pagina").forEach(p => p.style.display = "none");
 
 document.getElementById(pagina).style.display = "block";
 
 }
 
-// =====================================================//   CLASIFICACIÓN — TABLA// =====================================================function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {const div = document.getElementById("clasificacion");
+// =====//   CLASIFICACIÓN — TABLA// ===function mostrarClasificacion(lista, fechaActualizacion, modoOrden) {const div = document.getElementById("clasificacion");
 
 // --- Fecha formateada ---
 let fechaFormateada = "Fecha desconocida";
@@ -171,7 +171,7 @@ div.innerHTML += html;
 
 }
 
-// =====================================================//   PARTIDOS// =====================================================function mostrarPartidos(lista) {const div = document.getElementById("partidos");if (!div) return;
+// =====//   PARTIDOS// ===function mostrarPartidos(lista) {const div = document.getElementById("partidos");if (!div) return;
 
 // Agrupar por jornada
 const jornadas = {};
@@ -215,15 +215,21 @@ div.innerHTML = tabs + contenido;
 
 }
 
-function cambiarJornada(num, ev) {document.querySelectorAll(".jornada-contenido").forEach(x => x.style.display = "none");
+function cambiarJornada(num, ev) {
+    document.querySelectorAll(".jornada-contenido")
+        .forEach(x => x.style.display = "none");
 
-document.getElementById("jornada_" + num).style.display = "block";
+    const id = String(num).startsWith("jornada_") || String(num) === "fase_final"
+        ? String(num)
+        : "jornada_" + num;
 
-document.querySelectorAll(".tab-btn")
-    .forEach(btn => btn.classList.remove("activa"));
+    const bloque = document.getElementById(id);
+    if (bloque) bloque.style.display = "block";
 
-if (ev?.target) ev.target.classList.add("activa");
+    document.querySelectorAll(".tab-btn")
+        .forEach(btn => btn.classList.remove("activa"));
 
+    if (ev?.target) ev.target.classList.add("activa");
 }
 
 // Render de cada jornadafunction generarHTMLJornada(partidos) {let html = "";
@@ -311,8 +317,24 @@ partidos.forEach(p => {
     `;
 });
 
+function generarHTMLCruces(lista) {
+    const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
+    let html = "";
+
+    fasesOrden.forEach(fase => {
+        const partidosFase = lista.filter(p => p.fase === fase);
+
+        if (partidosFase.length) {
+            html += `<h2>${fase}</h2>`;
+            html += generarHTMLJornada(partidosFase);
+        }
+    });
+
+
+
 return html;
 
 }
 
-// =====================================================//   Carga inicial// =====================================================cargarDatos();
+// =====//   Carga inicial// ===
+cargarDatos();
