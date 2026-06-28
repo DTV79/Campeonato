@@ -346,11 +346,7 @@ function generarHTMLJornada(partidos) {
 
 function generarHTMLCruces(lista) {
     const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
-    let html = `
-        <div class="mata-mata-box">
-            <div class="mata-mata-title">🏆 MATA-MATA</div>
-            <div class="mata-mata-subtitle">Fase final del campeonato</div>
-    `;
+    let html = "";
 
     fasesOrden.forEach(fase => {
         const partidosFase = lista.filter(p => p.fase === fase);
@@ -359,13 +355,14 @@ function generarHTMLCruces(lista) {
             html += `
                 <div class="mata-fase">
                     <h2>${iconoFase(fase)} ${fase}</h2>
-                    ${partidosFase.map(p => generarTarjetaCruce(p)).join("")}
+                    ${generarHTMLJornada(partidosFase)}
                 </div>
             `;
         }
     });
 
     const final = lista.find(p => p.fase === "Final");
+
     if (final && final.ganador) {
         html += `
             <div class="campeon-box">
@@ -375,7 +372,6 @@ function generarHTMLCruces(lista) {
         `;
     }
 
-    html += `</div>`;
     return html;
 }
 
@@ -386,45 +382,7 @@ function iconoFase(fase) {
     return "🎾";
 }
 
-function generarTarjetaCruce(p) {
-    const sets = p.resultado || [];
 
-    const marcadorA = [];
-    const marcadorB = [];
-
-    sets.forEach(s => {
-        const partes = s.split("-");
-        marcadorA.push(partes[0] || "");
-        marcadorB.push(partes[1] || "");
-    });
-
-    const estado = String(p.estado || "").toLowerCase();
-
-    const claseA = p.ganador === p.local ? "winner" : "";
-    const claseB = p.ganador === p.visitante ? "winner" : "";
-
-    const pendiente = estado === "pendiente" || !p.ganador;
-
-    return `
-        <div class="cruce-card">
-            <div class="cruce-row ${claseA}">
-                <div class="cruce-team">${p.local}</div>
-                <div class="cruce-sets">${marcadorA.map(x => `<span>${x}</span>`).join("")}</div>
-            </div>
-
-            <div class="cruce-row ${claseB}">
-                <div class="cruce-team">${p.visitante}</div>
-                <div class="cruce-sets">${marcadorB.map(x => `<span>${x}</span>`).join("")}</div>
-            </div>
-
-            ${
-                pendiente
-                    ? `<div class="cruce-status pendiente-line">⏳ Pendiente</div>`
-                    : `<div class="cruce-status">Ganador: <strong>${p.ganador}</strong></div>`
-            }
-        </div>
-    `;
-}
 
 // =====================================================
 //   Carga inicial
