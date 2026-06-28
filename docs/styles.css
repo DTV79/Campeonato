@@ -560,3 +560,82 @@ footer {
     font-size: 1.35rem;
     font-weight: 900;
 }
+
+
+/* =====================================================
+   PALAS DE PLAYA
+===================================================== */
+
+.palas-playa-box {
+    margin-top: 12px;
+}
+
+.palas-ronda {
+    margin-top: 36px;
+    margin-bottom: 36px;
+}
+
+.palas-ronda:first-child {
+    margin-top: 10px;
+}
+
+.palas-ronda h2 {
+    font-size: 22px;
+    color: #0b5f7a;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #65c7e8;
+}
+
+.palas-ronda .partido {
+    background: #f7fdff;
+    border-radius: 12px;
+    padding: 14px 12px 20px 12px;
+    border: 1px solid #bde8f5;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.palas-descanso {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 14px;
+    text-align: center;
+    background: #eef8ff;
+    border: 1px dashed #65c7e8;
+}
+
+.palas-descanso-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0b5f7a;
+    letter-spacing: 1px;
+}
+
+.palas-descanso-equipo {
+    margin-top: 5px;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #003f52;
+}
+
+.farolillo-box {
+    margin-top: 34px;
+    padding: 22px;
+    border-radius: 18px;
+    text-align: center;
+    background: linear-gradient(135deg, #4b1f12, #b45309);
+    color: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.farolillo-label {
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.farolillo-nombre {
+    margin-top: 8px;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
