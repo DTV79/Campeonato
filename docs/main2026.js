@@ -273,15 +273,13 @@ function generarHTMLJornada(partidos) {
 
     partidos.forEach(p => {
         if (p.estado === "descanso" || p.visitante === "DESCANSO") {
-            html += `
-                <div class="partido">
-                    <div class="descanso-line">
-                        <span class="descanso-label">DESCANSAN:</span>
-                        <span class="descanso-equipo">${p.local}</span>
-                    </div>
-                </div>`;
-            return;
-        }
+    html += `
+        <div class="palas-descanso">
+            <div class="palas-descanso-label">💤 DESCANSA</div>
+            <div class="palas-descanso-equipo">${p.local}</div>
+        </div>`;
+    return;
+}
 
         const sets = p.resultado || [];
 
