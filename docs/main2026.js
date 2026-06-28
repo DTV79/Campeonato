@@ -217,7 +217,7 @@ function mostrarPartidos(lista) {
         tabs += `
             <button class="tab-btn ${activaFinal ? "activa" : ""}"
                     onclick="cambiarJornada('fase_final', event)">
-                Fase Final
+                Mata-Mata
             </button>`;
 
         contenido += `
