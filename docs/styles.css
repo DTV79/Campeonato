@@ -498,108 +498,48 @@ footer {
 }
 
 
-```css
+
 /* =====================================================
    MATA-MATA / FASE FINAL
 ===================================================== */
 
-.mata-mata-box {
-    margin-top: 18px;
-    padding: 18px;
-    border-radius: 20px;
-    background: linear-gradient(180deg, #fff7e6, #ffffff);
-    border: 2px solid #f0c36a;
-    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
-}
-
-.mata-mata-title {
-    text-align: center;
-    font-size: 1.55rem;
-    font-weight: 900;
-    letter-spacing: 1px;
-    color: #7a1f1f;
-    margin-bottom: 4px;
-}
-
-.mata-mata-subtitle {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 18px;
-}
-
 .mata-fase {
-    margin-top: 22px;
+    margin-top: 34px;
+    margin-bottom: 34px;
+}
+
+.mata-fase:first-child {
+    margin-top: 10px;
 }
 
 .mata-fase h2 {
-    font-size: 1.15rem;
+    font-size: 22px;
     color: #7a1f1f;
-    border-bottom: 2px solid #e8c36a;
-    padding-bottom: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d6a21d;
 }
 
-.cruce-card {
-    background: #ffffff;
-    border-radius: 16px;
-    margin-bottom: 14px;
-    padding: 12px;
-    border: 1px solid #ead8a3;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.cruce-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: center;
-    padding: 8px 10px;
+.mata-fase .partido {
+    background: #fffdf6;
     border-radius: 12px;
-    margin-bottom: 6px;
-    background: #f8f8f8;
+    padding: 14px 12px 20px 12px;
+    border: 1px solid #ead8a3;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
-.cruce-row.winner {
-    background: #fff1c4;
+.mata-fase .ganador {
+    color: #008000;
     font-weight: 900;
-    color: #6b180f;
+    background: #fff1c4;
     border-left: 5px solid #d6a21d;
-}
-
-.cruce-team {
-    font-size: 0.95rem;
-}
-
-.cruce-sets {
-    display: flex;
-    gap: 5px;
-}
-
-.cruce-sets span {
-    min-width: 24px;
-    text-align: center;
+    border-radius: 6px;
     padding: 3px 6px;
-    border-radius: 7px;
-    background: #eeeeee;
-    font-weight: 700;
-}
-
-.cruce-row.winner .cruce-sets span {
-    background: #d6a21d;
-    color: white;
-}
-
-.cruce-status {
-    margin-top: 8px;
-    text-align: center;
-    font-size: 0.85rem;
-    color: #666;
 }
 
 .campeon-box {
-    margin-top: 24px;
-    padding: 18px;
+    margin-top: 32px;
+    padding: 20px;
     border-radius: 18px;
     text-align: center;
     background: linear-gradient(135deg, #7a1f1f, #b8860b);
