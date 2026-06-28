@@ -343,7 +343,7 @@ function generarHTMLJornada(partidos) {
 // =====================================================
 //   Fase Final
 // =====================================================
-```javascript
+
 function generarHTMLCruces(lista) {
     const fasesOrden = ["Cuartos de Final", "Semifinales", "Final"];
     let html = `
