@@ -261,8 +261,6 @@ function pintarPantallaClasificacion(contenido) {
             eq.posicion_actual == 3 ? "🥉" :
             eq.posicion_actual + ".";
 
-        const textoEtiqueta = obtenerEtiqueta(eq);
-
         html += `
             <article class="filaClasificacion">
 
@@ -275,7 +273,7 @@ function pintarPantallaClasificacion(contenido) {
                     🔢 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
                 </div>
 
-                <div class="etiquetaEspecial">${textoEtiqueta}</div>
+                <div class="etiquetaEspecial">${obtenerEtiqueta(eq)}</div>
 
                 <div class="toggleDetalles">▼ Ver estadísticas</div>
 
@@ -324,14 +322,15 @@ function pintarClasificacionCompleta() {
             <table class="tablaClasificacion">
                 <thead>
                     <tr>
-                        <th>Pos</th>
-                        <th>Equipo</th>
-                        <th>Pts</th>
-                        <th>Coef</th>
+                        <th class="stickyMov"></th>
+                        <th class="stickyPos">POS</th>
+                        <th class="stickyEquipo">EQUIPO</th>
+                        <th>PTOS</th>
+                        <th>COEF</th>
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
-                        <th>Des</th>
+                        <th>DES</th>
                         <th>SG</th>
                         <th>SP</th>
                         <th>SD</th>
@@ -348,11 +347,13 @@ function pintarClasificacionCompleta() {
 
         html += `
             <tr>
-                <td>
-                    <strong>${eq.posicion_actual}</strong>
+                <td class="stickyMov">
                     <span class="${mov.clase} movTabla">${mov.texto}</span>
                 </td>
-                <td class="equipoTabla">${eq.equipo}</td>
+                <td class="stickyPos">
+                    <strong>${eq.posicion_actual}</strong>
+                </td>
+                <td class="stickyEquipo equipoTabla">${eq.equipo}</td>
                 <td>${eq.puntos_totales}</td>
                 <td>${eq.coeficiente}</td>
                 <td>${eq.pj}</td>
@@ -385,13 +386,8 @@ function pintarClasificacionCompleta() {
 function obtenerMovimiento(eq) {
     const dif = eq.posicion_anterior - eq.posicion_actual;
 
-    if (dif > 0) {
-        return { texto: "▲ " + dif, clase: "sube" };
-    }
-
-    if (dif < 0) {
-        return { texto: "▼ " + Math.abs(dif), clase: "baja" };
-    }
+    if (dif > 0) return { texto: "▲ " + dif, clase: "sube" };
+    if (dif < 0) return { texto: "▼ " + Math.abs(dif), clase: "baja" };
 
     return { texto: "—", clase: "igual" };
 }
