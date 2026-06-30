@@ -190,22 +190,33 @@ document.addEventListener("click", function(e) {
         return;
     }
 
-    const botonVolver = e.target.closest("#btnVolver");
-    if (botonVolver) {
-        mostrarInicio();
-        return;
-    }
+    
 
     const nav = e.target.closest(".navBtn");
-    if (nav) {
-        document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
-        nav.classList.add("navActivo");
+if (nav) {
+    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
+    nav.classList.add("navActivo");
 
-        if (nav.dataset.pantalla === "inicio") {
-            mostrarInicio();
-        }
+    const pantalla = nav.dataset.pantalla;
+
+    if (pantalla === "inicio") {
+        mostrarInicio();
     }
-});
+
+    if (pantalla === "clasificacion") {
+        abrirDetalle("clasificacion");
+    }
+
+    if (pantalla === "partidos") {
+        abrirDetalle("partidos");
+    }
+
+    if (pantalla === "mas") {
+        abrirDetalle("mas");
+    }
+
+    return;
+}
 
 function abrirDetalle(seccion) {
 
@@ -271,7 +282,10 @@ if (eq.posicion_actual == 1) {
 } else {
     textoEtiqueta = "🚣 A remar";
 }
-
+if (seccion === "mas") {
+    contenido.innerHTML = "<h2>☰ Más</h2>";
+}
+        
 const etiqueta = `<div class="etiquetaEspecial">${textoEtiqueta}</div>`;
 
     html += `
