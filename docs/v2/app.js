@@ -159,23 +159,18 @@ function pintarTarjetasDashboard(data) {
 
 document.addEventListener("click", function(e) {
 
+    const btnCompleta = e.target.closest("#btnVistaCompleta");
+    if (btnCompleta) {
+        pintarClasificacionCompleta();
+        return;
+    }
 
+    const btnResumida = e.target.closest("#btnVistaResumida");
+    if (btnResumida) {
+        pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
+        return;
+    }
 
-      const btnCompleta = e.target.closest("#btnVistaCompleta");
-if (btnCompleta) {
-    pintarClasificacionCompleta();
-    return;
-}
-
-const btnResumida = e.target.closest("#btnVistaResumida");
-if (btnResumida) {
-    pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
-    return;
-}
-
-  
-    
-    
     const card = e.target.closest(".cardAcceso");
     if (card) {
         abrirDetalle(card.dataset.seccion);
@@ -196,7 +191,6 @@ if (btnResumida) {
         return;
     }
 
- 
     const fila = e.target.closest(".filaClasificacion");
     if (fila) {
         const detalle = fila.querySelector(".detalleClasif");
@@ -224,21 +218,10 @@ function abrirDetalle(seccion) {
     podio.classList.add("oculto");
     detalle.classList.remove("oculto");
 
-    if (seccion === "clasificacion") {
-        pintarPantallaClasificacion(contenido);
-    }
-
-    if (seccion === "partidos") {
-        contenido.innerHTML = "<h2>🎾 Partidos</h2>";
-    }
-
-    if (seccion === "cruces") {
-        contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
-    }
-
-    if (seccion === "palas") {
-        contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
-    }
+    if (seccion === "clasificacion") pintarPantallaClasificacion(contenido);
+    if (seccion === "partidos") contenido.innerHTML = "<h2>🎾 Partidos</h2>";
+    if (seccion === "cruces") contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
+    if (seccion === "palas") contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
 
     if (seccion === "mas") {
         contenido.innerHTML = `
@@ -255,7 +238,6 @@ function abrirDetalle(seccion) {
 }
 
 function pintarPantallaClasificacion(contenido) {
-
     let html = `
         <h2>📊 Clasificación</h2>
 
@@ -263,25 +245,15 @@ function pintarPantallaClasificacion(contenido) {
             🏆 ${datos.modo_orden}
         </div>
 
+        <button class="btnVistaCompleta" id="btnVistaCompleta">
+            📋 Ver clasificación completa
+        </button>
+
         <div class="listaClasificacion">
     `;
 
     datos.clasificacion.forEach(eq => {
-
-        let movimiento = "—";
-        let clase = "igual";
-
-        const dif = eq.posicion_anterior - eq.posicion_actual;
-
-        if (dif > 0) {
-            movimiento = "▲ " + dif;
-            clase = "sube";
-        }
-
-        if (dif < 0) {
-            movimiento = "▼ " + Math.abs(dif);
-            clase = "baja";
-        }
+        const mov = obtenerMovimiento(eq);
 
         const medalla =
             eq.posicion_actual == 1 ? "🥇" :
@@ -289,44 +261,25 @@ function pintarPantallaClasificacion(contenido) {
             eq.posicion_actual == 3 ? "🥉" :
             eq.posicion_actual + ".";
 
-        let textoEtiqueta = "";
-
-        if (eq.posicion_actual == 1) {
-            textoEtiqueta = "⭐ Líder";
-        } else if (eq.posicion_actual == 2) {
-            textoEtiqueta = "🥈 Al acecho";
-        } else if (eq.posicion_actual == 3) {
-            textoEtiqueta = "🥉 Podio";
-        } else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
-            textoEtiqueta = "⚔️ Playoff";
-        } else if (eq.posicion_actual == datos.clasificacion.length) {
-            textoEtiqueta = "🥄 Farolillo";
-        } else {
-            textoEtiqueta = "🚣 A remar";
-        }
+        const textoEtiqueta = obtenerEtiqueta(eq);
 
         html += `
             <article class="filaClasificacion">
 
                 <div class="lineaEquipo">
                     <div class="equipoFila">${medalla} ${eq.equipo}</div>
-                    <div class="${clase} movimientoFila">${movimiento}</div>
+                    <div class="${mov.clase} movimientoFila">${mov.texto}</div>
                 </div>
 
                 <div class="datosFila">
                     🔢 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
                 </div>
 
-                <div class="etiquetaEspecial">
-                    ${textoEtiqueta}
-                </div>
+                <div class="etiquetaEspecial">${textoEtiqueta}</div>
 
-                <div class="toggleDetalles">
-                    ▼ Ver estadísticas
-                </div>
+                <div class="toggleDetalles">▼ Ver estadísticas</div>
 
                 <div class="detalleClasif oculto">
-
                     <div class="grupoStats">
                         <h5>Partidos</h5>
                         <div><span>Ganados</span><strong>${eq.pg}</strong></div>
@@ -351,58 +304,15 @@ function pintarPantallaClasificacion(contenido) {
                         <div><span>Perdidos</span><strong>${eq.puntos_perdidos}</strong></div>
                         <div><span>Diferencia</span><strong>${formatoDiff(eq.puntos_diff)}</strong></div>
                     </div>
-
                 </div>
 
             </article>
         `;
     });
 
-  html += `
-        </div>
-
-        <button class="btnVistaCompleta" id="btnVistaCompleta">
-            📋 Ver clasificación completa
-        </button>
-    `;
-
-contenido.innerHTML = html;
+    html += `</div>`;
+    contenido.innerHTML = html;
 }
-
-function mostrarInicio() {
-    document.querySelector(".cabecera").classList.remove("oculto");
-    document.querySelector(".gridDashboard").classList.remove("oculto");
-    document.querySelector(".podioCard").classList.remove("oculto");
-
-    document.getElementById("vistaDetalle").classList.add("oculto");
-
-    activarNav("inicio");
-}
-
-function activarNav(pantalla) {
-    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
-
-    const btn = document.querySelector(`.navBtn[data-pantalla="${pantalla}"]`);
-    if (btn) btn.classList.add("navActivo");
-}
-
-function setHTML(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-}
-
-function setText(id, texto) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = texto;
-}
-
-
-function formatoDiff(valor) {
-    const n = Number(valor);
-    if (n > 0) return "+" + n;
-    return String(n);
-}
-
 
 function pintarClasificacionCompleta() {
     const contenido = document.getElementById("contenidoDetalle");
@@ -421,18 +331,27 @@ function pintarClasificacionCompleta() {
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
-                        <th>Desc.</th>
-                        <th>Sets</th>
-                        <th>Juegos</th>
+                        <th>Des</th>
+                        <th>SG</th>
+                        <th>SP</th>
+                        <th>SD</th>
+                        <th>PGan</th>
+                        <th>PPer</th>
+                        <th>PDif</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
     datos.clasificacion.forEach(eq => {
+        const mov = obtenerMovimiento(eq);
+
         html += `
             <tr>
-                <td>${eq.posicion_actual}</td>
+                <td>
+                    <strong>${eq.posicion_actual}</strong>
+                    <span class="${mov.clase} movTabla">${mov.texto}</span>
+                </td>
                 <td class="equipoTabla">${eq.equipo}</td>
                 <td>${eq.puntos_totales}</td>
                 <td>${eq.coeficiente}</td>
@@ -440,8 +359,12 @@ function pintarClasificacionCompleta() {
                 <td>${eq.pg}</td>
                 <td>${eq.pp}</td>
                 <td>${eq.descanso}</td>
-                <td>${eq.sets_ganados}-${eq.sets_perdidos} (${formatoDiff(eq.sets_diff)})</td>
-                <td>${eq.puntos_ganados}-${eq.puntos_perdidos} (${formatoDiff(eq.puntos_diff)})</td>
+                <td>${eq.sets_ganados}</td>
+                <td>${eq.sets_perdidos}</td>
+                <td>${formatoDiff(eq.sets_diff)}</td>
+                <td>${eq.puntos_ganados}</td>
+                <td>${eq.puntos_perdidos}</td>
+                <td>${formatoDiff(eq.puntos_diff)}</td>
             </tr>
         `;
     });
@@ -457,4 +380,57 @@ function pintarClasificacionCompleta() {
     `;
 
     contenido.innerHTML = html;
+}
+
+function obtenerMovimiento(eq) {
+    const dif = eq.posicion_anterior - eq.posicion_actual;
+
+    if (dif > 0) {
+        return { texto: "▲ " + dif, clase: "sube" };
+    }
+
+    if (dif < 0) {
+        return { texto: "▼ " + Math.abs(dif), clase: "baja" };
+    }
+
+    return { texto: "—", clase: "igual" };
+}
+
+function obtenerEtiqueta(eq) {
+    if (eq.posicion_actual == 1) return "⭐ Líder";
+    if (eq.posicion_actual == 2) return "🥈 Al acecho";
+    if (eq.posicion_actual == 3) return "🥉 Podio";
+    if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) return "⚔️ Playoff";
+    if (eq.posicion_actual == datos.clasificacion.length) return "🥄 Farolillo";
+    return "🚣 A remar";
+}
+
+function mostrarInicio() {
+    document.querySelector(".cabecera").classList.remove("oculto");
+    document.querySelector(".gridDashboard").classList.remove("oculto");
+    document.querySelector(".podioCard").classList.remove("oculto");
+    document.getElementById("vistaDetalle").classList.add("oculto");
+    activarNav("inicio");
+}
+
+function activarNav(pantalla) {
+    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
+    const btn = document.querySelector(`.navBtn[data-pantalla="${pantalla}"]`);
+    if (btn) btn.classList.add("navActivo");
+}
+
+function formatoDiff(valor) {
+    const n = Number(valor);
+    if (n > 0) return "+" + n;
+    return String(n);
+}
+
+function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
+
+function setText(id, texto) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = texto;
 }
