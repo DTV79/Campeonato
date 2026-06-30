@@ -643,3 +643,21 @@ body{
     font-size:30px;
     margin-bottom:18px;
 }
+
+
+.vistaDetalle{
+    display:block;
+    background:white;
+    border-radius:22px;
+    padding:22px;
+    margin-top:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+.vistaDetalle.oculto{
+    display:none;
+}
+
+#contenidoDetalle h2{
+    color:#1d2939;
+}
