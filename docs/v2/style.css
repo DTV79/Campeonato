@@ -843,3 +843,87 @@ body{
 .btnDetallesClasif{
     display:none !important;
 }
+
+/* Ajustes finales clasificación */
+
+.filaClasificacion{
+    padding:14px 15px !important;
+    border-radius:16px;
+}
+
+.equipoFila{
+    font-size:15px;
+}
+
+.datosFila{
+    margin-top:6px;
+    font-size:13px;
+}
+
+.etiquetaEspecial{
+    margin-top:7px;
+    padding:4px 8px;
+    font-size:11px;
+}
+
+.toggleDetalles{
+    margin-top:9px;
+    font-size:12px;
+}
+
+/* Animación desplegable */
+
+.detalleClasif{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #e2e8f0;
+    overflow:hidden;
+    animation:abrirDetalle .22s ease-out;
+}
+
+@keyframes abrirDetalle{
+    from{
+        opacity:0;
+        transform:translateY(-6px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* Estadísticas mejoradas */
+
+.grupoStats{
+    padding:8px 0;
+    border-bottom:1px solid #eef2f7;
+}
+
+.grupoStats:last-child{
+    border-bottom:none;
+}
+
+.grupoStats h5{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:#2563eb;
+    margin-bottom:7px;
+}
+
+.grupoStats div{
+    display:flex;
+    justify-content:space-between;
+    padding:3px 0;
+    font-size:13px;
+}
+
+.grupoStats span{
+    color:#64748b;
+    font-weight:700;
+}
+
+.grupoStats strong{
+    color:#0f172a;
+    font-weight:900;
+}
