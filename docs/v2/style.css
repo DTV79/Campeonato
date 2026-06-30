@@ -161,7 +161,29 @@ body{
 
 }
 
+.progresoCabecera{
 
+    margin-top:18px;
+
+}
+
+.progresoCabecera .barra{
+
+    margin-bottom:8px;
+
+}
+
+.progresoCabecera .textoProgreso{
+
+    color:white;
+
+    opacity:.85;
+
+    text-align:left;
+
+    font-size:14px;
+
+}
 /*============================
         TARJETAS
 =============================*/
