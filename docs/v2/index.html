@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -13,134 +12,98 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 </head>
 
 <body>
 
 <div class="contenedor">
 
-    <!-- CABECERA -->
-
     <header class="cabecera">
 
-    <div class="tituloSuperior">
-        II CAMPEONATO
-    </div>
+        <div class="tituloSuperior">II CAMPEONATO</div>
+        <div class="tituloPrincipal">Sprint Pádel</div>
+        <div class="subtitulo">Tui · 2026</div>
 
-    <div class="tituloPrincipal">
-        Sprint Pádel
-    </div>
-
-    <div class="subtitulo">
-        Tui · 2026
-    </div>
-
-    <div class="estadoCabecera" id="estadoCabecera">
-        🟢 Cargando...
-    </div>
+        <div class="estadoCabecera" id="estadoCabecera">
+            🟢 Cargando...
+        </div>
 
         <div class="progresoCabecera">
+            <div class="barra">
+                <div class="progreso" id="barraProgreso"></div>
+            </div>
 
-    <div class="barra">
-        <div class="progreso" id="barraProgreso"></div>
-    </div>
-
-    <div class="textoProgreso" id="textoProgreso"></div>
-
-</div>
-
-    <div class="actualizacion">
-        Última actualización
-        <strong id="ultimaActualizacion">--</strong>
-    </div>
-
-</header>
-
-    
-    <!-- BOTONES -->
-
-   <section class="gridDashboard">
-
-    <div class="cardAcceso cardClasificacion" data-seccion="clasificacion">
-        <div class="iconoAcceso">📊</div>
-        <div>
-            <h4>Clasificación</h4>
-            <p id="resumenClasificacion">Cargando...</p>
+            <div class="textoProgreso" id="textoProgreso"></div>
         </div>
-        <span class="flecha">→</span>
-    </div>
 
-    <div class="cardAcceso cardPartidos" data-seccion="partidos">
-        <div class="iconoAcceso">🎾</div>
-        <div>
-            <h4>Partidos</h4>
-            <p id="resumenPartidos">Cargando...</p>
+        <div class="actualizacion">
+            Última actualización
+            <strong id="ultimaActualizacion">--</strong>
         </div>
-        <span class="flecha">→</span>
-    </div>
 
-    <div class="cardAcceso cardCruces" data-seccion="cruces">
-        <div class="iconoAcceso">⚔️</div>
-        <div>
-            <h4>Eliminatorias</h4>
-            <p id="resumenCruces">Cargando...</p>
+    </header>
+
+    <section class="gridDashboard">
+
+        <div class="cardAcceso cardClasificacion" data-seccion="clasificacion">
+            <div class="iconoAcceso">📊</div>
+            <div>
+                <h4>Clasificación</h4>
+                <p id="resumenClasificacion">Cargando...</p>
+            </div>
+            <span class="flecha">→</span>
         </div>
-        <span class="flecha">→</span>
-    </div>
 
-    <div class="cardAcceso cardPalas" data-seccion="palas">
-        <div class="iconoAcceso">🏖️</div>
-        <div>
-            <h4>Copa Palas Playa</h4>
-            <p id="resumenPalas">Cargando...</p>
+        <div class="cardAcceso cardPartidos" data-seccion="partidos">
+            <div class="iconoAcceso">🎾</div>
+            <div>
+                <h4>Partidos</h4>
+                <p id="resumenPartidos">Cargando...</p>
+            </div>
+            <span class="flecha">→</span>
         </div>
-        <span class="flecha">→</span>
-    </div>
 
-</section>
+        <div class="cardAcceso cardCruces" data-seccion="cruces">
+            <div class="iconoAcceso">⚔️</div>
+            <div>
+                <h4>Eliminatorias</h4>
+                <p id="resumenCruces">Cargando...</p>
+            </div>
+            <span class="flecha">→</span>
+        </div>
 
-    <!-- PODIO -->
+        <div class="cardAcceso cardPalas" data-seccion="palas">
+            <div class="iconoAcceso">🏖️</div>
+            <div>
+                <h4>Copa Palas Playa</h4>
+                <p id="resumenPalas">Cargando...</p>
+            </div>
+            <span class="flecha">→</span>
+        </div>
 
-    <section class="tarjeta">
+    </section>
+
+    <section class="tarjeta podioCard">
 
         <h3>🥇 Podio provisional</h3>
 
         <div id="podio">
-
             Cargando...
-
         </div>
 
-<section id="vistaDetalle" class="vistaDetalle oculto">
+    </section>
 
-    <button id="btnVolver" class="btnVolver">
-        ← Volver
-    </button>
+    <section id="vistaDetalle" class="vistaDetalle oculto">
 
-    <div id="contenidoDetalle"></div>
+        <button id="btnVolver" class="btnVolver">
+            ← Volver
+        </button>
 
-</section>
+        <div id="contenidoDetalle"></div>
 
-        
     </section>
 
 </div>
-
-<script src="app.js"></script>
-    
-<nav class="bottomNav">
-
-    <button class="navActivo">🏠<span>Inicio</span></button>
-
-    <button>📊<span>Clasificación</span></button>
-
-    <button>🎾<span>Partidos</span></button>
-
-    <button>🏆<span>Cruces</span></button>
-
-    <button>☰<span>Más</span></button>
-</nav>
 
 <nav class="bottomNav">
 
@@ -166,13 +129,7 @@
 
 </nav>
 
-    
+<script src="app.js"></script>
+
 </body>
 </html>
-
-<!-- PANTALLAS -->
-
-<section id="pantallaInicio" class="pantalla activa">
-</section>
-
-
