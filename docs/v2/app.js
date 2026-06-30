@@ -235,7 +235,7 @@ function abrirDetalle(seccion) {
     detalle.classList.remove("oculto");
 
     if (seccion === "clasificacion") pintarPantallaClasificacion(contenido);
-    if (seccion === "partidos") contenido.innerHTML = "<h2>🎾 Partidos</h2>";
+   if (seccion === "partidos") pintarPantallaPartidos(contenido);
     if (seccion === "cruces") contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
     if (seccion === "palas") contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
 
@@ -549,4 +549,81 @@ function obtenerInfoOrden(modo) {
             "Sorteo"
         ]
     };
+}
+
+
+function pintarPantallaPartidos(contenido) {
+    const partidos = datos.partidos || [];
+    const jornadas = [...new Set(partidos.map(p => p.jornada))].sort((a, b) => a - b);
+
+    let html = `
+        <h2>🎾 Partidos</h2>
+        <div class="listaJornadas">
+    `;
+
+    jornadas.forEach(jornada => {
+        const partidosJornada = partidos.filter(p => p.jornada === jornada);
+        const jugados = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
+        const pendientes = partidosJornada.filter(p => String(p.estado).toLowerCase() === "pendiente").length;
+
+        html += `
+            <section class="bloqueJornada">
+                <div class="cabeceraJornada">
+                    <div>
+                        <h3>Jornada ${jornada}</h3>
+                        <p>${jugados} jugados · ${pendientes} pendientes</p>
+                    </div>
+                </div>
+
+                <div class="listaPartidos">
+        `;
+
+        partidosJornada.forEach(p => {
+            html += pintarCardPartido(p);
+        });
+
+        html += `
+                </div>
+            </section>
+        `;
+    });
+
+    html += `</div>`;
+    contenido.innerHTML = html;
+}
+
+function pintarCardPartido(p) {
+    const estado = String(p.estado).toLowerCase();
+
+    if (estado === "descanso") {
+        return `
+            <article class="cardPartido descanso">
+                <div class="estadoPartido">💤 Descanso</div>
+                <div class="equipoPartido">${p.local}</div>
+            </article>
+        `;
+    }
+
+    const resultado = Array.isArray(p.resultado) && p.resultado.length
+        ? p.resultado.join(" · ")
+        : "Pendiente";
+
+    const claseEstado = estado === "jugado" ? "jugado" : "pendiente";
+    const textoEstado = estado === "jugado" ? "✅ Finalizado" : "⏳ Pendiente";
+
+    return `
+        <article class="cardPartido ${claseEstado}">
+            <div class="estadoPartido">${textoEstado}</div>
+
+            <div class="versusPartido">
+                <div class="equipoPartido">${p.local}</div>
+                <div class="vs">vs</div>
+                <div class="equipoPartido">${p.visitante}</div>
+            </div>
+
+            <div class="resultadoPartido">${resultado}</div>
+
+            ${p.ganador ? `<div class="ganadorPartido">🏆 Gana ${p.ganador}</div>` : ""}
+        </article>
+    `;
 }
