@@ -53,26 +53,35 @@ function pintarEstado(data) {
         String(p.estado).toLowerCase() !== "descanso"
     );
 
-    const jugados = partidos.filter(p =>
+    const jornadaActual = obtenerJornadaActual(partidos);
+
+    const partidosJornada = partidos.filter(p =>
+        Number(p.jornada) === Number(jornadaActual)
+    );
+
+    const jugadosJornada = partidosJornada.filter(p =>
         String(p.estado).toLowerCase() === "jugado"
     ).length;
 
-    const total = partidos.length;
-    const pendientes = total - jugados;
-    const jornadaActual = obtenerJornadaActual(partidos);
-    const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
+    const totalJornada = partidosJornada.length;
+    const pendientesJornada = totalJornada - jugadosJornada;
+
+    const porcentaje = totalJornada > 0
+        ? Math.round((jugadosJornada / totalJornada) * 100)
+        : 0;
 
     setText(
         "estadoCabecera",
-        pendientes === 0
+        pendientesJornada === 0
             ? "✅ Jornada " + jornadaActual + " finalizada"
-            : "🟢 Jornada " + jornadaActual + " en juego"
-    );
+            : "🟢 Jornada " + jornadaActual + " en juego");
 
     const barra = document.getElementById("barraProgreso");
     if (barra) barra.style.width = porcentaje + "%";
 
-    setText("textoProgreso", `${jugados} de ${total} partidos disputados · ${porcentaje}%`);
+    setText(
+        "textoProgreso",
+        `${jugadosJornada} de ${totalJornada} partidos de la jornada · ${porcentaje}%`);
 }
 
 function obtenerJornadaActual(partidos) {
