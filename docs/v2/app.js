@@ -1,4 +1,4 @@
-const JSON_URL = "../estado_torneo.json";
+const JSON_URL = "https://raw.githubusercontent.com/DTV79/Campeonato/main/docs/estado_torneo.json";
 let datos = null;
 
 document.addEventListener("DOMContentLoaded", iniciarApp);
