@@ -326,3 +326,92 @@ body{
     }
 
 }
+
+
+/*============================
+    DASHBOARD ACCESOS
+=============================*/
+
+.gridDashboard{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+    margin-top:22px;
+    padding-bottom:90px;
+}
+
+.cardAcceso{
+    background:white;
+    border-radius:22px;
+    padding:20px;
+    min-height:150px;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.cardAcceso:hover{
+    transform:translateY(-4px);
+}
+
+.iconoAcceso{
+    font-size:36px;
+}
+
+.cardAcceso h4{
+    font-size:18px;
+    font-weight:800;
+    margin-top:14px;
+}
+
+.cardAcceso p{
+    font-size:14px;
+    color:#667085;
+    line-height:1.35;
+    margin-top:8px;
+}
+
+.cardAcceso:nth-child(1){
+    border-top:5px solid #2563eb;
+}
+
+.cardAcceso:nth-child(2){
+    border-top:5px solid #16a34a;
+}
+
+.cardAcceso:nth-child(3){
+    border-top:5px solid #d97706;
+}
+
+.cardAcceso:nth-child(4){
+    border-top:5px solid #0ea5e9;
+}
+
+@media(max-width:600px){
+
+    .gridDashboard{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .cardAcceso{
+        padding:16px;
+        min-height:135px;
+    }
+
+    .iconoAcceso{
+        font-size:30px;
+    }
+
+    .cardAcceso h4{
+        font-size:15px;
+    }
+
+    .cardAcceso p{
+        font-size:13px;
+    }
+
+}
