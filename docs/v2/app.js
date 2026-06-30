@@ -183,38 +183,43 @@ function setHTML(id, html) {
 
 
 document.addEventListener("click", function(e) {
-    const boton = e.target.closest(".navBtn");
-    if (!boton) return;
 
-    document.querySelectorAll(".navBtn").forEach(b => {
-        b.classList.remove("navActivo");
-    });
-
-    boton.classList.add("navActivo");
-});
-
-
-document.addEventListener("click", function(e) {
     const card = e.target.closest(".cardAcceso");
-    if (!card) return;
+    if (card) {
+        abrirDetalle(card.dataset.seccion);
+        return;
+    }
 
-    abrirDetalle(card.dataset.seccion);
-});
+    const botonVolver = e.target.closest("#btnVolver");
+    if (botonVolver) {
+        mostrarInicio();
+        return;
+    }
 
-document.getElementById("btnVolver")?.addEventListener("click", function() {
-    document.querySelector(".cabecera").classList.remove("oculto");
-    document.querySelector(".gridDashboard").classList.remove("oculto");
-    document.querySelector(".tarjeta").classList.remove("oculto");
-    document.getElementById("vistaDetalle").classList.add("oculto");
+    const nav = e.target.closest(".navBtn");
+    if (nav) {
+        document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
+        nav.classList.add("navActivo");
+
+        if (nav.dataset.pantalla === "inicio") {
+            mostrarInicio();
+        }
+    }
 });
 
 function abrirDetalle(seccion) {
+
+    const cabecera = document.querySelector(".cabecera");
+    const dashboard = document.querySelector(".gridDashboard");
+    const podio = document.querySelector(".tarjeta");
+    const detalle = document.getElementById("vistaDetalle");
     const contenido = document.getElementById("contenidoDetalle");
 
-    document.querySelector(".cabecera").classList.add("oculto");
-    document.querySelector(".gridDashboard").classList.add("oculto");
-    document.querySelector(".tarjeta").classList.add("oculto");
-    document.getElementById("vistaDetalle").classList.remove("oculto");
+    cabecera.classList.add("oculto");
+    dashboard.classList.add("oculto");
+    podio.classList.add("oculto");
+
+    detalle.classList.remove("oculto");
 
     if (seccion === "clasificacion") {
         contenido.innerHTML = "<h2>📊 Clasificación</h2>";
@@ -231,4 +236,18 @@ function abrirDetalle(seccion) {
     if (seccion === "palas") {
         contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
     }
+}
+
+function mostrarInicio() {
+
+    document.querySelector(".cabecera").classList.remove("oculto");
+    document.querySelector(".gridDashboard").classList.remove("oculto");
+    document.querySelector(".tarjeta").classList.remove("oculto");
+
+    document.getElementById("vistaDetalle").classList.add("oculto");
+
+    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
+
+    const btnInicio = document.querySelector('.navBtn[data-pantalla="inicio"]');
+    if (btnInicio) btnInicio.classList.add("navActivo");
 }
