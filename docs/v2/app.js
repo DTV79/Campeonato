@@ -28,6 +28,7 @@ function pintarInicio(data) {
     pintarFecha(data.ultima_actualizacion);
     pintarEstado(data);
     pintarPodio(data.clasificacion || []);
+    pintarTarjetasDashboard(data);
 }
 
 function pintarFecha(fechaISO) {
@@ -108,4 +109,52 @@ function pintarPodio(clasificacion) {
             <strong>${eq.puntos_totales} pts</strong>
         </div>
     `).join("");
+}
+
+function pintarTarjetasDashboard(data) {
+
+    const clasificacion = data.clasificacion || [];
+    const partidos = (data.partidos || []).filter(p => p.estado !== "descanso");
+    const cruces = data.cruces || [];
+    const palas = data.palas_playa || [];
+
+    const lider = clasificacion.length ? clasificacion[0].equipo : "Sin datos";
+
+    const jugados = partidos.filter(p =>
+        String(p.estado).toLowerCase() === "jugado"
+    ).length;
+
+    const pendientes = partidos.length - jugados;
+
+    const jornadaActual = obtenerJornadaActual(partidos);
+
+    const crucesJugados = cruces.filter(p =>
+        String(p.estado).toLowerCase() === "finalizado" ||
+        String(p.estado).toLowerCase() === "jugado"
+    ).length;
+
+    const crucesPendientes = cruces.length - crucesJugados;
+
+    const palasJugados = palas.filter(p =>
+        String(p.estado).toLowerCase() === "finalizado" ||
+        String(p.estado).toLowerCase() === "jugado"
+    ).length;
+
+    const palasPendientes = palas.length - palasJugados;
+
+    document.getElementById("resumenClasificacion").innerHTML =
+        `🥇 ${lider}<br>${clasificacion.length} equipos`;
+
+    document.getElementById("resumenPartidos").innerHTML =
+        `Jornada ${jornadaActual}<br>${jugados} jugados · ${pendientes} pendientes`;
+
+    document.getElementById("resumenCruces").innerHTML =
+        cruces.length
+            ? `${crucesJugados} jugados · ${crucesPendientes} pendientes`
+            : `Pendientes de generar`;
+
+    document.getElementById("resumenPalas").innerHTML =
+        palas.length
+            ? `${palasJugados} jugados · ${palasPendientes} pendientes`
+            : `Todavía no iniciada`;
 }
