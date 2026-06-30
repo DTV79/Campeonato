@@ -517,3 +517,11 @@ body{
 .equipoTabla{
     font-weight:900;
 }
+
+
+.movTabla{
+    display:block;
+    margin-top:4px;
+    font-size:12px;
+    font-weight:900;
+}
