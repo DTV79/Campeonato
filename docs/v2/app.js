@@ -12,14 +12,6 @@ async function iniciarApp() {
         pintarInicio(datos);
     } catch (error) {
         console.error(error);
-        document.body.innerHTML = `
-            <div class="contenedor">
-                <section class="tarjeta">
-                    <h3>⚠️ Error cargando datos</h3>
-                    <p>${error.message}</p>
-                </section>
-            </div>
-        `;
     }
 }
 
@@ -34,11 +26,6 @@ function pintarFecha(fechaISO) {
     const el = document.getElementById("ultimaActualizacion");
     if (!el) return;
 
-    if (!fechaISO) {
-        el.textContent = "--";
-        return;
-    }
-
     const fecha = new Date(fechaISO);
     el.textContent = fecha.toLocaleString("es-ES", {
         day: "2-digit",
@@ -49,39 +36,23 @@ function pintarFecha(fechaISO) {
 }
 
 function pintarEstado(data) {
-    const partidos = (data.partidos || []).filter(p =>
-        String(p.estado).toLowerCase() !== "descanso"
-    );
-
+    const partidos = (data.partidos || []).filter(p => String(p.estado).toLowerCase() !== "descanso");
     const jornadaActual = obtenerJornadaActual(partidos);
 
-    const partidosJornada = partidos.filter(p =>
-        Number(p.jornada) === Number(jornadaActual)
+    const partidosJornada = partidos.filter(p => Number(p.jornada) === Number(jornadaActual));
+    const jugados = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
+    const total = partidosJornada.length;
+    const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
+
+    setText("estadoCabecera", jugados === total
+        ? `✅ Jornada ${jornadaActual} finalizada`
+        : `🟢 Jornada ${jornadaActual} en juego`
     );
-
-    const jugadosJornada = partidosJornada.filter(p =>
-        String(p.estado).toLowerCase() === "jugado"
-    ).length;
-
-    const totalJornada = partidosJornada.length;
-    const pendientesJornada = totalJornada - jugadosJornada;
-
-    const porcentaje = totalJornada > 0
-        ? Math.round((jugadosJornada / totalJornada) * 100)
-        : 0;
-
-    setText(
-        "estadoCabecera",
-        pendientesJornada === 0
-            ? "✅ Jornada " + jornadaActual + " finalizada"
-            : "🟢 Jornada " + jornadaActual + " en juego");
 
     const barra = document.getElementById("barraProgreso");
     if (barra) barra.style.width = porcentaje + "%";
 
-    setText(
-        "textoProgreso",
-        `${jugadosJornada} de ${totalJornada} partidos de la jornada · ${porcentaje}%`);
+    setText("textoProgreso", `${jugados} de ${total} partidos de la jornada · ${porcentaje}%`);
 }
 
 function obtenerJornadaActual(partidos) {
@@ -107,11 +78,6 @@ function pintarPodio(clasificacion) {
     const podio = document.getElementById("podio");
     if (!podio) return;
 
-    if (!clasificacion.length) {
-        podio.textContent = "Sin clasificación";
-        return;
-    }
-
     const top3 = clasificacion.slice(0, 3);
     const clases = ["oro", "plata", "bronce"];
     const medallas = ["🥇", "🥈", "🥉"];
@@ -125,20 +91,16 @@ function pintarPodio(clasificacion) {
 
 function pintarTarjetasDashboard(data) {
     const clasificacion = data.clasificacion || [];
-    const partidos = (data.partidos || []).filter(p =>
-        String(p.estado).toLowerCase() !== "descanso"
-    );
+    const partidos = (data.partidos || []).filter(p => String(p.estado).toLowerCase() !== "descanso");
     const cruces = data.cruces || [];
     const palas = data.palas_playa || [];
 
     const lider = clasificacion.length ? clasificacion[0].equipo : "Sin datos";
-
-    const jugados = partidos.filter(p =>
-        String(p.estado).toLowerCase() === "jugado"
-    ).length;
-
-    const pendientes = partidos.length - jugados;
     const jornadaActual = obtenerJornadaActual(partidos);
+
+    const partidosJornada = partidos.filter(p => Number(p.jornada) === Number(jornadaActual));
+    const jugadosJornada = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
+    const pendientesJornada = partidosJornada.length - jugadosJornada;
 
     const crucesJugados = cruces.filter(p =>
         ["finalizado", "jugado"].includes(String(p.estado).toLowerCase())
@@ -149,17 +111,15 @@ function pintarTarjetasDashboard(data) {
     ).length;
 
     setHTML("resumenClasificacion", `🥇 ${lider}<br>${clasificacion.length} equipos`);
-    setHTML("resumenPartidos", `Jornada ${jornadaActual}<br>${jugados} jugados · ${pendientes} pendientes`);
+    setHTML("resumenPartidos", `Jornada ${jornadaActual}<br>${jugadosJornada} jugados · ${pendientesJornada} pendientes`);
 
-    setHTML(
-        "resumenCruces",
+    setHTML("resumenCruces",
         cruces.length
             ? `${crucesJugados} jugados · ${cruces.length - crucesJugados} pendientes`
             : "Pendientes de generar"
     );
 
-    setHTML(
-        "resumenPalas",
+    setHTML("resumenPalas",
         palas.length
             ? `${palasJugados} jugados · ${palas.length - palasJugados} pendientes`
             : "Todavía no iniciada"
@@ -167,22 +127,17 @@ function pintarTarjetasDashboard(data) {
 }
 
 document.addEventListener("click", function(e) {
+    const btnInfoOrden = e.target.closest("#btnInfoOrden");
+    if (btnInfoOrden) {
+        mostrarInfoOrden();
+        return;
+    }
 
-const btnInfoOrden = e.target.closest("#btnInfoOrden");
-if (btnInfoOrden) {
-    mostrarInfoOrden();
-    return;
-}
-
-const cerrarInfo = e.target.closest("#cerrarInfoOrden");
-if (cerrarInfo || e.target.classList.contains("overlayInfo")) {
-    cerrarInfoOrden();
-    return;
-}
-
-
-
-    
+    const cerrarInfo = e.target.closest("#cerrarInfoOrden");
+    if (cerrarInfo || e.target.classList.contains("overlayInfo")) {
+        cerrarInfoOrden();
+        return;
+    }
 
     const btnCompleta = e.target.closest("#btnVistaCompleta");
     if (btnCompleta) {
@@ -193,6 +148,17 @@ if (cerrarInfo || e.target.classList.contains("overlayInfo")) {
     const btnResumida = e.target.closest("#btnVistaResumida");
     if (btnResumida) {
         pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
+        return;
+    }
+
+    const cabeceraJornada = e.target.closest(".cabeceraJornada");
+    if (cabeceraJornada) {
+        const bloque = cabeceraJornada.closest(".bloqueJornada");
+        const lista = bloque.querySelector(".listaPartidos");
+        const flecha = bloque.querySelector(".flechaJornada");
+
+        lista.classList.toggle("oculto");
+        flecha.textContent = lista.classList.contains("oculto") ? "▶" : "▼";
         return;
     }
 
@@ -232,19 +198,17 @@ if (cerrarInfo || e.target.classList.contains("overlayInfo")) {
 });
 
 function abrirDetalle(seccion) {
-    const cabecera = document.querySelector(".cabecera");
-    const dashboard = document.querySelector(".gridDashboard");
-    const podio = document.querySelector(".podioCard");
+    document.querySelector(".cabecera").classList.add("oculto");
+    document.querySelector(".gridDashboard").classList.add("oculto");
+    document.querySelector(".podioCard").classList.add("oculto");
+
     const detalle = document.getElementById("vistaDetalle");
     const contenido = document.getElementById("contenidoDetalle");
 
-    cabecera.classList.add("oculto");
-    dashboard.classList.add("oculto");
-    podio.classList.add("oculto");
     detalle.classList.remove("oculto");
 
     if (seccion === "clasificacion") pintarPantallaClasificacion(contenido);
-   if (seccion === "partidos") pintarPantallaPartidos(contenido);
+    if (seccion === "partidos") pintarPantallaPartidos(contenido);
     if (seccion === "cruces") contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
     if (seccion === "palas") contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
 
@@ -262,20 +226,24 @@ function abrirDetalle(seccion) {
     }
 }
 
+/* =========================
+   CLASIFICACIÓN
+========================= */
+
 function pintarPantallaClasificacion(contenido) {
+    const mostrarCoef = mostrarCoeficiente();
+
     let html = `
         <h2>📊 Clasificación</h2>
 
-       <div class="modoOrden">
-    <div>
-        <span>🏆 Sistema de clasificación</span>
-        <strong>${textoModoOrden(datos.modo_orden)}</strong>
-    </div>
+        <div class="modoOrden">
+            <div>
+                <span>🏆 Sistema de clasificación</span>
+                <strong>${textoModoOrden(datos.modo_orden)}</strong>
+            </div>
 
-    <button class="btnInfoOrden" id="btnInfoOrden" type="button">
-        ℹ️
-    </button>
-</div>
+            <button class="btnInfoOrden" id="btnInfoOrden" type="button">ℹ️</button>
+        </div>
 
         <button class="btnVistaCompleta" id="btnVistaCompleta">
             📋 Ver clasificación completa
@@ -295,7 +263,6 @@ function pintarPantallaClasificacion(contenido) {
 
         html += `
             <article class="filaClasificacion">
-
                 <div class="lineaEquipo">
                     <div class="equipoFila">${medalla} ${eq.equipo}</div>
                     <div class="${mov.clase} movimientoFila">${mov.texto}</div>
@@ -316,10 +283,11 @@ function pintarPantallaClasificacion(contenido) {
                         <div><span>Perdidos</span><strong>${eq.pp}</strong></div>
                     </div>
 
+                    ${mostrarCoef ? `
                     <div class="grupoStats">
                         <h5>Coeficiente</h5>
                         <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
-                    </div>
+                    </div>` : ""}
 
                     <div class="grupoStats">
                         <h5>Sets</h5>
@@ -335,7 +303,6 @@ function pintarPantallaClasificacion(contenido) {
                         <div><span>Diferencia</span><strong>${formatoDiff(eq.puntos_diff)}</strong></div>
                     </div>
                 </div>
-
             </article>
         `;
     });
@@ -346,6 +313,7 @@ function pintarPantallaClasificacion(contenido) {
 
 function pintarClasificacionCompleta() {
     const contenido = document.getElementById("contenidoDetalle");
+    const mostrarCoef = mostrarCoeficiente();
 
     let html = `
         <h2>📋 Clasificación completa</h2>
@@ -358,7 +326,7 @@ function pintarClasificacionCompleta() {
                         <th>POS</th>
                         <th>EQUIPO</th>
                         <th>PTOS</th>
-                        <th>COEF</th>
+                        ${mostrarCoef ? "<th>COEF</th>" : ""}
                         <th>PJ</th>
                         <th>PG</th>
                         <th>PP</th>
@@ -379,15 +347,11 @@ function pintarClasificacionCompleta() {
 
         html += `
             <tr>
-                <td>
-                <span class="${mov.clase} movTabla">${mov.texto}</span>
-                </td>
-                <td>
-                <strong>${eq.posicion_actual}</strong>
-                </td>
+                <td><span class="${mov.clase} movTabla">${mov.texto}</span></td>
+                <td><strong>${eq.posicion_actual}</strong></td>
                 <td class="equipoTabla">${eq.equipo}</td>
                 <td>${eq.puntos_totales}</td>
-                <td>${eq.coeficiente}</td>
+                ${mostrarCoef ? `<td>${eq.coeficiente}</td>` : ""}
                 <td>${eq.pj}</td>
                 <td>${eq.pg}</td>
                 <td>${eq.pp}</td>
@@ -415,154 +379,14 @@ function pintarClasificacionCompleta() {
     contenido.innerHTML = html;
 }
 
-function obtenerMovimiento(eq) {
-    const dif = eq.posicion_anterior - eq.posicion_actual;
-
-    if (dif > 0) return { texto: "▲ " + dif, clase: "sube" };
-    if (dif < 0) return { texto: "▼ " + Math.abs(dif), clase: "baja" };
-
-    return { texto: "—", clase: "igual" };
-}
-
-function obtenerEtiqueta(eq) {
-    if (eq.posicion_actual == 1) return "⭐ Líder";
-    if (eq.posicion_actual == 2) return "🥈 Al acecho";
-    if (eq.posicion_actual == 3) return "🥉 Podio";
-    if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) return "⚔️ Playoff";
-    if (eq.posicion_actual == datos.clasificacion.length) return "🥄 Farolillo";
-    return "🚣 A remar";
-}
-
-function mostrarInicio() {
-    document.querySelector(".cabecera").classList.remove("oculto");
-    document.querySelector(".gridDashboard").classList.remove("oculto");
-    document.querySelector(".podioCard").classList.remove("oculto");
-    document.getElementById("vistaDetalle").classList.add("oculto");
-    activarNav("inicio");
-}
-
-function activarNav(pantalla) {
-    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
-    const btn = document.querySelector(`.navBtn[data-pantalla="${pantalla}"]`);
-    if (btn) btn.classList.add("navActivo");
-}
-
-function formatoDiff(valor) {
-    const n = Number(valor);
-    if (n > 0) return "+" + n;
-    return String(n);
-}
-
-function setHTML(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-}
-
-function setText(id, texto) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = texto;
-}
-
-
-
-function textoModoOrden(modo) {
-    if (modo === "Opción A") return "· Rendimiento proporcional";
-    if (modo === "Opción B") return "· Constancia y participación";
-    if (modo === "Opción C") return "· Eficacia real";
-    return modo || "Sistema no definido";
-}
-
-function mostrarInfoOrden() {
-    const info = obtenerInfoOrden(datos.modo_orden);
-
-    const overlay = document.createElement("div");
-    overlay.className = "overlayInfo";
-    overlay.id = "overlayInfoOrden";
-
-    overlay.innerHTML = `
-        <div class="globoInfo">
-            <button id="cerrarInfoOrden" class="cerrarInfo">×</button>
-
-            <h3>${info.titulo}</h3>
-
-            <p>${info.descripcion}</p>
-
-            <div class="ejemploInfo">
-                ${info.ejemplo}
-            </div>
-
-            <h4>Orden de criterios</h4>
-
-            <ol>
-                ${info.criterios.map(c => `<li>${c}</li>`).join("")}
-            </ol>
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-}
-
-function cerrarInfoOrden() {
-    const overlay = document.getElementById("overlayInfoOrden");
-    if (overlay) overlay.remove();
-}
-
-function obtenerInfoOrden(modo) {
-    if (modo === "Opción A") {
-        return {
-            titulo: "Opción A · Rendimiento proporcional",
-            descripcion: "Prioriza la eficacia por partido jugado, pero manteniendo los puntos totales como primer criterio.",
-            ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 12 pts / 7 PJ = 1,71<br><strong>A va por delante.</strong>",
-            criterios: [
-                "Puntos totales",
-                "Coeficiente de puntos",
-                "Diferencia de sets",
-                "Sets ganados",
-                "Diferencia de juegos",
-                "Juegos ganados",
-                "Partidos jugados",
-                "Sorteo"
-            ]
-        };
-    }
-
-    if (modo === "Opción B") {
-        return {
-            titulo: "Opción B · Constancia y participación",
-            descripcion: "Premia a quien suma los mismos puntos jugando más partidos.",
-            ejemplo: "A: 12 pts / 6 PJ<br>B: 12 pts / 7 PJ<br><strong>B va por delante.</strong>",
-            criterios: [
-                "Puntos totales",
-                "Partidos jugados",
-                "Diferencia de sets",
-                "Sets ganados",
-                "Diferencia de juegos",
-                "Juegos ganados",
-                "Sorteo"
-            ]
-        };
-    }
-
-    return {
-        titulo: "Opción C · Eficacia real",
-        descripcion: "Ordena principalmente por rendimiento por partido. Es útil cuando hay descansos o equipos con distinto número de partidos.",
-        ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 11 pts / 5 PJ = 2,20<br><strong>B va por delante.</strong>",
-        criterios: [
-            "Coeficiente puro",
-            "Puntos totales",
-            "Diferencia de sets",
-            "Sets ganados",
-            "Diferencia de juegos",
-            "Juegos ganados",
-            "Partidos jugados",
-            "Sorteo"
-        ]
-    };
-}
-
+/* =========================
+   PARTIDOS
+========================= */
 
 function pintarPantallaPartidos(contenido) {
     const partidos = datos.partidos || [];
+    const partidosNoDescanso = partidos.filter(p => String(p.estado).toLowerCase() !== "descanso");
+    const jornadaActual = obtenerJornadaActual(partidosNoDescanso);
     const jornadas = [...new Set(partidos.map(p => p.jornada))].sort((a, b) => a - b);
 
     let html = `
@@ -574,6 +398,7 @@ function pintarPantallaPartidos(contenido) {
         const partidosJornada = partidos.filter(p => p.jornada === jornada);
         const jugados = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
         const pendientes = partidosJornada.filter(p => String(p.estado).toLowerCase() === "pendiente").length;
+        const abierta = Number(jornada) === Number(jornadaActual);
 
         html += `
             <section class="bloqueJornada">
@@ -582,16 +407,11 @@ function pintarPantallaPartidos(contenido) {
                         <h3>Jornada ${jornada}</h3>
                         <p>${jugados} jugados · ${pendientes} pendientes</p>
                     </div>
+                    <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
                 </div>
 
-                <div class="listaPartidos">
-        `;
-
-        partidosJornada.forEach(p => {
-            html += pintarCardPartido(p);
-        });
-
-        html += `
+                <div class="listaPartidos ${abierta ? "" : "oculto"}">
+                    ${partidosJornada.map(p => pintarCardPartido(p)).join("")}
                 </div>
             </section>
         `;
@@ -635,4 +455,65 @@ function pintarCardPartido(p) {
             ${p.ganador ? `<div class="ganadorPartido">🏆 Gana ${p.ganador}</div>` : ""}
         </article>
     `;
+}
+
+/* =========================
+   AUXILIARES
+========================= */
+
+function mostrarCoeficiente() {
+    return datos.modo_orden === "Opción C";
+}
+
+function obtenerMovimiento(eq) {
+    const dif = eq.posicion_anterior - eq.posicion_actual;
+    if (dif > 0) return { texto: "▲ " + dif, clase: "sube" };
+    if (dif < 0) return { texto: "▼ " + Math.abs(dif), clase: "baja" };
+    return { texto: "—", clase: "igual" };
+}
+
+function obtenerEtiqueta(eq) {
+    if (eq.posicion_actual == 1) return "⭐ Líder";
+    if (eq.posicion_actual == 2) return "🥈 Al acecho";
+    if (eq.posicion_actual == 3) return "🥉 Podio";
+    if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) return "⚔️ Playoff";
+    if (eq.posicion_actual == datos.clasificacion.length) return "🥄 Farolillo";
+    return "🚣 A remar";
+}
+
+function textoModoOrden(modo) {
+    if (modo === "Opción A") return "Opción A · Rendimiento proporcional";
+    if (modo === "Opción B") return "Opción B · Constancia y participación";
+    if (modo === "Opción C") return "Opción C · Eficacia real";
+    return modo || "Sistema no definido";
+}
+
+function formatoDiff(valor) {
+    const n = Number(valor);
+    if (n > 0) return "+" + n;
+    return String(n);
+}
+
+function mostrarInicio() {
+    document.querySelector(".cabecera").classList.remove("oculto");
+    document.querySelector(".gridDashboard").classList.remove("oculto");
+    document.querySelector(".podioCard").classList.remove("oculto");
+    document.getElementById("vistaDetalle").classList.add("oculto");
+    activarNav("inicio");
+}
+
+function activarNav(pantalla) {
+    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
+    const btn = document.querySelector(`.navBtn[data-pantalla="${pantalla}"]`);
+    if (btn) btn.classList.add("navActivo");
+}
+
+function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
+
+function setText(id, texto) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = texto;
 }
