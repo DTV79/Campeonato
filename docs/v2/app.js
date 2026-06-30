@@ -490,8 +490,7 @@ function pintarCardPartido(p) {
 
             <div class="filaMarcador ${localGana ? "ganadorFila" : ""}">
                 <div class="nombreEquipoMarcador">
-                    ${localGana ? `<span class="badgeGanador">🏆</span>` : ""}
-                    ${localJugadores.map(j => `<strong>${j}</strong>`).join("")}
+                ${localJugadores.map(j => `<strong>${j}</strong>`).join("")}
                 </div>
                 <div>${sets[0].local}</div>
                 <div>${sets[1].local}</div>
@@ -500,8 +499,7 @@ function pintarCardPartido(p) {
 
             <div class="filaMarcador ${visitanteGana ? "ganadorFila" : ""}">
                 <div class="nombreEquipoMarcador">
-                    ${visitanteGana ? `<span class="badgeGanador">🏆</span>` : ""}
-                    ${visitanteJugadores.map(j => `<strong>${j}</strong>`).join("")}
+                ${visitanteJugadores.map(j => `<strong>${j}</strong>`).join("")}
                 </div>
                 <div>${sets[0].visitante}</div>
                 <div>${sets[1].visitante}</div>
