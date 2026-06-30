@@ -401,71 +401,97 @@ body{
 .gridDashboard{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:16px;
-    margin-top:22px;
-    padding-bottom:90px;
+    gap:14px;
+    margin-top:20px;
+    margin-bottom:18px;
 }
 
 .cardAcceso{
-    background:white;
-    border-radius:22px;
-    padding:20px;
-    min-height:150px;
-    box-shadow:0 6px 20px rgba(0,0,0,.08);
+    position:relative;
+    overflow:hidden;
+    border-radius:24px;
+    padding:18px;
+    min-height:165px;
+    color:white;
+    box-shadow:0 10px 26px rgba(15,23,42,.18);
     display:flex;
     flex-direction:column;
     justify-content:space-between;
     cursor:pointer;
-    transition:.25s;
+    transition:.22s ease;
 }
 
-.cardAcceso:hover{
-    transform:translateY(-4px);
+.cardAcceso:active{
+    transform:scale(.97);
+}
+
+.cardAcceso::after{
+    content:"";
+    position:absolute;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:rgba(255,255,255,.13);
+    right:-42px;
+    top:-42px;
+}
+
+.cardClasificacion{
+    background:linear-gradient(135deg,#2563eb,#1e40af);
+}
+
+.cardPartidos{
+    background:linear-gradient(135deg,#16a34a,#166534);
+}
+
+.cardCruces{
+    background:linear-gradient(135deg,#d97706,#92400e);
+}
+
+.cardPalas{
+    background:linear-gradient(135deg,#0ea5e9,#0369a1);
 }
 
 .iconoAcceso{
-    font-size:36px;
+    font-size:34px;
+    z-index:1;
 }
 
 .cardAcceso h4{
+    position:relative;
+    z-index:1;
     font-size:18px;
     font-weight:800;
-    margin-top:14px;
+    margin-bottom:8px;
 }
 
 .cardAcceso p{
-    font-size:14px;
-    color:#667085;
+    position:relative;
+    z-index:1;
+    font-size:13px;
     line-height:1.35;
-    margin-top:8px;
+    opacity:.92;
 }
 
-.cardAcceso:nth-child(1){
-    border-top:5px solid #2563eb;
-}
-
-.cardAcceso:nth-child(2){
-    border-top:5px solid #16a34a;
-}
-
-.cardAcceso:nth-child(3){
-    border-top:5px solid #d97706;
-}
-
-.cardAcceso:nth-child(4){
-    border-top:5px solid #0ea5e9;
+.flecha{
+    position:absolute;
+    right:18px;
+    bottom:16px;
+    font-size:24px;
+    font-weight:800;
+    opacity:.85;
 }
 
 @media(max-width:600px){
-
     .gridDashboard{
         grid-template-columns:1fr 1fr;
         gap:12px;
     }
 
     .cardAcceso{
+        min-height:150px;
         padding:16px;
-        min-height:135px;
+        border-radius:22px;
     }
 
     .iconoAcceso{
@@ -477,7 +503,6 @@ body{
     }
 
     .cardAcceso p{
-        font-size:13px;
+        font-size:12px;
     }
-
 }
