@@ -235,56 +235,61 @@ function abrirDetalle(seccion) {
 
     datos.clasificacion.forEach(eq => {
 
-        let movimiento = "=";
-        let clase = "igual";
+    let movimiento = "—";
+    let clase = "igual";
 
-        const dif = eq.posicion_anterior - eq.posicion_actual;
+    const dif = eq.posicion_anterior - eq.posicion_actual;
 
-        if (dif > 0){
-            movimiento = "▲ " + dif;
-            clase = "sube";
-        }
+    if (dif > 0){
+        movimiento = "▲ " + dif;
+        clase = "sube";
+    }
 
-        if (dif < 0){
-            movimiento = "▼ " + Math.abs(dif);
-            clase = "baja";
-        }
+    if (dif < 0){
+        movimiento = "▼ " + Math.abs(dif);
+        clase = "baja";
+    }
 
-        const medalla =
-            eq.posicion_actual==1 ? "🥇" :
-            eq.posicion_actual==2 ? "🥈" :
-            eq.posicion_actual==3 ? "🥉" :
-            eq.posicion_actual;
+    const medalla =
+        eq.posicion_actual == 1 ? "🥇" :
+        eq.posicion_actual == 2 ? "🥈" :
+        eq.posicion_actual == 3 ? "🥉" :
+        eq.posicion_actual + ".";
 
-        html += `
-        <div class="filaClasificacion">
+    const etiqueta =
+        eq.posicion_actual == 1 ? `<div class="etiquetaEspecial">⭐ Líder de liguilla</div>` :
+        eq.posicion_actual == datos.clasificacion.length ? `<div class="etiquetaEspecial farolillo">🥄 Farolillo provisional</div>` :
+        "";
 
+    html += `
+    <div class="filaClasificacion">
+
+        <div class="filaTop">
             <div>
-
-                <div class="equipoFila">
-
-                    ${medalla} ${eq.equipo}
-
-                </div>
-
-                <div class="datosFila">
-
-                    ${eq.puntos_totales} pts · ${eq.pj} PJ
-
-                </div>
-
+                <div class="equipoFila">${medalla} ${eq.equipo}</div>
+                <div class="datosFila">🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ</div>
+                ${eq.descanso > 0 ? `<div class="descansoFila">💤 Descansos: ${eq.descanso}</div>` : ""}
+                ${etiqueta}
             </div>
 
-            <div class="${clase}">
-
-                ${movimiento}
-
-            </div>
-
+            <div class="${clase} movimientoFila">${movimiento}</div>
         </div>
-        `;
 
-    });
+        <button class="btnDetallesClasif" type="button">
+            Ver detalles
+        </button>
+
+        <div class="detalleClasif oculto">
+            <div><span>PG</span><strong>${eq.pg}</strong></div>
+            <div><span>PP</span><strong>${eq.pp}</strong></div>
+            <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
+            <div><span>Sets</span><strong>${eq.sets_ganados} - ${eq.sets_perdidos} (${eq.sets_diff})</strong></div>
+            <div><span>Juegos</span><strong>${eq.puntos_ganados} - ${eq.puntos_perdidos} (${eq.puntos_diff})</strong></div>
+        </div>
+
+    </div>
+    `;
+});
 
     html += "</div>";
 
