@@ -538,3 +538,43 @@ body{
     font-weight:900;
     white-space:nowrap;
 }
+
+
+.stickyMov,
+.stickyPos,
+.stickyEquipo{
+    position:sticky;
+    z-index:3;
+    background:white;
+}
+
+.tablaClasificacion th.stickyMov,
+.tablaClasificacion th.stickyPos,
+.tablaClasificacion th.stickyEquipo{
+    background:#1e3a8a;
+    color:white;
+    z-index:4;
+}
+
+.stickyMov{
+    left:0;
+    min-width:62px;
+}
+
+.stickyPos{
+    left:62px;
+    min-width:55px;
+}
+
+.stickyEquipo{
+    left:117px;
+    min-width:180px;
+    box-shadow:4px 0 8px rgba(15,23,42,.08);
+}
+
+.movTabla{
+    display:inline-block;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
