@@ -278,19 +278,23 @@ const etiqueta = `<div class="etiquetaEspecial">${textoEtiqueta}</div>`;
     <div class="filaClasificacion">
 
         <div class="filaTop">
-            <div>
-                <div class="equipoFila">${medalla} ${eq.equipo}</div>
-                <div class="datosFila">🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ</div>
-                ${eq.descanso > 0 ? `<div class="descansoFila">💤 Descansos: ${eq.descanso}</div>` : ""}
-                ${etiqueta}
-            </div>
-
+    <div class="infoEquipo">
+        <div class="lineaEquipo">
+            <div class="equipoFila">${medalla} ${eq.equipo}</div>
             <div class="${clase} movimientoFila">${movimiento}</div>
         </div>
 
-        <button class="btnDetallesClasif" type="button">
-            Ver detalles
-        </button>
+        <div class="datosFila">
+            🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
+        </div>
+
+        ${etiqueta}
+    </div>
+</div>
+
+<div class="toggleDetalles">
+    ▼ Ver estadísticas
+</div>
 
         <div class="detalleClasif oculto">
             <div><span>PG</span><strong>${eq.pg}</strong></div>
