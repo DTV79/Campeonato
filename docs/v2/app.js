@@ -457,9 +457,9 @@ function setText(id, texto) {
 
 
 function textoModoOrden(modo) {
-    if (modo === "Opción A") return "Opción A · Rendimiento proporcional";
-    if (modo === "Opción B") return "Opción B · Constancia y participación";
-    if (modo === "Opción C") return "Opción C · Eficacia real";
+    if (modo === "Opción A") return "· Rendimiento proporcional";
+    if (modo === "Opción B") return "· Constancia y participación";
+    if (modo === "Opción C") return "· Eficacia real";
     return modo || "Sistema no definido";
 }
 
