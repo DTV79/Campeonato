@@ -1,5 +1,4 @@
 const JSON_URL = "../estado_torneo.json";
-
 let datos = null;
 
 document.addEventListener("DOMContentLoaded", iniciarApp);
@@ -7,14 +6,10 @@ document.addEventListener("DOMContentLoaded", iniciarApp);
 async function iniciarApp() {
     try {
         const respuesta = await fetch(JSON_URL + "?v=" + Date.now());
-
-        if (!respuesta.ok) {
-            throw new Error("No se pudo cargar el JSON");
-        }
+        if (!respuesta.ok) throw new Error("No se pudo cargar el JSON");
 
         datos = await respuesta.json();
         pintarInicio(datos);
-
     } catch (error) {
         console.error(error);
         document.body.innerHTML = `
@@ -45,7 +40,6 @@ function pintarFecha(fechaISO) {
     }
 
     const fecha = new Date(fechaISO);
-
     el.textContent = fecha.toLocaleString("es-ES", {
         day: "2-digit",
         month: "short",
@@ -68,25 +62,17 @@ function pintarEstado(data) {
     const jornadaActual = obtenerJornadaActual(partidos);
     const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
 
-    const estadoCabecera = document.getElementById("estadoCabecera");
-    const barraProgreso = document.getElementById("barraProgreso");
-    const textoProgreso = document.getElementById("textoProgreso");
+    setText(
+        "estadoCabecera",
+        pendientes === 0
+            ? "✅ Jornada " + jornadaActual + " finalizada"
+            : "🟢 Jornada " + jornadaActual + " en juego"
+    );
 
-    if (estadoCabecera) {
-        estadoCabecera.textContent =
-            pendientes === 0
-                ? "✅ Jornada " + jornadaActual + " finalizada"
-                : "🟢 Jornada " + jornadaActual + " en juego";
-    }
+    const barra = document.getElementById("barraProgreso");
+    if (barra) barra.style.width = porcentaje + "%";
 
-    if (barraProgreso) {
-        barraProgreso.style.width = porcentaje + "%";
-    }
-
-    if (textoProgreso) {
-        textoProgreso.textContent =
-            `${jugados} de ${total} partidos disputados · ${porcentaje}%`;
-    }
+    setText("textoProgreso", `${jugados} de ${total} partidos disputados · ${porcentaje}%`);
 }
 
 function obtenerJornadaActual(partidos) {
@@ -149,184 +135,79 @@ function pintarTarjetasDashboard(data) {
         ["finalizado", "jugado"].includes(String(p.estado).toLowerCase())
     ).length;
 
-    const crucesPendientes = cruces.length - crucesJugados;
-
     const palasJugados = palas.filter(p =>
         ["finalizado", "jugado"].includes(String(p.estado).toLowerCase())
     ).length;
 
-    const palasPendientes = palas.length - palasJugados;
-
     setHTML("resumenClasificacion", `🥇 ${lider}<br>${clasificacion.length} equipos`);
-
     setHTML("resumenPartidos", `Jornada ${jornadaActual}<br>${jugados} jugados · ${pendientes} pendientes`);
 
     setHTML(
         "resumenCruces",
         cruces.length
-            ? `${crucesJugados} jugados · ${crucesPendientes} pendientes`
+            ? `${crucesJugados} jugados · ${cruces.length - crucesJugados} pendientes`
             : "Pendientes de generar"
     );
 
     setHTML(
         "resumenPalas",
         palas.length
-            ? `${palasJugados} jugados · ${palasPendientes} pendientes`
+            ? `${palasJugados} jugados · ${palas.length - palasJugados} pendientes`
             : "Todavía no iniciada"
     );
 }
 
-function setHTML(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-}
-
-
 document.addEventListener("click", function(e) {
-
     const card = e.target.closest(".cardAcceso");
     if (card) {
         abrirDetalle(card.dataset.seccion);
+        activarNav(card.dataset.seccion);
         return;
     }
 
-    
-
     const nav = e.target.closest(".navBtn");
-if (nav) {
-    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
-    nav.classList.add("navActivo");
+    if (nav) {
+        const pantalla = nav.dataset.pantalla;
+        activarNav(pantalla);
 
-    const pantalla = nav.dataset.pantalla;
+        if (pantalla === "inicio") mostrarInicio();
+        if (pantalla === "clasificacion") abrirDetalle("clasificacion");
+        if (pantalla === "partidos") abrirDetalle("partidos");
+        if (pantalla === "mas") abrirDetalle("mas");
 
-    if (pantalla === "inicio") {
-        mostrarInicio();
+        return;
     }
 
-    if (pantalla === "clasificacion") {
-        abrirDetalle("clasificacion");
-    }
+    const fila = e.target.closest(".filaClasificacion");
+    if (fila) {
+        const detalle = fila.querySelector(".detalleClasif");
+        const toggle = fila.querySelector(".toggleDetalles");
 
-    if (pantalla === "partidos") {
-        abrirDetalle("partidos");
-    }
+        if (!detalle || !toggle) return;
 
-    if (pantalla === "mas") {
-        abrirDetalle("mas");
-    }
+        detalle.classList.toggle("oculto");
 
-    return;
-}
+        toggle.textContent = detalle.classList.contains("oculto")
+            ? "▼ Ver estadísticas"
+            : "▲ Ocultar estadísticas";
+    }
+});
 
 function abrirDetalle(seccion) {
-
     const cabecera = document.querySelector(".cabecera");
     const dashboard = document.querySelector(".gridDashboard");
-    const podio = document.querySelector(".tarjeta");
+    const podio = document.querySelector(".podioCard");
     const detalle = document.getElementById("vistaDetalle");
     const contenido = document.getElementById("contenidoDetalle");
 
     cabecera.classList.add("oculto");
     dashboard.classList.add("oculto");
     podio.classList.add("oculto");
-
     detalle.classList.remove("oculto");
 
     if (seccion === "clasificacion") {
-
-    let html = `
-        <h2>📊 Clasificación</h2>
-
-        <div class="modoOrden">
-            🏆 ${datos.modo_orden}
-        </div>
-
-        <div class="listaClasificacion">
-    `;
-
-    datos.clasificacion.forEach(eq => {
-
-    let movimiento = "—";
-    let clase = "igual";
-
-    const dif = eq.posicion_anterior - eq.posicion_actual;
-
-    if (dif > 0){
-        movimiento = "▲ " + dif;
-        clase = "sube";
+        pintarPantallaClasificacion(contenido);
     }
-
-    if (dif < 0){
-        movimiento = "▼ " + Math.abs(dif);
-        clase = "baja";
-    }
-
-    const medalla =
-        eq.posicion_actual == 1 ? "🥇" :
-        eq.posicion_actual == 2 ? "🥈" :
-        eq.posicion_actual == 3 ? "🥉" :
-        eq.posicion_actual + ".";
-
-    let textoEtiqueta = "";
-
-if (eq.posicion_actual == 1) {
-    textoEtiqueta = "⭐ Líder";
-} else if (eq.posicion_actual == 2) {
-    textoEtiqueta = "🥈 Al acecho";
-} else if (eq.posicion_actual == 3) {
-    textoEtiqueta = "🥉 En el podio";
-} else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
-    textoEtiqueta = "⚔️ Zona Playoff";
-} else if (eq.posicion_actual == datos.clasificacion.length) {
-    textoEtiqueta = "🥄 Farolillo provisional";
-} else {
-    textoEtiqueta = "🚣 A remar";
-}
-if (seccion === "mas") {
-    contenido.innerHTML = "<h2>☰ Más</h2>";
-}
-        
-const etiqueta = `<div class="etiquetaEspecial">${textoEtiqueta}</div>`;
-
-    html += `
-    <div class="filaClasificacion">
-
-        <div class="filaTop">
-    <div class="infoEquipo">
-        <div class="lineaEquipo">
-            <div class="equipoFila">${medalla} ${eq.equipo}</div>
-            <div class="${clase} movimientoFila">${movimiento}</div>
-        </div>
-
-        <div class="datosFila">
-            🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
-        </div>
-
-        ${etiqueta}
-    </div>
-</div>
-
-<div class="toggleDetalles">
-    ▼ Ver estadísticas
-</div>
-
-        <div class="detalleClasif oculto">
-            <div><span>PG</span><strong>${eq.pg}</strong></div>
-            <div><span>PP</span><strong>${eq.pp}</strong></div>
-            <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
-            <div><span>Sets</span><strong>${eq.sets_ganados} - ${eq.sets_perdidos} (${eq.sets_diff})</strong></div>
-            <div><span>Juegos</span><strong>${eq.puntos_ganados} - ${eq.puntos_perdidos} (${eq.puntos_diff})</strong></div>
-        </div>
-
-    </div>
-    `;
-});
-
-    html += "</div>";
-
-    contenido.innerHTML = html;
-
-}
 
     if (seccion === "partidos") {
         contenido.innerHTML = "<h2>🎾 Partidos</h2>";
@@ -339,35 +220,133 @@ const etiqueta = `<div class="etiquetaEspecial">${textoEtiqueta}</div>`;
     if (seccion === "palas") {
         contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
     }
+
+    if (seccion === "mas") {
+        contenido.innerHTML = `
+            <h2>☰ Más</h2>
+            <div class="listaClasificacion">
+                <div class="filaClasificacion">⚔️ Eliminatorias</div>
+                <div class="filaClasificacion">🏖️ Copa Palas Playa</div>
+                <div class="filaClasificacion">📜 Normas</div>
+                <div class="filaClasificacion">🏆 Campeones</div>
+                <div class="filaClasificacion">📷 Fotos</div>
+            </div>
+        `;
+    }
+}
+
+function pintarPantallaClasificacion(contenido) {
+    let html = `
+        <h2>📊 Clasificación</h2>
+
+        <div class="modoOrden">
+            🏆 ${datos.modo_orden}
+        </div>
+
+        <div class="listaClasificacion">
+    `;
+
+    datos.clasificacion.forEach(eq => {
+        let movimiento = "—";
+        let clase = "igual";
+
+        const dif = eq.posicion_anterior - eq.posicion_actual;
+
+        if (dif > 0) {
+            movimiento = "▲ " + dif;
+            clase = "sube";
+        }
+
+        if (dif < 0) {
+            movimiento = "▼ " + Math.abs(dif);
+            clase = "baja";
+        }
+
+        const medalla =
+            eq.posicion_actual == 1 ? "🥇" :
+            eq.posicion_actual == 2 ? "🥈" :
+            eq.posicion_actual == 3 ? "🥉" :
+            eq.posicion_actual + ".";
+
+        let textoEtiqueta = "";
+
+        if (eq.posicion_actual == 1) {
+            textoEtiqueta = "⭐ Líder";
+        } else if (eq.posicion_actual == 2) {
+            textoEtiqueta = "🥈 Al acecho";
+        } else if (eq.posicion_actual == 3) {
+            textoEtiqueta = "🥉 En el podio";
+        } else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
+            textoEtiqueta = "⚔️ Zona Playoff";
+        } else if (eq.posicion_actual == datos.clasificacion.length) {
+            textoEtiqueta = "🥄 Farolillo provisional";
+        } else {
+            textoEtiqueta = "🚣 A remar";
+        }
+
+        html += `
+            <div class="filaClasificacion">
+
+                <div class="filaTop">
+                    <div class="infoEquipo">
+
+                        <div class="lineaEquipo">
+                            <div class="equipoFila">${medalla} ${eq.equipo}</div>
+                            <div class="${clase} movimientoFila">${movimiento}</div>
+                        </div>
+
+                        <div class="datosFila">
+                            🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
+                        </div>
+
+                        <div class="etiquetaEspecial">${textoEtiqueta}</div>
+
+                    </div>
+                </div>
+
+                <div class="toggleDetalles">
+                    ▼ Ver estadísticas
+                </div>
+
+                <div class="detalleClasif oculto">
+                    <div><span>PG</span><strong>${eq.pg}</strong></div>
+                    <div><span>PP</span><strong>${eq.pp}</strong></div>
+                    <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
+                    <div><span>Sets</span><strong>${eq.sets_ganados} - ${eq.sets_perdidos} (${eq.sets_diff})</strong></div>
+                    <div><span>Juegos</span><strong>${eq.puntos_ganados} - ${eq.puntos_perdidos} (${eq.puntos_diff})</strong></div>
+                </div>
+
+            </div>
+        `;
+    });
+
+    html += "</div>";
+    contenido.innerHTML = html;
 }
 
 function mostrarInicio() {
-
     document.querySelector(".cabecera").classList.remove("oculto");
     document.querySelector(".gridDashboard").classList.remove("oculto");
-    document.querySelector(".tarjeta").classList.remove("oculto");
+    document.querySelector(".podioCard").classList.remove("oculto");
 
     document.getElementById("vistaDetalle").classList.add("oculto");
 
-    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
-
-    const btnInicio = document.querySelector('.navBtn[data-pantalla="inicio"]');
-    if (btnInicio) btnInicio.classList.add("navActivo");
+    activarNav("inicio");
 }
 
+function activarNav(pantalla) {
+    document.querySelectorAll(".navBtn").forEach(b => b.classList.remove("navActivo"));
 
-document.addEventListener("click", function(e) {
-    const fila = e.target.closest(".filaClasificacion");
-    if (!fila) return;
+    const btn = document.querySelector(`.navBtn[data-pantalla="${pantalla}"]`);
+    if (btn) btn.classList.add("navActivo");
+}
 
-    const detalle = fila.querySelector(".detalleClasif");
-    const toggle = fila.querySelector(".toggleDetalles");
+function setHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
 
-    if (!detalle || !toggle) return;
-
-    detalle.classList.toggle("oculto");
-
-    toggle.textContent = detalle.classList.contains("oculto")
-        ? "▼ Ver estadísticas"
-        : "▲ Ocultar estadísticas";
-});
+function setText(id, texto) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = texto;
+}
