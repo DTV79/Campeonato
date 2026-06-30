@@ -322,9 +322,9 @@ function pintarClasificacionCompleta() {
             <table class="tablaClasificacion">
                 <thead>
                     <tr>
-                        <th class="stickyMov"></th>
-                        <th class="stickyPos">POS</th>
-                        <th class="stickyEquipo">EQUIPO</th>
+                        <th>MOV</th>
+                        <th>POS</th>
+                        <th>EQUIPO</th>
                         <th>PTOS</th>
                         <th>COEF</th>
                         <th>PJ</th>
@@ -347,13 +347,13 @@ function pintarClasificacionCompleta() {
 
         html += `
             <tr>
-                <td class="stickyMov">
-                    <span class="${mov.clase} movTabla">${mov.texto}</span>
+                <td>
+                <span class="${mov.clase} movTabla">${mov.texto}</span>
                 </td>
-                <td class="stickyPos">
-                    <strong>${eq.posicion_actual}</strong>
+                <td>
+                <strong>${eq.posicion_actual}</strong>
                 </td>
-                <td class="stickyEquipo equipoTabla">${eq.equipo}</td>
+                <td class="equipoTabla">${eq.equipo}</td>
                 <td>${eq.puntos_totales}</td>
                 <td>${eq.coeficiente}</td>
                 <td>${eq.pj}</td>
