@@ -256,10 +256,23 @@ function abrirDetalle(seccion) {
         eq.posicion_actual == 3 ? "🥉" :
         eq.posicion_actual + ".";
 
-    const etiqueta =
-        eq.posicion_actual == 1 ? `<div class="etiquetaEspecial">⭐ Líder de liguilla</div>` :
-        eq.posicion_actual == datos.clasificacion.length ? `<div class="etiquetaEspecial farolillo">🥄 Farolillo provisional</div>` :
-        "";
+    let textoEtiqueta = "";
+
+if (eq.posicion_actual == 1) {
+    textoEtiqueta = "⭐ Líder";
+} else if (eq.posicion_actual == 2) {
+    textoEtiqueta = "🥈 Al acecho";
+} else if (eq.posicion_actual == 3) {
+    textoEtiqueta = "🥉 En el podio";
+} else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
+    textoEtiqueta = "⚔️ Zona Playoff";
+} else if (eq.posicion_actual == datos.clasificacion.length) {
+    textoEtiqueta = "🥄 Farolillo provisional";
+} else {
+    textoEtiqueta = "🚣 A remar";
+}
+
+const etiqueta = `<div class="etiquetaEspecial">${textoEtiqueta}</div>`;
 
     html += `
     <div class="filaClasificacion">
