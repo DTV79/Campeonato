@@ -788,3 +788,27 @@ body{
 .detalleClasif strong{
     color:#0f172a;
 }
+
+
+.filaClasificacion{
+    display:block !important;
+    padding:18px;
+}
+
+.detalleClasif.oculto{
+    display:none !important;
+}
+
+.detalleClasif{
+    display:grid;
+    grid-template-columns:1fr;
+}
+
+.btnDetallesClasif{
+    display:block;
+    margin-top:12px;
+}
+
+.etiquetaEspecial{
+    max-width:max-content;
+}
