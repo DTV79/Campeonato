@@ -645,3 +645,21 @@ body{
     color:#334155;
     line-height:1.55;
 }
+
+.actualizacion{
+    margin-top:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    background:rgba(255,255,255,.15);
+    border-radius:14px;
+    padding:10px 14px;
+    font-size:14px;
+}
+
+.actualizacion strong{
+    margin:0;
+    font-size:15px;
+    font-weight:800;
+}
