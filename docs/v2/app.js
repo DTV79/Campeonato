@@ -209,7 +209,7 @@ function abrirDetalle(seccion) {
 
     if (seccion === "clasificacion") pintarPantallaClasificacion(contenido);
     if (seccion === "partidos") pintarPantallaPartidos(contenido);
-    if (seccion === "cruces") contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
+    if (seccion === "cruces") pintarPantallaCruces(contenido);
     if (seccion === "palas") contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
 
     if (seccion === "mas") {
@@ -659,4 +659,103 @@ function obtenerInfoOrden(modo) {
         ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 11 pts / 5 PJ = 2,20<br><strong>B va por delante.</strong>",
         criterios: ["Coeficiente", "Puntos totales", "Diferencia de sets", "Sets ganados", "Diferencia de juegos", "Juegos ganados", "Partidos jugados", "Sorteo"]
     };
+}
+
+
+function pintarPantallaCruces(contenido) {
+    const cruces = datos.cruces || [];
+
+    if (!cruces.length) {
+        contenido.innerHTML = `
+            <h2>⚔️ Eliminatorias</h2>
+            <section class="tarjetaVacia">
+                <h3>⏳ Todavía no generadas</h3>
+                <p>Las eliminatorias aparecerán aquí cuando se creen desde Excel.</p>
+            </section>
+        `;
+        return;
+    }
+
+    const fases = [...new Set(cruces.map(c => c.fase))];
+
+    let html = `
+        <h2>⚔️ Eliminatorias</h2>
+        <div class="listaJornadas">
+    `;
+
+    fases.forEach(fase => {
+        const partidosFase = cruces.filter(c => c.fase === fase);
+        const jugados = partidosFase.filter(c =>
+            ["finalizado", "jugado"].includes(String(c.estado).toLowerCase())
+        ).length;
+
+        const pendientes = partidosFase.length - jugados;
+
+        html += `
+            <section class="bloqueJornada">
+                <div class="cabeceraJornada ${pendientes === 0 ? "finalizada" : "enJuego"}">
+                    <div>
+                        <span class="chipJornada">
+                            ${pendientes === 0 ? "✅ Finalizada" : "🟢 En juego"}
+                        </span>
+                        <h3>${fase}</h3>
+                        <p>${jugados}/${partidosFase.length} partidos</p>
+                    </div>
+                    <span class="flechaJornada">▼</span>
+                </div>
+
+                <div class="listaPartidos">
+                    ${partidosFase.map(p => pintarCardCruce(p)).join("")}
+                </div>
+            </section>
+        `;
+    });
+
+    html += `</div>`;
+    contenido.innerHTML = html;
+}
+
+function pintarCardCruce(p) {
+    const estado = String(p.estado).toLowerCase();
+    const sets = obtenerSets(p.resultado);
+
+    const finalizado = ["finalizado", "jugado"].includes(estado);
+    const claseEstado = finalizado ? "jugado" : "pendiente";
+    const textoEstado = finalizado ? "✅ Finalizado" : "⏳ Pendiente";
+
+    const localGana = p.ganador && normalizar(p.ganador) === normalizar(p.local);
+    const visitanteGana = p.ganador && normalizar(p.ganador) === normalizar(p.visitante);
+
+    return `
+        <article class="cardPartido marcador ${claseEstado}">
+
+            <div class="estadoPartido">${textoEstado}</div>
+
+            <div class="marcadorHeader">
+                <div></div>
+                <div>I</div>
+                <div>II</div>
+                <div>III</div>
+            </div>
+
+            <div class="filaMarcador ${localGana ? "ganadorFila" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(p.local).map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].local}</div>
+                <div>${sets[1].local}</div>
+                <div>${sets[2].local}</div>
+            </div>
+
+            <div class="filaMarcador ${visitanteGana ? "ganadorFila" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(p.visitante).map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].visitante}</div>
+                <div>${sets[1].visitante}</div>
+                <div>${sets[2].visitante}</div>
+            </div>
+
+        </article>
+    `;
 }
