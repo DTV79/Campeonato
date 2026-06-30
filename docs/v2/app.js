@@ -271,18 +271,18 @@ function pintarPantallaClasificacion(contenido) {
         let textoEtiqueta = "";
 
         if (eq.posicion_actual == 1) {
-            textoEtiqueta = "⭐ Líder";
-        } else if (eq.posicion_actual == 2) {
-            textoEtiqueta = "🥈 Al acecho";
-        } else if (eq.posicion_actual == 3) {
-            textoEtiqueta = "🥉 En el podio";
-        } else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
-            textoEtiqueta = "⚔️ Zona Playoff";
-        } else if (eq.posicion_actual == datos.clasificacion.length) {
-            textoEtiqueta = "🥄 Farolillo provisional";
-        } else {
-            textoEtiqueta = "🚣 A remar";
-        }
+    textoEtiqueta = "⭐ Líder";
+} else if (eq.posicion_actual == 2) {
+    textoEtiqueta = "🥈 Al acecho";
+} else if (eq.posicion_actual == 3) {
+    textoEtiqueta = "🥉 Podio";
+} else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
+    textoEtiqueta = "⚔️ Playoff";
+} else if (eq.posicion_actual == datos.clasificacion.length) {
+    textoEtiqueta = "🥄 Farolillo";
+} else {
+    textoEtiqueta = "🚣 A remar";
+}
 
         html += `
             <div class="filaClasificacion">
@@ -296,7 +296,7 @@ function pintarPantallaClasificacion(contenido) {
                         </div>
 
                         <div class="datosFila">
-                            🏆 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
+                            🧮 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
                         </div>
 
                         <div class="etiquetaEspecial">${textoEtiqueta}</div>
@@ -309,14 +309,35 @@ function pintarPantallaClasificacion(contenido) {
                 </div>
 
                 <div class="detalleClasif oculto">
-                    <div><span>PG</span><strong>${eq.pg}</strong></div>
-                    <div><span>PP</span><strong>${eq.pp}</strong></div>
-                    <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
-                    <div><span>Sets</span><strong>${eq.sets_ganados} - ${eq.sets_perdidos} (${eq.sets_diff})</strong></div>
-                    <div><span>Juegos</span><strong>${eq.puntos_ganados} - ${eq.puntos_perdidos} (${eq.puntos_diff})</strong></div>
-                </div>
 
-            </div>
+    <div class="grupoStats">
+        <h5>Partidos</h5>
+        <div><span>Ganados</span><strong>${eq.pg}</strong></div>
+        <div><span>Perdidos</span><strong>${eq.pp}</strong></div>
+    </div>
+
+    <div class="grupoStats">
+        <h5>Coeficiente</h5>
+        <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
+    </div>
+
+    <div class="grupoStats">
+        <h5>Sets</h5>
+        <div><span>Ganados</span><strong>${eq.sets_ganados}</strong></div>
+        <div><span>Perdidos</span><strong>${eq.sets_perdidos}</strong></div>
+        <div><span>Diferencia</span><strong>${formatoDiff(eq.sets_diff)}</strong></div>
+    </div>
+
+    <div class="grupoStats">
+        <h5>Juegos</h5>
+        <div><span>Ganados</span><strong>${eq.puntos_ganados}</strong></div>
+        <div><span>Perdidos</span><strong>${eq.puntos_perdidos}</strong></div>
+        <div><span>Diferencia</span><strong>${formatoDiff(eq.puntos_diff)}</strong></div>
+    </div>
+
+</div>
+
+           
         `;
     });
 
@@ -349,4 +370,11 @@ function setHTML(id, html) {
 function setText(id, texto) {
     const el = document.getElementById(id);
     if (el) el.textContent = texto;
+}
+
+
+function formatoDiff(valor) {
+    const n = Number(valor);
+    if (n > 0) return "+" + n;
+    return String(n);
 }
