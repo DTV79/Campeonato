@@ -295,7 +295,7 @@ function pintarPantallaClasificacion(contenido) {
                 </div>
 
                 <div class="datosFila">
-                    🧮 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
+                    🔢 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
                 </div>
 
                 <div class="etiquetaEspecial">
