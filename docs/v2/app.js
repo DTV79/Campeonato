@@ -323,3 +323,18 @@ function mostrarInicio() {
     const btnInicio = document.querySelector('.navBtn[data-pantalla="inicio"]');
     if (btnInicio) btnInicio.classList.add("navActivo");
 }
+
+
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest(".btnDetallesClasif");
+    if (!btn) return;
+
+    const fila = btn.closest(".filaClasificacion");
+    const detalle = fila.querySelector(".detalleClasif");
+
+    detalle.classList.toggle("oculto");
+
+    btn.textContent = detalle.classList.contains("oculto")
+        ? "Ver detalles"
+        : "Ocultar detalles";
+});
