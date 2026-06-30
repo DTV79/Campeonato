@@ -159,6 +159,22 @@ function pintarTarjetasDashboard(data) {
 
 document.addEventListener("click", function(e) {
 
+const btnInfoOrden = e.target.closest("#btnInfoOrden");
+if (btnInfoOrden) {
+    mostrarInfoOrden();
+    return;
+}
+
+const cerrarInfo = e.target.closest("#cerrarInfoOrden");
+if (cerrarInfo || e.target.classList.contains("overlayInfo")) {
+    cerrarInfoOrden();
+    return;
+}
+
+
+
+    
+
     const btnCompleta = e.target.closest("#btnVistaCompleta");
     if (btnCompleta) {
         pintarClasificacionCompleta();
@@ -241,9 +257,16 @@ function pintarPantallaClasificacion(contenido) {
     let html = `
         <h2>📊 Clasificación</h2>
 
-        <div class="modoOrden">
-            🏆 ${datos.modo_orden}
-        </div>
+       <div class="modoOrden">
+    <div>
+        <span>🏆 Sistema de clasificación</span>
+        <strong>${textoModoOrden(datos.modo_orden)}</strong>
+    </div>
+
+    <button class="btnInfoOrden" id="btnInfoOrden" type="button">
+        ℹ️
+    </button>
+</div>
 
         <button class="btnVistaCompleta" id="btnVistaCompleta">
             📋 Ver clasificación completa
@@ -429,4 +452,101 @@ function setHTML(id, html) {
 function setText(id, texto) {
     const el = document.getElementById(id);
     if (el) el.textContent = texto;
+}
+
+
+
+function textoModoOrden(modo) {
+    if (modo === "Opción A") return "Opción A · Rendimiento proporcional";
+    if (modo === "Opción B") return "Opción B · Constancia y participación";
+    if (modo === "Opción C") return "Opción C · Eficacia real";
+    return modo || "Sistema no definido";
+}
+
+function mostrarInfoOrden() {
+    const info = obtenerInfoOrden(datos.modo_orden);
+
+    const overlay = document.createElement("div");
+    overlay.className = "overlayInfo";
+    overlay.id = "overlayInfoOrden";
+
+    overlay.innerHTML = `
+        <div class="globoInfo">
+            <button id="cerrarInfoOrden" class="cerrarInfo">×</button>
+
+            <h3>${info.titulo}</h3>
+
+            <p>${info.descripcion}</p>
+
+            <div class="ejemploInfo">
+                ${info.ejemplo}
+            </div>
+
+            <h4>Orden de criterios</h4>
+
+            <ol>
+                ${info.criterios.map(c => `<li>${c}</li>`).join("")}
+            </ol>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function cerrarInfoOrden() {
+    const overlay = document.getElementById("overlayInfoOrden");
+    if (overlay) overlay.remove();
+}
+
+function obtenerInfoOrden(modo) {
+    if (modo === "Opción A") {
+        return {
+            titulo: "Opción A · Rendimiento proporcional",
+            descripcion: "Prioriza la eficacia por partido jugado, pero manteniendo los puntos totales como primer criterio.",
+            ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 12 pts / 7 PJ = 1,71<br><strong>A va por delante.</strong>",
+            criterios: [
+                "Puntos totales",
+                "Coeficiente de puntos",
+                "Diferencia de sets",
+                "Sets ganados",
+                "Diferencia de juegos",
+                "Juegos ganados",
+                "Partidos jugados",
+                "Sorteo"
+            ]
+        };
+    }
+
+    if (modo === "Opción B") {
+        return {
+            titulo: "Opción B · Constancia y participación",
+            descripcion: "Premia a quien suma los mismos puntos jugando más partidos.",
+            ejemplo: "A: 12 pts / 6 PJ<br>B: 12 pts / 7 PJ<br><strong>B va por delante.</strong>",
+            criterios: [
+                "Puntos totales",
+                "Partidos jugados",
+                "Diferencia de sets",
+                "Sets ganados",
+                "Diferencia de juegos",
+                "Juegos ganados",
+                "Sorteo"
+            ]
+        };
+    }
+
+    return {
+        titulo: "Opción C · Eficacia real",
+        descripcion: "Ordena principalmente por rendimiento por partido. Es útil cuando hay descansos o equipos con distinto número de partidos.",
+        ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 11 pts / 5 PJ = 2,20<br><strong>B va por delante.</strong>",
+        criterios: [
+            "Coeficiente puro",
+            "Puntos totales",
+            "Diferencia de sets",
+            "Sets ganados",
+            "Diferencia de juegos",
+            "Juegos ganados",
+            "Partidos jugados",
+            "Sorteo"
+        ]
+    };
 }
