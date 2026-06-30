@@ -158,3 +158,9 @@ function pintarTarjetasDashboard(data) {
             ? `${palasJugados} jugados · ${palasPendientes} pendientes`
             : `Todavía no iniciada`;
 }
+
+
+document.getElementById("estadoCabecera").textContent =
+    pendientes === 0
+        ? "✅ Jornada " + jornadaActual + " finalizada"
+        : "🟢 Jornada " + jornadaActual + " en juego";
