@@ -20,6 +20,7 @@ function pintarInicio(data) {
     pintarEstado(data);
     pintarPodio(data.clasificacion || []);
     pintarTarjetasDashboard(data);
+    mostrarBotonCruces(data);
 }
 
 function pintarFecha(fechaISO) {
@@ -177,6 +178,7 @@ document.addEventListener("click", function(e) {
         if (pantalla === "inicio") mostrarInicio();
         if (pantalla === "clasificacion") abrirDetalle("clasificacion");
         if (pantalla === "partidos") abrirDetalle("partidos");
+        if (pantalla === "cruces") abrirDetalle("cruces");
         if (pantalla === "mas") abrirDetalle("mas");
 
         return;
@@ -778,4 +780,18 @@ function obtenerFaseActualCruces(cruces) {
     }
 
     return fases[fases.length - 1] || "";
+}
+
+
+function mostrarBotonCruces(data) {
+    const btn = document.querySelector(".navCruces");
+    if (!btn) return;
+
+    const cruces = data.cruces || [];
+
+    if (cruces.length > 0) {
+        btn.classList.remove("oculto");
+    } else {
+        btn.classList.add("oculto");
+    }
 }
