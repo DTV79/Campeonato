@@ -661,3 +661,58 @@ body{
 #contenidoDetalle h2{
     color:#1d2939;
 }
+
+
+.modoOrden{
+    background:#eef2ff;
+    color:#1e3a8a;
+    padding:12px 14px;
+    border-radius:16px;
+    font-weight:800;
+    margin-bottom:14px;
+    font-size:14px;
+}
+
+.listaClasificacion{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.filaClasificacion{
+    background:white;
+    border-radius:18px;
+    padding:14px 16px;
+    box-shadow:0 4px 14px rgba(15,23,42,.08);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+
+.equipoFila{
+    font-size:16px;
+    font-weight:800;
+}
+
+.datosFila{
+    margin-top:4px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:600;
+}
+
+.sube{
+    color:#16a34a;
+    font-weight:900;
+}
+
+.baja{
+    color:#dc2626;
+    font-weight:900;
+}
+
+.igual{
+    color:#64748b;
+    font-weight:900;
+}
