@@ -389,23 +389,56 @@ function pintarPantallaPartidos(contenido) {
     const jornadaActual = obtenerJornadaActual(partidosNoDescanso);
     const jornadas = [...new Set(partidos.map(p => p.jornada))].sort((a, b) => a - b);
 
+    const partidosJornadaActual = partidosNoDescanso.filter(p => Number(p.jornada) === Number(jornadaActual));
+    const jugadosActual = partidosJornadaActual.filter(p => String(p.estado).toLowerCase() === "jugado").length;
+    const totalActual = partidosJornadaActual.length;
+    const pendientesActual = totalActual - jugadosActual;
+    const porcentaje = totalActual > 0 ? Math.round((jugadosActual / totalActual) * 100) : 0;
+
     let html = `
         <h2>🎾 Partidos</h2>
+
+        <section class="resumenPartidos">
+            <div class="estadoResumen">🟢 Jornada ${jornadaActual} en juego</div>
+            <div class="barra">
+                <div class="progreso" style="width:${porcentaje}%"></div>
+            </div>
+            <p>${jugadosActual} jugados · ${pendientesActual} pendientes · ${porcentaje}%</p>
+        </section>
+
         <div class="listaJornadas">
     `;
 
     jornadas.forEach(jornada => {
-        const partidosJornada = partidos.filter(p => p.jornada === jornada);
-        const jugados = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
-        const pendientes = partidosJornada.filter(p => String(p.estado).toLowerCase() === "pendiente").length;
+        const partidosJornada = partidos.filter(p => Number(p.jornada) === Number(jornada));
+        const noDescanso = partidosJornada.filter(p => String(p.estado).toLowerCase() !== "descanso");
+
+        const jugados = noDescanso.filter(p => String(p.estado).toLowerCase() === "jugado").length;
+        const pendientes = noDescanso.filter(p => String(p.estado).toLowerCase() === "pendiente").length;
+        const total = noDescanso.length;
+
         const abierta = Number(jornada) === Number(jornadaActual);
+
+        let estadoJornada = "⏳ Próxima";
+        let claseEstado = "proxima";
+
+        if (pendientes === 0 && total > 0) {
+            estadoJornada = "✅ Finalizada";
+            claseEstado = "finalizada";
+        }
+
+        if (Number(jornada) === Number(jornadaActual) && pendientes > 0) {
+            estadoJornada = "🟢 En juego";
+            claseEstado = "enJuego";
+        }
 
         html += `
             <section class="bloqueJornada">
-                <div class="cabeceraJornada">
+                <div class="cabeceraJornada ${claseEstado}">
                     <div>
+                        <span class="chipJornada">${estadoJornada}</span>
                         <h3>Jornada ${jornada}</h3>
-                        <p>${jugados} jugados · ${pendientes} pendientes</p>
+                        <p>${jugados}/${total} partidos</p>
                     </div>
                     <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
                 </div>
@@ -433,28 +466,79 @@ function pintarCardPartido(p) {
         `;
     }
 
-    const resultado = Array.isArray(p.resultado) && p.resultado.length
-        ? p.resultado.join(" · ")
-        : "Pendiente";
+    const localJugadores = dividirEquipo(p.local);
+    const visitanteJugadores = dividirEquipo(p.visitante);
+    const sets = obtenerSets(p.resultado);
 
     const claseEstado = estado === "jugado" ? "jugado" : "pendiente";
     const textoEstado = estado === "jugado" ? "✅ Finalizado" : "⏳ Pendiente";
 
+    const localGana = p.ganador && normalizar(p.ganador) === normalizar(p.local);
+    const visitanteGana = p.ganador && normalizar(p.ganador) === normalizar(p.visitante);
+
     return `
-        <article class="cardPartido ${claseEstado}">
+        <article class="cardPartido marcador ${claseEstado}">
+
             <div class="estadoPartido">${textoEstado}</div>
 
-            <div class="versusPartido">
-                <div class="equipoPartido">${p.local}</div>
-                <div class="vs">vs</div>
-                <div class="equipoPartido">${p.visitante}</div>
+            <div class="marcadorHeader">
+                <div></div>
+                <div>I</div>
+                <div>II</div>
+                <div>III</div>
             </div>
 
-            <div class="resultadoPartido">${resultado}</div>
+            <div class="filaMarcador ${localGana ? "ganadorFila" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${localGana ? `<span class="badgeGanador">🏆</span>` : ""}
+                    ${localJugadores.map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].local}</div>
+                <div>${sets[1].local}</div>
+                <div>${sets[2].local}</div>
+            </div>
 
-            ${p.ganador ? `<div class="ganadorPartido">🏆 Gana ${p.ganador}</div>` : ""}
+            <div class="filaMarcador ${visitanteGana ? "ganadorFila" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${visitanteGana ? `<span class="badgeGanador">🏆</span>` : ""}
+                    ${visitanteJugadores.map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].visitante}</div>
+                <div>${sets[1].visitante}</div>
+                <div>${sets[2].visitante}</div>
+            </div>
+
         </article>
     `;
+}
+
+function dividirEquipo(nombre) {
+    return String(nombre || "")
+        .split("/")
+        .map(j => j.trim())
+        .filter(Boolean);
+}
+
+function obtenerSets(resultado) {
+    const sets = [
+        { local: "-", visitante: "-" },
+        { local: "-", visitante: "-" },
+        { local: "-", visitante: "-" }
+    ];
+
+    if (!Array.isArray(resultado)) return sets;
+
+    resultado.slice(0, 3).forEach((set, i) => {
+        const partes = String(set).split("-");
+        sets[i].local = partes[0] || "-";
+        sets[i].visitante = partes[1] || "-";
+    });
+
+    return sets;
+}
+
+function normalizar(txt) {
+    return String(txt || "").trim().toUpperCase();
 }
 
 /* =========================
