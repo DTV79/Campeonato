@@ -875,10 +875,6 @@ body{
     background:#dcfce7;
 }
 
-.badgeGanador{
-    display:inline-block;
-    margin-bottom:3px;
-}
 
 .cardPartido.marcador .estadoPartido{
     padding:10px 12px;
