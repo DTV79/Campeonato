@@ -716,3 +716,75 @@ body{
     color:#64748b;
     font-weight:900;
 }
+
+
+.filaTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.movimientoFila{
+    min-width:46px;
+    text-align:right;
+    font-size:15px;
+}
+
+.descansoFila{
+    margin-top:5px;
+    color:#475569;
+    font-size:13px;
+    font-weight:700;
+}
+
+.etiquetaEspecial{
+    display:inline-block;
+    margin-top:8px;
+    background:#fef3c7;
+    color:#92400e;
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+}
+
+.etiquetaEspecial.farolillo{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.btnDetallesClasif{
+    margin-top:12px;
+    border:none;
+    background:#f1f5f9;
+    color:#1e293b;
+    border-radius:12px;
+    padding:9px 12px;
+    font-weight:800;
+    width:100%;
+}
+
+.detalleClasif{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid #e2e8f0;
+    display:grid;
+    gap:9px;
+}
+
+.detalleClasif div{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:14px;
+}
+
+.detalleClasif span{
+    color:#64748b;
+    font-weight:700;
+}
+
+.detalleClasif strong{
+    color:#0f172a;
+}
