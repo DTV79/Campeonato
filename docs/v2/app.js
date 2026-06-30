@@ -343,15 +343,17 @@ function mostrarInicio() {
 
 
 document.addEventListener("click", function(e) {
-    const btn = e.target.closest(".btnDetallesClasif");
-    if (!btn) return;
+    const fila = e.target.closest(".filaClasificacion");
+    if (!fila) return;
 
-    const fila = btn.closest(".filaClasificacion");
     const detalle = fila.querySelector(".detalleClasif");
+    const toggle = fila.querySelector(".toggleDetalles");
+
+    if (!detalle || !toggle) return;
 
     detalle.classList.toggle("oculto");
 
-    btn.textContent = detalle.classList.contains("oculto")
-        ? "Ver detalles"
-        : "Ocultar detalles";
+    toggle.textContent = detalle.classList.contains("oculto")
+        ? "▼ Ver estadísticas"
+        : "▲ Ocultar estadísticas";
 });
