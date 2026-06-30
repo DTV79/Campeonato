@@ -897,3 +897,16 @@ body{
     margin:0;
     background:#f8fafc;
 }
+
+
+.tarjetaVacia{
+    background:#f8fafc;
+    border-radius:20px;
+    padding:22px;
+    color:#475569;
+}
+
+.tarjetaVacia h3{
+    color:#0f172a;
+    margin-bottom:8px;
+}
