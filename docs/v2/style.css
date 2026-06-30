@@ -812,3 +812,43 @@ body{
 .etiquetaEspecial{
     max-width:max-content;
 }
+
+
+.lineaEquipo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.infoEquipo{
+    width:100%;
+}
+
+.filaTop{
+    width:100%;
+}
+
+.movimientoFila{
+    font-size:16px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.datosFila{
+    margin-top:8px;
+    color:#64748b;
+    font-size:14px;
+    font-weight:700;
+}
+
+.toggleDetalles{
+    margin-top:12px;
+    color:#2563eb;
+    font-weight:900;
+    font-size:13px;
+}
+
+.btnDetallesClasif{
+    display:none !important;
+}
