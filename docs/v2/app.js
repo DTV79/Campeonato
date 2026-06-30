@@ -352,14 +352,14 @@ function pintarPantallaClasificacion(contenido) {
     });
 
   html += `
-    </div>
+        </div>
 
-    <button class="btnVistaCompleta" id="btnVistaCompleta">
-        📋 Ver clasificación completa
-    </button>
-`;
+        <button class="btnVistaCompleta" id="btnVistaCompleta">
+            📋 Ver clasificación completa
+        </button>
+    `;
 
-    contenido.innerHTML = html;
+contenido.innerHTML = html;
 }
 
 function mostrarInicio() {
