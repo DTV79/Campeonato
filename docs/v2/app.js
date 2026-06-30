@@ -399,7 +399,9 @@ function pintarPantallaPartidos(contenido) {
         <h2>🎾 Partidos</h2>
 
         <section class="resumenPartidos">
-            <div class="estadoResumen">🟢 Jornada ${jornadaActual} en juego</div>
+            <div class="estadoResumen">
+            ${pendientesActual === 0 ? "✅ Jornada " + jornadaActual + " finalizada" : "🟢 Jornada " + jornadaActual + " en juego"}
+            </div>
             <div class="barra">
                 <div class="progreso" style="width:${porcentaje}%"></div>
             </div>
@@ -677,13 +679,14 @@ function pintarPantallaCruces(contenido) {
     }
 
     const fases = [...new Set(cruces.map(c => c.fase))];
-
+    const faseActual = obtenerFaseActualCruces(cruces);
     let html = `
         <h2>⚔️ Eliminatorias</h2>
         <div class="listaJornadas">
     `;
 
     fases.forEach(fase => {
+        const abierta = fase === faseActual;
         const partidosFase = cruces.filter(c => c.fase === fase);
         const jugados = partidosFase.filter(c =>
             ["finalizado", "jugado"].includes(String(c.estado).toLowerCase())
@@ -701,10 +704,10 @@ function pintarPantallaCruces(contenido) {
                         <h3>${fase}</h3>
                         <p>${jugados}/${partidosFase.length} partidos</p>
                     </div>
-                    <span class="flechaJornada">▼</span>
+                    <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
                 </div>
 
-                <div class="listaPartidos">
+                <div class="listaPartidos ${abierta ? "" : "oculto"}">
                     ${partidosFase.map(p => pintarCardCruce(p)).join("")}
                 </div>
             </section>
@@ -758,4 +761,21 @@ function pintarCardCruce(p) {
 
         </article>
     `;
+}
+
+
+function obtenerFaseActualCruces(cruces) {
+    const fases = [...new Set(cruces.map(c => c.fase))];
+
+    for (const fase of fases) {
+        const partidosFase = cruces.filter(c => c.fase === fase);
+
+        const hayPendientes = partidosFase.some(c =>
+            !["finalizado", "jugado"].includes(String(c.estado).toLowerCase())
+        );
+
+        if (hayPendientes) return fase;
+    }
+
+    return fases[fases.length - 1] || "";
 }
