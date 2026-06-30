@@ -180,3 +180,15 @@ function setHTML(id, html) {
     const el = document.getElementById(id);
     if (el) el.innerHTML = html;
 }
+
+
+document.addEventListener("click", function(e) {
+    const boton = e.target.closest(".navBtn");
+    if (!boton) return;
+
+    document.querySelectorAll(".navBtn").forEach(b => {
+        b.classList.remove("navActivo");
+    });
+
+    boton.classList.add("navActivo");
+});
