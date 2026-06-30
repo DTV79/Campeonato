@@ -663,3 +663,101 @@ body{
     font-size:15px;
     font-weight:800;
 }
+
+
+.listaJornadas{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.bloqueJornada{
+    background:#f8fafc;
+    border-radius:20px;
+    padding:14px;
+}
+
+.cabeceraJornada{
+    margin-bottom:12px;
+}
+
+.cabeceraJornada h3{
+    font-size:20px;
+    font-weight:900;
+}
+
+.cabeceraJornada p{
+    margin-top:3px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+}
+
+.listaPartidos{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.cardPartido{
+    background:white;
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 4px 14px rgba(15,23,42,.08);
+    border-left:5px solid #e5e7eb;
+}
+
+.cardPartido.jugado{
+    border-left-color:#16a34a;
+}
+
+.cardPartido.pendiente{
+    border-left-color:#f59e0b;
+}
+
+.cardPartido.descanso{
+    border-left-color:#64748b;
+    background:#f1f5f9;
+}
+
+.estadoPartido{
+    font-size:13px;
+    font-weight:900;
+    color:#64748b;
+    margin-bottom:10px;
+}
+
+.versusPartido{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:10px;
+}
+
+.equipoPartido{
+    font-size:15px;
+    font-weight:900;
+    line-height:1.25;
+}
+
+.vs{
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:900;
+}
+
+.resultadoPartido{
+    margin-top:12px;
+    font-size:20px;
+    font-weight:900;
+    color:#0f172a;
+    text-align:center;
+}
+
+.ganadorPartido{
+    margin-top:8px;
+    font-size:13px;
+    font-weight:900;
+    color:#16a34a;
+    text-align:center;
+}
