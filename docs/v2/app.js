@@ -192,3 +192,43 @@ document.addEventListener("click", function(e) {
 
     boton.classList.add("navActivo");
 });
+
+
+document.addEventListener("click", function(e) {
+    const card = e.target.closest(".cardAcceso");
+    if (!card) return;
+
+    abrirDetalle(card.dataset.seccion);
+});
+
+document.getElementById("btnVolver")?.addEventListener("click", function() {
+    document.querySelector(".cabecera").classList.remove("oculto");
+    document.querySelector(".gridDashboard").classList.remove("oculto");
+    document.querySelector(".tarjeta").classList.remove("oculto");
+    document.getElementById("vistaDetalle").classList.add("oculto");
+});
+
+function abrirDetalle(seccion) {
+    const contenido = document.getElementById("contenidoDetalle");
+
+    document.querySelector(".cabecera").classList.add("oculto");
+    document.querySelector(".gridDashboard").classList.add("oculto");
+    document.querySelector(".tarjeta").classList.add("oculto");
+    document.getElementById("vistaDetalle").classList.remove("oculto");
+
+    if (seccion === "clasificacion") {
+        contenido.innerHTML = "<h2>📊 Clasificación</h2>";
+    }
+
+    if (seccion === "partidos") {
+        contenido.innerHTML = "<h2>🎾 Partidos</h2>";
+    }
+
+    if (seccion === "cruces") {
+        contenido.innerHTML = "<h2>⚔️ Eliminatorias</h2>";
+    }
+
+    if (seccion === "palas") {
+        contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
+    }
+}
