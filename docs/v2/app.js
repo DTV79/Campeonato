@@ -236,6 +236,7 @@ function abrirDetalle(seccion) {
 }
 
 function pintarPantallaClasificacion(contenido) {
+
     let html = `
         <h2>📊 Clasificación</h2>
 
@@ -247,6 +248,7 @@ function pintarPantallaClasificacion(contenido) {
     `;
 
     datos.clasificacion.forEach(eq => {
+
         let movimiento = "—";
         let clase = "igual";
 
@@ -271,37 +273,33 @@ function pintarPantallaClasificacion(contenido) {
         let textoEtiqueta = "";
 
         if (eq.posicion_actual == 1) {
-    textoEtiqueta = "⭐ Líder";
-} else if (eq.posicion_actual == 2) {
-    textoEtiqueta = "🥈 Al acecho";
-} else if (eq.posicion_actual == 3) {
-    textoEtiqueta = "🥉 Podio";
-} else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
-    textoEtiqueta = "⚔️ Playoff";
-} else if (eq.posicion_actual == datos.clasificacion.length) {
-    textoEtiqueta = "🥄 Farolillo";
-} else {
-    textoEtiqueta = "🚣 A remar";
-}
+            textoEtiqueta = "⭐ Líder";
+        } else if (eq.posicion_actual == 2) {
+            textoEtiqueta = "🥈 Al acecho";
+        } else if (eq.posicion_actual == 3) {
+            textoEtiqueta = "🥉 Podio";
+        } else if (eq.posicion_actual >= 4 && eq.posicion_actual <= 8) {
+            textoEtiqueta = "⚔️ Playoff";
+        } else if (eq.posicion_actual == datos.clasificacion.length) {
+            textoEtiqueta = "🥄 Farolillo";
+        } else {
+            textoEtiqueta = "🚣 A remar";
+        }
 
         html += `
-            <div class="filaClasificacion">
+            <article class="filaClasificacion">
 
-                <div class="filaTop">
-                    <div class="infoEquipo">
+                <div class="lineaEquipo">
+                    <div class="equipoFila">${medalla} ${eq.equipo}</div>
+                    <div class="${clase} movimientoFila">${movimiento}</div>
+                </div>
 
-                        <div class="lineaEquipo">
-                            <div class="equipoFila">${medalla} ${eq.equipo}</div>
-                            <div class="${clase} movimientoFila">${movimiento}</div>
-                        </div>
+                <div class="datosFila">
+                    🧮 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
+                </div>
 
-                        <div class="datosFila">
-                            🧮 ${eq.puntos_totales} pts · 🎾 ${eq.pj} PJ${eq.descanso > 0 ? ` · 💤 ${eq.descanso}` : ""}
-                        </div>
-
-                        <div class="etiquetaEspecial">${textoEtiqueta}</div>
-
-                    </div>
+                <div class="etiquetaEspecial">
+                    ${textoEtiqueta}
                 </div>
 
                 <div class="toggleDetalles">
@@ -310,38 +308,41 @@ function pintarPantallaClasificacion(contenido) {
 
                 <div class="detalleClasif oculto">
 
-    <div class="grupoStats">
-        <h5>Partidos</h5>
-        <div><span>Ganados</span><strong>${eq.pg}</strong></div>
-        <div><span>Perdidos</span><strong>${eq.pp}</strong></div>
-    </div>
+                    <div class="grupoStats">
+                        <h5>Partidos</h5>
+                        <div><span>Ganados</span><strong>${eq.pg}</strong></div>
+                        <div><span>Perdidos</span><strong>${eq.pp}</strong></div>
+                    </div>
 
-    <div class="grupoStats">
-        <h5>Coeficiente</h5>
-        <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
-    </div>
+                    <div class="grupoStats">
+                        <h5>Coeficiente</h5>
+                        <div><span>Coeficiente</span><strong>${eq.coeficiente}</strong></div>
+                    </div>
 
-    <div class="grupoStats">
-        <h5>Sets</h5>
-        <div><span>Ganados</span><strong>${eq.sets_ganados}</strong></div>
-        <div><span>Perdidos</span><strong>${eq.sets_perdidos}</strong></div>
-        <div><span>Diferencia</span><strong>${formatoDiff(eq.sets_diff)}</strong></div>
-    </div>
+                    <div class="grupoStats">
+                        <h5>Sets</h5>
+                        <div><span>Ganados</span><strong>${eq.sets_ganados}</strong></div>
+                        <div><span>Perdidos</span><strong>${eq.sets_perdidos}</strong></div>
+                        <div><span>Diferencia</span><strong>${formatoDiff(eq.sets_diff)}</strong></div>
+                    </div>
 
-    <div class="grupoStats">
-        <h5>Juegos</h5>
-        <div><span>Ganados</span><strong>${eq.puntos_ganados}</strong></div>
-        <div><span>Perdidos</span><strong>${eq.puntos_perdidos}</strong></div>
-        <div><span>Diferencia</span><strong>${formatoDiff(eq.puntos_diff)}</strong></div>
-    </div>
+                    <div class="grupoStats">
+                        <h5>Juegos</h5>
+                        <div><span>Ganados</span><strong>${eq.puntos_ganados}</strong></div>
+                        <div><span>Perdidos</span><strong>${eq.puntos_perdidos}</strong></div>
+                        <div><span>Diferencia</span><strong>${formatoDiff(eq.puntos_diff)}</strong></div>
+                    </div>
 
-</div>
+                </div>
 
-           
+            </article>
         `;
     });
 
-    html += "</div>";
+    html += `
+        </div>
+    `;
+
     contenido.innerHTML = html;
 }
 
