@@ -222,8 +222,75 @@ function abrirDetalle(seccion) {
     detalle.classList.remove("oculto");
 
     if (seccion === "clasificacion") {
-        contenido.innerHTML = "<h2>📊 Clasificación</h2>";
-    }
+
+    let html = `
+        <h2>📊 Clasificación</h2>
+
+        <div class="modoOrden">
+            🏆 ${datos.modo_orden}
+        </div>
+
+        <div class="listaClasificacion">
+    `;
+
+    datos.clasificacion.forEach(eq => {
+
+        let movimiento = "=";
+        let clase = "igual";
+
+        const dif = eq.posicion_anterior - eq.posicion_actual;
+
+        if (dif > 0){
+            movimiento = "▲ " + dif;
+            clase = "sube";
+        }
+
+        if (dif < 0){
+            movimiento = "▼ " + Math.abs(dif);
+            clase = "baja";
+        }
+
+        const medalla =
+            eq.posicion_actual==1 ? "🥇" :
+            eq.posicion_actual==2 ? "🥈" :
+            eq.posicion_actual==3 ? "🥉" :
+            eq.posicion_actual;
+
+        html += `
+        <div class="filaClasificacion">
+
+            <div>
+
+                <div class="equipoFila">
+
+                    ${medalla} ${eq.equipo}
+
+                </div>
+
+                <div class="datosFila">
+
+                    ${eq.puntos_totales} pts · ${eq.pj} PJ
+
+                </div>
+
+            </div>
+
+            <div class="${clase}">
+
+                ${movimiento}
+
+            </div>
+
+        </div>
+        `;
+
+    });
+
+    html += "</div>";
+
+    contenido.innerHTML = html;
+
+}
 
     if (seccion === "partidos") {
         contenido.innerHTML = "<h2>🎾 Partidos</h2>";
