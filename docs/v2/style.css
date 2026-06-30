@@ -35,19 +35,63 @@ body{
 
 .cabecera{
 
-    background:linear-gradient(135deg,#0d3b66,#155799);
+    background:linear-gradient(135deg,#0f172a,#1e3a8a);
 
     color:white;
 
     border-radius:24px;
 
-    padding:30px;
+    padding:24px;
 
-    text-align:center;
-
-    margin-bottom:22px;
+    margin-bottom:20px;
 
     box-shadow:0 8px 24px rgba(0,0,0,.15);
+
+}
+
+.tituloSuperior{
+
+    font-size:13px;
+
+    letter-spacing:3px;
+
+    opacity:.8;
+
+    text-transform:uppercase;
+
+}
+
+.tituloPrincipal{
+
+    font-size:34px;
+
+    font-weight:800;
+
+    margin-top:6px;
+
+}
+
+.subtitulo{
+
+    margin-top:4px;
+
+    opacity:.8;
+
+}
+
+.estadoCabecera{
+
+    margin-top:18px;
+
+    display:inline-block;
+
+    background:rgba(255,255,255,.15);
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-weight:600;
 
 }
 
