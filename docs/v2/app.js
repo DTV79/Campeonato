@@ -158,6 +158,24 @@ function pintarTarjetasDashboard(data) {
 }
 
 document.addEventListener("click", function(e) {
+
+
+
+      const btnCompleta = e.target.closest("#btnVistaCompleta");
+if (btnCompleta) {
+    pintarClasificacionCompleta();
+    return;
+}
+
+const btnResumida = e.target.closest("#btnVistaResumida");
+if (btnResumida) {
+    pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
+    return;
+}
+
+  
+    
+    
     const card = e.target.closest(".cardAcceso");
     if (card) {
         abrirDetalle(card.dataset.seccion);
@@ -178,18 +196,7 @@ document.addEventListener("click", function(e) {
         return;
     }
 
-
-    const btnCompleta = e.target.closest("#btnVistaCompleta");
-if (btnCompleta) {
-    pintarClasificacionCompleta();
-    return;
-}
-
-const btnResumida = e.target.closest("#btnVistaResumida");
-if (btnResumida) {
-    pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
-    return;
-}
+ 
     const fila = e.target.closest(".filaClasificacion");
     if (fila) {
         const detalle = fila.querySelector(".detalleClasif");
