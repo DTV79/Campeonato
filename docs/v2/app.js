@@ -178,6 +178,18 @@ document.addEventListener("click", function(e) {
         return;
     }
 
+
+    const btnCompleta = e.target.closest("#btnVistaCompleta");
+if (btnCompleta) {
+    pintarClasificacionCompleta();
+    return;
+}
+
+const btnResumida = e.target.closest("#btnVistaResumida");
+if (btnResumida) {
+    pintarPantallaClasificacion(document.getElementById("contenidoDetalle"));
+    return;
+}
     const fila = e.target.closest(".filaClasificacion");
     if (fila) {
         const detalle = fila.querySelector(".detalleClasif");
@@ -339,9 +351,13 @@ function pintarPantallaClasificacion(contenido) {
         `;
     });
 
-    html += `
-        </div>
-    `;
+  html += `
+    </div>
+
+    <button class="btnVistaCompleta" id="btnVistaCompleta">
+        📋 Ver clasificación completa
+    </button>
+`;
 
     contenido.innerHTML = html;
 }
@@ -378,4 +394,60 @@ function formatoDiff(valor) {
     const n = Number(valor);
     if (n > 0) return "+" + n;
     return String(n);
+}
+
+
+function pintarClasificacionCompleta() {
+    const contenido = document.getElementById("contenidoDetalle");
+
+    let html = `
+        <h2>📋 Clasificación completa</h2>
+
+        <div class="tablaScroll">
+            <table class="tablaClasificacion">
+                <thead>
+                    <tr>
+                        <th>Pos</th>
+                        <th>Equipo</th>
+                        <th>Pts</th>
+                        <th>Coef</th>
+                        <th>PJ</th>
+                        <th>PG</th>
+                        <th>PP</th>
+                        <th>Desc.</th>
+                        <th>Sets</th>
+                        <th>Juegos</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    datos.clasificacion.forEach(eq => {
+        html += `
+            <tr>
+                <td>${eq.posicion_actual}</td>
+                <td class="equipoTabla">${eq.equipo}</td>
+                <td>${eq.puntos_totales}</td>
+                <td>${eq.coeficiente}</td>
+                <td>${eq.pj}</td>
+                <td>${eq.pg}</td>
+                <td>${eq.pp}</td>
+                <td>${eq.descanso}</td>
+                <td>${eq.sets_ganados}-${eq.sets_perdidos} (${formatoDiff(eq.sets_diff)})</td>
+                <td>${eq.puntos_ganados}-${eq.puntos_perdidos} (${formatoDiff(eq.puntos_diff)})</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btnVistaCompleta" id="btnVistaResumida">
+            ← Volver a vista resumida
+        </button>
+    `;
+
+    contenido.innerHTML = html;
 }
