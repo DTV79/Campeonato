@@ -927,3 +927,71 @@ body{
     color:#0f172a;
     font-weight:900;
 }
+
+/* FIX clasificación compacta y estadísticas */
+
+.detalleClasif{
+    display:block !important;
+    width:100%;
+}
+
+.detalleClasif .grupoStats{
+    display:block !important;
+    padding:10px 0;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.detalleClasif .grupoStats:last-child{
+    border-bottom:none;
+}
+
+.detalleClasif .grupoStats h5{
+    display:block;
+    font-size:12px;
+    color:#2563eb;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    margin-bottom:8px;
+}
+
+.detalleClasif .grupoStats div{
+    display:flex !important;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    padding:5px 0;
+    font-size:14px;
+}
+
+.detalleClasif .grupoStats span{
+    color:#64748b;
+    font-weight:700;
+}
+
+.detalleClasif .grupoStats strong{
+    color:#0f172a;
+    font-weight:900;
+    text-align:right;
+}
+
+/* Tarjetas algo más compactas */
+
+.filaClasificacion{
+    margin-bottom:10px;
+}
+
+.etiquetaEspecial{
+    width:auto;
+    max-width:max-content;
+}
+
+/* Botón inferior activo */
+
+.navBtn.navActivo{
+    color:#2563eb !important;
+}
+
+.navBtn.navActivo small{
+    color:#2563eb !important;
+    font-weight:900;
+}
