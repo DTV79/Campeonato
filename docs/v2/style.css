@@ -843,3 +843,28 @@ body{
         border-radius:22px;
     }
 }
+
+.progreso.barraLiguilla{
+    background:linear-gradient(90deg,#16a34a,#22c55e);
+}
+
+.progreso.barraCuartos{
+    background:linear-gradient(90deg,#f97316,#fb923c);
+}
+
+.progreso.barraSemis{
+    background:linear-gradient(90deg,#7c3aed,#a855f7);
+}
+
+.progreso.barraFinal{
+    background:linear-gradient(90deg,#facc15,#f59e0b);
+}
+
+.progreso.barraFinalizado{
+    width:100% !important;
+    background:linear-gradient(90deg,#facc15,#f59e0b,#d97706);
+}
+
+.cabecera.cabeceraFinalizada{
+    background:linear-gradient(135deg,#78350f,#d97706,#facc15);
+}
