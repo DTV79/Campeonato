@@ -725,6 +725,8 @@ function pintarPantallaCruces(contenido) {
 }
 
 function pintarCardCruce(p) {
+    const local = p.local || p.equipo1 || p.equipo_a || p.jugador1 || "";
+    const visitante = p.visitante || p.equipo2 || p.equipo_b || p.jugador2 || "";
     const estado = String(p.estado).toLowerCase();
     const sets = obtenerSets(p.resultado);
 
@@ -732,8 +734,8 @@ function pintarCardCruce(p) {
     const claseEstado = finalizado ? "jugado" : "pendiente";
     const textoEstado = finalizado ? "✅ Finalizado" : "⏳ Pendiente";
 
-    const localGana = p.ganador && normalizar(p.ganador) === normalizar(p.local);
-    const visitanteGana = p.ganador && normalizar(p.ganador) === normalizar(p.visitante);
+    const localGana = p.ganador && normalizar(p.ganador) === normalizar(local);
+    const visitanteGana = p.ganador && normalizar(p.ganador) === normalizar(visitante);
 
     return `
         <article class="cardPartido marcador ${claseEstado}">
@@ -749,7 +751,7 @@ function pintarCardCruce(p) {
 
             <div class="filaMarcador ${localGana ? "ganadorFila" : ""}">
                 <div class="nombreEquipoMarcador">
-                    ${dividirEquipo(p.local).map(j => `<strong>${j}</strong>`).join("")}
+                    ${dividirEquipo(local).map(j => `<strong>${j}</strong>`).join("")}
                 </div>
                 <div>${sets[0].local}</div>
                 <div>${sets[1].local}</div>
@@ -758,7 +760,7 @@ function pintarCardCruce(p) {
 
             <div class="filaMarcador ${visitanteGana ? "ganadorFila" : ""}">
                 <div class="nombreEquipoMarcador">
-                    ${dividirEquipo(p.visitante).map(j => `<strong>${j}</strong>`).join("")}
+                    ${dividirEquipo(visitante).map(j => `<strong>${j}</strong>`).join("")}
                 </div>
                 <div>${sets[0].visitante}</div>
                 <div>${sets[1].visitante}</div>
