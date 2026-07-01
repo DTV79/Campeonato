@@ -25,6 +25,7 @@ function pintarInicio(data) {
     pintarPodio(data.clasificacion || []);
     pintarTarjetasDashboard(data);
     mostrarBotonCruces(data);
+    mostrarBotonPalas(data);
 }
 
 function pintarFecha(fechaISO) {
@@ -951,4 +952,18 @@ function pintarCardPalas(p) {
             ` : ""}
         </article>
     `;
+}
+
+
+function mostrarBotonPalas(data) {
+    const btn = document.querySelector(".navPalas");
+    if (!btn) return;
+
+    const palas = data.palas_playa || [];
+
+    if (palas.length > 0) {
+        btn.classList.remove("oculto");
+    } else {
+        btn.classList.add("oculto");
+    }
 }
