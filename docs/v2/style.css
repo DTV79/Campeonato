@@ -8,6 +8,11 @@
     box-sizing:border-box;
 }
 
+html,
+body{
+    min-height:100%;
+}
+
 body{
     font-family:'Inter',sans-serif;
     background:#f4f6f9;
@@ -59,20 +64,6 @@ body{
     font-weight:600;
 }
 
-.actualizacion{
-    margin-top:22px;
-    background:rgba(255,255,255,.15);
-    border-radius:14px;
-    padding:10px;
-    font-size:14px;
-}
-
-.actualizacion strong{
-    display:block;
-    margin-top:4px;
-    font-size:17px;
-}
-
 .progresoCabecera{
     margin-top:18px;
 }
@@ -98,6 +89,24 @@ body{
     opacity:.85;
     text-align:left;
     font-size:14px;
+}
+
+.actualizacion{
+    margin-top:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    background:rgba(255,255,255,.15);
+    border-radius:14px;
+    padding:10px 14px;
+    font-size:14px;
+}
+
+.actualizacion strong{
+    margin:0;
+    font-size:15px;
+    font-weight:800;
 }
 
 /* TARJETAS GENERALES */
@@ -155,21 +164,10 @@ body{
     top:-42px;
 }
 
-.cardClasificacion{
-    background:linear-gradient(135deg,#2563eb,#1e40af);
-}
-
-.cardPartidos{
-    background:linear-gradient(135deg,#16a34a,#166534);
-}
-
-.cardCruces{
-    background:linear-gradient(135deg,#d97706,#92400e);
-}
-
-.cardPalas{
-    background:linear-gradient(135deg,#0ea5e9,#0369a1);
-}
+.cardClasificacion{ background:linear-gradient(135deg,#2563eb,#1e40af); }
+.cardPartidos{ background:linear-gradient(135deg,#16a34a,#166534); }
+.cardCruces{ background:linear-gradient(135deg,#d97706,#92400e); }
+.cardPalas{ background:linear-gradient(135deg,#0ea5e9,#0369a1); }
 
 .iconoAcceso{
     font-size:30px;
@@ -253,6 +251,55 @@ body{
     color:#1d2939;
 }
 
+/* BARRA INFERIOR */
+
+.bottomNav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:calc(76px + env(safe-area-inset-bottom));
+    padding-bottom:env(safe-area-inset-bottom);
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    box-shadow:0 -8px 24px rgba(15,23,42,.12);
+    z-index:9999;
+}
+
+.navBtn{
+    border:none;
+    background:none;
+    color:#64748b;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.navBtn span{
+    font-size:24px;
+    line-height:1;
+}
+
+.navBtn small{
+    font-size:11px;
+}
+
+.navBtn.navActivo,
+.navBtn.navActivo small{
+    color:#2563eb;
+    font-weight:900;
+}
+
+/* CLASIFICACIÓN */
+
 .modoOrden{
     background:#eef2ff;
     color:#1e3a8a;
@@ -290,8 +337,6 @@ body{
     font-weight:900;
 }
 
-/* CLASIFICACIÓN */
-
 .listaClasificacion{
     display:flex;
     flex-direction:column;
@@ -308,13 +353,8 @@ body{
     box-shadow:0 6px 18px rgba(15,23,42,.08);
 }
 
-.filaTop,
-.infoEquipo,
 .lineaEquipo{
     width:100%;
-}
-
-.lineaEquipo{
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
@@ -350,7 +390,6 @@ body{
 
 .etiquetaEspecial{
     display:inline-block;
-    width:auto;
     max-width:max-content;
     margin-top:10px;
     padding:6px 11px;
@@ -429,82 +468,7 @@ body{
     text-align:right;
 }
 
-/* BARRA INFERIOR */
-
-.bottomNav{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:calc(76px + env(safe-area-inset-bottom));
-    padding-bottom:env(safe-area-inset-bottom);
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    box-shadow:0 -8px 24px rgba(15,23,42,.12);
-    z-index:9999;
-}
-
-.navBtn{
-    border:none;
-    background:none;
-    color:#64748b;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
-    font-weight:700;
-    cursor:pointer;
-}
-
-.navBtn span{
-    font-size:24px;
-    line-height:1;
-}
-
-.navBtn small{
-    font-size:11px;
-}
-
-.navBtn.navActivo{
-    color:#2563eb;
-}
-
-.navBtn.navActivo small{
-    color:#2563eb;
-    font-weight:900;
-}
-
-/* MÓVIL */
-
-@media(max-width:600px){
-    .contenedor{
-        padding:20px;
-    }
-
-    .cabecera{
-        padding:24px;
-    }
-
-    .tituloPrincipal{
-        font-size:32px;
-    }
-
-    .gridDashboard{
-        grid-template-columns:1fr 1fr;
-        gap:12px;
-    }
-
-    .cardAcceso{
-        min-height:150px;
-        padding:16px;
-        border-radius:22px;
-    }
-}
+/* CLASIFICACIÓN COMPLETA */
 
 .btnVistaCompleta{
     width:100%;
@@ -556,28 +520,6 @@ body{
     font-weight:900;
 }
 
-
-.movTabla{
-    display:block;
-    margin-top:4px;
-    font-size:12px;
-    font-weight:900;
-}
-
-
-.posTabla{
-    display:flex;
-    align-items:center;
-    gap:8px;
-}
-
-.movTabla{
-    font-size:12px;
-    font-weight:900;
-    white-space:nowrap;
-}
-
-
 .movTabla{
     display:inline-block;
     font-size:12px;
@@ -585,6 +527,7 @@ body{
     white-space:nowrap;
 }
 
+/* GLOBO INFO */
 
 .overlayInfo{
     position:fixed;
@@ -657,24 +600,7 @@ body{
     line-height:1.55;
 }
 
-.actualizacion{
-    margin-top:18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    background:rgba(255,255,255,.15);
-    border-radius:14px;
-    padding:10px 14px;
-    font-size:14px;
-}
-
-.actualizacion strong{
-    margin:0;
-    font-size:15px;
-    font-weight:800;
-}
-
+/* PARTIDOS / RONDAS */
 
 .listaJornadas{
     display:flex;
@@ -689,7 +615,15 @@ body{
 }
 
 .cabeceraJornada{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
+    background:white;
+    border-radius:16px;
+    padding:14px;
     margin-bottom:12px;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
 }
 
 .cabeceraJornada h3{
@@ -704,123 +638,10 @@ body{
     font-weight:700;
 }
 
-.listaPartidos{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-
-    overflow:hidden;
-    max-height:5000px;
-
-    opacity:1;
-    transition:
-        max-height .35s ease,
-        opacity .25s ease;
-}
-
-.cardPartido{
-    background:white;
-    border-radius:18px;
-    padding:16px;
-    box-shadow:0 4px 14px rgba(15,23,42,.08);
-    border-left:5px solid #e5e7eb;
-}
-
-.cardPartido.jugado{
-    border-left-color:#16a34a;
-}
-
-.cardPartido.pendiente{
-    border-left-color:#f59e0b;
-}
-
-.cardPartido.descanso{
-    border-left-color:#64748b;
-    background:#f1f5f9;
-}
-
-.estadoPartido{
-    font-size:13px;
-    font-weight:900;
-    color:#64748b;
-    margin-bottom:10px;
-}
-
-.versusPartido{
-    display:grid;
-    grid-template-columns:1fr auto 1fr;
-    align-items:center;
-    gap:10px;
-}
-
-.equipoPartido{
-    font-size:15px;
-    font-weight:900;
-    line-height:1.25;
-}
-
-.vs{
-    color:#94a3b8;
-    font-size:12px;
-    font-weight:900;
-}
-
-.resultadoPartido{
-    margin-top:12px;
-    font-size:20px;
-    font-weight:900;
-    color:#0f172a;
-    text-align:center;
-}
-
-.ganadorPartido{
-    margin-top:8px;
-    font-size:13px;
-    font-weight:900;
-    color:#16a34a;
-    text-align:center;
-}
-
-
-.cabeceraJornada{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    cursor:pointer;
-}
-
 .flechaJornada{
     font-size:20px;
     font-weight:900;
     color:#2563eb;
-}
-
-
-.resumenPartidos{
-    background:#eef2ff;
-    border-radius:20px;
-    padding:16px;
-    margin-bottom:18px;
-}
-
-.estadoResumen{
-    font-weight:900;
-    color:#1e3a8a;
-    margin-bottom:10px;
-}
-
-.resumenPartidos p{
-    margin-top:8px;
-    color:#475569;
-    font-size:14px;
-    font-weight:800;
-}
-
-.cabeceraJornada{
-    background:white;
-    border-radius:16px;
-    padding:14px;
-    box-shadow:0 4px 14px rgba(15,23,42,.06);
 }
 
 .chipJornada{
@@ -848,9 +669,75 @@ body{
     color:#92400e;
 }
 
+.listaPartidos{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    overflow:hidden;
+    max-height:5000px;
+    opacity:1;
+    transition:max-height .35s ease, opacity .25s ease;
+}
+
+.resumenPartidos{
+    background:#eef2ff;
+    border-radius:20px;
+    padding:16px;
+    margin-bottom:18px;
+}
+
+.estadoResumen{
+    font-weight:900;
+    color:#1e3a8a;
+    margin-bottom:10px;
+}
+
+.resumenPartidos p{
+    margin-top:8px;
+    color:#475569;
+    font-size:14px;
+    font-weight:800;
+}
+
+/* MARCADOR */
+
+.cardPartido{
+    background:white;
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 4px 14px rgba(15,23,42,.08);
+    border-left:5px solid #e5e7eb;
+}
+
+.cardPartido.jugado{
+    border-left-color:#16a34a;
+}
+
+.cardPartido.pendiente{
+    border-left-color:#f59e0b;
+}
+
+.cardPartido.descanso{
+    border-left-color:#64748b;
+    background:#f1f5f9;
+}
+
 .cardPartido.marcador{
     padding:0;
     overflow:hidden;
+}
+
+.estadoPartido{
+    font-size:13px;
+    font-weight:900;
+    color:#64748b;
+    margin-bottom:10px;
+}
+
+.cardPartido.marcador .estadoPartido{
+    padding:10px 12px;
+    margin:0;
+    background:#f8fafc;
 }
 
 .marcadorHeader,
@@ -894,13 +781,21 @@ body{
     background:#dcfce7;
 }
 
-
-.cardPartido.marcador .estadoPartido{
-    padding:10px 12px;
-    margin:0;
-    background:#f8fafc;
+.perdedorPalas{
+    background:#fee2e2;
 }
 
+.infoPalas{
+    padding:10px 12px;
+    background:#fff7ed;
+    color:#92400e;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.45;
+    border-top:1px solid #fed7aa;
+}
+
+/* OTROS */
 
 .tarjetaVacia{
     background:#f8fafc;
@@ -914,7 +809,6 @@ body{
     margin-bottom:8px;
 }
 
-
 .resumenPalas{
     background:#ecfeff;
 }
@@ -923,17 +817,29 @@ body{
     color:#0369a1;
 }
 
+/* MÓVIL */
 
-.perdedorPalas{
-    background:#fee2e2;
-}
+@media(max-width:600px){
+    .contenedor{
+        padding:20px;
+    }
 
-.infoPalas{
-    padding:10px 12px;
-    background:#fff7ed;
-    color:#92400e;
-    font-size:13px;
-    font-weight:800;
-    line-height:1.45;
-    border-top:1px solid #fed7aa;
+    .cabecera{
+        padding:24px;
+    }
+
+    .tituloPrincipal{
+        font-size:32px;
+    }
+
+    .gridDashboard{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .cardAcceso{
+        min-height:150px;
+        padding:16px;
+        border-radius:22px;
+    }
 }
