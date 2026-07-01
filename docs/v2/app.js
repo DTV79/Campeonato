@@ -212,7 +212,7 @@ function abrirDetalle(seccion) {
     if (seccion === "clasificacion") pintarPantallaClasificacion(contenido);
     if (seccion === "partidos") pintarPantallaPartidos(contenido);
     if (seccion === "cruces") pintarPantallaCruces(contenido);
-    if (seccion === "palas") contenido.innerHTML = "<h2>🏖️ Copa Palas Playa</h2>";
+    if (seccion === "palas") pintarPantallaPalas(contenido);
 
     if (seccion === "mas") {
         contenido.innerHTML = `
@@ -794,4 +794,34 @@ function mostrarBotonCruces(data) {
     } else {
         btn.classList.add("oculto");
     }
+}
+
+
+function pintarPantallaPalas(contenido) {
+    const palas = datos.palas_playa || [];
+
+    if (!palas.length) {
+        contenido.innerHTML = `
+            <h2>🏖️ Copa Palas Playa</h2>
+            <section class="tarjetaVacia">
+                <h3>⏳ Todavía no iniciada</h3>
+                <p>Aquí aparecerán los partidos cuando se genere la Copa Palas Playa desde Excel.</p>
+            </section>
+        `;
+        return;
+    }
+
+    let html = `
+        <h2>🏖️ Copa Palas Playa</h2>
+        <section class="resumenPartidos resumenPalas">
+            <div class="estadoResumen">🥄 El que pierde sigue jugando</div>
+            <p>Ganar un partido significa salvarse del farolillo.</p>
+        </section>
+
+        <div class="listaPartidos">
+            ${palas.map(p => pintarCardCruce(p)).join("")}
+        </div>
+    `;
+
+    contenido.innerHTML = html;
 }
