@@ -919,3 +919,18 @@ body{
 .resumenPalas .estadoResumen{
     color:#0369a1;
 }
+
+
+.perdedorPalas{
+    background:#fee2e2;
+}
+
+.infoPalas{
+    padding:10px 12px;
+    background:#fff7ed;
+    color:#92400e;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.45;
+    border-top:1px solid #fed7aa;
+}
