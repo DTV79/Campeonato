@@ -910,6 +910,8 @@ function pintarCardPalas(p) {
     const salvado = localGana ? local : visitanteGana ? visitante : "";
     const sigue = localPierde ? local : visitantePierde ? visitante : "";
 
+    const esFinalPalas = finalizado && p.es_final === true;
+
     return `
         <article class="cardPartido marcador pendientePalas">
 
@@ -940,11 +942,12 @@ function pintarCardPalas(p) {
                 <div>${sets[2].visitante}</div>
             </div>
 
-            ${finalizado ? `
-                <div class="infoPalas">
-                    🛟 Se salva: <strong>${salvado}</strong><br>
-                    🥄 Sigue en la lucha: <strong>${sigue}</strong>
-                </div>
+           ${finalizado ? `
+            <div class="infoPalas">
+            ${esFinalPalas 
+            ? `🥄 Farolillo rojo: <strong>${sigue}</strong>` 
+            : `🛟 Se salva: <strong>${salvado}</strong>`}
+            </div>
             ` : ""}
         </article>
     `;
