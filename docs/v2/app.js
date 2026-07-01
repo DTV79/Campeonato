@@ -1,15 +1,19 @@
-const JSON_URL = "https://raw.githubusercontent.com/DTV79/Campeonato/main/docs/estado_torneo.json";
+const JSON_URL = "estado_torneo.json";
 let datos = null;
 
 document.addEventListener("DOMContentLoaded", iniciarApp);
 
 async function iniciarApp() {
     try {
-        const respuesta = await fetch(JSON_URL + "?v=" + Date.now());
+        const respuesta = await fetch(JSON_URL + "?v=" + Date.now(), {
+            cache: "no-store"
+        });
+
         if (!respuesta.ok) throw new Error("No se pudo cargar el JSON");
 
         datos = await respuesta.json();
         pintarInicio(datos);
+
     } catch (error) {
         console.error(error);
     }
