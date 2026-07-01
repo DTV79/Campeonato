@@ -805,6 +805,7 @@ function mostrarBotonCruces(data) {
 
 function pintarPantallaPalas(contenido) {
     const palas = datos.palas_playa || [];
+    console.log("PALAS PLAYA:", palas);
 
     if (!palas.length) {
         contenido.innerHTML = `
