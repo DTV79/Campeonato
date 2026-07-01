@@ -817,6 +817,8 @@ function pintarPantallaPalas(contenido) {
         return;
     }
 
+    const rondaActual = obtenerRondaActualPalas(rondas);
+
     let html = `
         <h2>🏖️ Copa Palas Playa</h2>
 
@@ -830,6 +832,7 @@ function pintarPantallaPalas(contenido) {
 
     rondas.forEach(ronda => {
         const partidos = ronda.partidos || [];
+        const abierta = Number(ronda.ronda) === Number(rondaActual);
 
         const jugados = partidos.filter(p =>
             ["jugado", "finalizado"].includes(String(p.estado).toLowerCase())
@@ -837,21 +840,32 @@ function pintarPantallaPalas(contenido) {
 
         const pendientes = partidos.length - jugados;
 
+        let estadoRonda = "⏳ Próxima";
+        let claseEstado = "proxima";
+
+        if (pendientes === 0 && partidos.length > 0) {
+            estadoRonda = "✅ Finalizada";
+            claseEstado = "finalizada";
+        }
+
+        if (abierta && pendientes > 0) {
+            estadoRonda = "🟢 En juego";
+            claseEstado = "enJuego";
+        }
+
         html += `
             <section class="bloqueJornada">
-                <div class="cabeceraJornada ${pendientes === 0 ? "finalizada" : "enJuego"}">
+                <div class="cabeceraJornada ${claseEstado}">
                     <div>
-                        <span class="chipJornada">
-                            ${pendientes === 0 ? "✅ Finalizada" : "🟢 En juego"}
-                        </span>
+                        <span class="chipJornada">${estadoRonda}</span>
                         <h3>${ronda.nombre || "Ronda " + ronda.ronda}</h3>
                         <p>${jugados}/${partidos.length} partidos</p>
                         ${ronda.descansa ? `<p>💤 Descansa: <strong>${ronda.descansa}</strong></p>` : ""}
                     </div>
-                    <span class="flechaJornada">▼</span>
+                    <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
                 </div>
 
-                <div class="listaPartidos">
+                <div class="listaPartidos ${abierta ? "" : "oculto"}">
                     ${partidos.map(p => pintarCardCruce(p)).join("")}
                 </div>
             </section>
