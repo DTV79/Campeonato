@@ -866,7 +866,7 @@ function pintarPantallaPalas(contenido) {
                 </div>
 
                 <div class="listaPartidos ${abierta ? "" : "oculto"}">
-                    ${partidos.map(p => pintarCardCruce(p)).join("")}
+                    ${partidos.map(p => pintarCardPalas(p)).join("")}
                 </div>
             </section>
         `;
@@ -889,4 +889,63 @@ function obtenerRondaActualPalas(rondas) {
     }
 
     return rondas[rondas.length - 1]?.ronda || 1;
+}
+
+
+function pintarCardPalas(p) {
+    const local = p.local || p.equipo1 || p.equipo_a || p.jugador1 || "";
+    const visitante = p.visitante || p.equipo2 || p.equipo_b || p.jugador2 || "";
+    const estado = String(p.estado).toLowerCase();
+    const sets = obtenerSets(p.resultado);
+
+    const finalizado = ["finalizado", "jugado"].includes(estado);
+    const textoEstado = finalizado ? "✅ Finalizado" : "⏳ Pendiente";
+
+    const localGana = p.ganador && normalizar(p.ganador) === normalizar(local);
+    const visitanteGana = p.ganador && normalizar(p.ganador) === normalizar(visitante);
+
+    const localPierde = finalizado && visitanteGana;
+    const visitantePierde = finalizado && localGana;
+
+    const salvado = localGana ? local : visitanteGana ? visitante : "";
+    const sigue = localPierde ? local : visitantePierde ? visitante : "";
+
+    return `
+        <article class="cardPartido marcador pendientePalas">
+
+            <div class="estadoPartido">${textoEstado}</div>
+
+            <div class="marcadorHeader">
+                <div></div>
+                <div>I</div>
+                <div>II</div>
+                <div>III</div>
+            </div>
+
+            <div class="filaMarcador ${localPierde ? "perdedorPalas" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(local).map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].local}</div>
+                <div>${sets[1].local}</div>
+                <div>${sets[2].local}</div>
+            </div>
+
+            <div class="filaMarcador ${visitantePierde ? "perdedorPalas" : ""}">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(visitante).map(j => `<strong>${j}</strong>`).join("")}
+                </div>
+                <div>${sets[0].visitante}</div>
+                <div>${sets[1].visitante}</div>
+                <div>${sets[2].visitante}</div>
+            </div>
+
+            ${finalizado ? `
+                <div class="infoPalas">
+                    🛟 Se salva: <strong>${salvado}</strong><br>
+                    🥄 Sigue en la lucha: <strong>${sigue}</strong>
+                </div>
+            ` : ""}
+        </article>
+    `;
 }
