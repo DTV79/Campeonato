@@ -875,3 +875,18 @@ function pintarPantallaPalas(contenido) {
     html += `</div>`;
     contenido.innerHTML = html;
 }
+
+
+function obtenerRondaActualPalas(rondas) {
+    for (const ronda of rondas) {
+        const partidos = ronda.partidos || [];
+
+        const hayPendientes = partidos.some(p =>
+            !["jugado", "finalizado"].includes(String(p.estado).toLowerCase())
+        );
+
+        if (hayPendientes) return ronda.ronda;
+    }
+
+    return rondas[rondas.length - 1]?.ronda || 1;
+}
