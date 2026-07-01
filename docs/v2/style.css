@@ -868,3 +868,28 @@ body{
 .cabecera.cabeceraFinalizada{
     background:linear-gradient(135deg,#78350f,#d97706,#facc15);
 }
+
+
+html,
+body{
+    width:100%;
+    min-height:100dvh;
+    overflow-x:hidden;
+}
+
+body{
+    min-height:100dvh;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom));
+}
+
+.bottomNav{
+    position:fixed !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    transform:translateZ(0);
+    -webkit-transform:translateZ(0);
+    height:calc(76px + env(safe-area-inset-bottom));
+    padding-bottom:env(safe-area-inset-bottom);
+    z-index:99999;
+}
