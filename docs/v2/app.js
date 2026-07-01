@@ -42,23 +42,22 @@ function pintarFecha(fechaISO) {
 }
 
 function pintarEstado(data) {
-    const partidos = (data.partidos || []).filter(p => String(p.estado).toLowerCase() !== "descanso");
-    const jornadaActual = obtenerJornadaActual(partidos);
+    const estado = obtenerEstadoCompeticion(data);
 
-    const partidosJornada = partidos.filter(p => Number(p.jornada) === Number(jornadaActual));
-    const jugados = partidosJornada.filter(p => String(p.estado).toLowerCase() === "jugado").length;
-    const total = partidosJornada.length;
-    const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
-
-    setText("estadoCabecera", jugados === total
-        ? `✅ Jornada ${jornadaActual} finalizada`
-        : `🟢 Jornada ${jornadaActual} en juego`
-    );
+    setText("estadoCabecera", estado.titulo);
 
     const barra = document.getElementById("barraProgreso");
-    if (barra) barra.style.width = porcentaje + "%";
+    if (barra) {
+        barra.style.width = estado.porcentaje + "%";
+        barra.className = "progreso " + estado.claseBarra;
+    }
 
-    setText("textoProgreso", `${jugados} de ${total} partidos de la jornada · ${porcentaje}%`);
+    setText("textoProgreso", estado.texto);
+
+    const cabecera = document.querySelector(".cabecera");
+    if (cabecera) {
+        cabecera.classList.toggle("cabeceraFinalizada", estado.finalizado);
+    }
 }
 
 function obtenerJornadaActual(partidos) {
@@ -967,4 +966,117 @@ function mostrarBotonPalas(data) {
     } else {
         btn.classList.add("oculto");
     }
+}
+
+
+function obtenerEstadoCompeticion(data) {
+    const cruces = data.cruces || [];
+
+    if (cruces.length) {
+        return obtenerEstadoCruces(cruces);
+    }
+
+    return obtenerEstadoLiguilla(data.partidos || []);
+}
+
+function obtenerEstadoLiguilla(partidosTodos) {
+    const partidos = partidosTodos.filter(p =>
+        String(p.estado).toLowerCase() !== "descanso"
+    );
+
+    const jornadaActual = obtenerJornadaActual(partidos);
+
+    const partidosJornada = partidos.filter(p =>
+        Number(p.jornada) === Number(jornadaActual)
+    );
+
+    const jugados = partidosJornada.filter(p =>
+        String(p.estado).toLowerCase() === "jugado"
+    ).length;
+
+    const total = partidosJornada.length;
+    const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
+
+    return {
+        titulo: jugados === total
+            ? `✅ Jornada ${jornadaActual} finalizada`
+            : `🟢 Jornada ${jornadaActual} en juego`,
+        texto: `${jugados} de ${total} partidos de la jornada · ${porcentaje}%`,
+        porcentaje,
+        claseBarra: "barraLiguilla",
+        finalizado: false
+    };
+}
+
+function obtenerEstadoCruces(cruces) {
+    const fases = [...new Set(cruces.map(c => c.fase))];
+
+    for (const fase of fases) {
+        const partidosFase = cruces.filter(c => c.fase === fase);
+
+        const jugados = partidosFase.filter(c =>
+            ["jugado", "finalizado"].includes(String(c.estado).toLowerCase())
+        ).length;
+
+        const total = partidosFase.length;
+        const pendientes = total - jugados;
+
+        if (pendientes > 0) {
+            const porcentaje = total > 0 ? Math.round((jugados / total) * 100) : 0;
+
+            return {
+                titulo: tituloFase(fase),
+                texto: textoFase(fase, jugados, total),
+                porcentaje,
+                claseBarra: claseBarraFase(fase),
+                finalizado: false
+            };
+        }
+    }
+
+    const final = cruces.find(c =>
+        String(c.fase).toLowerCase().includes("final")
+    );
+
+    return {
+        titulo: "🏆 Campeonato finalizado",
+        texto: final && final.ganador
+            ? `🥇 Campeones: ${final.ganador}`
+            : "¡Tenemos campeones!",
+        porcentaje: 100,
+        claseBarra: "barraFinalizado",
+        finalizado: true
+    };
+}
+
+function tituloFase(fase) {
+    const f = String(fase).toLowerCase();
+
+    if (f.includes("cuarto")) return "🟠 Cuartos de final";
+    if (f.includes("semi")) return "🟣 Semifinales";
+    if (f.includes("final")) return "🟡 Gran Final";
+
+    return "🟠 " + fase;
+}
+
+function textoFase(fase, jugados, total) {
+    const f = String(fase).toLowerCase();
+
+    if (f.includes("final")) {
+        return jugados === 0
+            ? "Pendiente el partido decisivo"
+            : `${jugados} de ${total} partidos`;
+    }
+
+    return `${jugados} de ${total} partidos`;
+}
+
+function claseBarraFase(fase) {
+    const f = String(fase).toLowerCase();
+
+    if (f.includes("cuarto")) return "barraCuartos";
+    if (f.includes("semi")) return "barraSemis";
+    if (f.includes("final")) return "barraFinal";
+
+    return "barraCuartos";
 }
