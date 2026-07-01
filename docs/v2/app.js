@@ -804,10 +804,9 @@ function mostrarBotonCruces(data) {
 
 
 function pintarPantallaPalas(contenido) {
-    const palas = datos.palas_playa || [];
-    console.log("PALAS PLAYA:", palas);
+    const rondas = datos.palas_playa || [];
 
-    if (!palas.length) {
+    if (!rondas.length) {
         contenido.innerHTML = `
             <h2>🏖️ Copa Palas Playa</h2>
             <section class="tarjetaVacia">
@@ -820,15 +819,45 @@ function pintarPantallaPalas(contenido) {
 
     let html = `
         <h2>🏖️ Copa Palas Playa</h2>
+
         <section class="resumenPartidos resumenPalas">
             <div class="estadoResumen">🥄 El que pierde sigue jugando</div>
             <p>Ganar un partido significa salvarse del farolillo.</p>
         </section>
 
-        <div class="listaPartidos">
-            ${palas.map(p => pintarCardCruce(p)).join("")}
-        </div>
+        <div class="listaJornadas">
     `;
 
+    rondas.forEach(ronda => {
+        const partidos = ronda.partidos || [];
+
+        const jugados = partidos.filter(p =>
+            ["jugado", "finalizado"].includes(String(p.estado).toLowerCase())
+        ).length;
+
+        const pendientes = partidos.length - jugados;
+
+        html += `
+            <section class="bloqueJornada">
+                <div class="cabeceraJornada ${pendientes === 0 ? "finalizada" : "enJuego"}">
+                    <div>
+                        <span class="chipJornada">
+                            ${pendientes === 0 ? "✅ Finalizada" : "🟢 En juego"}
+                        </span>
+                        <h3>${ronda.nombre || "Ronda " + ronda.ronda}</h3>
+                        <p>${jugados}/${partidos.length} partidos</p>
+                        ${ronda.descansa ? `<p>💤 Descansa: <strong>${ronda.descansa}</strong></p>` : ""}
+                    </div>
+                    <span class="flechaJornada">▼</span>
+                </div>
+
+                <div class="listaPartidos">
+                    ${partidos.map(p => pintarCardCruce(p)).join("")}
+                </div>
+            </section>
+        `;
+    });
+
+    html += `</div>`;
     contenido.innerHTML = html;
 }
