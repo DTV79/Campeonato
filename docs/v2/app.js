@@ -1034,9 +1034,10 @@ function obtenerEstadoCruces(cruces) {
         }
     }
 
-    const final = cruces.find(c =>
-        String(c.fase).toLowerCase().includes("final")
-    );
+    const final = cruces.find(c => {
+    const fase = String(c.fase).toLowerCase().trim();
+    return fase === "final" || fase === "gran final";
+    });
 
     return {
         titulo: "🏆 Campeonato finalizado",
