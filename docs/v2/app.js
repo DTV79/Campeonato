@@ -180,11 +180,12 @@ document.addEventListener("click", function(e) {
         const pantalla = nav.dataset.pantalla;
         activarNav(pantalla);
 
-        if (pantalla === "inicio") mostrarInicio();
-        if (pantalla === "clasificacion") abrirDetalle("clasificacion");
-        if (pantalla === "partidos") abrirDetalle("partidos");
-        if (pantalla === "cruces") abrirDetalle("cruces");
-        if (pantalla === "mas") abrirDetalle("mas");
+       if (pantalla === "inicio") mostrarInicio();
+    if (pantalla === "clasificacion") abrirDetalle("clasificacion");
+    if (pantalla === "partidos") abrirDetalle("partidos");
+    if (pantalla === "cruces") abrirDetalle("cruces");
+    if (pantalla === "palas") abrirDetalle("palas");
+    if (pantalla === "mas") abrirDetalle("mas");
 
         return;
     }
