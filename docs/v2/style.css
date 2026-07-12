@@ -893,3 +893,280 @@ body{
     padding-bottom:env(safe-area-inset-bottom);
     z-index:99999;
 }
+
+
+/* =========================================================
+   NUEVAS PANTALLAS: COMPETICIÓN, GRUPOS Y EQUIPOS
+   Añadir al final de style.css
+========================================================= */
+
+.bottomNav .navBtn{
+    flex:1 1 20%;
+    min-width:0;
+    padding:8px 2px;
+}
+
+.selectorFases{
+    display:flex;
+    gap:9px;
+    overflow-x:auto;
+    padding:4px 2px 10px;
+    margin-bottom:16px;
+    scrollbar-width:none;
+}
+
+.selectorFases::-webkit-scrollbar{
+    display:none;
+}
+
+.selectorBtn{
+    flex:0 0 auto;
+    border:1px solid #e5e7eb;
+    background:white;
+    color:#475569;
+    border-radius:999px;
+    padding:10px 14px;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 3px 10px rgba(15,23,42,.06);
+}
+
+.selectorBtn.selectorActivo{
+    border-color:#2563eb;
+    background:#2563eb;
+    color:white;
+}
+
+.selectorGrupos{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding:2px 0 10px;
+    margin-bottom:10px;
+    scrollbar-width:none;
+}
+
+.selectorGrupos::-webkit-scrollbar{
+    display:none;
+}
+
+.selectorGrupoBtn{
+    flex:0 0 auto;
+    border:none;
+    background:#eef2ff;
+    color:#1e3a8a;
+    border-radius:999px;
+    padding:9px 13px;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.selectorGrupoBtn.selectorGrupoActivo{
+    background:#1e3a8a;
+    color:white;
+}
+
+.cabeceraSeccion{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    background:#eef2ff;
+    color:#1e3a8a;
+    border-radius:18px;
+    padding:15px;
+    margin-bottom:14px;
+}
+
+.cabeceraSeccion > span{
+    font-size:28px;
+}
+
+.cabeceraSeccion h3{
+    font-size:17px;
+    font-weight:900;
+}
+
+.cabeceraSeccion p{
+    margin-top:3px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+}
+
+.separacionSuperior{
+    margin-top:18px;
+}
+
+.grupoPartidos{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.grupoPartidos + .grupoPartidos{
+    margin-top:8px;
+    padding-top:14px;
+    border-top:1px solid #e5e7eb;
+}
+
+.grupoPartidos h4{
+    color:#1e3a8a;
+    font-size:14px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+}
+
+.metaPartido{
+    padding:9px 12px;
+    background:white;
+    border-top:1px solid #e5e7eb;
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+
+/* EQUIPOS */
+
+.listaEquipos{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.cardEquipo{
+    background:white;
+    border-radius:20px;
+    padding:17px;
+    box-shadow:0 6px 18px rgba(15,23,42,.08);
+    cursor:pointer;
+}
+
+.cabeceraEquipo{
+    display:grid;
+    grid-template-columns:44px 1fr 24px;
+    align-items:center;
+    gap:12px;
+}
+
+.iconoEquipo{
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:#eef2ff;
+    font-size:22px;
+}
+
+.nombreEquipoFicha{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+}
+
+.nombreEquipoFicha strong{
+    color:#0f172a;
+    font-size:15px;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+}
+
+.nombreEquipoFicha span{
+    margin-top:4px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+
+.flechaEquipo{
+    color:#2563eb;
+    font-size:18px;
+    font-weight:900;
+    text-align:right;
+}
+
+.resumenEquipo{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:14px;
+}
+
+.resumenEquipo span{
+    background:#f8fafc;
+    color:#475569;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:900;
+}
+
+.detalleEquipo{
+    margin-top:14px;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+    animation:abrirDetalle .22s ease-out;
+}
+
+/* MÁS */
+
+.listaOpcionesMas{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.opcionMas{
+    width:100%;
+    border:none;
+    text-decoration:none;
+    background:white;
+    color:#1d2939;
+    border-radius:18px;
+    padding:16px;
+    display:grid;
+    grid-template-columns:32px 1fr 24px;
+    align-items:center;
+    gap:10px;
+    box-shadow:0 5px 16px rgba(15,23,42,.08);
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+}
+
+.opcionMas span{
+    font-size:22px;
+}
+
+.opcionMas strong{
+    font-size:15px;
+    font-weight:900;
+}
+
+.opcionMas b{
+    color:#2563eb;
+    font-size:20px;
+    text-align:right;
+}
+
+@media(max-width:600px){
+    .navBtn small{
+        font-size:10px;
+    }
+
+    .selectorBtn{
+        padding:9px 12px;
+        font-size:12px;
+    }
+
+    .selectorGrupoBtn{
+        padding:8px 11px;
+    }
+}
