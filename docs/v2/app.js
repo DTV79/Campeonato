@@ -100,12 +100,6 @@ function gestionarClickGlobal(evento) {
         return;
     }
 
-    const cardEquipo = evento.target.closest(".cardEquipo");
-    if (cardEquipo) {
-        alternarDetalleEquipo(cardEquipo);
-        return;
-    }
-
     const opcionMas = evento.target.closest("[data-destino-pantalla]");
     if (opcionMas) {
         const pantalla = opcionMas.dataset.destinoPantalla;
@@ -120,6 +114,8 @@ function gestionarClickGlobal(evento) {
 
         if (seccion === "especial") {
             abrirEspecialDesdePortada();
+        } else if (seccion === "competicion") {
+            abrirPantalla("competicion", obtenerFaseClasificacionPrincipal());
         } else {
             abrirPantalla(seccion);
         }
@@ -128,7 +124,11 @@ function gestionarClickGlobal(evento) {
 
     const nav = evento.target.closest(".navBtn");
     if (nav) {
-        abrirPantalla(nav.dataset.pantalla);
+        const pantalla = nav.dataset.pantalla;
+        abrirPantalla(
+            pantalla,
+            pantalla === "competicion" ? obtenerFaseClasificacionPrincipal() : ""
+        );
     }
 }
 
@@ -260,11 +260,152 @@ function alternarDetalleEquipo(card) {
     }
 }
 
+
+function pintarIdentidadCampeonato() {
+    const config = obtenerConfiguracion();
+    const nombreCompleto = String(
+        config.nombre_campeonato || "II Campeonato Sprint Pádel"
+    ).trim();
+    const anio = String(config.anio_campeonato || "").trim();
+
+    document.title = nombreCompleto;
+
+    let nombreSinAnio = nombreCompleto;
+    if (anio) {
+        nombreSinAnio = nombreSinAnio
+            .replace(new RegExp(`\\s*[-–—·]?\\s*${anio}\\s*$`), "")
+            .trim();
+    }
+
+    const partes = nombreSinAnio.match(
+        /^((?:[IVXLCDM]+|\d+)[ºª]?\s+CAMPEONATO)\s+(.+)$/i
+    );
+
+    const superior = partes ? partes[1].toUpperCase() : "CAMPEONATO";
+    const principal = partes ? partes[2] : nombreSinAnio;
+
+    setTextClase("tituloSuperior", superior);
+    setTextClase("tituloPrincipal", principal);
+    setTextClase("subtitulo", anio || "");
+
+    const textoNav = document.querySelector(
+        '.navBtn[data-pantalla="competicion"] small'
+    );
+    if (textoNav) textoNav.textContent = "Clasificación";
+}
+
+function setTextClase(clase, texto) {
+    const elemento = document.querySelector(`.${clase}`);
+    if (elemento) elemento.textContent = texto;
+}
+
+function obtenerFaseClasificacionPrincipal() {
+    if (!esModoGrupos()) return "liguilla";
+    return hayRegruposGenerados() ? "regrupos" : "grupos";
+}
+
+function hayRegruposGenerados() {
+    return obtenerClasificacionFase("regrupos").length > 0 ||
+        obtenerPartidosFase("regrupos").length > 0 ||
+        obtenerEquiposAsignadosFase("regrupos").length > 0;
+}
+
+function debeMostrarCrucesPendientes() {
+    if ((datos?.cruces || []).length) return true;
+
+    if (esModoGrupos()) {
+        const config = obtenerConfiguracion();
+        return config.hay_regrupos
+            ? hayRegruposGenerados()
+            : obtenerNombresGrupos("grupos").length > 0;
+    }
+
+    const partidos = quitarDescansos(obtenerPartidosFase("liguilla"));
+    return partidos.length > 0 && partidos.every(partidoFinalizado);
+}
+
+function hayPartidosJugadosEnFase(fase) {
+    return quitarDescansos(obtenerPartidosFase(fase)).some(partidoFinalizado);
+}
+
+function hayPartidosJugadosEnGrupo(fase, grupo) {
+    return quitarDescansos(obtenerPartidosFase(fase)).some(partido =>
+        partido.grupo === grupo && partidoFinalizado(partido)
+    );
+}
+
+function obtenerEquiposAsignadosFase(fase) {
+    if (fase === "grupos") {
+        return datos?.equipos || [];
+    }
+
+    if (fase === "regrupos") {
+        const regrupos = datos?.regrupos || {};
+        const candidatos = [
+            regrupos.equipos,
+            regrupos.asignaciones,
+            regrupos.integrantes
+        ];
+
+        const lista = candidatos.find(Array.isArray);
+        return lista || [];
+    }
+
+    return [];
+}
+
+function obtenerFilasGrupoParaMostrar(fase, grupo) {
+    const clasificacion = obtenerClasificacionFase(fase).filter(
+        fila => fila.grupo === grupo
+    );
+
+    if (clasificacion.length) return clasificacion;
+
+    return obtenerEquiposAsignadosFase(fase)
+        .filter(equipo => equipo.grupo === grupo)
+        .map(normalizarEquipoComoClasificacion);
+}
+
+function normalizarEquipoComoClasificacion(equipo, indice = 0) {
+    return {
+        ...equipo,
+        fase: equipo.fase || "",
+        grupo: equipo.grupo || "",
+        posicion: 0,
+        posicion_actual: 0,
+        posicion_anterior: 0,
+        puntos: 0,
+        puntos_totales: 0,
+        pj: 0,
+        pg: 0,
+        pp: 0,
+        sets_favor: 0,
+        sets_contra: 0,
+        sets_diff: 0,
+        juegos_favor: 0,
+        juegos_contra: 0,
+        juegos_diff: 0,
+        orden: numero(equipo.orden) || indice + 1
+    };
+}
+
+function pintarFilaEquipoGrupoSinClasificacion(fila) {
+    return `
+        <article class="filaClasificacion">
+            <div class="lineaEquipo">
+                <div class="equipoFila">👥 ${escaparHTML(fila.equipo)}</div>
+            </div>
+            <div class="datosFila">${escaparHTML(nombreGrupoVisible(fila.grupo))}</div>
+        </article>
+    `;
+}
+
 /* =========================================================
    PORTADA
 ========================================================= */
 
 function pintarInicio() {
+    pintarIdentidadCampeonato();
     pintarFecha(datos.ultima_actualizacion);
     pintarEstadoCabecera();
     pintarTarjetasDashboard();
@@ -308,52 +449,51 @@ function pintarTarjetasDashboard() {
     const config = obtenerConfiguracion();
     const equipos = datos.equipos || [];
     const faseActual = obtenerFaseActualCompeticion();
+    const faseClasificacion = obtenerFaseClasificacionPrincipal();
     const partidosActuales = obtenerPartidosFase(faseActual);
     const partidosSinDescanso = quitarDescansos(partidosActuales);
-    const jornada = obtenerJornadaActual(partidosSinDescanso);
-    const partidosJornada = partidosSinDescanso.filter(
-        partido => Number(partido.jornada) === Number(jornada)
-    );
-    const jugados = partidosJornada.filter(partidoFinalizado).length;
-    const pendientes = partidosJornada.filter(partidoPendiente).length;
+
+    setText("tituloTarjetaCompeticion", "Clasificación");
 
     if (esModoGrupos()) {
-        const faseClasif = obtenerClasificacionFase("regrupos").length ||
-            obtenerPartidosFase("regrupos").length
-            ? "regrupos"
-            : "grupos";
-        const grupos = obtenerNombresGrupos(faseClasif);
-
-        setText(
-            "tituloTarjetaCompeticion",
-            faseClasif === "regrupos" ? "ReGrupos" : "Grupos"
-        );
+        const grupos = obtenerNombresGrupos(faseClasificacion);
         setHTML(
             "resumenCompeticion",
-            `${grupos.length} ${grupos.length === 1 ? "grupo" : "grupos"}<br>` +
-            `${equipos.length} equipos participantes`
+            `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
+            `${grupos.length} ${grupos.length === 1 ? "grupo" : "grupos"} · ` +
+            `${equipos.length} equipos`
         );
     } else {
         const lider = datos.clasificacion?.[0]?.equipo || "Sin datos";
-        setText("tituloTarjetaCompeticion", "Clasificación");
         setHTML(
             "resumenCompeticion",
             `🥇 ${escaparHTML(lider)}<br>${equipos.length} equipos participantes`
         );
     }
 
-    if (["liguilla", "grupos", "regrupos"].includes(faseActual)) {
+    if (!partidosSinDescanso.length) {
+        setHTML(
+            "resumenPartidos",
+            `${escaparHTML(nombreFase(faseActual))}<br>Jornadas pendientes de generar`
+        );
+    } else if (["liguilla", "grupos", "regrupos"].includes(faseActual)) {
+        const jornada = obtenerJornadaActual(partidosSinDescanso);
+        const partidosJornada = partidosSinDescanso.filter(
+            partido => Number(partido.jornada) === Number(jornada)
+        );
+        const jugados = partidosJornada.filter(partidoFinalizado).length;
+        const pendientes = partidosJornada.filter(partidoPendiente).length;
+
         setHTML(
             "resumenPartidos",
             `Jornada ${jornada}<br>${jugados} jugados · ${pendientes} pendientes`
         );
     } else {
-        const partidos = obtenerPartidosFase(faseActual);
-        const totalJugados = partidos.filter(partidoFinalizado).length;
+        const totalJugados = partidosSinDescanso.filter(partidoFinalizado).length;
         setHTML(
             "resumenPartidos",
-            `${nombreFase(faseActual)}<br>${totalJugados} jugados · ` +
-            `${partidos.length - totalJugados} pendientes`
+            `${escaparHTML(nombreFase(faseActual))}<br>${totalJugados} jugados · ` +
+            `${partidosSinDescanso.length - totalJugados} pendientes`
         );
     }
 
@@ -365,7 +505,7 @@ function pintarTarjetasDashboard() {
         "resumenEquipos",
         esModoGrupos()
             ? `${equipos.length} equipos<br>${gruposIniciales} grupos iniciales`
-            : `${equipos.length} equipos<br>Ver participantes y trayectoria`
+            : `${equipos.length} equipos<br>Ver participantes`
     );
 
     pintarTarjetaEspecial(config);
@@ -394,17 +534,24 @@ function pintarTarjetaEspecial(config) {
         return;
     }
 
-    if (esModoGrupos() && config.hay_regrupos) {
-        const regruposGenerados = obtenerPartidosFase("regrupos").length > 0 ||
-            obtenerClasificacionFase("regrupos").length > 0;
-
+    if (esModoGrupos() && config.hay_regrupos && !hayRegruposGenerados()) {
         tarjeta.classList.add("cardClasificacion");
         tarjeta.dataset.destinoPantalla = "competicion";
-        tarjeta.dataset.destinoFase = regruposGenerados ? "regrupos" : "grupos";
+        tarjeta.dataset.destinoFase = "regrupos";
         icono.textContent = "🔁";
         titulo.textContent = "ReGrupos";
-        resumen.innerHTML = regruposGenerados
-            ? "Segunda fase disponible"
+        resumen.innerHTML = "Pendientes de generar";
+        return;
+    }
+
+    if (debeMostrarCrucesPendientes()) {
+        tarjeta.classList.add("cardCruces");
+        tarjeta.dataset.destinoPantalla = "competicion";
+        tarjeta.dataset.destinoFase = "cruces";
+        icono.textContent = "⚔️";
+        titulo.textContent = "Eliminatorias";
+        resumen.innerHTML = config.ronda_inicial_eliminatorias
+            ? `${escaparHTML(config.ronda_inicial_eliminatorias)} pendientes de generar`
             : "Pendientes de generar";
         return;
     }
@@ -421,7 +568,7 @@ function pintarTarjetaEspecial(config) {
 
     tarjeta.classList.add("cardCruces");
     tarjeta.dataset.destinoPantalla = "competicion";
-    tarjeta.dataset.destinoFase = esModoGrupos() ? "grupos" : "liguilla";
+    tarjeta.dataset.destinoFase = "cruces";
     icono.textContent = "⚔️";
     titulo.textContent = "Siguiente fase";
     resumen.innerHTML = config.ronda_inicial_eliminatorias
@@ -444,8 +591,41 @@ function pintarResumenPortada() {
 
     if (esModoGrupos()) {
         const faseGrupos = fase === "regrupos" ? "regrupos" : "grupos";
-        const clasificacion = obtenerClasificacionFase(faseGrupos);
-        const agrupada = agruparPor(clasificacion, item => item.grupo);
+        const nombresGrupos = obtenerNombresGrupos(faseGrupos);
+        const faseIniciada = hayPartidosJugadosEnFase(faseGrupos);
+
+        if (!faseIniciada) {
+            setText(
+                "tituloPodio",
+                faseGrupos === "regrupos"
+                    ? "🔁 Equipos de los ReGrupos"
+                    : "👥 Equipos de cada grupo"
+            );
+
+            const htmlEquipos = nombresGrupos.map(grupo => {
+                const filas = obtenerFilasGrupoParaMostrar(faseGrupos, grupo);
+                const nombres = filas.map(fila => escaparHTML(fila.equipo));
+
+                return `
+                    <div class="equipoPodio">
+                        <span>
+                            <strong>${escaparHTML(nombreGrupoVisible(grupo))}</strong><br>
+                            ${nombres.length ? nombres.join("<br>") : "Equipos pendientes"}
+                        </span>
+                    </div>
+                `;
+            }).join("");
+
+            setHTML(
+                "podio",
+                htmlEquipos || pintarVacioInline(
+                    faseGrupos === "regrupos"
+                        ? "ReGrupos pendientes de generar"
+                        : "Equipos pendientes de asignar"
+                )
+            );
+            return;
+        }
 
         setText(
             "tituloPodio",
@@ -454,20 +634,21 @@ function pintarResumenPortada() {
                 : "📊 Líderes de cada grupo"
         );
 
-        const html = [...agrupada.entries()]
-            .sort((a, b) => ordenarNombreGrupo(a[0], b[0]))
-            .map(([grupo, filas]) => {
-                const lider = ordenarClasificacionGrupo(filas)[0];
-                return `
-                    <div class="equipoPodio oro">
-                        <span>
-                            🏆 ${escaparHTML(nombreGrupoVisible(grupo))}:<br>
-                            <strong>${escaparHTML(lider?.equipo || "Sin datos")}</strong>
-                        </span>
-                    </div>
-                `;
-            })
-            .join("");
+        const html = nombresGrupos.map(grupo => {
+            const filas = ordenarClasificacionGrupo(
+                obtenerFilasGrupoParaMostrar(faseGrupos, grupo)
+            );
+            const lider = filas[0];
+
+            return `
+                <div class="equipoPodio oro">
+                    <span>
+                        🏆 ${escaparHTML(nombreGrupoVisible(grupo))}:<br>
+                        <strong>${escaparHTML(lider?.equipo || "Sin datos")}</strong>
+                    </span>
+                </div>
+            `;
+        }).join("");
 
         setHTML("podio", html || pintarVacioInline("Clasificaciones pendientes"));
         return;
@@ -542,11 +723,11 @@ function pintarPantallaCompeticion() {
     const fases = obtenerFasesCompeticionDisponibles();
 
     if (!fases.some(fase => fase.clave === estadoUI.faseCompeticion)) {
-        estadoUI.faseCompeticion = obtenerFaseActualCompeticion();
+        estadoUI.faseCompeticion = obtenerFaseClasificacionPrincipal();
     }
 
     let html = `
-        <h2>🏆 Competición</h2>
+        <h2>📊 Clasificación</h2>
         ${pintarSelectorFases(fases, estadoUI.faseCompeticion, "competicion")}
     `;
 
@@ -638,11 +819,33 @@ function pintarFilaClasificacionLiguilla(equipo, mostrarCoef) {
 
 function pintarClasificacionesPorGrupos(fase) {
     const nombresGrupos = obtenerNombresGrupos(fase);
-    const seleccionado = estadoUI.grupoCompeticion[fase] || nombresGrupos[0] || "";
+
+    if (!nombresGrupos.length) {
+        const titulo = fase === "regrupos" ? "Segunda fase · ReGrupos" : "Primera fase · Grupos";
+        const texto = fase === "regrupos"
+            ? "Los ReGrupos todavía no han sido generados."
+            : "Los equipos todavía no han sido asignados a sus grupos.";
+
+        return `
+            <div class="cabeceraSeccion">
+                <span>${fase === "regrupos" ? "🔁" : "📊"}</span>
+                <div>
+                    <h3>${titulo}</h3>
+                    <p>Pendiente</p>
+                </div>
+            </div>
+            ${pintarTarjetaVacia("⏳ Pendiente de generar", texto)}
+        `;
+    }
+
+    const seleccionado = nombresGrupos.includes(estadoUI.grupoCompeticion[fase])
+        ? estadoUI.grupoCompeticion[fase]
+        : nombresGrupos[0];
+
     estadoUI.grupoCompeticion[fase] = seleccionado;
 
-    const clasificacion = obtenerClasificacionFase(fase)
-        .filter(fila => fila.grupo === seleccionado);
+    const filas = obtenerFilasGrupoParaMostrar(fase, seleccionado);
+    const grupoIniciado = hayPartidosJugadosEnGrupo(fase, seleccionado);
 
     const titulo = fase === "regrupos"
         ? "Segunda fase · ReGrupos"
@@ -653,20 +856,31 @@ function pintarClasificacionesPorGrupos(fase) {
             <span>${fase === "regrupos" ? "🔁" : "📊"}</span>
             <div>
                 <h3>${titulo}</h3>
-                <p>${clasificacion.length} equipos en ${escaparHTML(nombreGrupoVisible(seleccionado))}</p>
+                <p>${filas.length} equipos en ${escaparHTML(nombreGrupoVisible(seleccionado))}</p>
             </div>
         </div>
 
         ${pintarSelectorGrupos(nombresGrupos, seleccionado, "competicion", fase, false)}
 
-        <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
-            📋 Ver tabla completa de ${escaparHTML(nombreGrupoVisible(seleccionado))}
-        </button>
+        ${grupoIniciado ? `
+            <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
+                📋 Ver tabla completa de ${escaparHTML(nombreGrupoVisible(seleccionado))}
+            </button>
+        ` : `
+            <section class="resumenPartidos separacionSuperior">
+                <div class="estadoResumen">👥 Equipos asignados</div>
+                <p>La clasificación aparecerá cuando se juegue el primer partido del grupo.</p>
+            </section>
+        `}
 
         <div class="listaClasificacion separacionSuperior">
-            ${ordenarClasificacionGrupo(clasificacion)
-                .map(fila => pintarFilaClasificacionGrupo(fila, fase, clasificacion.length))
-                .join("") || pintarTarjetaVacia("Clasificación pendiente", "Todavía no hay datos para este grupo.")}
+            ${filas.length
+                ? (grupoIniciado
+                    ? ordenarClasificacionGrupo(filas)
+                        .map(fila => pintarFilaClasificacionGrupo(fila, fase, filas.length))
+                        .join("")
+                    : filas.map(pintarFilaEquipoGrupoSinClasificacion).join(""))
+                : pintarTarjetaVacia("Equipos pendientes", "Todavía no hay equipos asignados a este grupo.")}
         </div>
     `;
 }
@@ -1103,11 +1317,7 @@ function pintarPantallaEquipos() {
 
         <section class="resumenPartidos">
             <div class="estadoResumen">${equipos.length} equipos participantes</div>
-            <p>
-                ${esModoGrupos()
-                    ? `${grupos.length} grupos iniciales · Pulsa un equipo para ver su trayectoria.`
-                    : "Pulsa un equipo para ver sus estadísticas y próximos partidos."}
-            </p>
+            <p>${esModoGrupos() ? "Filtra por grupo para localizar un equipo." : "Listado de equipos participantes."}</p>
         </section>
 
         ${esModoGrupos()
@@ -1124,6 +1334,14 @@ function pintarPantallaEquipos() {
 function pintarCardEquipo(equipo) {
     const ficha = obtenerFichaEquipo(equipo);
     const jugadores = dividirEquipo(equipo.equipo);
+    const etiquetas = [];
+
+    if (ficha.grupoInicial) etiquetas.push(ficha.grupoInicial);
+    if (ficha.regrupo) etiquetas.push(ficha.regrupo);
+    if (ficha.clasificacion?.pj > 0) {
+        etiquetas.push(`${ficha.clasificacion.pj} PJ`);
+        etiquetas.push(`${ficha.clasificacion.puntos_totales} pts`);
+    }
 
     return `
         <article class="cardEquipo">
@@ -1131,96 +1349,61 @@ function pintarCardEquipo(equipo) {
                 <div class="iconoEquipo">👥</div>
                 <div class="nombreEquipoFicha">
                     ${jugadores.map(jugador => `<strong>${escaparHTML(jugador)}</strong>`).join("")}
-                    <span>${escaparHTML(ficha.etiquetaFase)}</span>
                 </div>
-                <span class="flechaEquipo">▶</span>
+                <span></span>
             </div>
 
-            <div class="resumenEquipo">
-                ${ficha.clasificacion
-                    ? `<span>${ficha.clasificacion.posicion_actual}º</span>
-                       <span>${ficha.clasificacion.puntos_totales} pts</span>
-                       <span>${ficha.clasificacion.pj} PJ</span>`
-                    : `<span>Sin partidos</span>`}
-            </div>
-
-            <div class="detalleEquipo oculto">
-                <div class="grupoStats">
-                    <h5>Trayectoria</h5>
-                    <div><span>Grupo inicial</span><strong>${escaparHTML(ficha.grupoInicial || "—")}</strong></div>
-                    <div><span>Segunda fase</span><strong>${escaparHTML(ficha.regrupo || "—")}</strong></div>
-                    <div><span>Fase actual</span><strong>${escaparHTML(nombreFase(ficha.faseActual))}</strong></div>
+            ${etiquetas.length ? `
+                <div class="resumenEquipo">
+                    ${etiquetas.map(etiqueta => `<span>${escaparHTML(etiqueta)}</span>`).join("")}
                 </div>
+            ` : ""}
 
-                ${ficha.clasificacion ? `
-                    <div class="grupoStats">
-                        <h5>Rendimiento actual</h5>
-                        <div><span>Posición</span><strong>${ficha.clasificacion.posicion_actual}º</strong></div>
-                        <div><span>Ganados</span><strong>${ficha.clasificacion.pg}</strong></div>
-                        <div><span>Perdidos</span><strong>${ficha.clasificacion.pp}</strong></div>
-                    </div>
-                ` : ""}
-
-                <div class="grupoStats">
-                    <h5>Próximo partido</h5>
-                    <div>
-                        <span>Rival</span>
-                        <strong>${escaparHTML(ficha.proximo?.rival || "Sin partido pendiente")}</strong>
-                    </div>
-                    ${ficha.proximo?.detalle ? `
-                        <div><span>Detalle</span><strong>${escaparHTML(ficha.proximo.detalle)}</strong></div>
-                    ` : ""}
-                </div>
+            <div class="datosFila">
+                🎾 Próximo partido: <strong>${escaparHTML(ficha.proximo?.rival || "Sin partido pendiente")}</strong>
+                ${ficha.proximo?.detalle ? `<br>${escaparHTML(ficha.proximo.detalle)}` : ""}
             </div>
         </article>
     `;
 }
 
 function obtenerFichaEquipo(equipo) {
-    const faseActual = obtenerFaseActualCompeticion();
+    const faseClasificacion = obtenerFaseClasificacionPrincipal();
     const grupoInicial = equipo.grupo ? nombreGrupoVisible(equipo.grupo) : "";
 
     const filaRegrupo = obtenerClasificacionFase("regrupos").find(
         fila => mismoEquipoPorIDsONombre(fila, equipo)
+    ) || obtenerEquiposAsignadosFase("regrupos").find(
+        fila => mismoEquipoPorIDsONombre(fila, equipo)
     );
-    const regroup = filaRegrupo?.grupo || "";
 
-    let clasificacion = null;
+    const regrupo = filaRegrupo?.grupo || "";
 
-    if (faseActual === "regrupos") {
-        clasificacion = filaRegrupo ? normalizarClasificacion(filaRegrupo) : null;
-    } else if (faseActual === "grupos") {
-        const fila = obtenerClasificacionFase("grupos").find(
-            item => mismoEquipoPorIDsONombre(item, equipo)
+    let filaClasificacion = null;
+
+    if (faseClasificacion === "regrupos") {
+        filaClasificacion = obtenerClasificacionFase("regrupos").find(
+            fila => mismoEquipoPorIDsONombre(fila, equipo)
         );
-        clasificacion = fila ? normalizarClasificacion(fila) : null;
-    } else if (faseActual === "liguilla") {
-        const fila = (datos.clasificacion || []).find(
-            item => normalizar(item.equipo) === normalizar(equipo.equipo)
+    } else if (faseClasificacion === "grupos") {
+        filaClasificacion = obtenerClasificacionFase("grupos").find(
+            fila => mismoEquipoPorIDsONombre(fila, equipo)
         );
-        clasificacion = fila ? normalizarClasificacion(fila) : null;
     } else {
-        const fila = filaRegrupo || obtenerClasificacionFase("grupos").find(
-            item => mismoEquipoPorIDsONombre(item, equipo)
-        ) || (datos.clasificacion || []).find(
-            item => normalizar(item.equipo) === normalizar(equipo.equipo)
+        filaClasificacion = (datos.clasificacion || []).find(
+            fila => normalizar(fila.equipo) === normalizar(equipo.equipo)
         );
-        clasificacion = fila ? normalizarClasificacion(fila) : null;
     }
 
-    const proximo = obtenerProximoPartidoEquipo(equipo.equipo, faseActual);
-
-    let etiquetaFase = "Participante";
-    if (regroup) etiquetaFase = `${grupoInicial} · ${nombreGrupoVisible(regroup)}`;
-    else if (grupoInicial) etiquetaFase = grupoInicial;
+    const clasificacion = filaClasificacion
+        ? normalizarClasificacion(filaClasificacion)
+        : null;
 
     return {
         grupoInicial,
-        regrupo: regroup ? nombreGrupoVisible(regroup) : "",
-        faseActual,
+        regrupo: regrupo ? nombreGrupoVisible(regrupo) : "",
         clasificacion,
-        proximo,
-        etiquetaFase
+        proximo: obtenerProximoPartidoEquipo(equipo.equipo, obtenerFaseActualCompeticion())
     };
 }
 
@@ -1231,21 +1414,31 @@ function obtenerProximoPartidoEquipo(nombreEquipo, fasePreferida) {
     for (const fase of ordenFases) {
         const partido = obtenerPartidosFase(fase).find(item =>
             partidoPendiente(item) &&
-            [item.local, item.visitante].some(nombre => normalizar(nombre) === normalizar(nombreEquipo))
+            [item.local, item.visitante].some(
+                nombre => normalizar(nombre) === normalizar(nombreEquipo)
+            )
         );
 
         if (partido) {
             const rival = normalizar(partido.local) === normalizar(nombreEquipo)
                 ? partido.visitante
                 : partido.local;
-            const detalle = [
-                partido.fase || nombreFase(fase),
-                partido.grupo ? nombreGrupoVisible(partido.grupo) : "",
-                partido.jornada ? `Jornada ${partido.jornada}` : "",
-                partido.pista ? `Pista ${partido.pista}` : ""
-            ].filter(Boolean).join(" · ");
 
-            return { rival, detalle };
+            const partes = [];
+
+            if (partido.grupo) {
+                partes.push(nombreGrupoVisible(partido.grupo));
+            } else if (fase === "cruces") {
+                partes.push(partido.fase || "Eliminatorias");
+            }
+
+            if (partido.jornada) partes.push(`Jornada ${partido.jornada}`);
+            if (partido.pista) partes.push(`Pista ${partido.pista}`);
+
+            return {
+                rival,
+                detalle: partes.join(" · ")
+            };
         }
     }
 
@@ -1584,18 +1777,19 @@ function esModoGrupos() {
 
 function obtenerFasesCompeticionDisponibles() {
     const fases = [];
+    const config = obtenerConfiguracion();
 
     if (esModoGrupos()) {
         fases.push({ clave: "grupos", nombre: "Grupos", icono: "📊" });
 
-        if (obtenerClasificacionFase("regrupos").length || obtenerPartidosFase("regrupos").length) {
+        if (config.hay_regrupos) {
             fases.push({ clave: "regrupos", nombre: "ReGrupos", icono: "🔁" });
         }
     } else {
         fases.push({ clave: "liguilla", nombre: "Clasificación", icono: "📊" });
     }
 
-    if ((datos.cruces || []).length) {
+    if ((datos.cruces || []).length || debeMostrarCrucesPendientes()) {
         fases.push({ clave: "cruces", nombre: "Eliminatorias", icono: "⚔️" });
     }
 
@@ -1684,9 +1878,13 @@ function obtenerPartidosFase(fase) {
 function obtenerNombresGrupos(fase) {
     const desdeClasificacion = obtenerClasificacionFase(fase).map(fila => fila.grupo);
     const desdePartidos = obtenerPartidosFase(fase).map(partido => partido.grupo);
+    const desdeAsignaciones = obtenerEquiposAsignadosFase(fase).map(equipo => equipo.grupo);
 
-    return [...new Set([...desdeClasificacion, ...desdePartidos].filter(Boolean))]
-        .sort(ordenarNombreGrupo);
+    return [...new Set([
+        ...desdeClasificacion,
+        ...desdePartidos,
+        ...desdeAsignaciones
+    ].filter(Boolean))].sort(ordenarNombreGrupo);
 }
 
 function nombreFase(fase) {
@@ -1758,6 +1956,10 @@ function obtenerEtiquetaLiguilla(equipo) {
 }
 
 function obtenerEtiquetaGrupo(equipo, fase, totalEquipos) {
+    if (!hayPartidosJugadosEnGrupo(fase, equipo.grupo)) {
+        return "👥 Equipo asignado";
+    }
+
     const config = obtenerConfiguracion();
     const posicion = numero(equipo.posicion_actual);
 
