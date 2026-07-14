@@ -283,35 +283,76 @@ function alternarDetalleEquipo(card) {
 
 function pintarIdentidadCampeonato() {
     const config = obtenerConfiguracion();
+
     const nombreCompleto = String(
-        config.nombre_campeonato || "II Campeonato Sprint Pádel"
+        config.nombre_campeonato ||
+        "II CAMPEONATO - Sprint Pádel Tui"
     ).trim();
-    const anio = String(config.anio_campeonato || "").trim();
 
-    document.title = nombreCompleto;
+    /*
+       El nombre se divide mediante guiones:
 
-    let nombreSinAnio = nombreCompleto;
-    if (anio) {
-        nombreSinAnio = nombreSinAnio
-            .replace(new RegExp(`\\s*[-–—·]?\\s*${anio}\\s*$`), "")
-            .trim();
-    }
+       Parte 1: título superior pequeño
+       Parte 2: título principal grande
+       Parte 3: subtítulo pequeño
+    */
 
-    const partes = nombreSinAnio.match(
-        /^((?:[IVXLCDM]+|\d+)[ºª]?\s+CAMPEONATO)\s+(.+)$/i
+    const partes = nombreCompleto
+        .split(/\s*[-–—]\s*/)
+        .map(parte => parte.trim());
+
+    const tieneVariasPartes = partes.length >= 2;
+
+    const superior = tieneVariasPartes
+        ? partes[0]
+        : "CAMPEONATO";
+
+    const principal = tieneVariasPartes
+        ? partes[1]
+        : partes[0];
+
+    /*
+       Si hubiese más de tres partes, se unen a partir
+       de la tercera para no perder ningún texto.
+    */
+
+    const inferior = partes
+        .slice(2)
+        .filter(Boolean)
+        .join(" - ");
+
+    document.title = partes
+        .filter(Boolean)
+        .join(" · ");
+
+    setTextClase(
+        "tituloSuperior",
+        superior
     );
 
-    const superior = partes ? partes[1].toUpperCase() : "CAMPEONATO";
-    const principal = partes ? partes[2] : nombreSinAnio;
+    setTextClase(
+        "tituloPrincipal",
+        principal
+    );
 
-    setTextClase("tituloSuperior", superior);
-    setTextClase("tituloPrincipal", principal);
-    setTextClase("subtitulo", anio || "");
+    const subtitulo = document.querySelector(".subtitulo");
+
+    if (subtitulo) {
+        subtitulo.textContent = inferior;
+
+        subtitulo.classList.toggle(
+            "oculto",
+            !inferior
+        );
+    }
 
     const textoNav = document.querySelector(
         '.navBtn[data-pantalla="competicion"] small'
     );
-    if (textoNav) textoNav.textContent = "Clasificación";
+
+    if (textoNav) {
+        textoNav.textContent = "Clasificación";
+    }
 }
 
 function setTextClase(clase, texto) {
@@ -744,8 +785,6 @@ function pintarResumenPalasPortada() {
 ========================================================= */
 
 function pintarInicioPretorneo() {
-    const config = obtenerConfiguracion();
-    const anio = String(config.anio_campeonato || "").trim();
     const lugar = obtenerLugarCampeonato();
     const fecha = formatearFechaCampeonato();
     const inscripcionesAbiertas = esEstadoInscripciones();
@@ -760,10 +799,7 @@ function pintarInicioPretorneo() {
         .querySelector(".cabecera")
         ?.classList.remove("cabeceraFinalizada");
 
-    setTextClase(
-        "subtitulo",
-        [lugar, anio].filter(Boolean).join(" · ")
-    );
+ 
 
     configurarNavegacionPretorneo();
     configurarTarjetasPretorneo();
