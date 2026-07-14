@@ -1170,3 +1170,174 @@ body{
         padding:8px 11px;
     }
 }
+
+
+/* =========================================================
+   MODO PRETORNEO E INSCRIPCIONES
+========================================================= */
+
+body.modoPretorneo{
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37,99,235,.10),
+            transparent 34%
+        ),
+        #f4f6f9;
+}
+
+/* CABECERA PRETORNEO */
+
+.cabecera.cabeceraPretorneo{
+    background:
+        linear-gradient(
+            135deg,
+            #172554,
+            #1e40af 55%,
+            #2563eb
+        );
+}
+
+.cabeceraPretorneo .estadoCabecera{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.15);
+}
+
+.progreso.barraPretorneo{
+    background:
+        linear-gradient(
+            90deg,
+            #f59e0b,
+            #fbbf24
+        );
+}
+
+/* TARJETAS DE LA PORTADA */
+
+.modoPretorneo .gridDashboard .cardAcceso{
+    min-height:155px;
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(1){
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1e3a8a
+        );
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(2){
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #166534
+        );
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(3){
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #5b21b6
+        );
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(4){
+    background:
+        linear-gradient(
+            135deg,
+            #d97706,
+            #92400e
+        );
+}
+
+/* INFORMACIÓN DEL CAMPEONATO */
+
+.datoPretorneo{
+    cursor:default;
+}
+
+.datoPretorneo strong{
+    display:block;
+}
+
+.datoPretorneo strong small{
+    display:block;
+    margin-top:5px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.datoPretorneo b{
+    display:none;
+}
+
+/* INSCRIPCIONES */
+
+.resumenInscripcionCerrada{
+    background:#fff7ed;
+}
+
+.resumenInscripcionCerrada .estadoResumen{
+    color:#9a3412;
+}
+
+.enlaceInscripcion{
+    display:block;
+    width:100%;
+    text-align:center;
+    text-decoration:none;
+    margin-top:18px;
+    box-shadow:0 6px 16px rgba(37,99,235,.20);
+}
+
+.enlaceInscripcion:active{
+    transform:scale(.98);
+}
+
+/* RESUMEN DE PORTADA */
+
+.modoPretorneo .podioCard{
+    border-top:5px solid #f59e0b;
+}
+
+.modoPretorneo #podio .equipoPodio{
+    line-height:1.45;
+}
+
+.modoPretorneo #podio .equipoPodio strong{
+    color:#0f172a;
+}
+
+/* NAVEGACIÓN PRETORNEO */
+
+.modoPretorneo .bottomNav .navBtn.navActivo,
+.modoPretorneo .bottomNav .navBtn.navActivo small{
+    color:#1d4ed8;
+}
+
+/* AJUSTES MÓVIL */
+
+@media(max-width:600px){
+
+    .modoPretorneo .gridDashboard .cardAcceso{
+        min-height:155px;
+    }
+
+    .modoPretorneo .cardAcceso h4{
+        font-size:15px;
+    }
+
+    .modoPretorneo .cardAcceso p{
+        font-size:12px;
+    }
+
+    .datoPretorneo{
+        grid-template-columns:32px 1fr;
+    }
+}
