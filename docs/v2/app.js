@@ -920,7 +920,7 @@ function configurarTarjetasPretorneo() {
     configurarTarjetaPortada(
         tarjetas[0],
         "📅",
-        "Campeonato 2026",
+        "Campeonato",
         `${escaparHTML(fecha)}<br>${escaparHTML(lugar)}`,
         "pretorneo_info"
     );
