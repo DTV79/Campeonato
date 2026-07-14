@@ -1353,3 +1353,320 @@ body.modoPretorneo{
 .modoPretorneo .opcionMas{
     grid-template-columns:32px 1fr;
 }
+
+
+/* =========================================================
+   HISTORIA, CAMPEONES Y PÁGINAS SECUNDARIAS
+========================================================= */
+
+.paginaSecundaria{
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37,99,235,.10),
+            transparent 32%
+        ),
+        #f4f6f9;
+}
+
+.paginaSecundaria .contenedor{
+    padding-top:20px;
+}
+
+.cabeceraPagina{
+    position:relative;
+    padding-top:70px;
+}
+
+.cabeceraCampeones{
+    background:
+        linear-gradient(
+            135deg,
+            #78350f,
+            #d97706,
+            #f59e0b
+        );
+}
+
+.volverInicio{
+    position:absolute;
+    top:20px;
+    left:20px;
+    display:inline-flex;
+    align-items:center;
+    min-height:36px;
+    padding:8px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.16);
+    color:white;
+    text-decoration:none;
+    font-size:13px;
+    font-weight:800;
+    border:1px solid rgba(255,255,255,.15);
+}
+
+.volverInicio:active{
+    transform:scale(.97);
+}
+
+.contenidoPagina{
+    width:100%;
+}
+
+.articuloHistoria{
+    padding:24px;
+}
+
+.articuloHistoria p{
+    margin-bottom:19px;
+    color:#334155;
+    font-size:15px;
+    line-height:1.75;
+}
+
+.articuloHistoria p:last-child{
+    margin-bottom:0;
+}
+
+.articuloHistoria strong{
+    color:#0f172a;
+}
+
+.fraseHistoria{
+    margin:24px 0;
+    padding:18px;
+    border-left:5px solid #2563eb;
+    border-radius:0 16px 16px 0;
+    background:#eef2ff;
+    color:#1e3a8a;
+    font-size:17px;
+    font-weight:900;
+    line-height:1.55;
+}
+
+.fraseHistoria.fraseDestacada{
+    border-left-color:#f59e0b;
+    background:#fff7ed;
+    color:#92400e;
+}
+
+.listaHistoria{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin:0 0 22px;
+    padding:16px;
+    border-radius:16px;
+    background:#f8fafc;
+    color:#475569;
+    font-size:14px;
+    font-weight:800;
+}
+
+.figuraPagina{
+    margin:26px 0;
+}
+
+.fotoPagina{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:18px;
+    box-shadow:0 8px 22px rgba(15,23,42,.14);
+}
+
+.figuraPagina figcaption{
+    margin-top:10px;
+    color:#64748b;
+    text-align:center;
+    font-size:12px;
+    font-weight:700;
+}
+
+.cierreHistoria{
+    margin-top:26px;
+    padding:18px;
+    border-radius:16px;
+    background:#0f172a;
+    color:white !important;
+    font-weight:700;
+}
+
+/* PALMARÉS */
+
+.presentacionPalmares{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:18px;
+    padding:18px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 5px 18px rgba(15,23,42,.08);
+}
+
+.iconoTrofeo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 58px;
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    background:#fef3c7;
+    font-size:30px;
+}
+
+.presentacionPalmares h2{
+    margin-bottom:4px;
+    color:#0f172a;
+    font-size:20px;
+    font-weight:900;
+}
+
+.presentacionPalmares p{
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.listaCampeones{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.campeonCard{
+    overflow:hidden;
+    border-radius:24px;
+    background:white;
+    box-shadow:0 8px 24px rgba(15,23,42,.12);
+}
+
+.cabeceraCampeon{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    padding:20px;
+    background:
+        linear-gradient(
+            135deg,
+            #78350f,
+            #d97706,
+            #f59e0b
+        );
+    color:white;
+}
+
+.edicionCampeon{
+    display:block;
+    margin-bottom:8px;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    opacity:.85;
+}
+
+.cabeceraCampeon h2{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    font-size:22px;
+    line-height:1.15;
+}
+
+.cabeceraCampeon h2 span{
+    font-size:14px;
+    opacity:.8;
+}
+
+.trofeoCampeon{
+    flex:0 0 auto;
+    font-size:38px;
+}
+
+.figuraCampeon{
+    margin:0;
+}
+
+.fotoCampeon{
+    display:block;
+    width:100%;
+    height:auto;
+}
+
+.figuraCampeon figcaption{
+    padding:10px 14px;
+    background:#fff7ed;
+    color:#92400e;
+    text-align:center;
+    font-size:12px;
+    font-weight:800;
+}
+
+.datosCampeon{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    padding:18px;
+}
+
+.datosCampeon div{
+    padding:13px;
+    border-radius:15px;
+    background:#f8fafc;
+}
+
+.datosCampeon span{
+    display:block;
+    margin-bottom:5px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.datosCampeon strong{
+    display:block;
+    color:#0f172a;
+    font-size:13px;
+    line-height:1.4;
+}
+
+/* ENLACES EN LA NAVEGACIÓN INFERIOR */
+
+.bottomNav a.navBtn{
+    text-decoration:none;
+}
+
+/* AJUSTES PARA MÓVIL */
+
+@media(max-width:600px){
+
+    .cabeceraPagina{
+        padding-top:68px;
+    }
+
+    .articuloHistoria{
+        padding:20px;
+    }
+
+    .articuloHistoria p{
+        font-size:15px;
+        line-height:1.7;
+    }
+
+    .fraseHistoria{
+        font-size:16px;
+    }
+
+    .datosCampeon{
+        grid-template-columns:1fr;
+    }
+
+    .cabeceraCampeon h2{
+        font-size:20px;
+    }
+}
