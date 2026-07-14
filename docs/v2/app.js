@@ -108,6 +108,13 @@ function gestionarClickGlobal(evento) {
         return;
     }
 
+        const enlaceDirecto = evento.target.closest("[data-href]");
+    if (enlaceDirecto) {
+        const href = enlaceDirecto.dataset.href;
+        if (href) window.location.href = href;
+        return;
+    }
+
     const card = evento.target.closest(".cardAcceso");
     if (card) {
         const seccion = card.dataset.seccion;
@@ -142,7 +149,20 @@ function abrirPantalla(pantalla, fase = "") {
 
     ocultarInicio();
     activarNav(pantalla);
-    estadoUI.pantalla = pantalla;
+        estadoUI.pantalla = pantalla;
+
+    if (esWebPrevia()) {
+        if (pantalla === "pretorneo_info") {
+            pintarPantallaInformacionPretorneo();
+        } else if (pantalla === "pretorneo_inscripcion") {
+            pintarPantallaInscripciones();
+        } else if (pantalla === "mas") {
+            pintarPantallaMas();
+        } else {
+            mostrarInicio();
+        }
+        return;
+    }
 
     if (pantalla === "competicion") {
         if (fase) estadoUI.faseCompeticion = fase;
@@ -407,6 +427,13 @@ function pintarFilaEquipoGrupoSinClasificacion(fila) {
 function pintarInicio() {
     pintarIdentidadCampeonato();
     pintarFecha(datos.ultima_actualizacion);
+
+    if (esWebPrevia()) {
+        pintarInicioPretorneo();
+        return;
+    }
+
+    configurarPortadaCompeticion();
     pintarEstadoCabecera();
     pintarTarjetasDashboard();
     pintarResumenPortada();
@@ -710,6 +737,622 @@ function pintarResumenPalasPortada() {
         "podio",
         `<div class="equipoPodio"><span>🥄 El que pierde continúa jugando</span></div>`
     );
+}
+
+/* =========================================================
+   MODO PRETORNEO E INSCRIPCIONES
+========================================================= */
+
+function pintarInicioPretorneo() {
+    const config = obtenerConfiguracion();
+    const anio = String(config.anio_campeonato || "").trim();
+    const lugar = obtenerLugarCampeonato();
+    const fecha = formatearFechaCampeonato();
+    const inscripcionesAbiertas = esEstadoInscripciones();
+
+    document.body.classList.add("modoPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.add("cabeceraPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("cabeceraFinalizada");
+
+    setTextClase(
+        "subtitulo",
+        [lugar, anio].filter(Boolean).join(" · ")
+    );
+
+    configurarNavegacionPretorneo();
+    configurarTarjetasPretorneo();
+
+    setText(
+        "estadoCabecera",
+        inscripcionesAbiertas
+            ? "🟢 Inscripciones abiertas"
+            : "🟡 Próximamente"
+    );
+
+    setText(
+        "textoProgreso",
+        inscripcionesAbiertas
+            ? "Ya puedes solicitar tu plaza para el campeonato"
+            : `Próxima edición: ${fecha}`
+    );
+
+    const barra = document.getElementById("barraProgreso");
+
+    if (barra) {
+        barra.style.width = inscripcionesAbiertas ? "65%" : "30%";
+        barra.className = "progreso barraPretorneo";
+    }
+
+    setText(
+        "tituloPodio",
+        inscripcionesAbiertas
+            ? "✍️ Inscripciones abiertas"
+            : "🎾 Próxima edición"
+    );
+
+    setHTML(
+        "podio",
+        `
+            <div class="equipoPodio oro">
+                <span>
+                    📅 <strong>${escaparHTML(fecha)}</strong>
+                </span>
+            </div>
+
+            <div class="equipoPodio">
+                <span>📍 ${escaparHTML(lugar)}</span>
+            </div>
+
+            <div class="equipoPodio">
+                <span>
+                    ${
+                        inscripcionesAbiertas
+                            ? "🟢 El plazo de inscripción está abierto"
+                            : "⏳ Las inscripciones se abrirán próximamente"
+                    }
+                </span>
+            </div>
+        `
+    );
+}
+
+function configurarPortadaCompeticion() {
+    document.body.classList.remove("modoPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("cabeceraPretorneo");
+
+    configurarNavegacionCompeticion();
+
+    const tarjetas = [
+        ...document.querySelectorAll(
+            ".gridDashboard .cardAcceso"
+        )
+    ];
+
+    configurarTarjetaPortada(
+        tarjetas[0],
+        "📊",
+        "Clasificación",
+        "Cargando...",
+        "competicion"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[1],
+        "🎾",
+        "Partidos",
+        "Cargando...",
+        "partidos"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[2],
+        "👥",
+        "Equipos",
+        "Cargando...",
+        "equipos"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[3],
+        "⚔️",
+        "Siguiente fase",
+        "Pendiente de iniciar",
+        "especial"
+    );
+}
+
+function configurarTarjetasPretorneo() {
+    const tarjetas = [
+        ...document.querySelectorAll(
+            ".gridDashboard .cardAcceso"
+        )
+    ];
+
+    const fecha = formatearFechaCampeonato();
+    const lugar = obtenerLugarCampeonato();
+    const inscripcionesAbiertas = esEstadoInscripciones();
+
+    configurarTarjetaPortada(
+        tarjetas[0],
+        "📅",
+        "Campeonato 2026",
+        `${escaparHTML(fecha)}<br>${escaparHTML(lugar)}`,
+        "pretorneo_info"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[1],
+        "✍️",
+        "Inscripciones",
+        inscripcionesAbiertas
+            ? "Abiertas<br>Solicita tu plaza"
+            : "Próximamente<br>Te avisaremos cuando se abran",
+        "pretorneo_inscripcion"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[2],
+        "📖",
+        "Nuestra historia",
+        "Cómo nació el campeonato y sus mejores momentos",
+        "",
+        "historia.html"
+    );
+
+    configurarTarjetaPortada(
+        tarjetas[3],
+        "🏆",
+        "Campeones",
+        "Ganadores de las ediciones anteriores",
+        "",
+        "campeones.html"
+    );
+}
+
+function configurarTarjetaPortada(
+    tarjeta,
+    icono,
+    titulo,
+    resumen,
+    seccion = "",
+    href = ""
+) {
+    if (!tarjeta) return;
+
+    const iconoElemento =
+        tarjeta.querySelector(".iconoAcceso");
+
+    const tituloElemento =
+        tarjeta.querySelector("h4");
+
+    const resumenElemento =
+        tarjeta.querySelector("p");
+
+    if (iconoElemento) {
+        iconoElemento.textContent = icono;
+    }
+
+    if (tituloElemento) {
+        tituloElemento.textContent = titulo;
+    }
+
+    if (resumenElemento) {
+        resumenElemento.innerHTML = resumen;
+    }
+
+    if (seccion) {
+        tarjeta.dataset.seccion = seccion;
+    } else {
+        delete tarjeta.dataset.seccion;
+    }
+
+    if (href) {
+        tarjeta.dataset.href = href;
+    } else {
+        delete tarjeta.dataset.href;
+    }
+
+    delete tarjeta.dataset.destinoPantalla;
+    delete tarjeta.dataset.destinoFase;
+}
+
+function configurarNavegacionPretorneo() {
+    const botones = [
+        ...document.querySelectorAll(
+            ".bottomNav .navBtn"
+        )
+    ];
+
+    const config = obtenerConfiguracion();
+
+    const mostrarNormativa =
+        config.mostrar_normativa === undefined ||
+        esSi(config.mostrar_normativa);
+
+    configurarBotonNav(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "inicio"
+    );
+
+    configurarBotonNav(
+        botones[1],
+        "✍️",
+        "Inscripción",
+        "pretorneo_inscripcion"
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "📖",
+        "Historia",
+        "",
+        "historia.html"
+    );
+
+    if (mostrarNormativa) {
+        configurarBotonNav(
+            botones[3],
+            "📜",
+            "Normas",
+            "",
+            "normas.html"
+        );
+    } else {
+        configurarBotonNav(
+            botones[3],
+            "🏆",
+            "Campeones",
+            "",
+            "campeones.html"
+        );
+    }
+
+    configurarBotonNav(
+        botones[4],
+        "☰",
+        "Más",
+        "mas"
+    );
+}
+
+function configurarNavegacionCompeticion() {
+    const botones = [
+        ...document.querySelectorAll(
+            ".bottomNav .navBtn"
+        )
+    ];
+
+    configurarBotonNav(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "inicio"
+    );
+
+    configurarBotonNav(
+        botones[1],
+        "📊",
+        "Clasificación",
+        "competicion"
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "🎾",
+        "Partidos",
+        "partidos"
+    );
+
+    configurarBotonNav(
+        botones[3],
+        "👥",
+        "Equipos",
+        "equipos"
+    );
+
+    configurarBotonNav(
+        botones[4],
+        "☰",
+        "Más",
+        "mas"
+    );
+}
+
+function configurarBotonNav(
+    boton,
+    icono,
+    texto,
+    pantalla = "",
+    href = ""
+) {
+    if (!boton) return;
+
+    const iconoElemento =
+        boton.querySelector("span");
+
+    const textoElemento =
+        boton.querySelector("small");
+
+    if (iconoElemento) {
+        iconoElemento.textContent = icono;
+    }
+
+    if (textoElemento) {
+        textoElemento.textContent = texto;
+    }
+
+    if (pantalla) {
+        boton.dataset.pantalla = pantalla;
+    } else {
+        delete boton.dataset.pantalla;
+    }
+
+    if (href) {
+        boton.dataset.href = href;
+    } else {
+        delete boton.dataset.href;
+    }
+}
+
+function pintarPantallaInformacionPretorneo() {
+    const contenido = obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const config = obtenerConfiguracion();
+
+    const tipoCampeonato = String(
+        config.tipo_campeonato ||
+        config.sistema_primera_fase ||
+        "Pendiente de confirmar"
+    );
+
+    const rondaInicial = String(
+        config.ronda_inicial_eliminatorias ||
+        "Pendiente de confirmar"
+    );
+
+    contenido.innerHTML = `
+        <h2>📅 Campeonato 2026</h2>
+
+        <section class="resumenPartidos">
+            <div class="estadoResumen">
+                🎾 Información de la próxima edición
+            </div>
+
+            <p>
+                Todos los datos principales del campeonato,
+                reunidos en un solo lugar.
+            </p>
+        </section>
+
+        <div class="listaOpcionesMas">
+            ${pintarDatoPretorneo(
+                "📅",
+                "Fecha",
+                formatearFechaCampeonato()
+            )}
+
+            ${pintarDatoPretorneo(
+                "📍",
+                "Lugar",
+                obtenerLugarCampeonato()
+            )}
+
+            ${pintarDatoPretorneo(
+                "🏁",
+                "Primera fase",
+                tipoCampeonato
+            )}
+
+            ${pintarDatoPretorneo(
+                "⚔️",
+                "Eliminatorias",
+                rondaInicial
+            )}
+
+            ${pintarDatoPretorneo(
+                "🏖️",
+                "Copa Palas Playa",
+                esSi(config.hay_copa_palas_playa)
+                    ? "Sí"
+                    : "No"
+            )}
+        </div>
+    `;
+}
+
+function pintarDatoPretorneo(
+    icono,
+    titulo,
+    valor
+) {
+    return `
+        <div class="opcionMas datoPretorneo">
+            <span>${icono}</span>
+
+            <strong>
+                ${escaparHTML(titulo)}
+                <small>${escaparHTML(valor)}</small>
+            </strong>
+
+            <b></b>
+        </div>
+    `;
+}
+
+function pintarPantallaInscripciones() {
+    const contenido = obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const abiertas = esEstadoInscripciones();
+    const url = obtenerURLInscripcion();
+
+    contenido.innerHTML = `
+        <h2>✍️ Inscripciones</h2>
+
+        <section class="
+            resumenPartidos
+            ${abiertas ? "" : "resumenInscripcionCerrada"}
+        ">
+            <div class="estadoResumen">
+                ${
+                    abiertas
+                        ? "🟢 Inscripciones abiertas"
+                        : "⏳ Inscripciones todavía cerradas"
+                }
+            </div>
+
+            <p>
+                ${
+                    abiertas
+                        ? "Completa el formulario para solicitar tu plaza en el campeonato."
+                        : "Cuando se abra el plazo, podrás inscribirte directamente desde esta sección."
+                }
+            </p>
+        </section>
+
+        ${
+            abiertas && url
+                ? `
+                    <a
+                        class="btnVistaCompleta enlaceInscripcion"
+                        href="${escaparAtributo(url)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Abrir formulario de inscripción →
+                    </a>
+                `
+                : pintarTarjetaVacia(
+                    abiertas
+                        ? "Formulario pendiente"
+                        : "Próximamente",
+                    abiertas
+                        ? "Las inscripciones están activadas, pero todavía no se ha indicado el enlace del formulario."
+                        : "El formulario aparecerá aquí cuando el estado del torneo cambie a Inscripciones."
+                )
+        }
+    `;
+}
+
+function pintarPantallaMasPretorneo() {
+    const contenido = obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const config = obtenerConfiguracion();
+
+    const opciones = [
+        {
+            icono: "📅",
+            texto: "Información del campeonato",
+            pantalla: "pretorneo_info"
+        },
+        {
+            icono: "✍️",
+            texto: "Inscripciones",
+            pantalla: "pretorneo_inscripcion"
+        },
+        {
+            icono: "📖",
+            texto: "Historia",
+            href: "historia.html"
+        },
+        {
+            icono: "🏆",
+            texto: "Campeones",
+            href: "campeones.html"
+        }
+    ];
+
+    if (
+        config.mostrar_normativa === undefined ||
+        esSi(config.mostrar_normativa)
+    ) {
+        opciones.push({
+            icono: "📜",
+            texto: "Normativa",
+            href: "normas.html"
+        });
+    }
+
+    if (esSi(config.mostrar_fotos)) {
+        opciones.push({
+            icono: "📷",
+            texto: "Fotos",
+            href: "fotos.html"
+        });
+    }
+
+    if (esSi(config.mostrar_ranking_historico)) {
+        opciones.push({
+            icono: "📈",
+            texto: "Ranking histórico",
+            href: "ranking.html"
+        });
+    }
+
+    if (esSi(config.mostrar_estadisticas)) {
+        opciones.push({
+            icono: "📊",
+            texto: "Estadísticas",
+            href: "estadisticas.html"
+        });
+    }
+
+    contenido.innerHTML = `
+        <h2>☰ Más</h2>
+
+        <div class="listaOpcionesMas">
+            ${
+                opciones.map(opcion =>
+                    opcion.href
+                        ? `
+                            <a
+                                class="opcionMas"
+                                href="${escaparAtributo(opcion.href)}"
+                            >
+                                <span>${opcion.icono}</span>
+
+                                <strong>
+                                    ${escaparHTML(opcion.texto)}
+                                </strong>
+
+                                <b>→</b>
+                            </a>
+                        `
+                        : `
+                            <button
+                                class="opcionMas"
+                                type="button"
+                                data-destino-pantalla="${opcion.pantalla}"
+                            >
+                                <span>${opcion.icono}</span>
+
+                                <strong>
+                                    ${escaparHTML(opcion.texto)}
+                                </strong>
+
+                                <b>→</b>
+                            </button>
+                        `
+                ).join("")
+            }
+        </div>
+    `;
 }
 
 /* =========================================================
@@ -1614,6 +2257,11 @@ function pintarPantallaMas() {
     const contenido = obtenerContenidoDetalle();
     if (!contenido) return;
 
+    if (esWebPrevia()) {
+        pintarPantallaMasPretorneo();
+        return;
+    }
+
     const config = obtenerConfiguracion();
     const opciones = [];
 
@@ -1768,6 +2416,100 @@ function obtenerEstadoPalas() {
 
 function obtenerConfiguracion() {
     return datos?.configuracion || {};
+}
+
+function obtenerEstadoTorneo() {
+    const config = obtenerConfiguracion();
+    const valor = config.estado_torneo || config.estado || "En juego";
+
+    return normalizar(valor)
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ");
+}
+
+function esEstadoPretorneo() {
+    return obtenerEstadoTorneo() === "PRETORNEO";
+}
+
+function esEstadoInscripciones() {
+    return obtenerEstadoTorneo().includes("INSCRIP");
+}
+
+function esWebPrevia() {
+    return esEstadoPretorneo() || esEstadoInscripciones();
+}
+
+function obtenerLugarCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.lugar_campeonato ||
+        config.localidad ||
+        config.lugar ||
+        "Tui"
+    ).trim();
+}
+
+function obtenerFechaCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return config.fecha_campeonato || config.fecha || "";
+}
+
+function formatearFechaCampeonato() {
+    const valor = String(obtenerFechaCampeonato() || "").trim();
+
+    if (!valor) {
+        return "Fecha pendiente de confirmar";
+    }
+
+    let fecha = null;
+    let coincidencia = valor.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (coincidencia) {
+        fecha = new Date(
+            Number(coincidencia[1]),
+            Number(coincidencia[2]) - 1,
+            Number(coincidencia[3])
+        );
+    } else {
+        coincidencia = valor.match(
+            /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+        );
+
+        if (coincidencia) {
+            fecha = new Date(
+                Number(coincidencia[3]),
+                Number(coincidencia[2]) - 1,
+                Number(coincidencia[1])
+            );
+        }
+    }
+
+    if (!fecha || Number.isNaN(fecha.getTime())) {
+        return valor;
+    }
+
+    const texto = fecha.toLocaleDateString("es-ES", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+function obtenerURLInscripcion() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.url_inscripcion ||
+        config.url_inscripciones ||
+        config.enlace_inscripcion ||
+        config.formulario_inscripcion ||
+        ""
+    ).trim();
 }
 
 function esModoGrupos() {
