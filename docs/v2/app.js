@@ -786,6 +786,7 @@ function pintarResumenPalasPortada() {
 
 function pintarInicioPretorneo() {
     const lugar = obtenerLugarCampeonato();
+    const horario = obtenerHorarioCampeonato();
     const fecha = formatearFechaCampeonato();
     const inscripcionesAbiertas = esEstadoInscripciones();
 
@@ -842,10 +843,16 @@ function pintarInicioPretorneo() {
             </div>
 
             <div class="equipoPodio">
-                <span>📍 ${escaparHTML(lugar)}</span>
-            </div>
+        <span>📍 ${escaparHTML(lugar)}</span>
+        </div>
 
-            <div class="equipoPodio">
+    ${horario ? `
+    <div class="equipoPodio">
+        <span>🕒 ${escaparHTML(horario)}</span>
+    </div>
+` : ""}
+
+<div class="equipoPodio">
                 <span>
                     ${
                         inscripcionesAbiertas
@@ -907,6 +914,15 @@ function configurarPortadaCompeticion() {
 }
 
 function configurarTarjetasPretorneo() {
+   const config = obtenerConfiguracion();
+
+    const tarjetas = [
+        ...document.querySelectorAll(
+            ".gridDashboard .cardAcceso"
+        )
+    ]; 
+    
+    
     const tarjetas = [
         ...document.querySelectorAll(
             ".gridDashboard .cardAcceso"
@@ -935,22 +951,46 @@ function configurarTarjetasPretorneo() {
         "pretorneo_inscripcion"
     );
 
-    configurarTarjetaPortada(
-        tarjetas[2],
-        "📖",
-        "Nuestra historia",
-        "Cómo nació el campeonato y sus mejores momentos",
-        "",
-        "historia.html"
-    );
+    configurarTarjetaContenidoPretorneo(
+    tarjetas[2],
+    esSi(config.mostrar_historia),
+    "📖",
+    "Nuestra historia",
+    "Cómo nació el campeonato y sus mejores momentos",
+    "historia.html"
+);
+
+configurarTarjetaContenidoPretorneo(
+    tarjetas[3],
+    esSi(config.mostrar_campeones),
+    "🏆",
+    "Campeones",
+    "Ganadores de las ediciones anteriores",
+    "campeones.html"
+);
+}
+
+function configurarTarjetaContenidoPretorneo(
+    tarjeta,
+    mostrar,
+    icono,
+    titulo,
+    resumen,
+    href
+) {
+    if (!tarjeta) return;
+
+    tarjeta.classList.toggle("oculto", !mostrar);
+
+    if (!mostrar) return;
 
     configurarTarjetaPortada(
-        tarjetas[3],
-        "🏆",
-        "Campeones",
-        "Ganadores de las ediciones anteriores",
+        tarjeta,
+        icono,
+        titulo,
+        resumen,
         "",
-        "campeones.html"
+        href
     );
 }
 
@@ -963,6 +1003,7 @@ function configurarTarjetaPortada(
     href = ""
 ) {
     if (!tarjeta) return;
+    tarjeta.classList.remove("oculto");
 
     const iconoElemento =
         tarjeta.querySelector(".iconoAcceso");
@@ -1187,6 +1228,12 @@ function pintarPantallaInformacionPretorneo() {
             )}
 
             ${pintarDatoPretorneo(
+                "🕒",
+                "Horario",
+                obtenerHorarioCampeonato() || "Pendiente de confirmar"
+                )}
+
+            ${pintarDatoPretorneo(
                 "🏁",
                 "Primera fase",
                 tipoCampeonato
@@ -1292,27 +1339,33 @@ function pintarPantallaMasPretorneo() {
     const config = obtenerConfiguracion();
 
     const opciones = [
-        {
-            icono: "📅",
-            texto: "Información del campeonato",
-            pantalla: "pretorneo_info"
-        },
-        {
-            icono: "✍️",
-            texto: "Inscripciones",
-            pantalla: "pretorneo_inscripcion"
-        },
-        {
-            icono: "📖",
-            texto: "Historia",
-            href: "historia.html"
-        },
-        {
-            icono: "🏆",
-            texto: "Campeones",
-            href: "campeones.html"
-        }
-    ];
+    {
+        icono: "📅",
+        texto: "Información del campeonato",
+        pantalla: "pretorneo_info"
+    },
+    {
+        icono: "✍️",
+        texto: "Inscripciones",
+        pantalla: "pretorneo_inscripcion"
+    }
+];
+
+if (esSi(config.mostrar_historia)) {
+    opciones.push({
+        icono: "📖",
+        texto: "Historia",
+        href: "historia.html"
+    });
+}
+
+if (esSi(config.mostrar_campeones)) {
+    opciones.push({
+        icono: "🏆",
+        texto: "Campeones",
+        href: "campeones.html"
+    });
+}
 
     if (
         config.mostrar_normativa === undefined ||
@@ -2309,8 +2362,21 @@ function pintarPantallaMas() {
         opciones.push({ icono: "🏖️", texto: "Copa Palas Playa", pantalla: "competicion", fase: "palas" });
     }
 
-    opciones.push({ icono: "📖", texto: "Historia", href: "historia.html" });
-    opciones.push({ icono: "🏆", texto: "Campeones", href: "campeones.html" });
+    if (esSi(config.mostrar_historia)) {
+    opciones.push({
+        icono: "📖",
+        texto: "Historia",
+        href: "historia.html"
+    });
+}
+
+if (esSi(config.mostrar_campeones)) {
+    opciones.push({
+        icono: "🏆",
+        texto: "Campeones",
+        href: "campeones.html"
+    });
+}
 
     if (esSi(config.mostrar_normativa)) {
         opciones.push({ icono: "📜", texto: "Normativa", href: "normas.html" });
@@ -2486,6 +2552,15 @@ function obtenerLugarCampeonato() {
     ).trim();
 }
 
+function obtenerHorarioCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.horario_campeonato ||
+        config.horario ||
+        ""
+    ).trim();
+}
 function obtenerFechaCampeonato() {
     const config = obtenerConfiguracion();
 
