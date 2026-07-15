@@ -1373,10 +1373,7 @@ body.modoPretorneo{
     padding-top:20px;
 }
 
-.cabeceraPagina{
-    position:relative;
-    padding-top:70px;
-}
+
 
 .cabeceraCampeones{
     background:
@@ -1388,26 +1385,7 @@ body.modoPretorneo{
         );
 }
 
-.volverInicio{
-    position:absolute;
-    top:20px;
-    left:20px;
-    display:inline-flex;
-    align-items:center;
-    min-height:36px;
-    padding:8px 12px;
-    border-radius:999px;
-    background:rgba(255,255,255,.16);
-    color:white;
-    text-decoration:none;
-    font-size:13px;
-    font-weight:800;
-    border:1px solid rgba(255,255,255,.15);
-}
 
-.volverInicio:active{
-    transform:scale(.97);
-}
 
 .contenidoPagina{
     width:100%;
@@ -1643,11 +1621,7 @@ body.modoPretorneo{
 
 /* AJUSTES PARA MÓVIL */
 
-@media(max-width:600px){
 
-    .cabeceraPagina{
-        padding-top:68px;
-    }
 
     .articuloHistoria{
         padding:20px;
