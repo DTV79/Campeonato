@@ -914,15 +914,8 @@ function configurarPortadaCompeticion() {
 }
 
 function configurarTarjetasPretorneo() {
-   const config = obtenerConfiguracion();
+    const config = obtenerConfiguracion();
 
-    const tarjetas = [
-        ...document.querySelectorAll(
-            ".gridDashboard .cardAcceso"
-        )
-    ]; 
-    
-    
     const tarjetas = [
         ...document.querySelectorAll(
             ".gridDashboard .cardAcceso"
@@ -931,13 +924,18 @@ function configurarTarjetasPretorneo() {
 
     const fecha = formatearFechaCampeonato();
     const lugar = obtenerLugarCampeonato();
+    const horario = obtenerHorarioCampeonato();
     const inscripcionesAbiertas = esEstadoInscripciones();
 
     configurarTarjetaPortada(
         tarjetas[0],
         "📅",
         "Campeonato",
-        `${escaparHTML(fecha)}<br>${escaparHTML(lugar)}`,
+        `
+            ${escaparHTML(fecha)}<br>
+            ${escaparHTML(lugar)}
+            ${horario ? `<br>${escaparHTML(horario)}` : ""}
+        `,
         "pretorneo_info"
     );
 
@@ -952,22 +950,22 @@ function configurarTarjetasPretorneo() {
     );
 
     configurarTarjetaContenidoPretorneo(
-    tarjetas[2],
-    esSi(config.mostrar_historia),
-    "📖",
-    "Nuestra historia",
-    "Cómo nació el campeonato y sus mejores momentos",
-    "historia.html"
-);
+        tarjetas[2],
+        esSi(config.mostrar_historia),
+        "📖",
+        "Nuestra historia",
+        "Cómo nació el campeonato y sus mejores momentos",
+        "historia.html"
+    );
 
-configurarTarjetaContenidoPretorneo(
-    tarjetas[3],
-    esSi(config.mostrar_campeones),
-    "🏆",
-    "Campeones",
-    "Ganadores de las ediciones anteriores",
-    "campeones.html"
-);
+    configurarTarjetaContenidoPretorneo(
+        tarjetas[3],
+        esSi(config.mostrar_campeones),
+        "🏆",
+        "Campeones",
+        "Ganadores de las ediciones anteriores",
+        "campeones.html"
+    );
 }
 
 function configurarTarjetaContenidoPretorneo(
