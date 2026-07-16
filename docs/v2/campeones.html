@@ -177,7 +177,43 @@
 
 </nav>
 
-<script src="nav-pretorneo.js?v=168"></script>
+<script>
+(async function cargarNavegacionVersionada() {
+    let version = Date.now();
+
+    try {
+        const respuesta = await fetch(
+            "https://dtv79.github.io/Campeonato/estado_torneo.json?v=" +
+            Date.now(),
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (respuesta.ok) {
+            const datos = await respuesta.json();
+
+            version =
+                datos?.configuracion?.version_web ||
+                datos?.configuracion?.version ||
+                version;
+        }
+    } catch (error) {
+        console.error(
+            "No se pudo leer la versión WEB:",
+            error
+        );
+    }
+
+    const script = document.createElement("script");
+
+    script.src =
+        "nav-pretorneo.js?v=" +
+        encodeURIComponent(version);
+
+    document.body.appendChild(script);
+})();
+</script>
 
 </body>
 </html>
