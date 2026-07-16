@@ -1,6 +1,11 @@
-/* ==========================
-   SPRINT PADEL V2
-========================== */
+/* =========================================================
+   SPRINT PÁDEL TUI
+   STYLE.CSS LIMPIO
+========================================================= */
+
+/* =========================================================
+   1. BASE
+========================================================= */
 
 *{
     margin:0;
@@ -10,30 +15,49 @@
 
 html,
 body{
+    width:100%;
     min-height:100%;
+    overflow-x:hidden;
 }
 
 body{
-    font-family:'Inter',sans-serif;
+    min-height:100dvh;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom));
     background:#f4f6f9;
     color:#1d2939;
-    padding-bottom:calc(100px + env(safe-area-inset-bottom));
+    font-family:'Inter',sans-serif;
+}
+
+button,
+a{
+    -webkit-tap-highlight-color:transparent;
+}
+
+button{
+    font-family:inherit;
 }
 
 .contenedor{
+    width:100%;
     max-width:700px;
-    margin:auto;
+    margin:0 auto;
     padding:20px;
 }
 
-/* CABECERA */
+.oculto{
+    display:none !important;
+}
+
+/* =========================================================
+   2. CABECERA GENERAL
+========================================================= */
 
 .cabecera{
+    margin-bottom:20px;
+    padding:24px;
+    border-radius:24px;
     background:linear-gradient(135deg,#0f172a,#1e3a8a);
     color:white;
-    border-radius:24px;
-    padding:24px;
-    margin-bottom:20px;
     box-shadow:0 8px 24px rgba(0,0,0,.15);
 }
 
@@ -45,9 +69,10 @@ body{
 }
 
 .tituloPrincipal{
+    margin-top:6px;
     font-size:34px;
     font-weight:800;
-    margin-top:6px;
+    line-height:1.08;
 }
 
 .subtitulo{
@@ -56,11 +81,11 @@ body{
 }
 
 .estadoCabecera{
-    margin-top:18px;
     display:inline-block;
-    background:rgba(255,255,255,.15);
+    margin-top:18px;
     padding:8px 14px;
     border-radius:30px;
+    background:rgba(255,255,255,.15);
     font-weight:600;
 }
 
@@ -71,35 +96,35 @@ body{
 .barra{
     width:100%;
     height:12px;
-    background:#e5e7eb;
-    border-radius:20px;
-    overflow:hidden;
     margin-bottom:8px;
+    overflow:hidden;
+    border-radius:20px;
+    background:#e5e7eb;
 }
 
 .progreso{
     width:35%;
     height:100%;
     background:linear-gradient(90deg,#16a34a,#22c55e);
-    transition:.5s;
+    transition:width .5s ease;
 }
 
 .textoProgreso{
     color:white;
-    opacity:.85;
-    text-align:left;
     font-size:14px;
+    text-align:left;
+    opacity:.85;
 }
 
 .actualizacion{
-    margin-top:18px;
     display:flex;
     align-items:center;
     justify-content:center;
     gap:8px;
-    background:rgba(255,255,255,.15);
-    border-radius:14px;
+    margin-top:18px;
     padding:10px 14px;
+    border-radius:14px;
+    background:rgba(255,255,255,.15);
     font-size:14px;
 }
 
@@ -109,740 +134,7 @@ body{
     font-weight:800;
 }
 
-/* TARJETAS GENERALES */
-
-.tarjeta{
-    background:white;
-    border-radius:20px;
-    padding:22px;
-    margin-bottom:18px;
-    box-shadow:0 5px 18px rgba(0,0,0,.08);
-}
-
-.tarjeta h3{
-    font-size:18px;
-    margin-bottom:18px;
-}
-
-/* DASHBOARD */
-
-.gridDashboard{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-    margin-top:20px;
-    margin-bottom:18px;
-}
-
-.cardAcceso{
-    position:relative;
-    overflow:hidden;
-    border-radius:24px;
-    padding:18px;
-    min-height:150px;
-    color:white;
-    box-shadow:0 10px 26px rgba(15,23,42,.18);
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    cursor:pointer;
-    transition:.22s ease;
-}
-
-.cardAcceso:active{
-    transform:scale(.97);
-}
-
-.cardAcceso::after{
-    content:"";
-    position:absolute;
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    background:rgba(255,255,255,.13);
-    right:-42px;
-    top:-42px;
-}
-
-.cardClasificacion{ background:linear-gradient(135deg,#2563eb,#1e40af); }
-.cardPartidos{ background:linear-gradient(135deg,#16a34a,#166534); }
-.cardCruces{ background:linear-gradient(135deg,#d97706,#92400e); }
-.cardPalas{ background:linear-gradient(135deg,#0ea5e9,#0369a1); }
-
-.iconoAcceso{
-    font-size:30px;
-    z-index:1;
-}
-
-.cardAcceso h4{
-    position:relative;
-    z-index:1;
-    font-size:15px;
-    font-weight:800;
-    margin-bottom:8px;
-}
-
-.cardAcceso p{
-    position:relative;
-    z-index:1;
-    font-size:12px;
-    line-height:1.35;
-    opacity:.92;
-}
-
-.flecha{
-    position:absolute;
-    right:18px;
-    bottom:16px;
-    font-size:24px;
-    font-weight:800;
-    opacity:.85;
-}
-
-/* PODIO */
-
-#podio{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-}
-
-.equipoPodio{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:14px;
-    border-radius:14px;
-    background:#f8fafc;
-    font-size:17px;
-    font-weight:600;
-}
-
-.oro{ border-left:6px solid #FFD700; }
-.plata{ border-left:6px solid #C0C0C0; }
-.bronce{ border-left:6px solid #CD7F32; }
-
-/* VISTA DETALLE */
-
-.oculto{
-    display:none !important;
-}
-
-.listaPartidos.oculto{
-    max-height:0;
-    opacity:0;
-    margin-top:0;
-    gap:0;
-    pointer-events:none;
-}
-
-.vistaDetalle{
-    display:block;
-    background:white;
-    border-radius:22px;
-    padding:22px;
-    margin-top:20px;
-    box-shadow:0 6px 20px rgba(0,0,0,.08);
-}
-
-.vistaDetalle h2{
-    font-size:30px;
-    margin-bottom:18px;
-    color:#1d2939;
-}
-
-/* BARRA INFERIOR */
-
-.bottomNav{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:calc(76px + env(safe-area-inset-bottom));
-    padding-bottom:env(safe-area-inset-bottom);
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    box-shadow:0 -8px 24px rgba(15,23,42,.12);
-    z-index:9999;
-}
-
-.navBtn{
-    border:none;
-    background:none;
-    color:#64748b;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
-    font-weight:700;
-    cursor:pointer;
-}
-
-.navBtn span{
-    font-size:24px;
-    line-height:1;
-}
-
-.navBtn small{
-    font-size:11px;
-}
-
-.navBtn.navActivo,
-.navBtn.navActivo small{
-    color:#2563eb;
-    font-weight:900;
-}
-
-/* CLASIFICACIÓN */
-
-.modoOrden{
-    background:#eef2ff;
-    color:#1e3a8a;
-    padding:13px 14px;
-    border-radius:16px;
-    margin-bottom:14px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-}
-
-.modoOrden span{
-    display:block;
-    font-size:12px;
-    font-weight:800;
-    opacity:.8;
-    margin-bottom:3px;
-}
-
-.modoOrden strong{
-    display:block;
-    font-size:14px;
-    font-weight:900;
-}
-
-.btnInfoOrden{
-    border:none;
-    background:white;
-    color:#1e3a8a;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    font-size:17px;
-    font-weight:900;
-}
-
-.listaClasificacion{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    width:100%;
-}
-
-.filaClasificacion{
-    display:block;
-    width:100%;
-    background:white;
-    border-radius:20px;
-    padding:18px;
-    box-shadow:0 6px 18px rgba(15,23,42,.08);
-}
-
-.lineaEquipo{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-}
-
-.equipoFila{
-    font-size:18px;
-    font-weight:900;
-    line-height:1.25;
-}
-
-.movimientoFila{
-    min-width:55px;
-    text-align:right;
-    font-size:19px;
-    font-weight:900;
-    white-space:nowrap;
-}
-
-.sube{ color:#16a34a; }
-.baja{ color:#dc2626; }
-.igual{ color:#64748b; }
-
-.datosFila{
-    display:block;
-    margin-top:10px;
-    font-size:14px;
-    line-height:1.4;
-    color:#64748b;
-    font-weight:700;
-}
-
-.etiquetaEspecial{
-    display:inline-block;
-    max-width:max-content;
-    margin-top:10px;
-    padding:6px 11px;
-    border-radius:999px;
-    background:#fef3c7;
-    color:#92400e;
-    font-size:13px;
-    font-weight:900;
-}
-
-.toggleDetalles{
-    display:block;
-    margin-top:12px;
-    color:#2563eb;
-    font-weight:900;
-    font-size:14px;
-}
-
-.detalleClasif{
-    display:block;
-    width:100%;
-    margin-top:14px;
-    padding-top:12px;
-    border-top:1px solid #e5e7eb;
-    overflow:hidden;
-    animation:abrirDetalle .22s ease-out;
-}
-
-@keyframes abrirDetalle{
-    from{
-        opacity:0;
-        transform:translateY(-6px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.grupoStats{
-    display:block;
-    padding:10px 0;
-    border-bottom:1px solid #e5e7eb;
-}
-
-.grupoStats:last-child{
-    border-bottom:none;
-}
-
-.grupoStats h5{
-    display:block;
-    font-size:12px;
-    color:#2563eb;
-    text-transform:uppercase;
-    letter-spacing:.8px;
-    margin-bottom:8px;
-}
-
-.grupoStats div{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    width:100%;
-    padding:5px 0;
-    font-size:14px;
-}
-
-.grupoStats span{
-    color:#64748b;
-    font-weight:700;
-}
-
-.grupoStats strong{
-    color:#0f172a;
-    font-weight:900;
-    text-align:right;
-}
-
-/* CLASIFICACIÓN COMPLETA */
-
-.btnVistaCompleta{
-    width:100%;
-    margin-top:18px;
-    border:none;
-    border-radius:16px;
-    padding:14px 16px;
-    background:#2563eb;
-    color:white;
-    font-weight:900;
-    font-size:15px;
-}
-
-.tablaScroll{
-    width:100%;
-    overflow-x:auto;
-    margin-top:14px;
-    border-radius:16px;
-    box-shadow:0 4px 14px rgba(15,23,42,.08);
-}
-
-.tablaClasificacion{
-    width:100%;
-    min-width:850px;
-    border-collapse:collapse;
-    background:white;
-    font-size:13px;
-}
-
-.tablaClasificacion th{
-    background:#1e3a8a;
-    color:white;
-    padding:12px 10px;
-    text-align:left;
-    white-space:nowrap;
-}
-
-.tablaClasificacion td{
-    padding:12px 10px;
-    border-bottom:1px solid #e5e7eb;
-    white-space:nowrap;
-}
-
-.tablaClasificacion tr:nth-child(even){
-    background:#f8fafc;
-}
-
-.equipoTabla{
-    font-weight:900;
-}
-
-.movTabla{
-    display:inline-block;
-    font-size:12px;
-    font-weight:900;
-    white-space:nowrap;
-}
-
-/* GLOBO INFO */
-
-.overlayInfo{
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,.55);
-    z-index:2000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:22px;
-}
-
-.globoInfo{
-    background:white;
-    border-radius:22px;
-    padding:22px;
-    width:100%;
-    max-width:420px;
-    box-shadow:0 20px 50px rgba(0,0,0,.25);
-    position:relative;
-    animation:abrirDetalle .2s ease-out;
-}
-
-.cerrarInfo{
-    position:absolute;
-    top:12px;
-    right:14px;
-    border:none;
-    background:#f1f5f9;
-    color:#0f172a;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    font-size:22px;
-    font-weight:900;
-}
-
-.globoInfo h3{
-    font-size:20px;
-    margin-bottom:12px;
-    padding-right:38px;
-}
-
-.globoInfo p{
-    color:#475569;
-    font-size:14px;
-    line-height:1.45;
-    margin-bottom:14px;
-}
-
-.ejemploInfo{
-    background:#f8fafc;
-    border-radius:14px;
-    padding:12px;
-    font-size:14px;
-    line-height:1.5;
-    margin-bottom:14px;
-}
-
-.globoInfo h4{
-    font-size:14px;
-    margin-bottom:8px;
-    color:#1e3a8a;
-}
-
-.globoInfo ol{
-    padding-left:20px;
-    font-size:14px;
-    color:#334155;
-    line-height:1.55;
-}
-
-/* PARTIDOS / RONDAS */
-
-.listaJornadas{
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-}
-
-.bloqueJornada{
-    background:#f8fafc;
-    border-radius:20px;
-    padding:14px;
-}
-
-.cabeceraJornada{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    cursor:pointer;
-    background:white;
-    border-radius:16px;
-    padding:14px;
-    margin-bottom:12px;
-    box-shadow:0 4px 14px rgba(15,23,42,.06);
-}
-
-.cabeceraJornada h3{
-    font-size:20px;
-    font-weight:900;
-}
-
-.cabeceraJornada p{
-    margin-top:3px;
-    color:#64748b;
-    font-size:13px;
-    font-weight:700;
-}
-
-.flechaJornada{
-    font-size:20px;
-    font-weight:900;
-    color:#2563eb;
-}
-
-.chipJornada{
-    display:inline-block;
-    font-size:11px;
-    font-weight:900;
-    text-transform:uppercase;
-    padding:5px 9px;
-    border-radius:999px;
-    margin-bottom:7px;
-}
-
-.cabeceraJornada.enJuego .chipJornada{
-    background:#dcfce7;
-    color:#166534;
-}
-
-.cabeceraJornada.finalizada .chipJornada{
-    background:#e0f2fe;
-    color:#075985;
-}
-
-.cabeceraJornada.proxima .chipJornada{
-    background:#fef3c7;
-    color:#92400e;
-}
-
-.listaPartidos{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    overflow:hidden;
-    max-height:5000px;
-    opacity:1;
-    transition:max-height .35s ease, opacity .25s ease;
-}
-
-.resumenPartidos{
-    background:#eef2ff;
-    border-radius:20px;
-    padding:16px;
-    margin-bottom:18px;
-}
-
-.estadoResumen{
-    font-weight:900;
-    color:#1e3a8a;
-    margin-bottom:10px;
-}
-
-.resumenPartidos p{
-    margin-top:8px;
-    color:#475569;
-    font-size:14px;
-    font-weight:800;
-}
-
-/* MARCADOR */
-
-.cardPartido{
-    background:white;
-    border-radius:18px;
-    padding:16px;
-    box-shadow:0 4px 14px rgba(15,23,42,.08);
-    border-left:5px solid #e5e7eb;
-}
-
-.cardPartido.jugado{
-    border-left-color:#16a34a;
-}
-
-.cardPartido.pendiente{
-    border-left-color:#f59e0b;
-}
-
-.cardPartido.descanso{
-    border-left-color:#64748b;
-    background:#f1f5f9;
-}
-
-.cardPartido.marcador{
-    padding:0;
-    overflow:hidden;
-}
-
-.estadoPartido{
-    font-size:13px;
-    font-weight:900;
-    color:#64748b;
-    margin-bottom:10px;
-}
-
-.cardPartido.marcador .estadoPartido{
-    padding:10px 12px;
-    margin:0;
-    background:#f8fafc;
-}
-
-.marcadorHeader,
-.filaMarcador{
-    display:grid;
-    grid-template-columns:1fr 46px 46px 46px;
-    align-items:center;
-}
-
-.marcadorHeader{
-    background:#1e3a8a;
-    color:white;
-    font-size:12px;
-    font-weight:900;
-    text-align:center;
-    padding:8px 10px;
-}
-
-.filaMarcador{
-    padding:10px;
-    border-top:1px solid #e5e7eb;
-    font-size:18px;
-    font-weight:900;
-    text-align:center;
-}
-
-.nombreEquipoMarcador{
-    text-align:left;
-    font-size:14px;
-    line-height:1.3;
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-}
-
-.nombreEquipoMarcador strong{
-    display:block;
-}
-
-.ganadorFila{
-    background:#dcfce7;
-}
-
-.perdedorPalas{
-    background:#fee2e2;
-}
-
-.infoPalas{
-    padding:10px 12px;
-    background:#fff7ed;
-    color:#92400e;
-    font-size:13px;
-    font-weight:800;
-    line-height:1.45;
-    border-top:1px solid #fed7aa;
-}
-
-/* OTROS */
-
-.tarjetaVacia{
-    background:#f8fafc;
-    border-radius:20px;
-    padding:22px;
-    color:#475569;
-}
-
-.tarjetaVacia h3{
-    color:#0f172a;
-    margin-bottom:8px;
-}
-
-.resumenPalas{
-    background:#ecfeff;
-}
-
-.resumenPalas .estadoResumen{
-    color:#0369a1;
-}
-
-/* MÓVIL */
-
-@media(max-width:600px){
-    .contenedor{
-        padding:20px;
-    }
-
-    .cabecera{
-        padding:24px;
-    }
-
-    .tituloPrincipal{
-        font-size:32px;
-    }
-
-    .gridDashboard{
-        grid-template-columns:1fr 1fr;
-        gap:12px;
-    }
-
-    .cardAcceso{
-        min-height:150px;
-        padding:16px;
-        border-radius:22px;
-    }
-}
+/* Estados de la barra */
 
 .progreso.barraLiguilla{
     background:linear-gradient(90deg,#16a34a,#22c55e);
@@ -869,67 +161,819 @@ body{
     background:linear-gradient(135deg,#78350f,#d97706,#facc15);
 }
 
+/* =========================================================
+   3. TARJETAS GENERALES
+========================================================= */
 
-html,
-body{
-    width:100%;
-    min-height:100dvh;
-    overflow-x:hidden;
+.tarjeta{
+    margin-bottom:18px;
+    padding:22px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
 }
 
-body{
-    min-height:100dvh;
-    padding-bottom:calc(96px + env(safe-area-inset-bottom));
+.tarjeta h3{
+    margin-bottom:18px;
+    font-size:18px;
 }
+
+/* =========================================================
+   4. DASHBOARD
+========================================================= */
+
+.gridDashboard{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:20px;
+    margin-bottom:18px;
+}
+
+.cardAcceso{
+    position:relative;
+    display:flex;
+    min-height:150px;
+    padding:18px;
+    overflow:hidden;
+    flex-direction:column;
+    justify-content:space-between;
+    border-radius:24px;
+    color:white;
+    box-shadow:0 10px 26px rgba(15,23,42,.18);
+    cursor:pointer;
+    transition:transform .22s ease, opacity .22s ease;
+}
+
+.cardAcceso:active{
+    transform:scale(.97);
+}
+
+.cardAcceso::after{
+    content:"";
+    position:absolute;
+    top:-42px;
+    right:-42px;
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    background:rgba(255,255,255,.13);
+}
+
+.cardClasificacion{
+    background:linear-gradient(135deg,#2563eb,#1e40af);
+}
+
+.cardPartidos{
+    background:linear-gradient(135deg,#16a34a,#166534);
+}
+
+.cardCruces{
+    background:linear-gradient(135deg,#d97706,#92400e);
+}
+
+.cardPalas{
+    background:linear-gradient(135deg,#0ea5e9,#0369a1);
+}
+
+.iconoAcceso{
+    position:relative;
+    z-index:1;
+    font-size:30px;
+}
+
+.cardAcceso h4{
+    position:relative;
+    z-index:1;
+    margin-bottom:8px;
+    font-size:15px;
+    font-weight:800;
+}
+
+.cardAcceso p{
+    position:relative;
+    z-index:1;
+    font-size:12px;
+    line-height:1.35;
+    opacity:.92;
+}
+
+.flecha{
+    position:absolute;
+    right:18px;
+    bottom:16px;
+    z-index:1;
+    font-size:24px;
+    font-weight:800;
+    opacity:.85;
+}
+
+/* =========================================================
+   5. PODIO
+========================================================= */
+
+#podio{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.equipoPodio{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:14px;
+    border-radius:14px;
+    background:#f8fafc;
+    font-size:17px;
+    font-weight:600;
+}
+
+.oro{
+    border-left:6px solid #ffd700;
+}
+
+.plata{
+    border-left:6px solid #c0c0c0;
+}
+
+.bronce{
+    border-left:6px solid #cd7f32;
+}
+
+/* =========================================================
+   6. VISTA DETALLE
+========================================================= */
+
+.vistaDetalle{
+    display:block;
+    margin-top:20px;
+    padding:22px;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+.vistaDetalle h2{
+    margin-bottom:18px;
+    color:#1d2939;
+    font-size:30px;
+}
+
+/* =========================================================
+   7. NAVEGACIÓN INFERIOR
+========================================================= */
 
 .bottomNav{
     position:fixed !important;
-    left:0 !important;
     right:0 !important;
     bottom:0 !important;
-    transform:translateZ(0);
-    -webkit-transform:translateZ(0);
+    left:0 !important;
+    z-index:99999;
+    display:flex;
+    width:100%;
     height:calc(76px + env(safe-area-inset-bottom));
     padding-bottom:env(safe-area-inset-bottom);
-    z-index:99999;
+    align-items:center;
+    justify-content:space-around;
+    background:rgba(255,255,255,.96);
+    box-shadow:0 -8px 24px rgba(15,23,42,.12);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    transform:translateZ(0);
+    -webkit-transform:translateZ(0);
 }
-
-
-/* =========================================================
-   NUEVAS PANTALLAS: COMPETICIÓN, GRUPOS Y EQUIPOS
-   Añadir al final de style.css
-========================================================= */
 
 .bottomNav .navBtn{
-    flex:1 1 20%;
+    display:flex;
     min-width:0;
     padding:8px 2px;
+    flex:1 1 20%;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    border:none;
+    background:none;
+    color:#64748b;
+    font-family:inherit;
+    font-weight:700;
+    text-decoration:none;
+    cursor:pointer;
 }
 
-.selectorFases{
+.navBtn span{
+    font-size:24px;
+    line-height:1;
+}
+
+.navBtn small{
+    font-size:11px;
+}
+
+.navBtn.navActivo,
+.navBtn.navActivo small{
+    color:#2563eb;
+    font-weight:900;
+}
+
+/* =========================================================
+   8. CLASIFICACIÓN
+========================================================= */
+
+.modoOrden{
     display:flex;
-    gap:9px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    padding:13px 14px;
+    border-radius:16px;
+    background:#eef2ff;
+    color:#1e3a8a;
+}
+
+.modoOrden span{
+    display:block;
+    margin-bottom:3px;
+    font-size:12px;
+    font-weight:800;
+    opacity:.8;
+}
+
+.modoOrden strong{
+    display:block;
+    font-size:14px;
+    font-weight:900;
+}
+
+.btnInfoOrden{
+    width:34px;
+    height:34px;
+    border:none;
+    border-radius:50%;
+    background:white;
+    color:#1e3a8a;
+    font-size:17px;
+    font-weight:900;
+}
+
+.listaClasificacion{
+    display:flex;
+    width:100%;
+    flex-direction:column;
+    gap:14px;
+}
+
+.filaClasificacion{
+    display:block;
+    width:100%;
+    padding:18px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 6px 18px rgba(15,23,42,.08);
+}
+
+.lineaEquipo{
+    display:flex;
+    width:100%;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.equipoFila{
+    font-size:18px;
+    font-weight:900;
+    line-height:1.25;
+}
+
+.movimientoFila{
+    min-width:55px;
+    font-size:19px;
+    font-weight:900;
+    text-align:right;
+    white-space:nowrap;
+}
+
+.sube{
+    color:#16a34a;
+}
+
+.baja{
+    color:#dc2626;
+}
+
+.igual{
+    color:#64748b;
+}
+
+.datosFila{
+    display:block;
+    margin-top:10px;
+    color:#64748b;
+    font-size:14px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.etiquetaEspecial{
+    display:inline-block;
+    max-width:max-content;
+    margin-top:10px;
+    padding:6px 11px;
+    border-radius:999px;
+    background:#fef3c7;
+    color:#92400e;
+    font-size:13px;
+    font-weight:900;
+}
+
+.toggleDetalles{
+    display:block;
+    margin-top:12px;
+    color:#2563eb;
+    font-size:14px;
+    font-weight:900;
+}
+
+.detalleClasif{
+    display:block;
+    width:100%;
+    margin-top:14px;
+    padding-top:12px;
+    overflow:hidden;
+    border-top:1px solid #e5e7eb;
+    animation:abrirDetalle .22s ease-out;
+}
+
+@keyframes abrirDetalle{
+    from{
+        opacity:0;
+        transform:translateY(-6px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.grupoStats{
+    display:block;
+    padding:10px 0;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.grupoStats:last-child{
+    border-bottom:none;
+}
+
+.grupoStats h5{
+    display:block;
+    margin-bottom:8px;
+    color:#2563eb;
+    font-size:12px;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+}
+
+.grupoStats div{
+    display:flex;
+    width:100%;
+    padding:5px 0;
+    align-items:center;
+    justify-content:space-between;
+    font-size:14px;
+}
+
+.grupoStats span{
+    color:#64748b;
+    font-weight:700;
+}
+
+.grupoStats strong{
+    color:#0f172a;
+    font-weight:900;
+    text-align:right;
+}
+
+/* Clasificación completa */
+
+.btnVistaCompleta{
+    width:100%;
+    margin-top:18px;
+    padding:14px 16px;
+    border:none;
+    border-radius:16px;
+    background:#2563eb;
+    color:white;
+    font-size:15px;
+    font-weight:900;
+}
+
+.tablaScroll{
+    width:100%;
+    margin-top:14px;
     overflow-x:auto;
-    padding:4px 2px 10px;
-    margin-bottom:16px;
+    border-radius:16px;
+    box-shadow:0 4px 14px rgba(15,23,42,.08);
+}
+
+.tablaClasificacion{
+    width:100%;
+    min-width:850px;
+    border-collapse:collapse;
+    background:white;
+    font-size:13px;
+}
+
+.tablaClasificacion th{
+    padding:12px 10px;
+    background:#1e3a8a;
+    color:white;
+    text-align:left;
+    white-space:nowrap;
+}
+
+.tablaClasificacion td{
+    padding:12px 10px;
+    border-bottom:1px solid #e5e7eb;
+    white-space:nowrap;
+}
+
+.tablaClasificacion tr:nth-child(even){
+    background:#f8fafc;
+}
+
+.equipoTabla{
+    font-weight:900;
+}
+
+.movTabla{
+    display:inline-block;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   9. GLOBO DE INFORMACIÓN
+========================================================= */
+
+.overlayInfo{
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    display:flex;
+    padding:22px;
+    align-items:center;
+    justify-content:center;
+    background:rgba(15,23,42,.55);
+}
+
+.globoInfo{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    padding:22px;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+    animation:abrirDetalle .2s ease-out;
+}
+
+.cerrarInfo{
+    position:absolute;
+    top:12px;
+    right:14px;
+    width:32px;
+    height:32px;
+    border:none;
+    border-radius:50%;
+    background:#f1f5f9;
+    color:#0f172a;
+    font-size:22px;
+    font-weight:900;
+}
+
+.globoInfo h3{
+    margin-bottom:12px;
+    padding-right:38px;
+    font-size:20px;
+}
+
+.globoInfo p{
+    margin-bottom:14px;
+    color:#475569;
+    font-size:14px;
+    line-height:1.45;
+}
+
+.ejemploInfo{
+    margin-bottom:14px;
+    padding:12px;
+    border-radius:14px;
+    background:#f8fafc;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.globoInfo h4{
+    margin-bottom:8px;
+    color:#1e3a8a;
+    font-size:14px;
+}
+
+.globoInfo ol{
+    padding-left:20px;
+    color:#334155;
+    font-size:14px;
+    line-height:1.55;
+}
+
+/* =========================================================
+   10. PARTIDOS Y RONDAS
+========================================================= */
+
+.listaJornadas{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.bloqueJornada{
+    padding:14px;
+    border-radius:20px;
+    background:#f8fafc;
+}
+
+.cabeceraJornada{
+    display:flex;
+    margin-bottom:12px;
+    padding:14px;
+    align-items:center;
+    justify-content:space-between;
+    border-radius:16px;
+    background:white;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+    cursor:pointer;
+}
+
+.cabeceraJornada h3{
+    font-size:20px;
+    font-weight:900;
+}
+
+.cabeceraJornada p{
+    margin-top:3px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+}
+
+.flechaJornada{
+    color:#2563eb;
+    font-size:20px;
+    font-weight:900;
+}
+
+.chipJornada{
+    display:inline-block;
+    margin-bottom:7px;
+    padding:5px 9px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.cabeceraJornada.enJuego .chipJornada{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.cabeceraJornada.finalizada .chipJornada{
+    background:#e0f2fe;
+    color:#075985;
+}
+
+.cabeceraJornada.proxima .chipJornada{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.listaPartidos{
+    display:flex;
+    max-height:5000px;
+    overflow:hidden;
+    flex-direction:column;
+    gap:12px;
+    opacity:1;
+    transition:max-height .35s ease, opacity .25s ease;
+}
+
+.listaPartidos.oculto{
+    display:flex !important;
+    max-height:0;
+    margin-top:0;
+    gap:0;
+    opacity:0;
+    pointer-events:none;
+}
+
+.resumenPartidos{
+    margin-bottom:18px;
+    padding:16px;
+    border-radius:20px;
+    background:#eef2ff;
+}
+
+.estadoResumen{
+    margin-bottom:10px;
+    color:#1e3a8a;
+    font-weight:900;
+}
+
+.resumenPartidos p{
+    margin-top:8px;
+    color:#475569;
+    font-size:14px;
+    font-weight:800;
+}
+
+/* =========================================================
+   11. MARCADOR
+========================================================= */
+
+.cardPartido{
+    padding:16px;
+    border-left:5px solid #e5e7eb;
+    border-radius:18px;
+    background:white;
+    box-shadow:0 4px 14px rgba(15,23,42,.08);
+}
+
+.cardPartido.jugado{
+    border-left-color:#16a34a;
+}
+
+.cardPartido.pendiente{
+    border-left-color:#f59e0b;
+}
+
+.cardPartido.descanso{
+    border-left-color:#64748b;
+    background:#f1f5f9;
+}
+
+.cardPartido.marcador{
+    padding:0;
+    overflow:hidden;
+}
+
+.estadoPartido{
+    margin-bottom:10px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:900;
+}
+
+.cardPartido.marcador .estadoPartido{
+    margin:0;
+    padding:10px 12px;
+    background:#f8fafc;
+}
+
+.marcadorHeader,
+.filaMarcador{
+    display:grid;
+    grid-template-columns:1fr 46px 46px 46px;
+    align-items:center;
+}
+
+.marcadorHeader{
+    padding:8px 10px;
+    background:#1e3a8a;
+    color:white;
+    font-size:12px;
+    font-weight:900;
+    text-align:center;
+}
+
+.filaMarcador{
+    padding:10px;
+    border-top:1px solid #e5e7eb;
+    font-size:18px;
+    font-weight:900;
+    text-align:center;
+}
+
+.nombreEquipoMarcador{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    font-size:14px;
+    line-height:1.3;
+    text-align:left;
+}
+
+.nombreEquipoMarcador strong{
+    display:block;
+}
+
+.ganadorFila{
+    background:#dcfce7;
+}
+
+.perdedorPalas{
+    background:#fee2e2;
+}
+
+.infoPalas{
+    padding:10px 12px;
+    border-top:1px solid #fed7aa;
+    background:#fff7ed;
+    color:#92400e;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.45;
+}
+
+.metaPartido{
+    padding:9px 12px;
+    border-top:1px solid #e5e7eb;
+    background:white;
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+
+/* =========================================================
+   12. OTROS COMPONENTES
+========================================================= */
+
+.tarjetaVacia{
+    padding:22px;
+    border-radius:20px;
+    background:#f8fafc;
+    color:#475569;
+}
+
+.tarjetaVacia h3{
+    margin-bottom:8px;
+    color:#0f172a;
+}
+
+.resumenPalas{
+    background:#ecfeff;
+}
+
+.resumenPalas .estadoResumen{
+    color:#0369a1;
+}
+
+/* Selectores */
+
+.selectorFases,
+.selectorGrupos{
+    display:flex;
+    overflow-x:auto;
     scrollbar-width:none;
 }
 
-.selectorFases::-webkit-scrollbar{
+.selectorFases{
+    gap:9px;
+    margin-bottom:16px;
+    padding:4px 2px 10px;
+}
+
+.selectorGrupos{
+    gap:8px;
+    margin-bottom:10px;
+    padding:2px 0 10px;
+}
+
+.selectorFases::-webkit-scrollbar,
+.selectorGrupos::-webkit-scrollbar{
     display:none;
 }
 
-.selectorBtn{
+.selectorBtn,
+.selectorGrupoBtn{
     flex:0 0 auto;
+    border:none;
+    border-radius:999px;
+    font-family:inherit;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.selectorBtn{
+    padding:10px 14px;
     border:1px solid #e5e7eb;
     background:white;
     color:#475569;
-    border-radius:999px;
-    padding:10px 14px;
-    font-family:inherit;
     font-size:13px;
-    font-weight:900;
-    cursor:pointer;
     box-shadow:0 3px 10px rgba(15,23,42,.06);
 }
 
@@ -939,30 +983,11 @@ body{
     color:white;
 }
 
-.selectorGrupos{
-    display:flex;
-    gap:8px;
-    overflow-x:auto;
-    padding:2px 0 10px;
-    margin-bottom:10px;
-    scrollbar-width:none;
-}
-
-.selectorGrupos::-webkit-scrollbar{
-    display:none;
-}
-
 .selectorGrupoBtn{
-    flex:0 0 auto;
-    border:none;
+    padding:9px 13px;
     background:#eef2ff;
     color:#1e3a8a;
-    border-radius:999px;
-    padding:9px 13px;
-    font-family:inherit;
     font-size:12px;
-    font-weight:900;
-    cursor:pointer;
 }
 
 .selectorGrupoBtn.selectorGrupoActivo{
@@ -970,15 +995,17 @@ body{
     color:white;
 }
 
+/* Cabeceras de sección */
+
 .cabeceraSeccion{
     display:flex;
+    margin-bottom:14px;
+    padding:15px;
     align-items:center;
     gap:13px;
+    border-radius:18px;
     background:#eef2ff;
     color:#1e3a8a;
-    border-radius:18px;
-    padding:15px;
-    margin-bottom:14px;
 }
 
 .cabeceraSeccion > span{
@@ -1001,6 +1028,8 @@ body{
     margin-top:18px;
 }
 
+/* Grupos */
+
 .grupoPartidos{
     display:flex;
     flex-direction:column;
@@ -1017,20 +1046,11 @@ body{
     color:#1e3a8a;
     font-size:14px;
     font-weight:900;
-    text-transform:uppercase;
     letter-spacing:.6px;
+    text-transform:uppercase;
 }
 
-.metaPartido{
-    padding:9px 12px;
-    background:white;
-    border-top:1px solid #e5e7eb;
-    color:#64748b;
-    font-size:12px;
-    font-weight:800;
-}
-
-/* EQUIPOS */
+/* Equipos */
 
 .listaEquipos{
     display:flex;
@@ -1039,9 +1059,9 @@ body{
 }
 
 .cardEquipo{
-    background:white;
-    border-radius:20px;
     padding:17px;
+    border-radius:20px;
+    background:white;
     box-shadow:0 6px 18px rgba(15,23,42,.08);
     cursor:pointer;
 }
@@ -1054,9 +1074,9 @@ body{
 }
 
 .iconoEquipo{
+    display:flex;
     width:44px;
     height:44px;
-    display:flex;
     align-items:center;
     justify-content:center;
     border-radius:14px;
@@ -1066,9 +1086,9 @@ body{
 
 .nombreEquipoFicha{
     display:flex;
+    min-width:0;
     flex-direction:column;
     gap:2px;
-    min-width:0;
 }
 
 .nombreEquipoFicha strong{
@@ -1094,16 +1114,16 @@ body{
 
 .resumenEquipo{
     display:flex;
+    margin-top:14px;
     flex-wrap:wrap;
     gap:8px;
-    margin-top:14px;
 }
 
 .resumenEquipo span{
+    padding:6px 10px;
+    border-radius:999px;
     background:#f8fafc;
     color:#475569;
-    border-radius:999px;
-    padding:6px 10px;
     font-size:12px;
     font-weight:900;
 }
@@ -1115,7 +1135,7 @@ body{
     animation:abrirDetalle .22s ease-out;
 }
 
-/* MÁS */
+/* Pantalla Más */
 
 .listaOpcionesMas{
     display:flex;
@@ -1124,20 +1144,20 @@ body{
 }
 
 .opcionMas{
-    width:100%;
-    border:none;
-    text-decoration:none;
-    background:white;
-    color:#1d2939;
-    border-radius:18px;
-    padding:16px;
     display:grid;
+    width:100%;
+    padding:16px;
     grid-template-columns:32px 1fr 24px;
     align-items:center;
     gap:10px;
-    box-shadow:0 5px 16px rgba(15,23,42,.08);
+    border:none;
+    border-radius:18px;
+    background:white;
+    color:#1d2939;
     font-family:inherit;
     text-align:left;
+    text-decoration:none;
+    box-shadow:0 5px 16px rgba(15,23,42,.08);
     cursor:pointer;
 }
 
@@ -1156,105 +1176,136 @@ body{
     text-align:right;
 }
 
-@media(max-width:600px){
-    .navBtn small{
-        font-size:10px;
-    }
-
-    .selectorBtn{
-        padding:9px 12px;
-        font-size:12px;
-    }
-
-    .selectorGrupoBtn{
-        padding:8px 11px;
-    }
-}
-
-
 /* =========================================================
-   MODO PRETORNEO E INSCRIPCIONES
+   13. PRETORNEO E INSCRIPCIONES
 ========================================================= */
 
 body.modoPretorneo{
     background:
         radial-gradient(
             circle at top right,
-            rgba(37,99,235,.10),
+            rgba(194,101,69,.16),
             transparent 34%
         ),
-        #f4f6f9;
+        radial-gradient(
+            circle at bottom left,
+            rgba(15,118,110,.10),
+            transparent 35%
+        ),
+        #fbf7f2;
 }
 
-/* CABECERA PRETORNEO */
-
 .cabecera.cabeceraPretorneo{
-    background:
-        linear-gradient(
-            135deg,
-            #172554,
-            #1e40af 55%,
-            #2563eb
-        );
+    background:linear-gradient(135deg,#431c2b,#7c2d2d 55%,#c26645);
+    box-shadow:0 12px 30px rgba(67,28,43,.24);
 }
 
 .cabeceraPretorneo .estadoCabecera{
-    background:rgba(255,255,255,.18);
-    border:1px solid rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,248,240,.16);
 }
 
-.progreso.barraPretorneo{
-    background:
-        linear-gradient(
-            90deg,
-            #f59e0b,
-            #fbbf24
-        );
+.modoPretorneo .progresoCabecera{
+    display:none;
 }
 
-/* TARJETAS DE LA PORTADA */
+/* Cuenta atrás */
+
+.actualizacion.cuentaAtras{
+    display:flex;
+    padding:14px;
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+    background:rgba(255,248,240,.14);
+}
+
+.cuentaAtrasTitulo,
+.cuentaAtrasMensaje{
+    display:block;
+    color:white;
+    font-size:13px;
+    font-weight:800;
+    text-align:center;
+}
+
+.cuentaAtrasValores{
+    display:grid;
+    width:100%;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.cuentaAtrasValores div{
+    padding:10px 6px;
+    border-radius:13px;
+    background:rgba(255,255,255,.14);
+    text-align:center;
+}
+
+.cuentaAtrasValores strong{
+    display:block;
+    color:white;
+    font-size:23px;
+    font-weight:900;
+    line-height:1;
+}
+
+.cuentaAtrasValores small{
+    display:block;
+    margin-top:5px;
+    color:rgba(255,255,255,.78);
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+/* Dos tarjetas principales */
+
+.modoPretorneo .gridDashboard{
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:20px;
+}
 
 .modoPretorneo .gridDashboard .cardAcceso{
-    min-height:155px;
+    min-height:145px;
+    padding:16px;
+    border-radius:20px;
 }
 
 .modoPretorneo .gridDashboard .cardAcceso:nth-child(1){
-    background:
-        linear-gradient(
-            135deg,
-            #2563eb,
-            #1e3a8a
-        );
+    background:linear-gradient(135deg,#9a3412,#c2410c,#ea8b4b);
 }
 
 .modoPretorneo .gridDashboard .cardAcceso:nth-child(2){
-    background:
-        linear-gradient(
-            135deg,
-            #16a34a,
-            #166534
-        );
+    background:linear-gradient(135deg,#0f766e,#115e59,#134e4a);
 }
 
-.modoPretorneo .gridDashboard .cardAcceso:nth-child(3){
-    background:
-        linear-gradient(
-            135deg,
-            #7c3aed,
-            #5b21b6
-        );
+.modoPretorneo .cardAcceso .flecha,
+.modoPretorneo .opcionMas b{
+    display:none;
 }
 
-.modoPretorneo .gridDashboard .cardAcceso:nth-child(4){
-    background:
-        linear-gradient(
-            135deg,
-            #d97706,
-            #92400e
-        );
+.modoPretorneo .opcionMas{
+    grid-template-columns:32px 1fr;
 }
 
-/* INFORMACIÓN DEL CAMPEONATO */
+/* Inscripciones bloqueadas */
+
+.modoPretorneo .tarjetaBloqueada{
+    opacity:.48;
+    filter:saturate(.35);
+    cursor:not-allowed;
+    pointer-events:none;
+    box-shadow:0 5px 14px rgba(15,23,42,.08);
+}
+
+.modoPretorneo .tarjetaBloqueada::after{
+    background:rgba(255,255,255,.06);
+}
+
+/* Información del campeonato */
 
 .datoPretorneo{
     cursor:default;
@@ -1277,8 +1328,6 @@ body.modoPretorneo{
     display:none;
 }
 
-/* INSCRIPCIONES */
-
 .resumenInscripcionCerrada{
     background:#fff7ed;
 }
@@ -1290,9 +1339,9 @@ body.modoPretorneo{
 .enlaceInscripcion{
     display:block;
     width:100%;
+    margin-top:18px;
     text-align:center;
     text-decoration:none;
-    margin-top:18px;
     box-shadow:0 6px 16px rgba(37,99,235,.20);
 }
 
@@ -1300,96 +1349,70 @@ body.modoPretorneo{
     transform:scale(.98);
 }
 
-/* RESUMEN DE PORTADA */
+/* Pantallas interiores */
 
-.modoPretorneo .podioCard{
-    border-top:5px solid #f59e0b;
+.modoPretorneo .vistaDetalle h2{
+    color:#6b2737;
 }
 
-.modoPretorneo #podio .equipoPodio{
-    line-height:1.45;
+.modoPretorneo .resumenPartidos{
+    background:#f8e9dc;
 }
 
-.modoPretorneo #podio .equipoPodio strong{
-    color:#0f172a;
+.modoPretorneo .resumenPartidos .estadoResumen{
+    color:#9a3412;
 }
 
-/* NAVEGACIÓN PRETORNEO */
+/* Navegación Pretorneo */
+
+.modoPretorneo .bottomNav{
+    border-top:1px solid #ead8cc;
+}
 
 .modoPretorneo .bottomNav .navBtn.navActivo,
-.modoPretorneo .bottomNav .navBtn.navActivo small{
-    color:#1d4ed8;
+.modoPretorneo .bottomNav .navBtn.navActivo small,
+.paginaSecundaria .bottomNav .navBtn.navActivo,
+.paginaSecundaria .bottomNav .navBtn.navActivo small{
+    color:#a33a2b;
 }
 
-/* AJUSTES MÓVIL */
+/* En Pretorneo no se muestra el resumen inferior */
 
-@media(max-width:600px){
-
-    .modoPretorneo .gridDashboard .cardAcceso{
-        min-height:155px;
-    }
-
-    .modoPretorneo .cardAcceso h4{
-        font-size:15px;
-    }
-
-    .modoPretorneo .cardAcceso p{
-        font-size:12px;
-    }
-
-    .datoPretorneo{
-        grid-template-columns:32px 1fr;
-    }
+.modoPretorneo .podioCard{
+    display:none !important;
 }
-
-
-/* Quitar flechas de los botones en Pretorneo */
-
-.modoPretorneo .cardAcceso .flecha,
-.modoPretorneo .opcionMas b{
-    display:none;
-}
-
-.modoPretorneo .opcionMas{
-    grid-template-columns:32px 1fr;
-}
-
 
 /* =========================================================
-   HISTORIA, CAMPEONES Y PÁGINAS SECUNDARIAS
+   14. HISTORIA, CAMPEONES Y PÁGINAS SECUNDARIAS
 ========================================================= */
 
 .paginaSecundaria{
     background:
         radial-gradient(
             circle at top right,
-            rgba(37,99,235,.10),
+            rgba(194,101,69,.14),
             transparent 32%
         ),
-        #f4f6f9;
+        #fbf7f2;
 }
 
 .paginaSecundaria .contenedor{
     padding-top:20px;
 }
 
-
-
-.cabeceraCampeones{
-    background:
-        linear-gradient(
-            135deg,
-            #78350f,
-            #d97706,
-            #f59e0b
-        );
+.paginaSecundaria .cabecera{
+    background:linear-gradient(135deg,#431c2b,#7c2d2d 55%,#c26645);
 }
 
-
+.paginaSecundaria .cabeceraCampeones{
+    background:linear-gradient(135deg,#78350f,#d97706,#f59e0b);
+}
 
 .contenidoPagina{
     width:100%;
 }
+
+/* Historia */
 
 .articuloHistoria{
     padding:24px;
@@ -1413,10 +1436,10 @@ body.modoPretorneo{
 .fraseHistoria{
     margin:24px 0;
     padding:18px;
-    border-left:5px solid #2563eb;
+    border-left:5px solid #c2410c;
     border-radius:0 16px 16px 0;
-    background:#eef2ff;
-    color:#1e3a8a;
+    background:#fff1e8;
+    color:#9a3412;
     font-size:17px;
     font-weight:900;
     line-height:1.55;
@@ -1430,10 +1453,10 @@ body.modoPretorneo{
 
 .listaHistoria{
     display:flex;
-    flex-direction:column;
-    gap:8px;
     margin:0 0 22px;
     padding:16px;
+    flex-direction:column;
+    gap:8px;
     border-radius:16px;
     background:#f8fafc;
     color:#475569;
@@ -1456,28 +1479,28 @@ body.modoPretorneo{
 .figuraPagina figcaption{
     margin-top:10px;
     color:#64748b;
-    text-align:center;
     font-size:12px;
     font-weight:700;
+    text-align:center;
 }
 
 .cierreHistoria{
     margin-top:26px;
     padding:18px;
     border-radius:16px;
-    background:#0f172a;
+    background:#431c2b;
     color:white !important;
     font-weight:700;
 }
 
-/* PALMARÉS */
+/* Campeones */
 
 .presentacionPalmares{
     display:flex;
-    align-items:center;
-    gap:16px;
     margin-bottom:18px;
     padding:18px;
+    align-items:center;
+    gap:16px;
     border-radius:20px;
     background:white;
     box-shadow:0 5px 18px rgba(15,23,42,.08);
@@ -1485,11 +1508,11 @@ body.modoPretorneo{
 
 .iconoTrofeo{
     display:flex;
-    align-items:center;
-    justify-content:center;
-    flex:0 0 58px;
     width:58px;
     height:58px;
+    flex:0 0 58px;
+    align-items:center;
+    justify-content:center;
     border-radius:18px;
     background:#fef3c7;
     font-size:30px;
@@ -1524,17 +1547,11 @@ body.modoPretorneo{
 
 .cabeceraCampeon{
     display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:16px;
     padding:20px;
-    background:
-        linear-gradient(
-            135deg,
-            #78350f,
-            #d97706,
-            #f59e0b
-        );
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    background:linear-gradient(135deg,#78350f,#d97706,#f59e0b);
     color:white;
 }
 
@@ -1579,16 +1596,16 @@ body.modoPretorneo{
     padding:10px 14px;
     background:#fff7ed;
     color:#92400e;
-    text-align:center;
     font-size:12px;
     font-weight:800;
+    text-align:center;
 }
 
 .datosCampeon{
     display:grid;
+    padding:18px;
     grid-template-columns:1fr 1fr;
     gap:12px;
-    padding:18px;
 }
 
 .datosCampeon div{
@@ -1613,15 +1630,79 @@ body.modoPretorneo{
     line-height:1.4;
 }
 
-/* ENLACES EN LA NAVEGACIÓN INFERIOR */
+/* =========================================================
+   15. RESPONSIVE
+========================================================= */
 
-.bottomNav a.navBtn{
-    text-decoration:none;
-}
+@media(max-width:600px){
 
-/* AJUSTES PARA MÓVIL */
+    .contenedor{
+        padding:20px;
+    }
 
+    .cabecera{
+        padding:24px;
+    }
 
+    .tituloPrincipal{
+        font-size:32px;
+    }
+
+    .gridDashboard{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .cardAcceso{
+        min-height:150px;
+        padding:16px;
+        border-radius:22px;
+    }
+
+    .navBtn small{
+        font-size:10px;
+    }
+
+    .selectorBtn{
+        padding:9px 12px;
+        font-size:12px;
+    }
+
+    .selectorGrupoBtn{
+        padding:8px 11px;
+    }
+
+    /* Pretorneo: mantener dos tarjetas una junto a otra */
+
+    .modoPretorneo .gridDashboard{
+        grid-template-columns:1fr 1fr;
+        gap:12px;
+    }
+
+    .modoPretorneo .gridDashboard .cardAcceso{
+        min-height:145px;
+        padding:16px;
+        border-radius:20px;
+    }
+
+    .modoPretorneo .cardAcceso h4{
+        font-size:15px;
+    }
+
+    .modoPretorneo .cardAcceso p{
+        font-size:12px;
+        line-height:1.4;
+    }
+
+    .cuentaAtrasValores strong{
+        font-size:21px;
+    }
+
+    .datoPretorneo{
+        grid-template-columns:32px 1fr;
+    }
+
+    /* Páginas secundarias */
 
     .articuloHistoria{
         padding:20px;
@@ -1645,195 +1726,32 @@ body.modoPretorneo{
     }
 }
 
+@media(max-width:380px){
 
-/* =========================================================
-   REDISEÑO PRETORNEO
-========================================================= */
-
-body.modoPretorneo{
-    background:
-        radial-gradient(
-            circle at top right,
-            rgba(194,101,69,.16),
-            transparent 34%
-        ),
-        radial-gradient(
-            circle at bottom left,
-            rgba(15,118,110,.10),
-            transparent 35%
-        ),
-        #fbf7f2;
-}
-
-/* CABECERA */
-
-.cabecera.cabeceraPretorneo{
-    background:
-        linear-gradient(
-            135deg,
-            #431c2b,
-            #7c2d2d 55%,
-            #c26645
-        );
-    box-shadow:
-        0 12px 30px rgba(67,28,43,.24);
-}
-
-.cabeceraPretorneo .estadoCabecera{
-    background:rgba(255,248,240,.16);
-    border:1px solid rgba(255,255,255,.18);
-}
-
-.modoPretorneo .progresoCabecera{
-    display:none;
-}
-
-/* CUENTA ATRÁS */
-
-.actualizacion.cuentaAtras{
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    gap:12px;
-    padding:14px;
-    background:rgba(255,248,240,.14);
-}
-
-.cuentaAtrasTitulo,
-.cuentaAtrasMensaje{
-    display:block;
-    text-align:center;
-    color:white;
-    font-size:13px;
-    font-weight:800;
-}
-
-.cuentaAtrasValores{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:9px;
-    width:100%;
-}
-
-.cuentaAtrasValores div{
-    padding:10px 6px;
-    border-radius:13px;
-    background:rgba(255,255,255,.14);
-    text-align:center;
-}
-
-.cuentaAtrasValores strong{
-    display:block;
-    color:white;
-    font-size:23px;
-    font-weight:900;
-    line-height:1;
-}
-
-.cuentaAtrasValores small{
-    display:block;
-    margin-top:5px;
-    color:rgba(255,255,255,.78);
-    font-size:10px;
-    font-weight:800;
-    text-transform:uppercase;
-}
-
-/* DOS TARJETAS PRINCIPALES */
-
-.modoPretorneo .gridDashboard{
-    margin-bottom:20px;
-}
-
-.modoPretorneo .gridDashboard .cardAcceso{
-    min-height:145px;
-}
-
-.modoPretorneo .gridDashboard .cardAcceso:nth-child(1){
-    background:
-        linear-gradient(
-            135deg,
-            #9a3412,
-            #c2410c,
-            #ea8b4b
-        );
-}
-
-.modoPretorneo .gridDashboard .cardAcceso:nth-child(2){
-    background:
-        linear-gradient(
-            135deg,
-            #0f766e,
-            #115e59,
-            #134e4a
-        );
-}
-
-/* INSCRIPCIONES TODAVÍA CERRADAS */
-
-.modoPretorneo .tarjetaBloqueada{
-    opacity:.48;
-    filter:saturate(.35);
-    cursor:not-allowed;
-    pointer-events:none;
-    box-shadow:
-        0 5px 14px rgba(15,23,42,.08);
-}
-
-.modoPretorneo .tarjetaBloqueada::after{
-    background:rgba(255,255,255,.06);
-}
-
-/* PANTALLAS INTERIORES */
-
-.modoPretorneo .vistaDetalle h2{
-    color:#6b2737;
-}
-
-.modoPretorneo .resumenPartidos{
-    background:#f8e9dc;
-}
-
-.modoPretorneo .resumenPartidos .estadoResumen{
-    color:#9a3412;
-}
-
-/* NAVEGACIÓN */
-
-.modoPretorneo .bottomNav{
-    border-top:1px solid #ead8cc;
-}
-
-.modoPretorneo .bottomNav .navBtn.navActivo,
-.modoPretorneo .bottomNav .navBtn.navActivo small{
-    color:#a33a2b;
-}
-
-.paginaSecundaria .bottomNav .navBtn.navActivo,
-.paginaSecundaria .bottomNav .navBtn.navActivo small{
-    color:#a33a2b;
-}
-
-/* EN PRETORNEO NO HAY RESUMEN INFERIOR */
-
-.modoPretorneo .podioCard{
-    display:none !important;
-}
-
-/* MÓVIL */
-
-@media(max-width:600px){
-
-    .modoPretorneo .gridDashboard{
-        grid-template-columns:1fr;
-        gap:13px;
+    .contenedor{
+        padding:14px;
     }
 
+    .cabecera{
+        padding:20px;
+    }
+
+    .tituloPrincipal{
+        font-size:29px;
+    }
+
+    .cardAcceso,
     .modoPretorneo .gridDashboard .cardAcceso{
-        min-height:125px;
+        min-height:138px;
+        padding:14px;
     }
 
-    .cuentaAtrasValores strong{
-        font-size:21px;
+    .navBtn span{
+        font-size:22px;
+    }
+
+    .navBtn small{
+        font-size:9px;
     }
 }
+
