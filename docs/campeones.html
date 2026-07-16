@@ -1,25 +1,217 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campeones</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Campeones del Torneo</title>
+
+    <link rel="stylesheet" href="style.css?v=164">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
 </head>
-<body>
-    <header>
-        <h1>Campeones</h1>
+
+<body class="paginaSecundaria">
+
+<div class="contenedor">
+
+    <header class="cabecera cabeceraCampeones">
+
+        
+
+        <div class="tituloSuperior">
+            PALMARÉS
+        </div>
+
+        <div class="tituloPrincipal">
+            Campeones
+        </div>
+
+        <div class="subtitulo">
+            Los nombres que ya forman parte de la historia
+        </div>
+
     </header>
 
-    <section class="campeones">
-        <div class="campeon">
-            <h2>Campeones 2025</h2>
-            <img src="Imagenes/Campeones_2025.JPG" alt="Campeones 2025">
-            <p><strong>Equipo:</strong> Diego Alfonsín & Diego Troncoso</p>
-            <p><strong>Fecha:</strong> 27 de septiembre de 2025</p>
-        </div>
-    </section>
-<script src="menu.js"></script>
+    <main class="contenidoPagina">
+
+        <section class="presentacionPalmares">
+
+            <span class="iconoTrofeo">🏆</span>
+
+            <div>
+                <h2>Cuadro de honor</h2>
+
+                <p>
+                    Campeones de cada edición del Sprint Pádel Tui.
+                </p>
+            </div>
+
+        </section>
+
+        <section class="listaCampeones">
+
+            <article class="campeonCard">
+
+                <div class="cabeceraCampeon">
+
+                    <div>
+                        <span class="edicionCampeon">
+                            EDICIÓN 2025
+                        </span>
+
+                        <h2>
+                            Diego Alfonsín
+                            <span>&</span>
+                            Diego Troncoso
+                        </h2>
+                    </div>
+
+                    <div class="trofeoCampeon">
+                        🏆
+                    </div>
+
+                </div>
+
+                <figure class="figuraCampeon">
+
+                    <img
+                        class="fotoCampeon"
+                        src="Imagenes/Campeones_2025.JPG"
+                        alt="Diego Alfonsín y Diego Troncoso, campeones de 2025"
+                    >
+
+                    <figcaption>
+                        Campeones de la edición de 2025
+                    </figcaption>
+
+                </figure>
+
+                <div class="datosCampeon">
+
+                    <div>
+                        <span>📅 Fecha</span>
+                        <strong>27 de septiembre de 2025</strong>
+                    </div>
+
+                    <div>
+                        <span>📍 Edición</span>
+                        <strong>Sprint Pádel Tui 2025</strong>
+                    </div>
+
+                </div>
+
+            </article>
+
+        </section>
+
+    </main>
+
+</div>
+
+<nav class="bottomNav">
+
+    <a
+        class="navBtn"
+        data-nav="inicio"
+        href="index.html"
+    >
+        <span>🏠</span>
+        <small>Inicio</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="historia"
+        data-contenido-web="historia"
+        href="historia.html"
+    >
+        <span>📖</span>
+        <small>Historia</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="normativa"
+        data-contenido-web="normativa"
+        href="normas.html"
+    >
+        <span>📜</span>
+        <small>Normas</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="campeones"
+        data-contenido-web="campeones"
+        href="campeones.html"
+    >
+        <span>🏆</span>
+        <small>Campeones</small>
+    </a>
+
+    <a
+        class="navBtn"
+        data-nav="mas"
+        href="index.html?pantalla=mas"
+    >
+        <span>☰</span>
+        <small>Más</small>
+    </a>
+
+</nav>
+
+<script>
+(async function cargarNavegacionVersionada() {
+    let version = Date.now();
+
+    try {
+        const respuesta = await fetch(
+            "https://dtv79.github.io/Campeonato/estado_torneo.json?v=" +
+            Date.now(),
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (respuesta.ok) {
+            const datos = await respuesta.json();
+
+            version =
+                datos?.configuracion?.version_web ||
+                datos?.configuracion?.version ||
+                version;
+        }
+    } catch (error) {
+        console.error(
+            "No se pudo leer la versión WEB:",
+            error
+        );
+    }
+
+    const script = document.createElement("script");
+
+    script.src =
+        "nav-pretorneo.js?v=" +
+        encodeURIComponent(version);
+
+    document.body.appendChild(script);
+})();
+</script>
+
 </body>
 </html>
 
