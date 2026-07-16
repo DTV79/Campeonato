@@ -1,6 +1,7 @@
 const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
 
 let datos = null;
+let temporizadorCuentaAtras = null;
 
 const estadoUI = {
     pantalla: "inicio",
@@ -28,6 +29,17 @@ async function iniciarApp() {
 
         inicializarEstadoUI();
         pintarInicio();
+
+        const pantallaSolicitada = new URLSearchParams(
+            window.location.search
+        ).get("pantalla");
+
+        if (
+            esWebPrevia() &&
+            pantallaSolicitada === "mas"
+        ) {
+            abrirPantalla("mas");
+        }
     } catch (error) {
         console.error(error);
         pintarErrorCarga();
@@ -467,13 +479,20 @@ function pintarFilaEquipoGrupoSinClasificacion(fila) {
 
 function pintarInicio() {
     pintarIdentidadCampeonato();
-    pintarFecha(datos.ultima_actualizacion);
 
     if (esWebPrevia()) {
         pintarInicioPretorneo();
         return;
     }
 
+    detenerCuentaAtrasCampeonato();
+    restaurarBloqueActualizacionCompeticion();
+
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
+    pintarFecha(datos.ultima_actualizacion);
     configurarPortadaCompeticion();
     pintarEstadoCabecera();
     pintarTarjetasDashboard();
@@ -785,9 +804,6 @@ function pintarResumenPalasPortada() {
 ========================================================= */
 
 function pintarInicioPretorneo() {
-    const lugar = obtenerLugarCampeonato();
-    const horario = obtenerHorarioCampeonato();
-    const fecha = formatearFechaCampeonato();
     const inscripcionesAbiertas = esEstadoInscripciones();
 
     document.body.classList.add("modoPretorneo");
@@ -800,72 +816,27 @@ function pintarInicioPretorneo() {
         .querySelector(".cabecera")
         ?.classList.remove("cabeceraFinalizada");
 
- 
+    document
+        .querySelector(".podioCard")
+        ?.classList.add("oculto");
 
     configurarNavegacionPretorneo();
     configurarTarjetasPretorneo();
+    iniciarCuentaAtrasCampeonato();
 
     setText(
         "estadoCabecera",
         inscripcionesAbiertas
             ? "🟢 Inscripciones abiertas"
-            : "🟡 Próximamente"
-    );
-
-    setText(
-        "textoProgreso",
-        inscripcionesAbiertas
-            ? "Ya puedes solicitar tu plaza para el campeonato"
-            : `Próxima edición: ${fecha}`
-    );
-
-    const barra = document.getElementById("barraProgreso");
-
-    if (barra) {
-        barra.style.width = inscripcionesAbiertas ? "65%" : "30%";
-        barra.className = "progreso barraPretorneo";
-    }
-
-    setText(
-        "tituloPodio",
-        inscripcionesAbiertas
-            ? "✍️ Inscripciones abiertas"
-            : "🎾 Próxima edición"
-    );
-
-    setHTML(
-        "podio",
-        `
-            <div class="equipoPodio oro">
-                <span>
-                    📅 <strong>${escaparHTML(fecha)}</strong>
-                </span>
-            </div>
-
-            <div class="equipoPodio">
-        <span>📍 ${escaparHTML(lugar)}</span>
-        </div>
-
-    ${horario ? `
-    <div class="equipoPodio">
-        <span>🕒 ${escaparHTML(horario)}</span>
-    </div>
-` : ""}
-
-<div class="equipoPodio">
-                <span>
-                    ${
-                        inscripcionesAbiertas
-                            ? "🟢 El plazo de inscripción está abierto"
-                            : "⏳ Las inscripciones se abrirán próximamente"
-                    }
-                </span>
-            </div>
-        `
+            : "🟠 Información previa"
     );
 }
 
 function configurarPortadaCompeticion() {
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
     document.body.classList.remove("modoPretorneo");
 
     document
@@ -914,28 +885,19 @@ function configurarPortadaCompeticion() {
 }
 
 function configurarTarjetasPretorneo() {
-    const config = obtenerConfiguracion();
-
     const tarjetas = [
         ...document.querySelectorAll(
             ".gridDashboard .cardAcceso"
         )
     ];
 
-    const fecha = formatearFechaCampeonato();
-    const lugar = obtenerLugarCampeonato();
-    const horario = obtenerHorarioCampeonato();
     const inscripcionesAbiertas = esEstadoInscripciones();
 
     configurarTarjetaPortada(
         tarjetas[0],
         "📅",
         "Campeonato",
-        `
-            ${escaparHTML(fecha)}<br>
-            ${escaparHTML(lugar)}
-            ${horario ? `<br>${escaparHTML(horario)}` : ""}
-        `,
+        "Información de la próxima edición",
         "pretorneo_info"
     );
 
@@ -944,52 +906,23 @@ function configurarTarjetasPretorneo() {
         "✍️",
         "Inscripciones",
         inscripcionesAbiertas
-            ? "Abiertas<br>Solicita tu plaza"
-            : "Próximamente<br>Te avisaremos cuando se abran",
-        "pretorneo_inscripcion"
+            ? "El plazo de inscripción está abierto"
+            : "En breve se abrirá el plazo de inscripciones",
+        inscripcionesAbiertas
+            ? "pretorneo_inscripcion"
+            : ""
     );
 
-    configurarTarjetaContenidoPretorneo(
-        tarjetas[2],
-        esSi(config.mostrar_historia),
-        "📖",
-        "Nuestra historia",
-        "Cómo nació el campeonato y sus mejores momentos",
-        "historia.html"
-    );
+    if (!inscripcionesAbiertas && tarjetas[1]) {
+        tarjetas[1].classList.add("tarjetaBloqueada");
+        tarjetas[1].setAttribute("aria-disabled", "true");
 
-    configurarTarjetaContenidoPretorneo(
-        tarjetas[3],
-        esSi(config.mostrar_campeones),
-        "🏆",
-        "Campeones",
-        "Ganadores de las ediciones anteriores",
-        "campeones.html"
-    );
-}
+        delete tarjetas[1].dataset.seccion;
+        delete tarjetas[1].dataset.href;
+    }
 
-function configurarTarjetaContenidoPretorneo(
-    tarjeta,
-    mostrar,
-    icono,
-    titulo,
-    resumen,
-    href
-) {
-    if (!tarjeta) return;
-
-    tarjeta.classList.toggle("oculto", !mostrar);
-
-    if (!mostrar) return;
-
-    configurarTarjetaPortada(
-        tarjeta,
-        icono,
-        titulo,
-        resumen,
-        "",
-        href
-    );
+    tarjetas[2]?.classList.add("oculto");
+    tarjetas[3]?.classList.add("oculto");
 }
 
 function configurarTarjetaPortada(
@@ -1001,7 +934,13 @@ function configurarTarjetaPortada(
     href = ""
 ) {
     if (!tarjeta) return;
-    tarjeta.classList.remove("oculto");
+
+    tarjeta.classList.remove(
+        "oculto",
+        "tarjetaBloqueada"
+    );
+
+    tarjeta.removeAttribute("aria-disabled");
 
     const iconoElemento =
         tarjeta.querySelector(".iconoAcceso");
@@ -1049,10 +988,6 @@ function configurarNavegacionPretorneo() {
 
     const config = obtenerConfiguracion();
 
-    const mostrarNormativa =
-        config.mostrar_normativa === undefined ||
-        esSi(config.mostrar_normativa);
-
     configurarBotonNav(
         botones[0],
         "🏠",
@@ -1062,36 +997,42 @@ function configurarNavegacionPretorneo() {
 
     configurarBotonNav(
         botones[1],
-        "✍️",
-        "Inscripción",
-        "pretorneo_inscripcion"
-    );
-
-    configurarBotonNav(
-        botones[2],
         "📖",
         "Historia",
         "",
         "historia.html"
     );
 
-    if (mostrarNormativa) {
-        configurarBotonNav(
-            botones[3],
-            "📜",
-            "Normas",
-            "",
-            "normas.html"
-        );
-    } else {
-        configurarBotonNav(
-            botones[3],
-            "🏆",
-            "Campeones",
-            "",
-            "campeones.html"
-        );
-    }
+    botones[1]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_historia)
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "📜",
+        "Normas",
+        "",
+        "normas.html"
+    );
+
+    botones[2]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_normativa)
+    );
+
+    configurarBotonNav(
+        botones[3],
+        "🏆",
+        "Campeones",
+        "",
+        "campeones.html"
+    );
+
+    botones[3]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_campeones)
+    );
 
     configurarBotonNav(
         botones[4],
@@ -1153,6 +1094,8 @@ function configurarBotonNav(
 ) {
     if (!boton) return;
 
+    boton.classList.remove("oculto");
+
     const iconoElemento =
         boton.querySelector("span");
 
@@ -1199,17 +1142,12 @@ function pintarPantallaInformacionPretorneo() {
     );
 
     contenido.innerHTML = `
-        <h2>📅 Campeonato 2026</h2>
+        <h2>📅 Campeonato</h2>
 
         <section class="resumenPartidos">
             <div class="estadoResumen">
                 🎾 Información de la próxima edición
             </div>
-
-            <p>
-                Todos los datos principales del campeonato,
-                reunidos en un solo lugar.
-            </p>
         </section>
 
         <div class="listaOpcionesMas">
@@ -1335,46 +1273,7 @@ function pintarPantallaMasPretorneo() {
     if (!contenido) return;
 
     const config = obtenerConfiguracion();
-
-    const opciones = [
-    {
-        icono: "📅",
-        texto: "Información del campeonato",
-        pantalla: "pretorneo_info"
-    },
-    {
-        icono: "✍️",
-        texto: "Inscripciones",
-        pantalla: "pretorneo_inscripcion"
-    }
-];
-
-if (esSi(config.mostrar_historia)) {
-    opciones.push({
-        icono: "📖",
-        texto: "Historia",
-        href: "historia.html"
-    });
-}
-
-if (esSi(config.mostrar_campeones)) {
-    opciones.push({
-        icono: "🏆",
-        texto: "Campeones",
-        href: "campeones.html"
-    });
-}
-
-    if (
-        config.mostrar_normativa === undefined ||
-        esSi(config.mostrar_normativa)
-    ) {
-        opciones.push({
-            icono: "📜",
-            texto: "Normativa",
-            href: "normas.html"
-        });
-    }
+    const opciones = [];
 
     if (esSi(config.mostrar_fotos)) {
         opciones.push({
@@ -1403,11 +1302,11 @@ if (esSi(config.mostrar_campeones)) {
     contenido.innerHTML = `
         <h2>☰ Más</h2>
 
-        <div class="listaOpcionesMas">
-            ${
-                opciones.map(opcion =>
-                    opcion.href
-                        ? `
+        ${
+            opciones.length
+                ? `
+                    <div class="listaOpcionesMas">
+                        ${opciones.map(opcion => `
                             <a
                                 class="opcionMas"
                                 href="${escaparAtributo(opcion.href)}"
@@ -1420,25 +1319,14 @@ if (esSi(config.mostrar_campeones)) {
 
                                 <b>→</b>
                             </a>
-                        `
-                        : `
-                            <button
-                                class="opcionMas"
-                                type="button"
-                                data-destino-pantalla="${opcion.pantalla}"
-                            >
-                                <span>${opcion.icono}</span>
-
-                                <strong>
-                                    ${escaparHTML(opcion.texto)}
-                                </strong>
-
-                                <b>→</b>
-                            </button>
-                        `
-                ).join("")
-            }
-        </div>
+                        `).join("")}
+                    </div>
+                `
+                : pintarTarjetaVacia(
+                    "Sin más secciones",
+                    "No hay contenido adicional habilitado."
+                )
+        }
     `;
 }
 
@@ -2558,6 +2446,172 @@ function obtenerHorarioCampeonato() {
         config.horario ||
         ""
     ).trim();
+}
+
+function obtenerFechaHoraInicioCampeonato() {
+    const fechaTexto = String(
+        obtenerFechaCampeonato() || ""
+    ).trim();
+
+    const horarioTexto = String(
+        obtenerHorarioCampeonato() || ""
+    ).trim();
+
+    let dia;
+    let mes;
+    let anio;
+
+    let coincidencia = fechaTexto.match(
+        /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+    if (coincidencia) {
+        anio = Number(coincidencia[1]);
+        mes = Number(coincidencia[2]);
+        dia = Number(coincidencia[3]);
+    } else {
+        coincidencia = fechaTexto.match(
+            /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/
+        );
+
+        if (coincidencia) {
+            dia = Number(coincidencia[1]);
+            mes = Number(coincidencia[2]);
+            anio = Number(coincidencia[3]);
+        }
+    }
+
+    if (!dia || !mes || !anio) {
+        return null;
+    }
+
+    const coincidenciaHora = horarioTexto.match(
+        /(\d{1,2})[:.](\d{2})/
+    );
+
+    const hora = coincidenciaHora
+        ? Number(coincidenciaHora[1])
+        : 0;
+
+    const minutos = coincidenciaHora
+        ? Number(coincidenciaHora[2])
+        : 0;
+
+    const fechaInicio = new Date(
+        anio,
+        mes - 1,
+        dia,
+        hora,
+        minutos,
+        0,
+        0
+    );
+
+    return Number.isNaN(fechaInicio.getTime())
+        ? null
+        : fechaInicio;
+}
+
+function iniciarCuentaAtrasCampeonato() {
+    detenerCuentaAtrasCampeonato();
+
+    const contenedor =
+        document.querySelector(".actualizacion");
+
+    if (!contenedor) return;
+
+    contenedor.classList.add("cuentaAtras");
+
+    const actualizar = () => {
+        const fechaInicio =
+            obtenerFechaHoraInicioCampeonato();
+
+        if (!fechaInicio) {
+            contenedor.innerHTML = `
+                <span class="cuentaAtrasMensaje">
+                    📅 Fecha y horario pendientes de confirmar
+                </span>
+            `;
+            return;
+        }
+
+        const diferencia =
+            fechaInicio.getTime() - Date.now();
+
+        if (diferencia <= 0) {
+            contenedor.innerHTML = `
+                <span class="cuentaAtrasMensaje">
+                    🎾 El campeonato ya ha comenzado
+                </span>
+            `;
+            return;
+        }
+
+        const totalMinutos = Math.floor(
+            diferencia / 60000
+        );
+
+        const dias = Math.floor(
+            totalMinutos / 1440
+        );
+
+        const horas = Math.floor(
+            (totalMinutos % 1440) / 60
+        );
+
+        const minutos = totalMinutos % 60;
+
+        contenedor.innerHTML = `
+            <span class="cuentaAtrasTitulo">
+                ⏳ Faltan para el inicio
+            </span>
+
+            <div class="cuentaAtrasValores">
+                <div>
+                    <strong>${dias}</strong>
+                    <small>días</small>
+                </div>
+
+                <div>
+                    <strong>${horas}</strong>
+                    <small>horas</small>
+                </div>
+
+                <div>
+                    <strong>${minutos}</strong>
+                    <small>min</small>
+                </div>
+            </div>
+        `;
+    };
+
+    actualizar();
+
+    temporizadorCuentaAtras = setInterval(
+        actualizar,
+        30000
+    );
+}
+
+function detenerCuentaAtrasCampeonato() {
+    if (temporizadorCuentaAtras) {
+        clearInterval(temporizadorCuentaAtras);
+        temporizadorCuentaAtras = null;
+    }
+}
+
+function restaurarBloqueActualizacionCompeticion() {
+    const contenedor =
+        document.querySelector(".actualizacion");
+
+    if (!contenedor) return;
+
+    contenedor.classList.remove("cuentaAtras");
+
+    contenedor.innerHTML = `
+        <span>🕒 Última actualización:</span>
+        <strong id="ultimaActualizacion">--</strong>
+    `;
 }
 function obtenerFechaCampeonato() {
     const config = obtenerConfiguracion();
