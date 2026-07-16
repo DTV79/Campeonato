@@ -11,9 +11,20 @@ const estadoUI = {
     grupoPartidos: {}
 };
 
-document.addEventListener("DOMContentLoaded", iniciarApp);
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarApp,
+        { once: true }
+    );
+} else {
+    iniciarApp();
+}
 
-document.addEventListener("click", gestionarClickGlobal);
+document.addEventListener(
+    "click",
+    gestionarClickGlobal
+);
 
 async function iniciarApp() {
     try {
