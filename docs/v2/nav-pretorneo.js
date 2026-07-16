@@ -1,10 +1,14 @@
 const JSON_URL_NAV =
     "https://dtv79.github.io/Campeonato/estado_torneo.json";
 
-document.addEventListener(
-    "DOMContentLoaded",
-    iniciarNavegacionPretorneo
-);
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarNavegacionPretorneo
+    );
+} else {
+    iniciarNavegacionPretorneo();
+}
 
 async function iniciarNavegacionPretorneo() {
     activarPaginaActual();
