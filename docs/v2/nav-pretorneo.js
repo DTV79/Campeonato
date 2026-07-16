@@ -58,12 +58,16 @@ function activarPaginaActual() {
             .toLowerCase() || "index.html";
 
     const mapa = {
+        "index.html": "inicio",
         "historia.html": "historia",
         "normas.html": "normativa",
-        "campeones.html": "campeones"
+        "campeones.html": "campeones",
+        "fotos.html": "mas",
+        "ranking.html": "mas",
+        "estadisticas.html": "mas"
     };
 
-    const actual = mapa[archivo];
+    const actual = mapa[archivo] || "";
 
     document
         .querySelectorAll(".bottomNav .navBtn")
