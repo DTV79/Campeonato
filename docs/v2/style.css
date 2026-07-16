@@ -1644,3 +1644,196 @@ body.modoPretorneo{
         font-size:20px;
     }
 }
+
+
+/* =========================================================
+   REDISEÑO PRETORNEO
+========================================================= */
+
+body.modoPretorneo{
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(194,101,69,.16),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at bottom left,
+            rgba(15,118,110,.10),
+            transparent 35%
+        ),
+        #fbf7f2;
+}
+
+/* CABECERA */
+
+.cabecera.cabeceraPretorneo{
+    background:
+        linear-gradient(
+            135deg,
+            #431c2b,
+            #7c2d2d 55%,
+            #c26645
+        );
+    box-shadow:
+        0 12px 30px rgba(67,28,43,.24);
+}
+
+.cabeceraPretorneo .estadoCabecera{
+    background:rgba(255,248,240,.16);
+    border:1px solid rgba(255,255,255,.18);
+}
+
+.modoPretorneo .progresoCabecera{
+    display:none;
+}
+
+/* CUENTA ATRÁS */
+
+.actualizacion.cuentaAtras{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:12px;
+    padding:14px;
+    background:rgba(255,248,240,.14);
+}
+
+.cuentaAtrasTitulo,
+.cuentaAtrasMensaje{
+    display:block;
+    text-align:center;
+    color:white;
+    font-size:13px;
+    font-weight:800;
+}
+
+.cuentaAtrasValores{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+    width:100%;
+}
+
+.cuentaAtrasValores div{
+    padding:10px 6px;
+    border-radius:13px;
+    background:rgba(255,255,255,.14);
+    text-align:center;
+}
+
+.cuentaAtrasValores strong{
+    display:block;
+    color:white;
+    font-size:23px;
+    font-weight:900;
+    line-height:1;
+}
+
+.cuentaAtrasValores small{
+    display:block;
+    margin-top:5px;
+    color:rgba(255,255,255,.78);
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+/* DOS TARJETAS PRINCIPALES */
+
+.modoPretorneo .gridDashboard{
+    margin-bottom:20px;
+}
+
+.modoPretorneo .gridDashboard .cardAcceso{
+    min-height:145px;
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(1){
+    background:
+        linear-gradient(
+            135deg,
+            #9a3412,
+            #c2410c,
+            #ea8b4b
+        );
+}
+
+.modoPretorneo .gridDashboard .cardAcceso:nth-child(2){
+    background:
+        linear-gradient(
+            135deg,
+            #0f766e,
+            #115e59,
+            #134e4a
+        );
+}
+
+/* INSCRIPCIONES TODAVÍA CERRADAS */
+
+.modoPretorneo .tarjetaBloqueada{
+    opacity:.48;
+    filter:saturate(.35);
+    cursor:not-allowed;
+    pointer-events:none;
+    box-shadow:
+        0 5px 14px rgba(15,23,42,.08);
+}
+
+.modoPretorneo .tarjetaBloqueada::after{
+    background:rgba(255,255,255,.06);
+}
+
+/* PANTALLAS INTERIORES */
+
+.modoPretorneo .vistaDetalle h2{
+    color:#6b2737;
+}
+
+.modoPretorneo .resumenPartidos{
+    background:#f8e9dc;
+}
+
+.modoPretorneo .resumenPartidos .estadoResumen{
+    color:#9a3412;
+}
+
+/* NAVEGACIÓN */
+
+.modoPretorneo .bottomNav{
+    border-top:1px solid #ead8cc;
+}
+
+.modoPretorneo .bottomNav .navBtn.navActivo,
+.modoPretorneo .bottomNav .navBtn.navActivo small{
+    color:#a33a2b;
+}
+
+.paginaSecundaria .bottomNav .navBtn.navActivo,
+.paginaSecundaria .bottomNav .navBtn.navActivo small{
+    color:#a33a2b;
+}
+
+/* EN PRETORNEO NO HAY RESUMEN INFERIOR */
+
+.modoPretorneo .podioCard{
+    display:none !important;
+}
+
+/* MÓVIL */
+
+@media(max-width:600px){
+
+    .modoPretorneo .gridDashboard{
+        grid-template-columns:1fr;
+        gap:13px;
+    }
+
+    .modoPretorneo .gridDashboard .cardAcceso{
+        min-height:125px;
+    }
+
+    .cuentaAtrasValores strong{
+        font-size:21px;
+    }
+}
