@@ -1,29 +1,320 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprint Pádel Tui 2026</title>
-    <link rel="stylesheet" href="styles.css?v=2003">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>II Campeonato Sprint Pádel</title>
+
+    <!--
+        Se carga como respaldo inmediatamente.
+        Después se sustituirá por style.css?v=VERSION_WEB.
+    -->
+    <link
+        id="cssPrincipal"
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!--
+        Lee Configuración!B13 desde el JSON.
+
+        Esta promesa se utilizará también al final
+        para cargar app.js con la misma versión.
+    -->
+    <script>
+        window.versionWebPromise = (
+            async function obtenerVersionWeb() {
+
+                const URL_ESTADO =
+                    "https://dtv79.github.io/Campeonato/estado_torneo.json";
+
+                let version = Date.now();
+
+                try {
+                    const respuesta = await fetch(
+                        `${URL_ESTADO}?v=${Date.now()}`,
+                        {
+                            cache: "no-store"
+                        }
+                    );
+
+                    if (!respuesta.ok) {
+                        throw new Error(
+                            `Error al cargar el JSON: ${respuesta.status}`
+                        );
+                    }
+
+                    const estado = await respuesta.json();
+                    const configuracion =
+                        estado?.configuracion || {};
+
+                    version =
+                        configuracion.version_web ||
+                        configuracion.version ||
+                        version;
+
+                } catch (error) {
+                    console.error(
+                        "No se pudo leer Versión WEB. " +
+                        "Se utilizará una versión temporal.",
+                        error
+                    );
+                }
+
+                const versionSegura =
+                    encodeURIComponent(version);
+
+                const css =
+                    document.getElementById("cssPrincipal");
+
+                if (css) {
+                    css.href =
+                        `style.css?v=${versionSegura}`;
+                }
+
+                return versionSegura;
+            }
+        )();
+    </script>
 </head>
 
 <body>
 
-<!-- ===========================
-     HERO LIMPIO
-=========================== -->
-<section class="hero">
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-        <div class="hero-title-line1">II Campeonato Sprint Pádel</div>
-        <div class="hero-title-line2">Tui 2026</div>
-    </div>
-</section>
+<div class="contenedor">
 
-<!-- ===========================
-     MENÚ GLOBAL
-=========================== -->
-<script src="menu.js"></script>
+    <header class="cabecera">
+
+        <div class="tituloSuperior"></div>
+        <div class="tituloPrincipal"></div>
+        <div class="subtitulo"></div>
+
+        <div
+            class="estadoCabecera"
+            id="estadoCabecera"
+        >
+            🟢 Cargando...
+        </div>
+
+        <div class="progresoCabecera">
+
+            <div class="barra">
+                <div
+                    class="progreso"
+                    id="barraProgreso"
+                ></div>
+            </div>
+
+            <div
+                class="textoProgreso"
+                id="textoProgreso"
+            ></div>
+
+        </div>
+
+        <div class="actualizacion">
+            <span>🕒 Última actualización:</span>
+            <strong id="ultimaActualizacion">--</strong>
+        </div>
+
+    </header>
+
+    <section class="gridDashboard">
+
+        <div
+            class="cardAcceso cardClasificacion"
+            data-seccion="competicion"
+        >
+            <div class="iconoAcceso">📊</div>
+
+            <div>
+                <h4 id="tituloTarjetaCompeticion">
+                    Competición
+                </h4>
+
+                <p id="resumenCompeticion">
+                    Cargando...
+                </p>
+            </div>
+
+            <span class="flecha">→</span>
+        </div>
+
+        <div
+            class="cardAcceso cardPartidos"
+            data-seccion="partidos"
+        >
+            <div class="iconoAcceso">🎾</div>
+
+            <div>
+                <h4>Partidos</h4>
+
+                <p id="resumenPartidos">
+                    Cargando...
+                </p>
+            </div>
+
+            <span class="flecha">→</span>
+        </div>
+
+        <div
+            class="cardAcceso cardPalas"
+            data-seccion="equipos"
+        >
+            <div class="iconoAcceso">👥</div>
+
+            <div>
+                <h4>Equipos</h4>
+
+                <p id="resumenEquipos">
+                    Cargando...
+                </p>
+            </div>
+
+            <span class="flecha">→</span>
+        </div>
+
+        <div
+            class="cardAcceso cardCruces"
+            id="tarjetaEspecial"
+            data-seccion="especial"
+        >
+            <div
+                class="iconoAcceso"
+                id="iconoTarjetaEspecial"
+            >
+                ⚔️
+            </div>
+
+            <div>
+                <h4 id="tituloTarjetaEspecial">
+                    Siguiente fase
+                </h4>
+
+                <p id="resumenEspecial">
+                    Pendiente de iniciar
+                </p>
+            </div>
+
+            <span class="flecha">→</span>
+        </div>
+
+    </section>
+
+    <section class="tarjeta podioCard">
+
+        <h3 id="tituloPodio">
+            📊 Resumen de la competición
+        </h3>
+
+        <div id="podio">
+            Cargando...
+        </div>
+
+    </section>
+
+    <section
+        id="vistaDetalle"
+        class="vistaDetalle oculto"
+    >
+        <div id="contenidoDetalle"></div>
+    </section>
+
+</div>
+
+<nav class="bottomNav">
+
+    <button
+        class="navBtn navActivo"
+        data-pantalla="inicio"
+        type="button"
+    >
+        <span>🏠</span>
+        <small>Inicio</small>
+    </button>
+
+    <button
+        class="navBtn"
+        data-pantalla="competicion"
+        type="button"
+    >
+        <span>📊</span>
+        <small>Competición</small>
+    </button>
+
+    <button
+        class="navBtn"
+        data-pantalla="partidos"
+        type="button"
+    >
+        <span>🎾</span>
+        <small>Partidos</small>
+    </button>
+
+    <button
+        class="navBtn"
+        data-pantalla="equipos"
+        type="button"
+    >
+        <span>👥</span>
+        <small>Equipos</small>
+    </button>
+
+    <button
+        class="navBtn"
+        data-pantalla="mas"
+        type="button"
+    >
+        <span>☰</span>
+        <small>Más</small>
+    </button>
+
+</nav>
+
+<!--
+    Carga app.js utilizando automáticamente
+    el valor de Configuración!B13.
+-->
+<script>
+    (
+        async function cargarAplicacionVersionada() {
+
+            const version =
+                await window.versionWebPromise;
+
+            const script =
+                document.createElement("script");
+
+            script.src =
+                `app.js?v=${version}`;
+
+            script.async = false;
+
+            document.body.appendChild(script);
+        }
+    )();
+</script>
 
 </body>
 </html>
