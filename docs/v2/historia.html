@@ -188,32 +188,57 @@
 
 <nav class="bottomNav">
 
-    <a class="navBtn" href="index.html">
+    <a
+        class="navBtn"
+        data-nav="inicio"
+        href="index.html"
+    >
         <span>🏠</span>
         <small>Inicio</small>
     </a>
 
-    <a class="navBtn navActivo" href="historia.html">
+    <a
+        class="navBtn oculto"
+        data-nav="historia"
+        data-contenido-web="historia"
+        href="historia.html"
+    >
         <span>📖</span>
         <small>Historia</small>
     </a>
 
-    <a class="navBtn" href="campeones.html">
-        <span>🏆</span>
-        <small>Campeones</small>
-    </a>
-
-    <a class="navBtn" href="normas.html">
+    <a
+        class="navBtn oculto"
+        data-nav="normativa"
+        data-contenido-web="normativa"
+        href="normas.html"
+    >
         <span>📜</span>
         <small>Normas</small>
     </a>
 
-    <a class="navBtn" href="fotos.html">
-        <span>📷</span>
-        <small>Fotos</small>
+    <a
+        class="navBtn oculto"
+        data-nav="campeones"
+        data-contenido-web="campeones"
+        href="campeones.html"
+    >
+        <span>🏆</span>
+        <small>Campeones</small>
+    </a>
+
+    <a
+        class="navBtn"
+        data-nav="mas"
+        href="index.html?pantalla=mas"
+    >
+        <span>☰</span>
+        <small>Más</small>
     </a>
 
 </nav>
+
+<script src="nav-pretorneo.js?v=168"></script>
 
 </body>
 </html>
