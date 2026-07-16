@@ -1192,13 +1192,13 @@ function pintarPantallaInformacionPretorneo() {
                 rondaInicial
             )}
 
-            ${pintarDatoPretorneo(
-                "🏖️",
-                "Copa Palas Playa",
-                esSi(config.hay_copa_palas_playa)
-                    ? "Sí"
-                    : "No"
-            )}
+           ${pintarDatoPretorneo(
+    "🏖️",
+    "Copa Palas Playa",
+    textoSiNoPendiente(
+        config.hay_copa_palas_playa
+    )
+)}
         </div>
     `;
 }
@@ -3117,6 +3117,37 @@ function normalizar(texto) {
 function esSi(valor) {
     return ["SI", "SÍ", "TRUE", "1"].includes(normalizar(valor));
 }
+
+function textoSiNoPendiente(valor) {
+
+    const texto = normalizar(valor);
+
+    if (
+        valor === true ||
+        ["SI", "SÍ", "TRUE", "1"].includes(texto)
+    ) {
+        return "Sí";
+    }
+
+    if (
+        valor === false ||
+        ["NO", "FALSE", "0"].includes(texto)
+    ) {
+        return "No";
+    }
+
+    /*
+       Incluye:
+       "-"
+       null
+       undefined
+       vacío
+       "Pendiente"
+    */
+
+    return "Pendiente de confirmar";
+}
+
 
 function escaparHTML(valor) {
     return String(valor ?? "")
