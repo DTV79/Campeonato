@@ -1322,11 +1322,12 @@ function pintarPantallaInscripciones() {
                 ? `
                     <div class="marcoInscripciones">
 
-                        <iframe
-                            class="iframeInscripciones"
-                            src="${escaparAtributo(urlIntegrada)}"
-                            title="Formulario de inscripción"
-                            loading="eager"
+                     <iframe
+                        class="iframeInscripciones"
+                        src="${escaparAtributo(urlIntegrada)}"
+                        title="Formulario de inscripción"
+                        loading="eager"
+                        scrolling="no"
                         ></iframe>
 
                     </div>
