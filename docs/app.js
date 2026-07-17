@@ -1292,30 +1292,7 @@ function pintarPantallaInscripciones() {
     contenido.innerHTML = `
         <h2>✍️ Inscripciones</h2>
 
-        <section class="
-            resumenPartidos
-            ${
-                abiertas
-                    ? ""
-                    : "resumenInscripcionCerrada"
-            }
-        ">
-            <div class="estadoResumen">
-                ${
-                    abiertas
-                        ? "🟢 Inscripciones abiertas"
-                        : "⏳ Inscripciones todavía cerradas"
-                }
-            </div>
-
-            <p>
-                ${
-                    abiertas
-                        ? "Las plazas se adjudican por orden de inscripción."
-                        : "El formulario estará disponible cuando se abra el plazo."
-                }
-            </p>
-        </section>
+        
 
         ${
             abiertas && urlIntegrada
