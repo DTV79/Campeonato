@@ -1235,6 +1235,10 @@ function pintarPantallaInscripciones() {
     const url =
         obtenerURLInscripcion();
 
+    const urlIntegrada = url
+        ? `${url}${url.includes("?") ? "&" : "?"}embed=1`
+        : "";
+
     contenido.innerHTML = `
         <h2>✍️ Inscripciones</h2>
 
@@ -1264,34 +1268,15 @@ function pintarPantallaInscripciones() {
         </section>
 
         ${
-            abiertas && url
+            abiertas && urlIntegrada
                 ? `
-                    <div class="accionesInscripciones">
-
-                        <a
-                            class="btnVistaCompleta enlaceInscripcion"
-                            href="${escaparAtributo(url)}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Abrir formulario en una pestaña nueva →
-                        </a>
-
-                        <p class="avisoSafariInscripciones">
-                            En iPhone, utiliza Safari si el formulario
-                            no se abre correctamente en Chrome.
-                        </p>
-
-                    </div>
-
                     <div class="marcoInscripciones">
 
                         <iframe
                             class="iframeInscripciones"
-                            src="${escaparAtributo(url)}"
+                            src="${escaparAtributo(urlIntegrada)}"
                             title="Formulario de inscripción"
-                            loading="lazy"
-                            allow="clipboard-write"
+                            loading="eager"
                         ></iframe>
 
                     </div>
