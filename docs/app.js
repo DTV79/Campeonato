@@ -26,6 +26,56 @@ document.addEventListener(
     gestionarClickGlobal
 );
 
+window.addEventListener(
+    "message",
+    gestionarMensajeInscripciones
+);
+
+function gestionarMensajeInscripciones(
+    evento
+) {
+
+    const origen =
+        String(evento.origin || "");
+
+    const origenGoogle =
+        origen.includes(
+            "googleusercontent.com"
+        ) ||
+        origen.includes(
+            "script.google.com"
+        );
+
+    if (!origenGoogle) return;
+
+    if (
+        evento.data?.tipo !==
+        "altura-inscripciones"
+    ) {
+        return;
+    }
+
+    const altura =
+        Number(evento.data.altura);
+
+    if (
+        !Number.isFinite(altura) ||
+        altura < 300
+    ) {
+        return;
+    }
+
+    const iframe =
+        document.querySelector(
+            ".iframeInscripciones"
+        );
+
+    if (!iframe) return;
+
+    iframe.style.height =
+        `${altura + 10}px`;
+}
+
 async function iniciarApp() {
     try {
         const respuesta = await fetch(`${JSON_URL}?v=${Date.now()}`, {
