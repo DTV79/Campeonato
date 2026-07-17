@@ -60,7 +60,7 @@ function gestionarMensajeInscripciones(
 
     if (
         !Number.isFinite(altura) ||
-        altura < 300
+        altura < 250
     ) {
         return;
     }
@@ -73,7 +73,7 @@ function gestionarMensajeInscripciones(
     if (!iframe) return;
 
     iframe.style.height =
-        `${altura + 10}px`;
+        `${Math.ceil(altura) + 12}px`;
 }
 
 async function iniciarApp() {
