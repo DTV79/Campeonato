@@ -1760,56 +1760,33 @@ body.modoPretorneo{
    INSCRIPCIONES
 ========================================================= */
 
-.accionesInscripciones{
-    display:grid;
-    gap:10px;
-    margin:16px 0;
-}
-
-.enlaceInscripcion{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    text-align:center;
-    text-decoration:none;
-}
-
-.avisoSafariInscripciones{
-    margin:0;
-    color:#756b70;
-    font-size:.78rem;
-    line-height:1.45;
-    text-align:center;
-}
-
 .marcoInscripciones{
     width:100%;
-    height:75vh;
-    min-height:720px;
-    overflow:hidden;
-    border:1px solid #e5dcd4;
-    border-radius:20px;
-    background:#fff;
-    box-shadow:
-        0 10px 30px
-        rgba(69,31,38,.10);
+    margin-top:14px;
+    overflow:visible;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
 .iframeInscripciones{
     display:block;
     width:100%;
-    height:100%;
+    height:950px;
     border:0;
-    background:#fff;
+    background:transparent;
+    overflow:hidden;
 }
 
 @media (max-width:600px){
 
     .marcoInscripciones{
-        height:78vh;
-        min-height:650px;
-        border-radius:16px;
+        margin-top:10px;
+    }
+
+    .iframeInscripciones{
+        height:1050px;
     }
 
 }
