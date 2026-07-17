@@ -1223,19 +1223,28 @@ function pintarDatoPretorneo(
 }
 
 function pintarPantallaInscripciones() {
-    const contenido = obtenerContenidoDetalle();
+
+    const contenido =
+        obtenerContenidoDetalle();
 
     if (!contenido) return;
 
-    const abiertas = esEstadoInscripciones();
-    const url = obtenerURLInscripcion();
+    const abiertas =
+        esEstadoInscripciones();
+
+    const url =
+        obtenerURLInscripcion();
 
     contenido.innerHTML = `
         <h2>✍️ Inscripciones</h2>
 
         <section class="
             resumenPartidos
-            ${abiertas ? "" : "resumenInscripcionCerrada"}
+            ${
+                abiertas
+                    ? ""
+                    : "resumenInscripcionCerrada"
+            }
         ">
             <div class="estadoResumen">
                 ${
@@ -1248,8 +1257,8 @@ function pintarPantallaInscripciones() {
             <p>
                 ${
                     abiertas
-                        ? "Completa el formulario para solicitar tu plaza en el campeonato."
-                        : "Cuando se abra el plazo, podrás inscribirte directamente desde esta sección."
+                        ? "Las plazas se adjudican por orden de inscripción."
+                        : "El formulario estará disponible cuando se abra el plazo."
                 }
             </p>
         </section>
@@ -1257,22 +1266,44 @@ function pintarPantallaInscripciones() {
         ${
             abiertas && url
                 ? `
-                    <a
-                        class="btnVistaCompleta enlaceInscripcion"
-                        href="${escaparAtributo(url)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Abrir formulario de inscripción →
-                    </a>
+                    <div class="accionesInscripciones">
+
+                        <a
+                            class="btnVistaCompleta enlaceInscripcion"
+                            href="${escaparAtributo(url)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Abrir formulario en una pestaña nueva →
+                        </a>
+
+                        <p class="avisoSafariInscripciones">
+                            En iPhone, utiliza Safari si el formulario
+                            no se abre correctamente en Chrome.
+                        </p>
+
+                    </div>
+
+                    <div class="marcoInscripciones">
+
+                        <iframe
+                            class="iframeInscripciones"
+                            src="${escaparAtributo(url)}"
+                            title="Formulario de inscripción"
+                            loading="lazy"
+                            allow="clipboard-write"
+                        ></iframe>
+
+                    </div>
                 `
                 : pintarTarjetaVacia(
                     abiertas
                         ? "Formulario pendiente"
                         : "Próximamente",
+
                     abiertas
-                        ? "Las inscripciones están activadas, pero todavía no se ha indicado el enlace del formulario."
-                        : "El formulario aparecerá aquí cuando el estado del torneo cambie a Inscripciones."
+                        ? "Las inscripciones están activadas, pero falta indicar el enlace del formulario."
+                        : "El formulario aparecerá cuando el estado cambie a Inscripciones."
                 )
         }
     `;
