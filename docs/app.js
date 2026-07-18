@@ -2691,7 +2691,7 @@ function pintarDetalleJugadorRanking(idJugador) {
         </button>
 
         <section class="cabeceraJugadorRanking">
-            <span class="puestoJugadorRanking">#${numero(jugador.posicion)}</span>
+            <span class="puestoJugadorRanking">${numero(jugador.posicion)}º</span>
             <div>
                 <small>RANKING HISTÓRICO</small>
                 <h2>${escaparHTML(jugador.jugador)}</h2>
