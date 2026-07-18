@@ -2097,10 +2097,11 @@ body.modoPretorneo{
     opacity:.78;
 }
 
-.cabeceraJugadorRanking h2{
+.vistaDetalle .cabeceraJugadorRanking h2{
     margin:0;
-    color:white;
+    color:#ffffff !important;
     font-size:25px;
+    font-weight:900;
     line-height:1.15;
 }
 
@@ -2109,6 +2110,12 @@ body.modoPretorneo{
     font-size:13px;
     font-weight:800;
     opacity:.86;
+}
+
+.cabeceraJugadorRanking small,
+.cabeceraJugadorRanking p,
+.puestoJugadorRanking{
+    color:#ffffff;
 }
 
 .metricasJugadorRanking{
