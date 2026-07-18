@@ -2606,10 +2606,14 @@ function pintarFilaRankingJugador(jugador) {
             </span>
 
             <span class="derechaRanking">
-                <strong>${formatearPuntosRanking(jugador.puntos)}</strong>
-                <small>puntos</small>
-                <b class="${movimiento.clase}">${movimiento.texto}</b>
-            </span>
+    <strong>${formatearPuntosRanking(jugador.puntos)}</strong>
+    <small>puntos</small>
+
+    ${numero(datosRanking?.resumen?.numero_ediciones) > 1
+        ? `<b class="${movimiento.clase}">${movimiento.texto}</b>`
+        : ""
+    }
+</span>
         </button>
     `;
 }
