@@ -132,6 +132,12 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+    const btnInfoRanking = evento.target.closest("#btnInfoRanking");
+    if (btnInfoRanking) {
+        mostrarInfoRanking();
+        return;
+    }
+
     const volverRanking = evento.target.closest("#btnVolverRanking");
     if (volverRanking) {
         pintarPantallaRanking();
@@ -2421,7 +2427,16 @@ function construirPantallaRanking(origen) {
     }
 
     return `
-        <h2>🏆 Ranking histórico</h2>
+        <div class="cabeceraTituloRanking">
+            <h2>🏆 Ranking histórico</h2>
+            <button
+                class="btnInfoOrden btnInfoRanking"
+                id="btnInfoRanking"
+                type="button"
+                aria-label="Información sobre la puntuación del ranking"
+                title="Cómo se calculan los puntos"
+            >ℹ️</button>
+        </div>
 
         <section class="resumenRankingHistorico">
             <div>
@@ -2461,6 +2476,86 @@ function construirPantallaRanking(origen) {
         </section>
 
         ${pintarRecordsRanking(ranking)}
+    `;
+}
+
+function mostrarInfoRanking() {
+    const baremo = datosRanking?.baremo || {};
+
+    const puntosParticipacion = formatearPuntosRanking(baremo.participacion);
+    const puntosCampeon = formatearPuntosRanking(baremo.campeon);
+    const puntosSubcampeon = formatearPuntosRanking(baremo.subcampeon);
+    const puntosSemifinalista = formatearPuntosRanking(baremo.semifinalista);
+    const puntosCuartos = formatearPuntosRanking(baremo.cuartos);
+    const puntosOctavos = formatearPuntosRanking(baremo.octavos);
+    const bonusVictorias = formatearPuntosRanking(baremo.max_bonus_victorias);
+    const bonusSets = formatearPuntosRanking(baremo.max_bonus_sets);
+    const maximoEdicion = formatearPuntosRanking(baremo.maximo_posible_edicion);
+
+    const palasCuenta = baremo.palas_playa_cuenta_bonus === true;
+
+    const overlay = document.createElement("div");
+    overlay.className = "overlayInfo";
+    overlay.id = "overlayInfoOrden";
+
+    overlay.innerHTML = `
+        <div class="globoInfo globoInfoRanking">
+            <button id="cerrarInfoOrden" class="cerrarInfo" type="button">×</button>
+
+            <h3>🏆 Cómo se calcula el ranking</h3>
+
+            <p>
+                Los puntos de cada jugador se calculan de forma individual y se
+                acumulan edición tras edición. Los valores que aparecen aquí se
+                leen automáticamente de la hoja <strong>Configuración</strong>.
+            </p>
+
+            <div class="baremoRankingInfo">
+                ${pintarLineaBaremoRanking("Participar", puntosParticipacion)}
+                ${pintarLineaBaremoRanking("Campeón", puntosCampeon)}
+                ${pintarLineaBaremoRanking("Subcampeón", puntosSubcampeon)}
+                ${pintarLineaBaremoRanking("Semifinalista", puntosSemifinalista)}
+                ${pintarLineaBaremoRanking("Cuartos de final", puntosCuartos)}
+                ${pintarLineaBaremoRanking("Octavos de final", puntosOctavos)}
+            </div>
+
+            <h4>Bonificaciones por rendimiento</h4>
+
+            <div class="formulaRankingInfo">
+                <div>
+                    <strong>Victorias</strong>
+                    <span>Hasta ${bonusVictorias} pts × PG / PJ</span>
+                </div>
+                <div>
+                    <strong>Sets</strong>
+                    <span>Hasta ${bonusSets} pts × SG / (SG + SP)</span>
+                </div>
+            </div>
+
+            <div class="ejemploInfo">
+                <strong>Puntos de la edición</strong><br>
+                Participación + resultado final + bonus de victorias + bonus de sets.
+                <br><br>
+                <strong>Máximo actual:</strong> ${maximoEdicion} puntos por edición.
+            </div>
+
+            <p class="notaRankingInfo">
+                🏖️ Copa Palas Playa:
+                <strong>${palasCuenta ? "sí cuenta" : "no cuenta"}</strong>
+                en los bonus de victorias y sets. No concede puntos directos.
+            </p>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function pintarLineaBaremoRanking(concepto, puntos) {
+    return `
+        <div>
+            <span>${escaparHTML(concepto)}</span>
+            <strong>${escaparHTML(puntos)} pts</strong>
+        </div>
     `;
 }
 
