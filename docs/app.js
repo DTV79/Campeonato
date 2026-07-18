@@ -2577,8 +2577,21 @@ function pintarPodioRankingJugador(jugador, indice) {
     `;
 }
 
+function obtenerPosicionCompartidaRanking(jugador) {
+    const ranking = datosRanking?.ranking || [];
+    const puntosJugador = numero(jugador.puntos);
+
+    const primeraCoincidencia = ranking.findIndex(
+        item => numero(item.puntos) === puntosJugador
+    );
+
+    return primeraCoincidencia >= 0
+        ? primeraCoincidencia + 1
+        : numero(jugador.posicion);
+}
+
 function pintarFilaRankingJugador(jugador) {
-    const posicion = numero(jugador.posicion);
+    const posicion = obtenerPosicionCompartidaRanking(jugador);
     const movimiento = obtenerMovimientoRanking(jugador);
     const posicionVisible = posicion === 1
         ? "🥇"
@@ -2695,7 +2708,7 @@ function pintarDetalleJugadorRanking(idJugador) {
         </button>
 
         <section class="cabeceraJugadorRanking">
-            <span class="puestoJugadorRanking">${numero(jugador.posicion)}º</span>
+            <span class="puestoJugadorRanking">${obtenerPosicionCompartidaRanking(jugador)}º</span>
             <div>
                 <small>RANKING HISTÓRICO</small>
                 <h2>${escaparHTML(jugador.jugador)}</h2>
