@@ -1790,3 +1790,553 @@ body.modoPretorneo{
     }
 
 }
+
+/* =========================================================
+   16. RANKING HISTÓRICO
+========================================================= */
+
+.cardRanking{
+    grid-column:1 / -1;
+    min-height:125px;
+    background:linear-gradient(135deg,#7c3aed,#4c1d95);
+}
+
+.resumenRankingHistorico{
+    display:grid;
+    margin-bottom:20px;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.resumenRankingHistorico div{
+    padding:14px 10px;
+    border-radius:16px;
+    background:#f5f3ff;
+    text-align:center;
+}
+
+.resumenRankingHistorico span{
+    display:block;
+    color:#6b7280;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+}
+
+.resumenRankingHistorico strong{
+    display:block;
+    margin-top:5px;
+    color:#4c1d95;
+    font-size:20px;
+    font-weight:900;
+}
+
+.bloqueRanking{
+    margin-top:22px;
+}
+
+.bloqueRanking > h3,
+.cabeceraBloqueRanking h3{
+    margin-bottom:13px;
+    color:#0f172a;
+    font-size:18px;
+    font-weight:900;
+}
+
+.cabeceraBloqueRanking{
+    display:flex;
+    margin-bottom:13px;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraBloqueRanking h3{
+    margin-bottom:3px;
+}
+
+.cabeceraBloqueRanking p{
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+}
+
+.podioRankingHistorico{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.podioRankingJugador{
+    display:flex;
+    min-width:0;
+    padding:14px 10px;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    background:white;
+    color:#1d2939;
+    text-align:center;
+    box-shadow:0 5px 16px rgba(15,23,42,.08);
+    cursor:pointer;
+}
+
+.podioRankingJugador.primero{
+    border-color:#facc15;
+    background:linear-gradient(180deg,#fffbeb,#ffffff);
+}
+
+.podioRankingJugador.segundo{
+    border-color:#cbd5e1;
+    background:linear-gradient(180deg,#f8fafc,#ffffff);
+}
+
+.podioRankingJugador.tercero{
+    border-color:#fdba74;
+    background:linear-gradient(180deg,#fff7ed,#ffffff);
+}
+
+.medallaRanking{
+    font-size:28px;
+}
+
+.podioRankingJugador strong{
+    width:100%;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+    line-height:1.25;
+    overflow-wrap:anywhere;
+}
+
+.podioRankingJugador b{
+    color:#4c1d95;
+    font-size:15px;
+}
+
+.podioRankingJugador small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:800;
+    line-height:1.35;
+}
+
+.listaRankingHistorico{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.filaRankingHistorico{
+    display:grid;
+    width:100%;
+    padding:14px;
+    grid-template-columns:48px minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+    border:none;
+    border-radius:18px;
+    background:white;
+    color:#1d2939;
+    text-align:left;
+    box-shadow:0 5px 16px rgba(15,23,42,.08);
+    cursor:pointer;
+}
+
+.filaRankingHistorico:active,
+.podioRankingJugador:active{
+    transform:scale(.985);
+}
+
+.posicionRankingHistorico{
+    color:#0f172a;
+    font-size:20px;
+    font-weight:900;
+    text-align:center;
+}
+
+.datosJugadorRanking{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    gap:4px;
+}
+
+.datosJugadorRanking strong{
+    color:#0f172a;
+    font-size:15px;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.datosJugadorRanking small{
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.derechaRanking{
+    display:flex;
+    min-width:64px;
+    flex-direction:column;
+    align-items:flex-end;
+}
+
+.derechaRanking > strong{
+    color:#4c1d95;
+    font-size:18px;
+    font-weight:900;
+}
+
+.derechaRanking > small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:800;
+}
+
+.derechaRanking > b{
+    margin-top:5px;
+    font-size:11px;
+    font-weight:900;
+}
+
+.movRankingNuevo{
+    color:#7c3aed;
+}
+
+.recordsRanking{
+    padding-top:2px;
+}
+
+.gridRecordsRanking{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.recordRanking{
+    display:flex;
+    min-width:0;
+    padding:14px 10px;
+    flex-direction:column;
+    gap:4px;
+    border-radius:17px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.recordRanking > span{
+    font-size:24px;
+}
+
+.recordRanking small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.recordRanking strong{
+    color:#0f172a;
+    font-size:12px;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.recordRanking b{
+    color:#4c1d95;
+    font-size:12px;
+}
+
+.btnVolverRanking{
+    margin-bottom:16px;
+    padding:10px 13px;
+    border:none;
+    border-radius:999px;
+    background:#f5f3ff;
+    color:#5b21b6;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.cabeceraJugadorRanking{
+    display:flex;
+    margin-bottom:18px;
+    padding:20px;
+    align-items:center;
+    gap:16px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#4c1d95,#7c3aed);
+    color:white;
+}
+
+.puestoJugadorRanking{
+    display:flex;
+    width:58px;
+    height:58px;
+    flex:0 0 58px;
+    align-items:center;
+    justify-content:center;
+    border-radius:18px;
+    background:rgba(255,255,255,.16);
+    font-size:22px;
+    font-weight:900;
+}
+
+.cabeceraJugadorRanking small{
+    display:block;
+    margin-bottom:4px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+    opacity:.78;
+}
+
+.cabeceraJugadorRanking h2{
+    margin:0;
+    color:white;
+    font-size:25px;
+    line-height:1.15;
+}
+
+.cabeceraJugadorRanking p{
+    margin-top:5px;
+    font-size:13px;
+    font-weight:800;
+    opacity:.86;
+}
+
+.metricasJugadorRanking{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.metricasJugadorRanking article{
+    display:flex;
+    min-width:0;
+    padding:13px 8px;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    border-radius:16px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.metricasJugadorRanking span{
+    font-size:21px;
+}
+
+.metricasJugadorRanking small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.metricasJugadorRanking strong{
+    color:#0f172a;
+    font-size:16px;
+    font-weight:900;
+}
+
+.historialJugadorRanking{
+    display:flex;
+    flex-direction:column;
+    gap:13px;
+}
+
+.edicionJugadorRanking{
+    padding:16px;
+    border-left:5px solid #7c3aed;
+    border-radius:18px;
+    background:white;
+    box-shadow:0 5px 16px rgba(15,23,42,.08);
+}
+
+.cabeceraEdicionRanking{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraEdicionRanking div{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.cabeceraEdicionRanking span{
+    color:#64748b;
+    font-size:12px;
+    font-weight:900;
+}
+
+.cabeceraEdicionRanking strong{
+    color:#0f172a;
+    font-size:16px;
+    font-weight:900;
+}
+
+.cabeceraEdicionRanking > b{
+    padding:6px 9px;
+    border-radius:999px;
+    background:#ede9fe;
+    color:#5b21b6;
+    font-size:12px;
+    white-space:nowrap;
+}
+
+.parejaEdicionRanking{
+    margin-top:12px;
+    padding:11px 12px;
+    border-radius:13px;
+    background:#f8fafc;
+}
+
+.parejaEdicionRanking small{
+    display:block;
+    margin-bottom:3px;
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.parejaEdicionRanking strong{
+    color:#0f172a;
+    font-size:14px;
+}
+
+.datosEdicionRanking{
+    display:flex;
+    margin-top:11px;
+    flex-wrap:wrap;
+    gap:7px;
+}
+
+.datosEdicionRanking span{
+    padding:6px 9px;
+    border-radius:999px;
+    background:#eef2ff;
+    color:#3730a3;
+    font-size:11px;
+    font-weight:900;
+}
+
+.desglosePuntosRanking{
+    display:grid;
+    margin-top:12px;
+    padding-top:11px;
+    grid-template-columns:1fr 1fr;
+    gap:7px 12px;
+    border-top:1px solid #e5e7eb;
+}
+
+.desglosePuntosRanking span{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+}
+
+.desglosePuntosRanking strong{
+    color:#0f172a;
+    font-weight:900;
+}
+
+.cargandoRanking{
+    margin-top:8px;
+}
+
+@media(max-width:600px){
+
+    .podioRankingHistorico,
+    .gridRecordsRanking{
+        grid-template-columns:1fr;
+    }
+
+    .podioRankingJugador{
+        display:grid;
+        grid-template-columns:42px minmax(0,1fr) auto;
+        text-align:left;
+    }
+
+    .podioRankingJugador .medallaRanking{
+        grid-row:1 / span 2;
+        align-self:center;
+        text-align:center;
+    }
+
+    .podioRankingJugador strong,
+    .podioRankingJugador small{
+        text-align:left;
+    }
+
+    .podioRankingJugador b{
+        grid-column:3;
+        grid-row:1 / span 2;
+        align-self:center;
+        white-space:nowrap;
+    }
+
+    .filaRankingHistorico{
+        grid-template-columns:42px minmax(0,1fr) auto;
+        padding:13px 11px;
+    }
+
+    .metricasJugadorRanking{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:380px){
+
+    .resumenRankingHistorico{
+        gap:7px;
+    }
+
+    .resumenRankingHistorico div{
+        padding:12px 6px;
+    }
+
+    .resumenRankingHistorico strong{
+        font-size:17px;
+    }
+
+    .datosJugadorRanking small{
+        font-size:10px;
+    }
+
+    .derechaRanking > strong{
+        font-size:16px;
+    }
+
+    .cabeceraJugadorRanking{
+        padding:17px;
+    }
+
+    .puestoJugadorRanking{
+        width:50px;
+        height:50px;
+        flex-basis:50px;
+    }
+
+    .cabeceraJugadorRanking h2{
+        font-size:21px;
+    }
+
+    .desglosePuntosRanking{
+        grid-template-columns:1fr;
+    }
+}
+
