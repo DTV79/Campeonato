@@ -2708,13 +2708,16 @@ function pintarDetalleJugadorRanking(idJugador) {
         </button>
 
         <section class="cabeceraJugadorRanking">
-            <span class="puestoJugadorRanking">${obtenerPosicionCompartidaRanking(jugador)}º</span>
-            <div>
-                <small>RANKING HISTÓRICO</small>
-                <h2>${escaparHTML(jugador.jugador)}</h2>
-                <p>${formatearPuntosRanking(jugador.puntos)} puntos acumulados</p>
-            </div>
-        </section>
+    <span class="puestoJugadorRanking">
+        ${obtenerPosicionCompartidaRanking(jugador)}º
+    </span>
+
+    <div>
+        <small>RANKING HISTÓRICO</small>
+        <h2>${escaparHTML(jugador.jugador)}</h2>
+        <p>${formatearPuntosRanking(jugador.puntos)} puntos acumulados</p>
+    </div>
+</section>
 
         <section class="metricasJugadorRanking">
             ${pintarMetricaRanking("🏆", "Títulos", numero(jugador.titulos))}
