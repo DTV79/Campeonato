@@ -2456,9 +2456,9 @@ function construirPantallaRanking(origen) {
         <section class="bloqueRanking">
             <h3>🥇 Podio histórico</h3>
             <div class="podioRankingHistorico">
-                ${top3.map((jugador, indice) =>
-                    pintarPodioRankingJugador(jugador, indice)
-                ).join("")}
+                ${top3.map(jugador =>
+    pintarPodioRankingJugador(jugador)
+).join("")}
             </div>
         </section>
 
@@ -2559,20 +2559,38 @@ function pintarLineaBaremoRanking(concepto, puntos) {
     `;
 }
 
-function pintarPodioRankingJugador(jugador, indice) {
-    const medallas = ["🥇", "🥈", "🥉"];
-    const clases = ["primero", "segundo", "tercero"];
+function pintarPodioRankingJugador(jugador) {
+    const posicion = obtenerPosicionCompartidaRanking(jugador);
+
+    const medalla = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    const clase = posicion === 1
+        ? "primero"
+        : posicion === 2
+            ? "segundo"
+            : posicion === 3
+                ? "tercero"
+                : "";
 
     return `
         <button
             type="button"
-            class="podioRankingJugador ${clases[indice] || ""}"
+            class="podioRankingJugador ${clase}"
             data-ranking-jugador="${escaparAtributo(jugador.id_jugador)}"
         >
-            <span class="medallaRanking">${medallas[indice] || `${indice + 1}.`}</span>
+            <span class="medallaRanking">${medalla}</span>
             <strong>${escaparHTML(jugador.jugador)}</strong>
             <b>${formatearPuntosRanking(jugador.puntos)} pts</b>
-            <small>${numero(jugador.titulos)} títulos · ${numero(jugador.ediciones)} ediciones</small>
+            <small>
+                ${numero(jugador.titulos)} títulos ·
+                ${numero(jugador.ediciones)} ediciones
+            </small>
         </button>
     `;
 }
