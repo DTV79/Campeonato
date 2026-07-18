@@ -1,6 +1,9 @@
 const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
+const JSON_RANKING_URL = "https://dtv79.github.io/Campeonato/ranking_historico.json";
 
 let datos = null;
+let datosRanking = null;
+let promesaRanking = null;
 let temporizadorCuentaAtras = null;
 
 const estadoUI = {
@@ -90,12 +93,18 @@ async function iniciarApp() {
 
         inicializarEstadoUI();
         pintarInicio();
+        prepararRankingHistoricoPortada();
 
         const pantallaSolicitada = new URLSearchParams(
             window.location.search
         ).get("pantalla");
 
         if (
+            pantallaSolicitada === "ranking" &&
+            esSi(obtenerConfiguracion().mostrar_ranking_historico)
+        ) {
+            abrirPantalla("ranking");
+        } else if (
             esWebPrevia() &&
             pantallaSolicitada === "mas"
         ) {
@@ -123,6 +132,18 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+    const volverRanking = evento.target.closest("#btnVolverRanking");
+    if (volverRanking) {
+        pintarPantallaRanking();
+        return;
+    }
+
+    const jugadorRanking = evento.target.closest("[data-ranking-jugador]");
+    if (jugadorRanking) {
+        pintarDetalleJugadorRanking(jugadorRanking.dataset.rankingJugador);
+        return;
+    }
+
     const btnInfo = evento.target.closest("#btnInfoOrden");
     if (btnInfo) {
         mostrarInfoOrden();
@@ -181,7 +202,7 @@ function gestionarClickGlobal(evento) {
         return;
     }
 
-        const enlaceDirecto = evento.target.closest("[data-href]");
+    const enlaceDirecto = evento.target.closest("[data-href]");
     if (enlaceDirecto) {
         const href = enlaceDirecto.dataset.href;
         if (href) window.location.href = href;
@@ -221,14 +242,16 @@ function abrirPantalla(pantalla, fase = "") {
     }
 
     ocultarInicio();
-    activarNav(pantalla);
-        estadoUI.pantalla = pantalla;
+    activarNav(pantalla === "ranking" ? "mas" : pantalla);
+    estadoUI.pantalla = pantalla;
 
     if (esWebPrevia()) {
         if (pantalla === "pretorneo_info") {
             pintarPantallaInformacionPretorneo();
         } else if (pantalla === "pretorneo_inscripcion") {
             pintarPantallaInscripciones();
+        } else if (pantalla === "ranking") {
+            pintarPantallaRanking();
         } else if (pantalla === "mas") {
             pintarPantallaMas();
         } else {
@@ -245,6 +268,8 @@ function abrirPantalla(pantalla, fase = "") {
         pintarPantallaPartidos();
     } else if (pantalla === "equipos") {
         pintarPantallaEquipos();
+    } else if (pantalla === "ranking") {
+        pintarPantallaRanking();
     } else if (pantalla === "mas") {
         pintarPantallaMas();
     }
@@ -657,6 +682,7 @@ function pintarTarjetasDashboard() {
     );
 
     pintarTarjetaEspecial(config);
+    pintarTarjetaRankingPortada(config);
 }
 
 function pintarTarjetaEspecial(config) {
@@ -722,6 +748,87 @@ function pintarTarjetaEspecial(config) {
     resumen.innerHTML = config.ronda_inicial_eliminatorias
         ? `${escaparHTML(config.ronda_inicial_eliminatorias)} pendientes de generar`
         : "Pendiente de iniciar";
+}
+
+async function prepararRankingHistoricoPortada() {
+    const config = obtenerConfiguracion();
+
+    if (!esSi(config.mostrar_ranking_historico)) {
+        pintarTarjetaRankingPortada(config);
+        return;
+    }
+
+    try {
+        await cargarDatosRankingHistorico();
+        pintarTarjetaRankingPortada(config);
+    } catch (error) {
+        console.error("No se pudo cargar el ranking histórico.", error);
+
+        const resumen = document.getElementById("resumenRanking");
+        if (resumen) {
+            resumen.innerHTML = "Ranking temporalmente no disponible";
+        }
+    }
+}
+
+function pintarTarjetaRankingPortada(config = obtenerConfiguracion()) {
+    const tarjeta = document.getElementById("tarjetaRanking");
+    const resumen = document.getElementById("resumenRanking");
+
+    if (!tarjeta) return;
+
+    const visible =
+        esSi(config.mostrar_ranking_historico) &&
+        !esWebPrevia();
+
+    tarjeta.classList.toggle("oculto", !visible);
+
+    if (!visible) return;
+
+    tarjeta.dataset.seccion = "ranking";
+
+    const ranking = datosRanking?.ranking || [];
+    const lider = ranking[0];
+
+    if (!resumen) return;
+
+    if (lider) {
+        resumen.innerHTML =
+            `🥇 ${escaparHTML(lider.jugador)}<br>` +
+            `${formatearPuntosRanking(lider.puntos)} pts · ${ranking.length} jugadores`;
+    } else {
+        resumen.innerHTML = "Clasificación individual de jugadores";
+    }
+}
+
+async function cargarDatosRankingHistorico() {
+    if (datosRanking) return datosRanking;
+
+    if (!promesaRanking) {
+        promesaRanking = fetch(
+            `${JSON_RANKING_URL}?v=${Date.now()}`,
+            { cache: "no-store" }
+        )
+            .then(respuesta => {
+                if (!respuesta.ok) {
+                    throw new Error(
+                        `No se pudo cargar el ranking (${respuesta.status})`
+                    );
+                }
+
+                return respuesta.json();
+            })
+            .then(ranking => {
+                datosRanking = ranking;
+                return ranking;
+            })
+            .catch(error => {
+                promesaRanking = null;
+                throw error;
+            });
+    }
+
+    return promesaRanking;
 }
 
 function pintarResumenPortada() {
@@ -906,14 +1013,8 @@ function configurarPortadaCompeticion() {
 
     configurarNavegacionCompeticion();
 
-    const tarjetas = [
-        ...document.querySelectorAll(
-            ".gridDashboard .cardAcceso"
-        )
-    ];
-
     configurarTarjetaPortada(
-        tarjetas[0],
+        document.getElementById("tarjetaCompeticion"),
         "📊",
         "Clasificación",
         "Cargando...",
@@ -921,7 +1022,7 @@ function configurarPortadaCompeticion() {
     );
 
     configurarTarjetaPortada(
-        tarjetas[1],
+        document.getElementById("tarjetaPartidos"),
         "🎾",
         "Partidos",
         "Cargando...",
@@ -929,7 +1030,7 @@ function configurarPortadaCompeticion() {
     );
 
     configurarTarjetaPortada(
-        tarjetas[2],
+        document.getElementById("tarjetaEquipos"),
         "👥",
         "Equipos",
         "Cargando...",
@@ -937,33 +1038,32 @@ function configurarPortadaCompeticion() {
     );
 
     configurarTarjetaPortada(
-        tarjetas[3],
+        document.getElementById("tarjetaEspecial"),
         "⚔️",
         "Siguiente fase",
         "Pendiente de iniciar",
         "especial"
     );
+
+    pintarTarjetaRankingPortada();
 }
 
 function configurarTarjetasPretorneo() {
-    const tarjetas = [
-        ...document.querySelectorAll(
-            ".gridDashboard .cardAcceso"
-        )
-    ];
-
     const inscripcionesAbiertas = esEstadoInscripciones();
 
     configurarTarjetaPortada(
-        tarjetas[0],
+        document.getElementById("tarjetaCompeticion"),
         "📅",
         "Campeonato",
         "Información de la próxima edición",
         "pretorneo_info"
     );
 
+    const tarjetaInscripciones =
+        document.getElementById("tarjetaPartidos");
+
     configurarTarjetaPortada(
-        tarjetas[1],
+        tarjetaInscripciones,
         "✍️",
         "Inscripciones",
         inscripcionesAbiertas
@@ -974,16 +1074,21 @@ function configurarTarjetasPretorneo() {
             : ""
     );
 
-    if (!inscripcionesAbiertas && tarjetas[1]) {
-        tarjetas[1].classList.add("tarjetaBloqueada");
-        tarjetas[1].setAttribute("aria-disabled", "true");
+    if (!inscripcionesAbiertas && tarjetaInscripciones) {
+        tarjetaInscripciones.classList.add("tarjetaBloqueada");
+        tarjetaInscripciones.setAttribute("aria-disabled", "true");
 
-        delete tarjetas[1].dataset.seccion;
-        delete tarjetas[1].dataset.href;
+        delete tarjetaInscripciones.dataset.seccion;
+        delete tarjetaInscripciones.dataset.href;
     }
 
-    tarjetas[2]?.classList.add("oculto");
-    tarjetas[3]?.classList.add("oculto");
+    [
+        "tarjetaEquipos",
+        "tarjetaEspecial",
+        "tarjetaRanking"
+    ].forEach(id => {
+        document.getElementById(id)?.classList.add("oculto");
+    });
 }
 
 function configurarTarjetaPortada(
@@ -1342,7 +1447,7 @@ function pintarPantallaMasPretorneo() {
         opciones.push({
             icono: "📈",
             texto: "Ranking histórico",
-            href: "ranking.html"
+            pantalla: "ranking"
         });
     }
 
@@ -1359,24 +1464,7 @@ function pintarPantallaMasPretorneo() {
 
         ${
             opciones.length
-                ? `
-                    <div class="listaOpcionesMas">
-                        ${opciones.map(opcion => `
-                            <a
-                                class="opcionMas"
-                                href="${escaparAtributo(opcion.href)}"
-                            >
-                                <span>${opcion.icono}</span>
-
-                                <strong>
-                                    ${escaparHTML(opcion.texto)}
-                                </strong>
-
-                                <b>→</b>
-                            </a>
-                        `).join("")}
-                    </div>
-                `
+                ? pintarListaOpcionesMas(opciones)
                 : pintarTarjetaVacia(
                     "Sin más secciones",
                     "No hay contenido adicional habilitado."
@@ -2280,6 +2368,398 @@ function pintarFilaPalas(nombre, sets, lado, pierde) {
 }
 
 /* =========================================================
+   RANKING HISTÓRICO
+========================================================= */
+
+async function pintarPantallaRanking() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    contenido.innerHTML = `
+        <h2>🏆 Ranking histórico</h2>
+        <section class="tarjetaVacia cargandoRanking">
+            <h3>⏳ Cargando clasificación</h3>
+            <p>Estamos consultando el histórico de jugadores.</p>
+        </section>
+    `;
+
+    try {
+        const ranking = await cargarDatosRankingHistorico();
+
+        if (estadoUI.pantalla !== "ranking") return;
+
+        contenido.innerHTML = construirPantallaRanking(ranking);
+    } catch (error) {
+        console.error(error);
+
+        contenido.innerHTML = `
+            <h2>🏆 Ranking histórico</h2>
+            ${pintarTarjetaVacia(
+                "No se pudo cargar el ranking",
+                "Comprueba que ranking_historico.json esté publicado y vuelve a intentarlo."
+            )}
+        `;
+    }
+}
+
+function construirPantallaRanking(origen) {
+    const ranking = [...(origen?.ranking || [])].sort(
+        (a, b) => numero(a.posicion) - numero(b.posicion)
+    );
+
+    const resumen = origen?.resumen || {};
+    const top3 = ranking.slice(0, 3);
+
+    if (!ranking.length) {
+        return `
+            <h2>🏆 Ranking histórico</h2>
+            ${pintarTarjetaVacia(
+                "Ranking pendiente",
+                "Todavía no hay jugadores guardados en el histórico."
+            )}
+        `;
+    }
+
+    return `
+        <h2>🏆 Ranking histórico</h2>
+
+        <section class="resumenRankingHistorico">
+            <div>
+                <span>Última edición</span>
+                <strong>${escaparHTML(resumen.ultima_edicion || "—")}</strong>
+            </div>
+            <div>
+                <span>Ediciones</span>
+                <strong>${numero(resumen.numero_ediciones)}</strong>
+            </div>
+            <div>
+                <span>Jugadores</span>
+                <strong>${numero(resumen.numero_jugadores) || ranking.length}</strong>
+            </div>
+        </section>
+
+        <section class="bloqueRanking">
+            <h3>🥇 Podio histórico</h3>
+            <div class="podioRankingHistorico">
+                ${top3.map((jugador, indice) =>
+                    pintarPodioRankingJugador(jugador, indice)
+                ).join("")}
+            </div>
+        </section>
+
+        <section class="bloqueRanking">
+            <div class="cabeceraBloqueRanking">
+                <div>
+                    <h3>Clasificación completa</h3>
+                    <p>Pulsa un jugador para ver su historial.</p>
+                </div>
+            </div>
+
+            <div class="listaRankingHistorico">
+                ${ranking.map(pintarFilaRankingJugador).join("")}
+            </div>
+        </section>
+
+        ${pintarRecordsRanking(ranking)}
+    `;
+}
+
+function pintarPodioRankingJugador(jugador, indice) {
+    const medallas = ["🥇", "🥈", "🥉"];
+    const clases = ["primero", "segundo", "tercero"];
+
+    return `
+        <button
+            type="button"
+            class="podioRankingJugador ${clases[indice] || ""}"
+            data-ranking-jugador="${escaparAtributo(jugador.id_jugador)}"
+        >
+            <span class="medallaRanking">${medallas[indice] || `${indice + 1}.`}</span>
+            <strong>${escaparHTML(jugador.jugador)}</strong>
+            <b>${formatearPuntosRanking(jugador.puntos)} pts</b>
+            <small>${numero(jugador.titulos)} títulos · ${numero(jugador.ediciones)} ediciones</small>
+        </button>
+    `;
+}
+
+function pintarFilaRankingJugador(jugador) {
+    const posicion = numero(jugador.posicion);
+    const movimiento = obtenerMovimientoRanking(jugador);
+    const posicionVisible = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    return `
+        <button
+            type="button"
+            class="filaRankingHistorico"
+            data-ranking-jugador="${escaparAtributo(jugador.id_jugador)}"
+        >
+            <span class="posicionRankingHistorico">${posicionVisible}</span>
+
+            <span class="datosJugadorRanking">
+                <strong>${escaparHTML(jugador.jugador)}</strong>
+                <small>
+                    ${numero(jugador.ediciones)} ediciones ·
+                    ${numero(jugador.titulos)} títulos ·
+                    ${formatearPorcentajeRanking(jugador.porcentaje_victorias)} victorias
+                </small>
+            </span>
+
+            <span class="derechaRanking">
+                <strong>${formatearPuntosRanking(jugador.puntos)}</strong>
+                <small>puntos</small>
+                <b class="${movimiento.clase}">${movimiento.texto}</b>
+            </span>
+        </button>
+    `;
+}
+
+function pintarRecordsRanking(ranking) {
+    const masTitulos = [...ranking].sort(
+        (a, b) => numero(b.titulos) - numero(a.titulos) || numero(a.posicion) - numero(b.posicion)
+    )[0];
+
+    const masParticipaciones = [...ranking].sort(
+        (a, b) => numero(b.ediciones) - numero(a.ediciones) || numero(a.posicion) - numero(b.posicion)
+    )[0];
+
+    const candidatosPorcentaje = ranking.filter(
+        jugador => numero(jugador.pj) > 0
+    );
+
+    const mejorPorcentaje = [...candidatosPorcentaje].sort(
+        (a, b) => numero(b.porcentaje_victorias) - numero(a.porcentaje_victorias)
+    )[0];
+
+    return `
+        <section class="bloqueRanking recordsRanking">
+            <h3>📚 Récords históricos</h3>
+            <div class="gridRecordsRanking">
+                ${pintarRecordRanking(
+                    "🏆",
+                    "Más títulos",
+                    masTitulos?.jugador || "—",
+                    `${numero(masTitulos?.titulos)} títulos`
+                )}
+                ${pintarRecordRanking(
+                    "🎾",
+                    "Más ediciones",
+                    masParticipaciones?.jugador || "—",
+                    `${numero(masParticipaciones?.ediciones)} ediciones`
+                )}
+                ${pintarRecordRanking(
+                    "📈",
+                    "Mejor % victorias",
+                    mejorPorcentaje?.jugador || "—",
+                    mejorPorcentaje
+                        ? formatearPorcentajeRanking(mejorPorcentaje.porcentaje_victorias)
+                        : "—"
+                )}
+            </div>
+        </section>
+    `;
+}
+
+function pintarRecordRanking(icono, titulo, jugador, valor) {
+    return `
+        <article class="recordRanking">
+            <span>${icono}</span>
+            <small>${escaparHTML(titulo)}</small>
+            <strong>${escaparHTML(jugador)}</strong>
+            <b>${escaparHTML(valor)}</b>
+        </article>
+    `;
+}
+
+function pintarDetalleJugadorRanking(idJugador) {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido || !datosRanking) return;
+
+    const jugador = (datosRanking.ranking || []).find(
+        fila => String(fila.id_jugador) === String(idJugador)
+    );
+
+    if (!jugador) return;
+
+    const historial = (datosRanking.historial_ediciones || [])
+        .filter(fila => String(fila.id_jugador) === String(idJugador))
+        .sort((a, b) => numero(b.anio) - numero(a.anio));
+
+    contenido.innerHTML = `
+        <button class="btnVolverRanking" id="btnVolverRanking" type="button">
+            ← Volver al ranking
+        </button>
+
+        <section class="cabeceraJugadorRanking">
+            <span class="puestoJugadorRanking">#${numero(jugador.posicion)}</span>
+            <div>
+                <small>RANKING HISTÓRICO</small>
+                <h2>${escaparHTML(jugador.jugador)}</h2>
+                <p>${formatearPuntosRanking(jugador.puntos)} puntos acumulados</p>
+            </div>
+        </section>
+
+        <section class="metricasJugadorRanking">
+            ${pintarMetricaRanking("🏆", "Títulos", numero(jugador.titulos))}
+            ${pintarMetricaRanking("🥈", "Finales", numero(jugador.finales))}
+            ${pintarMetricaRanking("📅", "Ediciones", numero(jugador.ediciones))}
+            ${pintarMetricaRanking("📈", "Victorias", formatearPorcentajeRanking(jugador.porcentaje_victorias))}
+            ${pintarMetricaRanking("🎾", "Partidos", numero(jugador.pj))}
+            ${pintarMetricaRanking("✅", "Ganados", numero(jugador.pg))}
+        </section>
+
+        <section class="bloqueRanking">
+            <h3>Historial por ediciones</h3>
+            <div class="historialJugadorRanking">
+                ${historial.length
+                    ? historial.map(pintarEdicionJugadorRanking).join("")
+                    : pintarTarjetaVacia(
+                        "Sin ediciones",
+                        "No se encontraron participaciones para este jugador."
+                    )}
+            </div>
+        </section>
+    `;
+}
+
+function pintarMetricaRanking(icono, titulo, valor) {
+    return `
+        <article>
+            <span>${icono}</span>
+            <small>${escaparHTML(titulo)}</small>
+            <strong>${escaparHTML(valor)}</strong>
+        </article>
+    `;
+}
+
+function pintarEdicionJugadorRanking(edicion) {
+    const resultado = formatearResultadoRanking(edicion.resultado_final);
+
+    return `
+        <article class="edicionJugadorRanking">
+            <div class="cabeceraEdicionRanking">
+                <div>
+                    <span>${escaparHTML(edicion.anio || "—")}</span>
+                    <strong>${resultado}</strong>
+                </div>
+                <b>+${formatearPuntosRanking(edicion.puntos_edicion)} pts</b>
+            </div>
+
+            <div class="parejaEdicionRanking">
+                <small>Pareja</small>
+                <strong>${escaparHTML(edicion.pareja || "Sin datos")}</strong>
+            </div>
+
+            <div class="datosEdicionRanking">
+                <span>🎾 ${numero(edicion.pj)} PJ</span>
+                <span>✅ ${numero(edicion.pg)} PG</span>
+                <span>❌ ${numero(edicion.pp)} PP</span>
+                <span>📈 ${formatearPorcentajeRanking(edicion.porcentaje_victorias)}</span>
+            </div>
+
+            <div class="desglosePuntosRanking">
+                <span>Participación <strong>${formatearPuntosRanking(edicion.puntos_participacion)}</strong></span>
+                <span>Resultado <strong>${formatearPuntosRanking(edicion.puntos_resultado)}</strong></span>
+                <span>Rendimiento <strong>${formatearPuntosRanking(edicion.puntos_rendimiento)}</strong></span>
+                <span>Acumulado <strong>${formatearPuntosRanking(edicion.puntos_acumulados)}</strong></span>
+            </div>
+        </article>
+    `;
+}
+
+function obtenerMovimientoRanking(jugador) {
+    const actual = numero(jugador.posicion);
+    const anterior = numero(jugador.posicion_anterior);
+
+    if (!anterior) {
+        return { texto: "NUEVO", clase: "movRankingNuevo" };
+    }
+
+    const diferencia = anterior - actual;
+
+    if (diferencia > 0) {
+        return { texto: `▲ ${diferencia}`, clase: "sube" };
+    }
+
+    if (diferencia < 0) {
+        return { texto: `▼ ${Math.abs(diferencia)}`, clase: "baja" };
+    }
+
+    return { texto: "—", clase: "igual" };
+}
+
+function formatearPorcentajeRanking(valor) {
+    const n = Number(valor);
+    if (!Number.isFinite(n)) return "0%";
+
+    const porcentaje = Math.abs(n) <= 1 ? n * 100 : n;
+
+    return `${porcentaje.toLocaleString("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+    })}%`;
+}
+
+function formatearPuntosRanking(valor) {
+    return numero(valor).toLocaleString("es-ES", {
+        maximumFractionDigits: 1
+    });
+}
+
+function formatearResultadoRanking(resultado) {
+    const valor = normalizar(resultado)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    if (valor === "CAMPEON") return "🏆 Campeón";
+    if (valor === "SUBCAMPEON") return "🥈 Subcampeón";
+    if (valor === "SEMIFINALISTA") return "⚔️ Semifinalista";
+    if (valor === "CUARTOS") return "🎾 Cuartos de final";
+    if (valor === "OCTAVOS") return "🎾 Octavos de final";
+
+    return escaparHTML(resultado || "Participante");
+}
+
+function pintarListaOpcionesMas(opciones) {
+    return `
+        <div class="listaOpcionesMas">
+            ${opciones.map(opcion => {
+                if (opcion.href) {
+                    return `
+                        <a
+                            class="opcionMas"
+                            href="${escaparAtributo(opcion.href)}"
+                        >
+                            <span>${opcion.icono}</span>
+                            <strong>${escaparHTML(opcion.texto)}</strong>
+                            <b>→</b>
+                        </a>
+                    `;
+                }
+
+                return `
+                    <button
+                        class="opcionMas"
+                        type="button"
+                        data-destino-pantalla="${escaparAtributo(opcion.pantalla || "") }"
+                        data-destino-fase="${escaparAtributo(opcion.fase || "") }"
+                    >
+                        <span>${opcion.icono}</span>
+                        <strong>${escaparHTML(opcion.texto)}</strong>
+                        <b>→</b>
+                    </button>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+/* =========================================================
    PANTALLA MÁS
 ========================================================= */
 
@@ -2296,56 +2776,74 @@ function pintarPantallaMas() {
     const opciones = [];
 
     if ((datos.cruces || []).length) {
-        opciones.push({ icono: "⚔️", texto: "Eliminatorias", pantalla: "competicion", fase: "cruces" });
+        opciones.push({
+            icono: "⚔️",
+            texto: "Eliminatorias",
+            pantalla: "competicion",
+            fase: "cruces"
+        });
     }
 
     if ((datos.palas_playa || []).length || config.hay_copa_palas_playa) {
-        opciones.push({ icono: "🏖️", texto: "Copa Palas Playa", pantalla: "competicion", fase: "palas" });
+        opciones.push({
+            icono: "🏖️",
+            texto: "Copa Palas Playa",
+            pantalla: "competicion",
+            fase: "palas"
+        });
     }
 
     if (esSi(config.mostrar_historia)) {
-    opciones.push({
-        icono: "📖",
-        texto: "Historia",
-        href: "historia.html"
-    });
-}
+        opciones.push({
+            icono: "📖",
+            texto: "Historia",
+            href: "historia.html"
+        });
+    }
 
-if (esSi(config.mostrar_campeones)) {
-    opciones.push({
-        icono: "🏆",
-        texto: "Campeones",
-        href: "campeones.html"
-    });
-}
+    if (esSi(config.mostrar_campeones)) {
+        opciones.push({
+            icono: "🏆",
+            texto: "Campeones",
+            href: "campeones.html"
+        });
+    }
 
     if (esSi(config.mostrar_normativa)) {
-        opciones.push({ icono: "📜", texto: "Normativa", href: "normas.html" });
+        opciones.push({
+            icono: "📜",
+            texto: "Normativa",
+            href: "normas.html"
+        });
     }
+
     if (esSi(config.mostrar_fotos)) {
-        opciones.push({ icono: "📷", texto: "Fotos", href: "fotos.html" });
+        opciones.push({
+            icono: "📷",
+            texto: "Fotos",
+            href: "fotos.html"
+        });
     }
+
     if (esSi(config.mostrar_ranking_historico)) {
-        opciones.push({ icono: "📈", texto: "Ranking histórico", href: "ranking.html" });
+        opciones.push({
+            icono: "📈",
+            texto: "Ranking histórico",
+            pantalla: "ranking"
+        });
     }
+
     if (esSi(config.mostrar_estadisticas)) {
-        opciones.push({ icono: "📊", texto: "Estadísticas", href: "estadisticas.html" });
+        opciones.push({
+            icono: "📊",
+            texto: "Estadísticas",
+            href: "estadisticas.html"
+        });
     }
 
     contenido.innerHTML = `
         <h2>☰ Más</h2>
-        <div class="listaOpcionesMas">
-            ${opciones.map(opcion => opcion.href
-                ? `<a class="opcionMas" href="${escaparAtributo(opcion.href)}">
-                    <span>${opcion.icono}</span><strong>${escaparHTML(opcion.texto)}</strong><b>→</b>
-                   </a>`
-                : `<button class="opcionMas" type="button"
-                        data-destino-pantalla="${opcion.pantalla}"
-                        data-destino-fase="${opcion.fase}">
-                    <span>${opcion.icono}</span><strong>${escaparHTML(opcion.texto)}</strong><b>→</b>
-                   </button>`
-            ).join("")}
-        </div>
+        ${pintarListaOpcionesMas(opciones)}
     `;
 }
 
