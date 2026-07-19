@@ -2414,7 +2414,10 @@ function construirPantallaRanking(origen) {
     );
 
     const resumen = origen?.resumen || {};
-    const top3 = ranking.slice(0, 3);
+    const top3 = ranking.filter(
+    jugador =>
+        obtenerPosicionCompartidaRanking(jugador) <= 3
+);
 
     if (!ranking.length) {
         return `
@@ -2832,25 +2835,7 @@ function pintarMetricaRanking(icono, titulo, valor) {
 }
 
 
-function obtenerMejorEdicionJugador(idJugador) {
-    const historial = datosRanking?.historial_ediciones || [];
 
-    const edicionesJugador = historial.filter(
-        edicion =>
-            String(edicion.id_jugador || "") ===
-            String(idJugador || "")
-    );
-
-    if (edicionesJugador.length < 2) {
-        return null;
-    }
-
-    return [...edicionesJugador].sort(
-        (a, b) =>
-            numero(b.puntos_edicion) -
-            numero(a.puntos_edicion)
-    )[0] || null;
-}
 function pintarEdicionJugadorRanking(edicion) {
     const resultado = formatearResultadoRanking(edicion.resultado_final);
 
