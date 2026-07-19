@@ -3658,7 +3658,18 @@ function pintarPantallaMas() {
         });
     }
 
-   
+    /*
+       Solo aparece cuando la Copa Palas Playa
+       ya ha sido generada.
+    */
+    if ((datos.palas_playa || []).length) {
+        opciones.push({
+            icono: "🏖️",
+            texto: "Copa Palas Playa",
+            pantalla: "competicion",
+            fase: "palas"
+        });
+    }
 
     if (esSi(config.mostrar_historia)) {
         opciones.push({
