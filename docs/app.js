@@ -99,6 +99,16 @@ async function iniciarApp() {
     new URLSearchParams(
         window.location.search
     ).get("pantalla");
+/*
+   Guardamos primero la pantalla solicitada
+   y después limpiamos la dirección.
+
+   La pantalla se abrirá esta vez, pero al
+   refrescar se abrirá siempre Inicio.
+*/
+if (pantallaSolicitada) {
+    limpiarPantallaDeURL();
+}
 
 if (!pantallaSolicitada) {
     return;
@@ -357,13 +367,52 @@ function ocultarInicio() {
     document.getElementById("vistaDetalle")?.classList.remove("oculto");
 }
 
+function limpiarPantallaDeURL() {
+    const url = new URL(
+        window.location.href
+    );
+
+    if (
+        !url.searchParams.has("pantalla")
+    ) {
+        return;
+    }
+
+    url.searchParams.delete("pantalla");
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.pathname +
+        url.search +
+        url.hash
+    );
+}
+
 function mostrarInicio() {
     estadoUI.pantalla = "inicio";
 
-    document.querySelector(".cabecera")?.classList.remove("oculto");
-    document.querySelector(".gridDashboard")?.classList.remove("oculto");
-    document.querySelector(".podioCard")?.classList.remove("oculto");
-    document.getElementById("vistaDetalle")?.classList.add("oculto");
+    /*
+       Cuando volvemos a Inicio eliminamos
+       ?pantalla=mas, ?pantalla=partidos, etc.
+    */
+    limpiarPantallaDeURL();
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("oculto");
+
+    document
+        .querySelector(".gridDashboard")
+        ?.classList.remove("oculto");
+
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
+    document
+        .getElementById("vistaDetalle")
+        ?.classList.add("oculto");
 
     activarNav("inicio");
     pintarInicio();
