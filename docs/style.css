@@ -2556,6 +2556,19 @@ body.modoPretorneo{
     font-weight:700;
 }
 
+/* Tarjetas bloqueadas en cualquier estado */
+.cardAcceso.tarjetaBloqueada{
+    opacity:.48;
+    filter:saturate(.35);
+    cursor:not-allowed;
+    pointer-events:none;
+    box-shadow:0 5px 14px rgba(15,23,42,.08);
+}
+
+.cardAcceso.tarjetaBloqueada::after{
+    background:rgba(255,255,255,.06);
+}
+
 
 /* Ocultar flechas de las tarjetas principales */
 .cardAcceso .flecha{
