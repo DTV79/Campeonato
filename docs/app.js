@@ -1860,6 +1860,39 @@ function pintarPantallaCompeticion() {
     contenido.innerHTML = html;
 }
 
+
+function pintarSelectorFases(
+    fases,
+    seleccionada,
+    contexto
+) {
+    if (
+        !Array.isArray(fases) ||
+        fases.length <= 1
+    ) {
+        return "";
+    }
+
+    return `
+        <div class="selectorFases">
+            ${fases.map(fase => `
+                <button
+                    type="button"
+                    class="selectorBtn ${
+                        fase.clave === seleccionada
+                            ? "selectorActivo"
+                            : ""
+                    }"
+                    data-selector-fase="${contexto}"
+                    data-fase="${fase.clave}"
+                >
+                    ${fase.icono}
+                    ${escaparHTML(fase.nombre)}
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
 function pintarClasificacionLiguilla() {
     const mostrarCoef = mostrarCoeficiente();
     const clasificacion = datos.clasificacion || [];
