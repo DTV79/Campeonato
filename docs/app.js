@@ -2720,6 +2720,14 @@ function pintarDetalleJugadorRanking(idJugador) {
         .filter(fila => String(fila.id_jugador) === String(idJugador))
         .sort((a, b) => numero(b.anio) - numero(a.anio));
 
+    const mejorEdicion = historial.length > 1
+    ? [...historial].sort(
+        (a, b) =>
+            numero(b.puntos_edicion) -
+            numero(a.puntos_edicion)
+      )[0]
+    : null;
+
     contenido.innerHTML = `
         <button class="btnVolverRanking" id="btnVolverRanking" type="button">
             ← Volver al ranking
@@ -2746,6 +2754,59 @@ function pintarDetalleJugadorRanking(idJugador) {
             ${pintarMetricaRanking("✅", "Ganados", numero(jugador.pg))}
         </section>
 
+        ${mejorEdicion
+    ? `
+        <section class="bloqueRanking mejorEdicionRanking">
+            <h3>⭐ Mejor edición</h3>
+
+            <article class="edicionJugadorRanking">
+                <div class="cabeceraEdicionRanking">
+                    <div>
+                        <span>${numero(mejorEdicion.anio)}</span>
+
+                        <strong>
+                            ${escaparHTML(
+                                mejorEdicion.resultado_final ||
+                                "Participación"
+                            )}
+                        </strong>
+                    </div>
+
+                    <b>
+                        ${formatearPuntosRanking(
+                            mejorEdicion.puntos_edicion
+                        )} pts
+                    </b>
+                </div>
+
+                <div class="parejaEdicionRanking">
+                    <small>Pareja</small>
+
+                    <strong>
+                        ${escaparHTML(
+                            mejorEdicion.pareja ||
+                            "Sin pareja registrada"
+                        )}
+                    </strong>
+                </div>
+
+                <div class="datosEdicionRanking">
+                    <span>🎾 ${numero(mejorEdicion.pj)} PJ</span>
+                    <span>✅ ${numero(mejorEdicion.pg)} PG</span>
+                    <span>❌ ${numero(mejorEdicion.pp)} PP</span>
+
+                    <span>
+                        📊 ${formatearPorcentajeRanking(
+                            mejorEdicion.porcentaje_victorias
+                        )} victorias
+                    </span>
+                </div>
+            </article>
+        </section>
+      `
+    : ""
+}
+
         <section class="bloqueRanking">
             <h3>Historial por ediciones</h3>
             <div class="historialJugadorRanking">
@@ -2770,6 +2831,26 @@ function pintarMetricaRanking(icono, titulo, valor) {
     `;
 }
 
+
+function obtenerMejorEdicionJugador(idJugador) {
+    const historial = datosRanking?.historial_ediciones || [];
+
+    const edicionesJugador = historial.filter(
+        edicion =>
+            String(edicion.id_jugador || "") ===
+            String(idJugador || "")
+    );
+
+    if (edicionesJugador.length < 2) {
+        return null;
+    }
+
+    return [...edicionesJugador].sort(
+        (a, b) =>
+            numero(b.puntos_edicion) -
+            numero(a.puntos_edicion)
+    )[0] || null;
+}
 function pintarEdicionJugadorRanking(edicion) {
     const resultado = formatearResultadoRanking(edicion.resultado_final);
 
