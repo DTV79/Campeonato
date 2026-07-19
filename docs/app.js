@@ -2570,39 +2570,132 @@ function obtenerFichaEquipo(equipo) {
     };
 }
 
-function obtenerProximoPartidoEquipo(nombreEquipo, fasePreferida) {
-    const ordenFases = [fasePreferida, "cruces", "regrupos", "grupos", "liguilla"]
-        .filter((fase, indice, lista) => fase && lista.indexOf(fase) === indice);
+function obtenerProximoPartidoEquipo(
+    nombreEquipo,
+    fasePreferida
+) {
+    const partidosPalas =
+        obtenerPartidosFase("palas");
+
+    const hayPalasPendientes =
+        partidosPalas.some(partidoPendiente);
+
+    /*
+       Si la Copa Palas Playa está en juego,
+       se busca primero en ella.
+    */
+    const ordenFases = (
+        hayPalasPendientes
+            ? [
+                "palas",
+                fasePreferida,
+                "cruces",
+                "regrupos",
+                "grupos",
+                "liguilla"
+            ]
+            : [
+                fasePreferida,
+                "cruces",
+                "regrupos",
+                "grupos",
+                "liguilla",
+                "palas"
+            ]
+    ).filter(
+        (fase, indice, lista) =>
+            fase &&
+            lista.indexOf(fase) === indice
+    );
 
     for (const fase of ordenFases) {
-        const partido = obtenerPartidosFase(fase).find(item =>
-            partidoPendiente(item) &&
-            [item.local, item.visitante].some(
-                nombre => normalizar(nombre) === normalizar(nombreEquipo)
-            )
-        );
+        const partido =
+            obtenerPartidosFase(fase).find(
+                item => {
+                    if (!partidoPendiente(item)) {
+                        return false;
+                    }
 
-        if (partido) {
-            const rival = normalizar(partido.local) === normalizar(nombreEquipo)
-                ? partido.visitante
-                : partido.local;
+                    const local =
+                        item.local ||
+                        item.equipo1 ||
+                        item.equipo_a ||
+                        "";
 
-            const partes = [];
+                    const visitante =
+                        item.visitante ||
+                        item.equipo2 ||
+                        item.equipo_b ||
+                        "";
 
-            if (partido.grupo) {
-                partes.push(nombreGrupoVisible(partido.grupo));
-            } else if (fase === "cruces") {
-                partes.push(partido.fase || "Eliminatorias");
+                    return [
+                        local,
+                        visitante
+                    ].some(
+                        nombre =>
+                            normalizar(nombre) ===
+                            normalizar(nombreEquipo)
+                    );
+                }
+            );
+
+        if (!partido) continue;
+
+        const local =
+            partido.local ||
+            partido.equipo1 ||
+            partido.equipo_a ||
+            "";
+
+        const visitante =
+            partido.visitante ||
+            partido.equipo2 ||
+            partido.equipo_b ||
+            "";
+
+        const rival =
+            normalizar(local) ===
+            normalizar(nombreEquipo)
+                ? visitante
+                : local;
+
+        const partes = [];
+
+        if (fase === "palas") {
+            partes.push("Copa Palas Playa");
+
+            if (partido.ronda) {
+                partes.push(
+                    `Ronda ${partido.ronda}`
+                );
             }
-
-            if (partido.jornada) partes.push(`Jornada ${partido.jornada}`);
-            if (partido.pista) partes.push(`Pista ${partido.pista}`);
-
-            return {
-                rival,
-                detalle: partes.join(" · ")
-            };
+        } else if (partido.grupo) {
+            partes.push(
+                nombreGrupoVisible(partido.grupo)
+            );
+        } else if (fase === "cruces") {
+            partes.push(
+                partido.fase ||
+                "Eliminatorias"
+            );
         }
+
+        if (partido.jornada) {
+            partes.push(
+                `Jornada ${partido.jornada}`
+            );
+        }
+
+        if (partido.pista) {
+            partes.push(
+                `Pista ${partido.pista}`
+            );
+        }
+
+        return {
+            rival,
+            detalle: partes.join(" · ")
+        };
     }
 
     return null;
