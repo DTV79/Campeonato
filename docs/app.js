@@ -3590,14 +3590,30 @@ function obtenerEstadoCompeticion() {
     const pendientesTotales = partidos.filter(partidoPendiente).length;
 
     if (pendientesTotales === 0) {
-        return {
-            titulo: `✅ ${nombreFase(fase)} finalizada`,
-            texto: `${partidos.length} de ${partidos.length} partidos · 100%`,
-            porcentaje: 100,
-            claseBarra: "barraLiguilla",
-            finalizado: false
-        };
-    }
+    const jornada =
+        obtenerJornadaActual(partidos);
+
+    const partidosJornada =
+        partidos.filter(
+            partido =>
+                Number(partido.jornada) ===
+                Number(jornada)
+        );
+
+    return {
+        titulo:
+            `✅ ${nombreFase(fase)} · Jornada ${jornada} finalizada`,
+
+        texto:
+            `${partidosJornada.length} de ` +
+            `${partidosJornada.length} partidos · ` +
+            `Siguiente jornada pendiente de generar`,
+
+        porcentaje: 100,
+        claseBarra: "barraLiguilla",
+        finalizado: false
+    };
+}
 
     const jornada = obtenerJornadaActual(partidos);
     const partidosJornada = partidos.filter(
