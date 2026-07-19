@@ -3615,7 +3615,23 @@ function obtenerURLInscripcion() {
 
 function esModoGrupos() {
     const config = obtenerConfiguracion();
-    return normalizar(config.tipo_campeonato) === "GRUPOS" || Boolean(datos?.grupos);
+    const tipoCampeonato = normalizar(config.tipo_campeonato);
+
+    // Si el JSON indica expresamente el tipo de campeonato,
+    // ese valor es el que manda.
+    if (tipoCampeonato) {
+        return tipoCampeonato === "GRUPOS";
+    }
+
+    // Compatibilidad con JSON antiguos que no tuvieran
+    // el campo tipo_campeonato.
+    const hayClasificacionGrupos =
+        (datos?.grupos?.clasificaciones || []).length > 0;
+
+    const hayPartidosGrupos =
+        (datos?.grupos?.partidos || []).length > 0;
+
+    return hayClasificacionGrupos || hayPartidosGrupos;
 }
 
 function obtenerFasesCompeticionDisponibles() {
