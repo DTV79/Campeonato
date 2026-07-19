@@ -2448,4 +2448,110 @@ body.modoPretorneo{
     }
 }
 
+/* =========================================================
+   PAREJAS HISTÓRICAS
+========================================================= */
 
+.listaParejasHistoricas{
+    display:grid;
+    gap:12px;
+}
+
+.parejaHistoricaJugador{
+    padding:15px;
+    border:1px solid #e4e7ec;
+    border-radius:16px;
+    background:#ffffff;
+    box-shadow:0 4px 14px rgba(15, 23, 42, .06);
+}
+
+.cabeceraParejaHistorica{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+}
+
+.cabeceraParejaHistorica div{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.cabeceraParejaHistorica small{
+    color:#7a8291;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.8px;
+}
+
+.cabeceraParejaHistorica strong{
+    color:#172033;
+    font-size:17px;
+    font-weight:900;
+}
+
+.cabeceraParejaHistorica > b{
+    flex-shrink:0;
+    padding:6px 9px;
+    border-radius:999px;
+    background:#f2f4f7;
+    color:#475467;
+    font-size:11px;
+    font-weight:800;
+}
+
+.datosParejaHistorica{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:7px;
+    margin-top:13px;
+}
+
+.datosParejaHistorica span{
+    padding:8px 5px;
+    border-radius:10px;
+    background:#f8fafc;
+    color:#344054;
+    font-size:11px;
+    font-weight:700;
+    text-align:center;
+}
+
+.resultadosParejaHistorica{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:11px;
+}
+
+.resultadosParejaHistorica span{
+    padding:6px 9px;
+    border-radius:999px;
+    background:#fff7df;
+    color:#8a6400;
+    font-size:11px;
+    font-weight:800;
+}
+
+.pieParejaHistorica{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:12px;
+    padding-top:11px;
+    border-top:1px solid #edf0f4;
+}
+
+.pieParejaHistorica span{
+    color:#475467;
+    font-size:11px;
+    font-weight:700;
+}
+
+.pieParejaHistorica small{
+    color:#98a2b3;
+    font-size:11px;
+    font-weight:700;
+}
