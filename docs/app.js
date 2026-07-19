@@ -93,7 +93,7 @@ async function iniciarApp() {
 
         inicializarEstadoUI();
         pintarInicio();
-        prepararRankingHistoricoPortada();
+       
 
         const pantallaSolicitada = new URLSearchParams(
             window.location.search
@@ -215,19 +215,46 @@ function gestionarClickGlobal(evento) {
         return;
     }
 
-    const card = evento.target.closest(".cardAcceso");
-    if (card) {
-        const seccion = card.dataset.seccion;
+    const card =
+    evento.target.closest(".cardAcceso");
 
-        if (seccion === "especial") {
-            abrirEspecialDesdePortada();
-        } else if (seccion === "competicion") {
-            abrirPantalla("competicion", obtenerFaseClasificacionPrincipal());
-        } else {
-            abrirPantalla(seccion);
-        }
+if (card) {
+    if (
+        card.classList.contains(
+            "tarjetaBloqueada"
+        )
+    ) {
         return;
     }
+
+    const seccion =
+        card.dataset.seccion;
+
+    if (seccion === "competicion") {
+        abrirPantalla(
+            "competicion",
+            obtenerFaseClasificacionPrincipal()
+        );
+    } else if (
+        seccion === "eliminatorias"
+    ) {
+        abrirPantalla(
+            "competicion",
+            "cruces"
+        );
+    } else if (
+        seccion === "palas"
+    ) {
+        abrirPantalla(
+            "competicion",
+            "palas"
+        );
+    } else if (seccion) {
+        abrirPantalla(seccion);
+    }
+
+    return;
+}
 
     const nav = evento.target.closest(".navBtn");
     if (nav) {
@@ -627,68 +654,295 @@ function pintarEstadoCabecera() {
 function pintarTarjetasDashboard() {
     const config = obtenerConfiguracion();
     const equipos = datos.equipos || [];
-    const faseActual = obtenerFaseActualCompeticion();
-    const faseClasificacion = obtenerFaseClasificacionPrincipal();
-    const partidosActuales = obtenerPartidosFase(faseActual);
-    const partidosSinDescanso = quitarDescansos(partidosActuales);
 
-    setText("tituloTarjetaCompeticion", "Clasificación");
+    const faseActual =
+        obtenerFaseActualCompeticion();
+
+    const faseClasificacion =
+        obtenerFaseClasificacionPrincipal();
+
+    const partidosActuales =
+        obtenerPartidosFase(faseActual);
+
+    const partidosSinDescanso =
+        quitarDescansos(partidosActuales);
+
+    const tituloClasificacion =
+        esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
+
+    setText(
+        "tituloTarjetaCompeticion",
+        tituloClasificacion
+    );
 
     if (esModoGrupos()) {
-        const grupos = obtenerNombresGrupos(faseClasificacion);
+        const grupos =
+            obtenerNombresGrupos(faseClasificacion);
+
         setHTML(
             "resumenCompeticion",
             `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
-            `${grupos.length} ${grupos.length === 1 ? "grupo" : "grupos"} · ` +
+            `${grupos.length} ` +
+            `${grupos.length === 1 ? "grupo" : "grupos"} · ` +
             `${equipos.length} equipos`
         );
     } else {
-        const lider = datos.clasificacion?.[0]?.equipo || "Sin datos";
+        const lider =
+            datos.clasificacion?.[0]?.equipo ||
+            "Sin datos";
+
         setHTML(
             "resumenCompeticion",
-            `🥇 ${escaparHTML(lider)}<br>${equipos.length} equipos participantes`
+            `🥇 ${escaparHTML(lider)}<br>` +
+            `${equipos.length} equipos participantes`
         );
     }
 
     if (!partidosSinDescanso.length) {
         setHTML(
             "resumenPartidos",
-            `${escaparHTML(nombreFase(faseActual))}<br>Jornadas pendientes de generar`
+            `${escaparHTML(nombreFase(faseActual))}<br>` +
+            `Jornadas pendientes de generar`
         );
-    } else if (["liguilla", "grupos", "regrupos"].includes(faseActual)) {
-        const jornada = obtenerJornadaActual(partidosSinDescanso);
-        const partidosJornada = partidosSinDescanso.filter(
-            partido => Number(partido.jornada) === Number(jornada)
-        );
-        const jugados = partidosJornada.filter(partidoFinalizado).length;
-        const pendientes = partidosJornada.filter(partidoPendiente).length;
+    } else if (
+        ["liguilla", "grupos", "regrupos"]
+            .includes(faseActual)
+    ) {
+        const jornada =
+            obtenerJornadaActual(partidosSinDescanso);
+
+        const partidosJornada =
+            partidosSinDescanso.filter(
+                partido =>
+                    Number(partido.jornada) ===
+                    Number(jornada)
+            );
+
+        const jugados =
+            partidosJornada
+                .filter(partidoFinalizado)
+                .length;
+
+        const pendientes =
+            partidosJornada
+                .filter(partidoPendiente)
+                .length;
 
         setHTML(
             "resumenPartidos",
-            `Jornada ${jornada}<br>${jugados} jugados · ${pendientes} pendientes`
+            `Jornada ${jornada}<br>` +
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`
         );
     } else {
-        const totalJugados = partidosSinDescanso.filter(partidoFinalizado).length;
+        const totalJugados =
+            partidosSinDescanso
+                .filter(partidoFinalizado)
+                .length;
+
         setHTML(
             "resumenPartidos",
-            `${escaparHTML(nombreFase(faseActual))}<br>${totalJugados} jugados · ` +
+            `${escaparHTML(nombreFase(faseActual))}<br>` +
+            `${totalJugados} jugados · ` +
             `${partidosSinDescanso.length - totalJugados} pendientes`
         );
     }
 
-    const gruposIniciales = esModoGrupos()
-        ? new Set(equipos.map(equipo => equipo.grupo).filter(Boolean)).size
-        : 0;
+    pintarTarjetaEliminatorias(config);
+    pintarTarjetaPalas(config);
 
-    setHTML(
-        "resumenEquipos",
-        esModoGrupos()
-            ? `${equipos.length} equipos<br>${gruposIniciales} grupos iniciales`
-            : `${equipos.length} equipos<br>Ver participantes`
+    document
+        .getElementById("tarjetaRanking")
+        ?.classList.add("oculto");
+}
+
+function pintarTarjetaEliminatorias(config) {
+    const tarjeta =
+        document.getElementById("tarjetaEquipos");
+
+    if (!tarjeta) return;
+
+    const cruces =
+        datos?.cruces || [];
+
+    const hayEquipos =
+        hayEquiposRealesEnPartidos(cruces);
+
+    let resumen;
+
+    if (hayEquipos) {
+        const jugados =
+            cruces.filter(partidoFinalizado).length;
+
+        const pendientes =
+            cruces.length - jugados;
+
+        resumen =
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`;
+    } else {
+        const ronda =
+            config.ronda_inicial_eliminatorias ||
+            "";
+
+        resumen = ronda
+            ? `${escaparHTML(ronda)} pendientes de generar`
+            : "Pendientes de generar";
+    }
+
+    configurarTarjetaPortada(
+        tarjeta,
+        "⚔️",
+        "Eliminatorias",
+        resumen,
+        hayEquipos ? "eliminatorias" : ""
     );
 
-    pintarTarjetaEspecial(config);
-    pintarTarjetaRankingPortada(config);
+    tarjeta.classList.remove("cardPalas");
+    tarjeta.classList.add("cardCruces");
+
+    configurarBloqueoTarjeta(
+        tarjeta,
+        !hayEquipos
+    );
+}
+
+
+function pintarTarjetaPalas(config) {
+    const tarjeta =
+        document.getElementById("tarjetaEspecial");
+
+    if (!tarjeta) return;
+
+    const hayCopa =
+        config.hay_copa_palas_playa === true ||
+        esSi(config.hay_copa_palas_playa);
+
+    const rondas =
+        datos?.palas_playa || [];
+
+    const partidos =
+        rondas.flatMap(
+            ronda => ronda.partidos || []
+        );
+
+    const hayEquipos =
+        hayCopa &&
+        hayEquiposRealesEnPartidos(partidos);
+
+    let resumen;
+
+    if (!hayCopa) {
+        resumen =
+            "No se disputa esta edición";
+    } else if (!hayEquipos) {
+        resumen =
+            "Pendiente de generar";
+    } else {
+        const jugados =
+            partidos.filter(partidoFinalizado).length;
+
+        const pendientes =
+            partidos.length - jugados;
+
+        resumen =
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`;
+    }
+
+    configurarTarjetaPortada(
+        tarjeta,
+        "🏖️",
+        "Palas de playa",
+        resumen,
+        hayEquipos ? "palas" : ""
+    );
+
+    tarjeta.classList.remove(
+        "cardCruces",
+        "cardClasificacion"
+    );
+
+    tarjeta.classList.add("cardPalas");
+
+    configurarBloqueoTarjeta(
+        tarjeta,
+        !hayEquipos
+    );
+}
+
+
+function configurarBloqueoTarjeta(
+    tarjeta,
+    bloqueada
+) {
+    if (!tarjeta) return;
+
+    tarjeta.classList.toggle(
+        "tarjetaBloqueada",
+        bloqueada
+    );
+
+    if (bloqueada) {
+        tarjeta.setAttribute(
+            "aria-disabled",
+            "true"
+        );
+
+        delete tarjeta.dataset.seccion;
+        delete tarjeta.dataset.destinoPantalla;
+        delete tarjeta.dataset.destinoFase;
+    } else {
+        tarjeta.removeAttribute(
+            "aria-disabled"
+        );
+    }
+}
+
+
+function hayEquiposRealesEnPartidos(partidos) {
+    return partidos.some(partido => {
+        const local =
+            partido.local ||
+            partido.equipo1 ||
+            partido.equipo_a ||
+            "";
+
+        const visitante =
+            partido.visitante ||
+            partido.equipo2 ||
+            partido.equipo_b ||
+            "";
+
+        return esNombreEquipoReal(local) ||
+            esNombreEquipoReal(visitante);
+    });
+}
+
+
+function esNombreEquipoReal(nombre) {
+    const texto =
+        normalizar(nombre);
+
+    if (!texto) return false;
+
+    const textosPendientes = [
+        "POR DEFINIR",
+        "PENDIENTE",
+        "GANADOR",
+        "PERDEDOR",
+        "CLASIFICADO",
+        "PRIMERO DE",
+        "SEGUNDO DE",
+        "TERCERO DE"
+    ];
+
+    return !textosPendientes.some(
+        pendiente =>
+            texto.includes(pendiente)
+    );
 }
 
 function pintarTarjetaEspecial(config) {
@@ -1019,10 +1273,15 @@ function configurarPortadaCompeticion() {
 
     configurarNavegacionCompeticion();
 
+    const tituloClasificacion =
+        esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
+
     configurarTarjetaPortada(
         document.getElementById("tarjetaCompeticion"),
         "📊",
-        "Clasificación",
+        tituloClasificacion,
         "Cargando...",
         "competicion"
     );
@@ -1035,23 +1294,53 @@ function configurarPortadaCompeticion() {
         "partidos"
     );
 
-    configurarTarjetaPortada(
-        document.getElementById("tarjetaEquipos"),
-        "👥",
-        "Equipos",
-        "Cargando...",
-        "equipos"
-    );
+    /*
+       Reutilizamos la antigua tarjeta Equipos
+       para mostrar Eliminatorias.
+    */
+    const tarjetaEliminatorias =
+        document.getElementById("tarjetaEquipos");
 
     configurarTarjetaPortada(
-        document.getElementById("tarjetaEspecial"),
+        tarjetaEliminatorias,
         "⚔️",
-        "Siguiente fase",
-        "Pendiente de iniciar",
-        "especial"
+        "Eliminatorias",
+        "Pendientes de generar",
+        "eliminatorias"
     );
 
-    pintarTarjetaRankingPortada();
+    tarjetaEliminatorias?.classList.remove("cardPalas");
+    tarjetaEliminatorias?.classList.add("cardCruces");
+
+    /*
+       Reutilizamos la antigua tarjeta Especial
+       para mostrar Palas de playa.
+    */
+    const tarjetaPalas =
+        document.getElementById("tarjetaEspecial");
+
+    configurarTarjetaPortada(
+        tarjetaPalas,
+        "🏖️",
+        "Palas de playa",
+        "Pendiente de generar",
+        "palas"
+    );
+
+    tarjetaPalas?.classList.remove(
+        "cardCruces",
+        "cardClasificacion"
+    );
+
+    tarjetaPalas?.classList.add("cardPalas");
+
+    /*
+       El Ranking histórico no aparece nunca
+       en la portada de la competición.
+    */
+    document
+        .getElementById("tarjetaRanking")
+        ?.classList.add("oculto");
 }
 
 function configurarTarjetasPretorneo() {
@@ -1484,26 +1773,84 @@ function pintarPantallaMasPretorneo() {
 ========================================================= */
 
 function pintarPantallaCompeticion() {
-    const contenido = obtenerContenidoDetalle();
+    const contenido =
+        obtenerContenidoDetalle();
+
     if (!contenido) return;
 
-    const fases = obtenerFasesCompeticionDisponibles();
+    /*
+       En el selector de clasificación solamente
+       pueden aparecer las fases clasificatorias.
+    */
+    const fasesClasificacion =
+        obtenerFasesCompeticionDisponibles()
+            .filter(fase =>
+                [
+                    "liguilla",
+                    "grupos",
+                    "regrupos"
+                ].includes(fase.clave)
+            );
 
-    if (!fases.some(fase => fase.clave === estadoUI.faseCompeticion)) {
-        estadoUI.faseCompeticion = obtenerFaseClasificacionPrincipal();
+    const faseEspecial =
+        ["cruces", "palas"]
+            .includes(
+                estadoUI.faseCompeticion
+            );
+
+    if (
+        !faseEspecial &&
+        !fasesClasificacion.some(
+            fase =>
+                fase.clave ===
+                estadoUI.faseCompeticion
+        )
+    ) {
+        estadoUI.faseCompeticion =
+            obtenerFaseClasificacionPrincipal();
     }
 
-    let html = `
-        <h2>📊 Clasificación</h2>
-        ${pintarSelectorFases(fases, estadoUI.faseCompeticion, "competicion")}
-    `;
+    const fase =
+        estadoUI.faseCompeticion;
 
-    const fase = estadoUI.faseCompeticion;
+    let titulo;
+
+    if (fase === "cruces") {
+        titulo = "⚔️ Eliminatorias";
+    } else if (fase === "palas") {
+        titulo = "🏖️ Palas de playa";
+    } else if (fase === "regrupos") {
+        titulo = "🔁 ReGrupos";
+    } else if (fase === "grupos") {
+        titulo = "📊 Grupos";
+    } else {
+        titulo = "📊 Clasificación";
+    }
+
+    let html = `<h2>${titulo}</h2>`;
+
+    /*
+       Los botones superiores solamente aparecen
+       dentro de las fases de clasificación.
+       Nunca se mostrarán Eliminatorias ni Palas.
+    */
+    if (!faseEspecial) {
+        html += pintarSelectorFases(
+            fasesClasificacion,
+            fase,
+            "competicion"
+        );
+    }
 
     if (fase === "liguilla") {
         html += pintarClasificacionLiguilla();
-    } else if (fase === "grupos" || fase === "regrupos") {
-        html += pintarClasificacionesPorGrupos(fase);
+    } else if (
+        fase === "grupos" ||
+        fase === "regrupos"
+    ) {
+        html += pintarClasificacionesPorGrupos(
+            fase
+        );
     } else if (fase === "cruces") {
         html += pintarContenidoCruces();
     } else if (fase === "palas") {
@@ -1511,25 +1858,6 @@ function pintarPantallaCompeticion() {
     }
 
     contenido.innerHTML = html;
-}
-
-function pintarSelectorFases(fases, seleccionada, contexto) {
-    if (fases.length <= 1) return "";
-
-    return `
-        <div class="selectorFases">
-            ${fases.map(fase => `
-                <button
-                    type="button"
-                    class="selectorBtn ${fase.clave === seleccionada ? "selectorActivo" : ""}"
-                    data-selector-fase="${contexto}"
-                    data-fase="${fase.clave}"
-                >
-                    ${fase.icono} ${escaparHTML(fase.nombre)}
-                </button>
-            `).join("")}
-        </div>
-    `;
 }
 
 function pintarClasificacionLiguilla() {
