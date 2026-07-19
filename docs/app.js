@@ -2731,6 +2731,11 @@ function pintarDetalleJugadorRanking(idJugador) {
       )[0]
     : null;
 
+    
+
+    const parejasHistoricas =
+    obtenerParejasHistoricasJugador(historial);
+
     contenido.innerHTML = `
         <button class="btnVolverRanking" id="btnVolverRanking" type="button">
             ← Volver al ranking
@@ -2759,6 +2764,7 @@ function pintarDetalleJugadorRanking(idJugador) {
 
         ${mejorEdicion
     ? `
+  
         <section class="bloqueRanking mejorEdicionRanking">
             <h3>⭐ Mejor edición</h3>
 
@@ -2810,6 +2816,22 @@ function pintarDetalleJugadorRanking(idJugador) {
     : ""
 }
 
+${historial.length > 1 && parejasHistoricas.length
+    ? `
+        <section class="bloqueRanking parejasHistoricasRanking">
+            <h3>🤝 Parejas históricas</h3>
+
+            <div class="listaParejasHistoricas">
+                ${parejasHistoricas
+                    .map(pintarParejaHistoricaJugador)
+                    .join("")
+                }
+            </div>
+        </section>
+      `
+    : ""
+}
+
         <section class="bloqueRanking">
             <h3>Historial por ediciones</h3>
             <div class="historialJugadorRanking">
@@ -2834,7 +2856,171 @@ function pintarMetricaRanking(icono, titulo, valor) {
     `;
 }
 
+function obtenerParejasHistoricasJugador(historial) {
+    const parejas = new Map();
 
+    (historial || []).forEach(edicion => {
+        const idPareja = String(
+            edicion.id_pareja || edicion.pareja || ""
+        ).trim();
+
+        if (!idPareja) return;
+
+        if (!parejas.has(idPareja)) {
+            parejas.set(idPareja, {
+                id_pareja: edicion.id_pareja || "",
+                pareja: edicion.pareja || "Sin datos",
+                ediciones: 0,
+                pj: 0,
+                pg: 0,
+                pp: 0,
+                titulos: 0,
+                finales: 0,
+                puntos: 0,
+                anios: []
+            });
+        }
+
+        const pareja = parejas.get(idPareja);
+
+        pareja.ediciones += 1;
+        pareja.pj += numero(edicion.pj);
+        pareja.pg += numero(edicion.pg);
+        pareja.pp += numero(edicion.pp);
+        pareja.puntos += numero(edicion.puntos_edicion);
+
+        if (edicion.anio) {
+            pareja.anios.push(numero(edicion.anio));
+        }
+
+        const resultado = String(
+            edicion.resultado_final || ""
+        )
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toUpperCase();
+
+        if (
+            numero(edicion.posicion_final) === 1 ||
+            resultado === "CAMPEON"
+        ) {
+            pareja.titulos += 1;
+        }
+
+        if (
+            numero(edicion.posicion_final) === 2 ||
+            resultado === "SUBCAMPEON"
+        ) {
+            pareja.finales += 1;
+        }
+    });
+
+    return [...parejas.values()]
+        .map(pareja => ({
+            ...pareja,
+
+            porcentaje_victorias:
+                pareja.pj > 0
+                    ? pareja.pg / pareja.pj
+                    : 0,
+
+            anios: [...new Set(pareja.anios)]
+                .sort((a, b) => b - a)
+        }))
+        .sort((a, b) =>
+            numero(b.titulos) - numero(a.titulos) ||
+            numero(b.puntos) - numero(a.puntos) ||
+            numero(b.pg) - numero(a.pg) ||
+            String(a.pareja).localeCompare(
+                String(b.pareja),
+                "es",
+                { sensitivity: "base" }
+            )
+        );
+}
+
+function pintarParejaHistoricaJugador(pareja) {
+    const resumenResultados = [];
+
+    if (numero(pareja.titulos) > 0) {
+        resumenResultados.push(
+            `🏆 ${numero(pareja.titulos)} ${
+                numero(pareja.titulos) === 1
+                    ? "título"
+                    : "títulos"
+            }`
+        );
+    }
+
+    if (numero(pareja.finales) > 0) {
+        resumenResultados.push(
+            `🥈 ${numero(pareja.finales)} ${
+                numero(pareja.finales) === 1
+                    ? "subcampeonato"
+                    : "subcampeonatos"
+            }`
+        );
+    }
+
+    return `
+        <article class="parejaHistoricaJugador">
+            <div class="cabeceraParejaHistorica">
+                <div>
+                    <small>COMPAÑERO</small>
+                    <strong>
+                        ${escaparHTML(pareja.pareja)}
+                    </strong>
+                </div>
+
+                <b>
+                    ${numero(pareja.ediciones)}
+                    ${numero(pareja.ediciones) === 1
+                        ? "edición"
+                        : "ediciones"
+                    }
+                </b>
+            </div>
+
+            <div class="datosParejaHistorica">
+                <span>🎾 ${numero(pareja.pj)} PJ</span>
+                <span>✅ ${numero(pareja.pg)} PG</span>
+                <span>❌ ${numero(pareja.pp)} PP</span>
+
+                <span>
+                    📈 ${formatearPorcentajeRanking(
+                        pareja.porcentaje_victorias
+                    )}
+                </span>
+            </div>
+
+            ${resumenResultados.length
+                ? `
+                    <div class="resultadosParejaHistorica">
+                        ${resumenResultados
+                            .map(resultado =>
+                                `<span>${escaparHTML(resultado)}</span>`
+                            )
+                            .join("")
+                        }
+                    </div>
+                  `
+                : ""
+            }
+
+            <div class="pieParejaHistorica">
+                <span>
+                    ${formatearPuntosRanking(pareja.puntos)}
+                    puntos conseguidos juntos
+                </span>
+
+                <small>
+                    ${pareja.anios.join(" · ")}
+                </small>
+            </div>
+        </article>
+    `;
+}
 
 function pintarEdicionJugadorRanking(edicion) {
     const resultado = formatearResultadoRanking(edicion.resultado_final);
