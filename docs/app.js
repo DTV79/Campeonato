@@ -95,21 +95,56 @@ async function iniciarApp() {
         pintarInicio();
        
 
-        const pantallaSolicitada = new URLSearchParams(
-            window.location.search
-        ).get("pantalla");
+        const pantallaSolicitada =
+    new URLSearchParams(
+        window.location.search
+    ).get("pantalla");
 
-        if (
-            pantallaSolicitada === "ranking" &&
-            esSi(obtenerConfiguracion().mostrar_ranking_historico)
-        ) {
-            abrirPantalla("ranking");
-        } else if (
-            esWebPrevia() &&
-            pantallaSolicitada === "mas"
-        ) {
-            abrirPantalla("mas");
-        }
+if (!pantallaSolicitada) {
+    return;
+}
+
+if (
+    pantallaSolicitada === "ranking"
+) {
+    if (
+        esSi(
+            obtenerConfiguracion()
+                .mostrar_ranking_historico
+        )
+    ) {
+        abrirPantalla("ranking");
+    }
+
+    return;
+}
+
+if (esWebPrevia()) {
+    if (
+        pantallaSolicitada === "mas"
+    ) {
+        abrirPantalla("mas");
+    }
+
+    return;
+}
+
+const pantallasPermitidas = [
+    "competicion",
+    "partidos",
+    "equipos",
+    "mas"
+];
+
+if (
+    pantallasPermitidas.includes(
+        pantallaSolicitada
+    )
+) {
+    abrirPantalla(
+        pantallaSolicitada
+    );
+}
     } catch (error) {
         console.error(error);
         pintarErrorCarga();
@@ -3530,14 +3565,7 @@ function pintarPantallaMas() {
         });
     }
 
-    if ((datos.palas_playa || []).length || config.hay_copa_palas_playa) {
-        opciones.push({
-            icono: "🏖️",
-            texto: "Copa Palas Playa",
-            pantalla: "competicion",
-            fase: "palas"
-        });
-    }
+   
 
     if (esSi(config.mostrar_historia)) {
         opciones.push({
