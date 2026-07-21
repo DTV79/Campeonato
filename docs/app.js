@@ -566,7 +566,9 @@ function pintarIdentidadCampeonato() {
     );
 
     if (textoNav) {
-        textoNav.textContent = "Clasificación";
+        textoNav.textContent = esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
     }
 }
 
@@ -1604,7 +1606,7 @@ function configurarNavegacionCompeticion() {
     configurarBotonNav(
         botones[1],
         "📊",
-        "Clasificación",
+        esModoGrupos() ? "Grupos" : "Clasificación",
         "competicion"
     );
 
