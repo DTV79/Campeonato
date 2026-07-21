@@ -1,0 +1,525 @@
+/* =========================================================
+   PORTADA ESPECIAL · CAMPEONATO FINALIZADO
+========================================================= */
+
+body.modoFinalizado{
+    background:
+        radial-gradient(circle at 12% 4%,rgba(250,204,21,.15),transparent 28%),
+        radial-gradient(circle at 88% 12%,rgba(217,119,6,.12),transparent 26%),
+        #f7f4ed;
+}
+
+.modoFinalizado .cabeceraCelebracion{
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(254,240,138,.45);
+    background:
+        radial-gradient(circle at 88% 5%,rgba(255,255,255,.28),transparent 22%),
+        linear-gradient(135deg,#451a03 0%,#92400e 42%,#d97706 72%,#facc15 125%);
+    box-shadow:0 16px 42px rgba(120,53,15,.28);
+}
+
+.modoFinalizado .cabeceraCelebracion::before,
+.modoFinalizado .cabeceraCelebracion::after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:50%;
+}
+
+.modoFinalizado .cabeceraCelebracion::before{
+    top:-88px;
+    right:-52px;
+}
+
+.modoFinalizado .cabeceraCelebracion::after{
+    right:42px;
+    bottom:-118px;
+}
+
+.modoFinalizado .cabeceraCelebracion > *{
+    position:relative;
+    z-index:1;
+}
+
+.modoFinalizado .estadoCabecera{
+    border:1px solid rgba(254,240,138,.55);
+    background:rgba(69,26,3,.35);
+    color:#fff7cc;
+    letter-spacing:.4px;
+    box-shadow:inset 0 0 20px rgba(250,204,21,.08);
+}
+
+.modoFinalizado .barra{
+    background:rgba(255,255,255,.2);
+}
+
+.modoFinalizado .barraFinalizado{
+    background:linear-gradient(90deg,#fde68a,#facc15,#f59e0b,#fde68a);
+    background-size:220% 100%;
+    animation:brilloBarraFinal 3s linear infinite;
+}
+
+.portadaFinalizada{
+    position:relative;
+    margin:20px 0 18px;
+}
+
+.coronaCampeones{
+    position:relative;
+    padding:30px 22px 26px;
+    overflow:hidden;
+    border:1px solid rgba(251,191,36,.65);
+    border-radius:28px;
+    background:
+        radial-gradient(circle at 50% -5%,rgba(254,240,138,.28),transparent 32%),
+        linear-gradient(155deg,#1c1917,#451a03 54%,#78350f);
+    color:white;
+    text-align:center;
+    box-shadow:0 18px 46px rgba(69,26,3,.28);
+}
+
+.coronaCampeones::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    opacity:.32;
+    background-image:
+        linear-gradient(115deg,transparent 35%,rgba(255,255,255,.12) 48%,transparent 61%);
+    background-size:230% 100%;
+    animation:brilloCorona 5.5s ease-in-out infinite;
+}
+
+.coronaCampeones > *{
+    position:relative;
+    z-index:2;
+}
+
+.selloEdicion{
+    display:inline-flex;
+    padding:7px 12px;
+    border:1px solid rgba(254,240,138,.48);
+    border-radius:999px;
+    background:rgba(250,204,21,.12);
+    color:#fef3c7;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.8px;
+}
+
+.trofeoFinal{
+    margin-top:16px;
+    font-size:62px;
+    line-height:1;
+    filter:drop-shadow(0 10px 14px rgba(0,0,0,.22));
+    animation:latidoTrofeo 2.8s ease-in-out infinite;
+}
+
+.tituloCampeones{
+    margin-top:12px;
+    color:#fde68a;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:2.8px;
+}
+
+.coronaCampeones h1{
+    max-width:560px;
+    margin:8px auto 0;
+    font-size:clamp(28px,7vw,46px);
+    font-weight:900;
+    line-height:1.03;
+    text-wrap:balance;
+}
+
+.textoCorona{
+    max-width:520px;
+    margin:13px auto 0;
+    color:#fef3c7;
+    font-size:14px;
+    line-height:1.5;
+    opacity:.88;
+}
+
+.fotoCampeones{
+    width:min(100%,500px);
+    margin:20px auto 0;
+    overflow:hidden;
+    border:3px solid rgba(254,240,138,.7);
+    border-radius:22px;
+    background:#292524;
+    box-shadow:0 14px 30px rgba(0,0,0,.28);
+}
+
+.fotoCampeones img{
+    display:block;
+    width:100%;
+    max-height:420px;
+    object-fit:cover;
+}
+
+.btnCelebrar{
+    margin-top:20px;
+    padding:11px 16px;
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+    transition:transform .2s ease,background .2s ease;
+}
+
+.btnCelebrar:active{
+    transform:scale(.96);
+}
+
+.destello{
+    position:absolute;
+    z-index:0;
+    width:190px;
+    height:190px;
+    border:1px solid rgba(254,240,138,.18);
+    border-radius:50%;
+}
+
+.destelloUno{
+    top:-105px;
+    left:-75px;
+}
+
+.destelloDos{
+    right:-85px;
+    bottom:-125px;
+}
+
+.granFinalCelebracion{
+    margin-top:16px;
+    padding:20px;
+    border:1px solid #fde68a;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 10px 28px rgba(120,53,15,.12);
+}
+
+.cabeceraGranFinal{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #f3e8d0;
+}
+
+.cabeceraGranFinal span{
+    color:#92400e;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:1.4px;
+}
+
+.cabeceraGranFinal strong{
+    color:#64748b;
+    font-size:11px;
+}
+
+.equipoGranFinal{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px;
+    border-radius:16px;
+}
+
+.equipoGranFinal > span{
+    font-size:25px;
+}
+
+.equipoGranFinal div{
+    min-width:0;
+}
+
+.equipoGranFinal small{
+    display:block;
+    margin-bottom:3px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.equipoGranFinal strong{
+    display:block;
+    font-size:17px;
+    line-height:1.25;
+}
+
+.equipoCampeonFinal{
+    border:1px solid #fde68a;
+    background:linear-gradient(135deg,#fffbeb,#fef3c7);
+    color:#78350f;
+}
+
+.equipoSubcampeonFinal{
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+    color:#334155;
+}
+
+.marcadorFinal{
+    margin:9px 0;
+    padding:9px 12px;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    font-size:16px;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:.8px;
+}
+
+.honoresFinales{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:16px;
+}
+
+.honor{
+    min-width:0;
+    padding:20px 16px;
+    border-radius:22px;
+    text-align:center;
+    box-shadow:0 8px 22px rgba(15,23,42,.08);
+}
+
+.honorOro{
+    border:1px solid #fcd34d;
+    background:linear-gradient(145deg,#fffbeb,#fef3c7);
+    color:#78350f;
+}
+
+.honorPlata{
+    border:1px solid #cbd5e1;
+    background:linear-gradient(145deg,#fff,#eef2f6);
+    color:#334155;
+}
+
+.medallaHonor{
+    display:block;
+    margin-bottom:7px;
+    font-size:34px;
+}
+
+.honor small{
+    display:block;
+    margin-bottom:7px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+}
+
+.honor strong{
+    display:block;
+    overflow-wrap:anywhere;
+    font-size:15px;
+    line-height:1.3;
+}
+
+.cifrasFinales{
+    margin-top:16px;
+    padding:22px;
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+}
+
+.cifrasFinales h2{
+    margin-bottom:16px;
+    color:#1e293b;
+    font-size:18px;
+    text-align:center;
+}
+
+.rejillaCifras{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.rejillaCifras div{
+    padding:15px 8px;
+    border-radius:16px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.rejillaCifras strong{
+    display:block;
+    color:#92400e;
+    font-size:26px;
+    line-height:1;
+}
+
+.rejillaCifras span{
+    display:block;
+    margin-top:7px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.25;
+}
+
+.mensajeDespedida{
+    margin-top:16px;
+    padding:24px 20px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    text-align:center;
+    box-shadow:0 10px 28px rgba(15,23,42,.16);
+}
+
+.mensajeDespedida > span{
+    display:block;
+    margin-bottom:10px;
+    font-size:31px;
+}
+
+.mensajeDespedida p{
+    color:#e2e8f0;
+    font-size:14px;
+    line-height:1.55;
+}
+
+.mensajeDespedida strong{
+    display:block;
+    margin-top:10px;
+    color:#fde68a;
+    font-size:16px;
+}
+
+.mensajeDespedida small{
+    display:block;
+    margin-top:13px;
+    color:#94a3b8;
+    font-size:11px;
+}
+
+.modoFinalizado .gridFinalizado{
+    margin-top:18px;
+}
+
+.modoFinalizado .gridFinalizado .cardAcceso{
+    min-height:142px;
+}
+
+.modoFinalizado .cardCaminoTitulo{
+    background:linear-gradient(135deg,#b45309,#78350f);
+}
+
+.cieloConfeti{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    overflow:hidden;
+    pointer-events:none;
+}
+
+.piezaConfeti{
+    --color:#facc15;
+    position:absolute;
+    top:-24px;
+    left:var(--x);
+    width:10px;
+    height:17px;
+    border-radius:2px;
+    background:var(--color);
+    opacity:0;
+    transform:scale(var(--escala)) rotate(0deg);
+}
+
+.confetiActivo .piezaConfeti{
+    animation:caerConfeti var(--duracion) cubic-bezier(.18,.75,.28,1) var(--retardo) forwards;
+}
+
+.piezaConfeti[style*="--tono: 0"]{--color:#facc15;}
+.piezaConfeti[style*="--tono: 1"]{--color:#f97316;}
+.piezaConfeti[style*="--tono: 2"]{--color:#ec4899;}
+.piezaConfeti[style*="--tono: 3"]{--color:#22c55e;}
+.piezaConfeti[style*="--tono: 4"]{--color:#38bdf8;}
+.piezaConfeti[style*="--tono: 5"]{--color:#a855f7;}
+
+@keyframes caerConfeti{
+    0%{
+        opacity:0;
+        transform:translate3d(0,-4vh,0) scale(var(--escala)) rotate(0deg);
+    }
+    8%{opacity:1;}
+    100%{
+        opacity:.95;
+        transform:translate3d(calc((50vw - var(--x)) * .22),108vh,0) scale(var(--escala)) rotate(var(--giro));
+    }
+}
+
+@keyframes brilloBarraFinal{
+    to{background-position:-220% 0;}
+}
+
+@keyframes brilloCorona{
+    0%,35%{background-position:230% 0;}
+    70%,100%{background-position:-130% 0;}
+}
+
+@keyframes latidoTrofeo{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-4px) scale(1.04);}
+}
+
+@media (max-width:520px){
+    .coronaCampeones{
+        padding:27px 17px 23px;
+        border-radius:24px;
+    }
+
+    .trofeoFinal{
+        font-size:54px;
+    }
+
+    .honoresFinales{
+        grid-template-columns:1fr;
+    }
+
+    .rejillaCifras{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .rejillaCifras div:last-child{
+        grid-column:1 / -1;
+    }
+
+    .cabeceraGranFinal{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .modoFinalizado *,
+    .modoFinalizado *::before,
+    .modoFinalizado *::after{
+        scroll-behavior:auto !important;
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+    }
+
+    .cieloConfeti{
+        display:none !important;
+    }
+}
