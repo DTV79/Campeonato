@@ -21,6 +21,16 @@
         href="style.css"
     >
 
+    <!--
+        Estilos específicos de la portada de celebración.
+        Solo se aplican cuando el estado del torneo es Finalizado.
+    -->
+    <link
+        id="cssFinalizado"
+        rel="stylesheet"
+        href="finalizado.css"
+    >
+
     <link
         rel="preconnect"
         href="https://fonts.googleapis.com"
@@ -92,6 +102,14 @@
                 if (css) {
                     css.href =
                         `style.css?v=${versionSegura}`;
+                }
+
+                const cssFinalizado =
+                    document.getElementById("cssFinalizado");
+
+                if (cssFinalizado) {
+                    cssFinalizado.href =
+                        `finalizado.css?v=${versionSegura}`;
                 }
 
                 return versionSegura;
@@ -332,6 +350,17 @@
 
             script.async = false;
 
+            script.addEventListener("load", () => {
+                const finalizado =
+                    document.createElement("script");
+
+                finalizado.src =
+                    `finalizado.js?v=${version}`;
+
+                finalizado.async = false;
+                document.body.appendChild(finalizado);
+            });
+
             document.body.appendChild(script);
         }
     )();
@@ -339,4 +368,3 @@
 
 </body>
 </html>
-
