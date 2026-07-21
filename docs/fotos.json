@@ -1,0 +1,20 @@
+{
+  "ultima_actualizacion": "2026-07-22T00:54:49",
+  "fotos": [
+    {
+      "id_foto": "F0001",
+      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
+      "codigo_campeonato": "CAMP-2025-01",
+      "archivo": "Campeones_2025.JPG",
+      "ruta": "Imagenes/CAMP-2025-01/Campeones_2025.JPG",
+      "categoria": "Campeones",
+      "jornada_fase": "Final",
+      "titulo": "Campeones I Campeonato Sprint Pádel Tui 2025",
+      "descripcion": "Diego Troncoso & Diego Alfonsín",
+      "autor": "Rosa Del Valle",
+      "fecha": "2025-09-27",
+      "orden": 1,
+      "destacada": true,      "mostrar": true,      "usar_en_palmares": true
+    }
+  ]
+}
