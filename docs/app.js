@@ -1,9 +1,12 @@
 const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
 const JSON_RANKING_URL = "https://dtv79.github.io/Campeonato/ranking_historico.json";
+const JSON_FOTOS_URL = "https://dtv79.github.io/Campeonato/fotos.json";
 
 let datos = null;
 let datosRanking = null;
 let promesaRanking = null;
+let datosFotos = null;
+let promesaFotos = null;
 let temporizadorCuentaAtras = null;
 
 const estadoUI = {
@@ -113,7 +116,20 @@ if (pantallaSolicitada) {
 if (!pantallaSolicitada) {
     return;
 }
+if (
+    pantallaSolicitada === "fotos"
+) {
+    if (
+        esSi(
+            obtenerConfiguracion()
+                .mostrar_fotos
+        )
+    ) {
+        abrirPantalla("fotos");
+    }
 
+    return;
+}
 if (
     pantallaSolicitada === "ranking"
 ) {
@@ -320,7 +336,11 @@ function abrirPantalla(pantalla, fase = "") {
     }
 
     ocultarInicio();
-    activarNav(pantalla === "ranking" ? "mas" : pantalla);
+    activarNav(
+    ["ranking", "fotos"].includes(pantalla)
+        ? "mas"
+        : pantalla
+);
     estadoUI.pantalla = pantalla;
 
     if (esWebPrevia()) {
@@ -329,7 +349,9 @@ function abrirPantalla(pantalla, fase = "") {
         } else if (pantalla === "pretorneo_inscripcion") {
             pintarPantallaInscripciones();
         } else if (pantalla === "ranking") {
-            pintarPantallaRanking();
+        pintarPantallaRanking();
+        } else if (pantalla === "fotos") {
+        pintarPantallaFotos();
         } else if (pantalla === "mas") {
             pintarPantallaMas();
         } else {
@@ -348,6 +370,8 @@ function abrirPantalla(pantalla, fase = "") {
         pintarPantallaEquipos();
     } else if (pantalla === "ranking") {
         pintarPantallaRanking();
+    } else if (pantalla === "fotos") {
+        pintarPantallaFotos();
     } else if (pantalla === "mas") {
         pintarPantallaMas();
     }
@@ -1177,6 +1201,109 @@ async function cargarDatosRankingHistorico() {
     return promesaRanking;
 }
 
+/* =========================================================
+   DATOS Y TARJETA DE FOTOGRAFÍAS
+========================================================= */
+
+async function prepararFotosPortada() {
+    const config = obtenerConfiguracion();
+    const tarjeta =
+        document.getElementById("tarjetaFotos");
+
+    if (!tarjeta) return;
+
+    const visible =
+        esSi(config.mostrar_fotos);
+
+    tarjeta.classList.toggle(
+        "oculto",
+        !visible
+    );
+
+    if (!visible) {
+        delete tarjeta.dataset.seccion;
+        return;
+    }
+
+    tarjeta.dataset.seccion = "fotos";
+
+    const resumen =
+        document.getElementById("resumenFotos");
+
+    try {
+        const origen =
+            await cargarDatosFotos();
+
+        const fotos =
+            obtenerFotosVisibles(origen);
+
+        if (resumen) {
+            resumen.textContent =
+                fotos.length === 1
+                    ? "1 fotografía publicada"
+                    : `${fotos.length} fotografías publicadas`;
+        }
+
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las fotografías.",
+            error
+        );
+
+        if (resumen) {
+            resumen.textContent =
+                "Galería temporalmente no disponible";
+        }
+    }
+}
+
+async function cargarDatosFotos() {
+    if (datosFotos) return datosFotos;
+
+    if (!promesaFotos) {
+        promesaFotos = fetch(
+            `${JSON_FOTOS_URL}?v=${Date.now()}`,
+            { cache: "no-store" }
+        )
+            .then(respuesta => {
+                if (!respuesta.ok) {
+                    throw new Error(
+                        `No se pudo cargar fotos.json (${respuesta.status})`
+                    );
+                }
+
+                return respuesta.json();
+            })
+            .then(origen => {
+                datosFotos = origen;
+                return origen;
+            })
+            .catch(error => {
+                promesaFotos = null;
+                throw error;
+            });
+    }
+
+    return promesaFotos;
+}
+
+function obtenerFotosVisibles(origen = datosFotos) {
+    const fotos = Array.isArray(origen)
+        ? origen
+        : origen?.fotos || [];
+
+    return fotos
+        .filter(foto =>
+            foto?.mostrar === true ||
+            esSi(foto?.mostrar)
+        )
+        .sort((a, b) =>
+            numero(a?.orden) -
+            numero(b?.orden)
+        );
+}
+
+
 function pintarResumenPortada() {
     const fase = obtenerFaseActualCompeticion();
 
@@ -1427,6 +1554,7 @@ function configurarPortadaCompeticion() {
     document
         .getElementById("tarjetaRanking")
         ?.classList.add("oculto");
+        prepararFotosPortada();
 }
 
 function configurarTarjetasPretorneo() {
@@ -1464,13 +1592,16 @@ function configurarTarjetasPretorneo() {
     }
 
     [
-        "tarjetaEquipos",
-        "tarjetaEspecial",
-        "tarjetaRanking"
-    ].forEach(id => {
+    "tarjetaEquipos",
+    "tarjetaEspecial",
+    "tarjetaRanking"
+].forEach(id => {
         document.getElementById(id)?.classList.add("oculto");
     });
+    
+prepararFotosPortada();
 }
+
 
 function configurarTarjetaPortada(
     tarjeta,
@@ -1817,12 +1948,12 @@ function pintarPantallaMasPretorneo() {
     const opciones = [];
 
     if (esSi(config.mostrar_fotos)) {
-        opciones.push({
-            icono: "📷",
-            texto: "Fotos",
-            href: "fotos.html"
-        });
-    }
+    opciones.push({
+        icono: "📷",
+        texto: "Fotos",
+        pantalla: "fotos"
+    });
+}
 
     if (esSi(config.mostrar_ranking_historico)) {
         opciones.push({
@@ -3685,6 +3816,186 @@ function pintarListaOpcionesMas(opciones) {
 }
 
 /* =========================================================
+   PANTALLA FOTOGRAFÍAS
+========================================================= */
+
+async function pintarPantallaFotos() {
+    const contenido =
+        obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    contenido.innerHTML = `
+        <h2>📷 Fotos</h2>
+
+        <div class="tarjetaVacia">
+            <strong>Cargando fotografías…</strong>
+        </div>
+    `;
+
+    try {
+        const origen =
+            await cargarDatosFotos();
+
+        if (estadoUI.pantalla !== "fotos") {
+            return;
+        }
+
+        const fotos =
+            obtenerFotosVisibles(origen);
+
+        if (!fotos.length) {
+            contenido.innerHTML = `
+                <h2>📷 Fotos</h2>
+
+                ${pintarTarjetaVacia(
+                    "Galería vacía",
+                    "Todavía no hay fotografías publicadas."
+                )}
+            `;
+
+            return;
+        }
+
+        contenido.innerHTML = `
+            <div class="cabeceraSeccionFotos">
+                <div>
+                    <h2>📷 Fotos</h2>
+                    <p>
+                        ${fotos.length}
+                        ${fotos.length === 1
+                            ? "fotografía"
+                            : "fotografías"}
+                    </p>
+                </div>
+            </div>
+
+            <section class="galeriaFotos">
+                ${fotos
+                    .map(pintarTarjetaFoto)
+                    .join("")}
+            </section>
+        `;
+
+    } catch (error) {
+        console.error(
+            "No se pudo pintar la galería.",
+            error
+        );
+
+        contenido.innerHTML = `
+            <h2>📷 Fotos</h2>
+
+            ${pintarTarjetaVacia(
+                "No se pudieron cargar las fotografías",
+                "Comprueba que fotos.json esté publicado y vuelve a intentarlo."
+            )}
+        `;
+    }
+}
+
+function pintarTarjetaFoto(foto) {
+    const ruta =
+        normalizarRutaFoto(foto?.ruta);
+
+    const titulo =
+        foto?.titulo ||
+        foto?.nombre ||
+        "Fotografía del campeonato";
+
+    const descripcion =
+        foto?.descripcion || "";
+
+    const fecha =
+        formatearFechaFoto(foto?.fecha);
+
+    return `
+        <article class="tarjetaFoto">
+            <a
+                class="enlaceImagenFoto"
+                href="${escaparAtributo(ruta)}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Ver ${escaparAtributo(titulo)}"
+            >
+                <img
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(titulo)}"
+                    loading="lazy"
+                >
+            </a>
+
+            <div class="datosFoto">
+                <h3>${escaparHTML(titulo)}</h3>
+
+                ${
+                    descripcion
+                        ? `<p>${escaparHTML(descripcion)}</p>`
+                        : ""
+                }
+
+                ${
+                    fecha
+                        ? `<small>📅 ${escaparHTML(fecha)}</small>`
+                        : ""
+                }
+            </div>
+        </article>
+    `;
+}
+
+function normalizarRutaFoto(ruta) {
+    const texto =
+        String(ruta || "")
+            .trim()
+            .replaceAll("\\", "/");
+
+    if (!texto) return "";
+
+    if (
+        texto.startsWith("http://") ||
+        texto.startsWith("https://")
+    ) {
+        return texto;
+    }
+
+    return texto.replace(/^\/+/, "");
+}
+
+function formatearFechaFoto(fechaISO) {
+    if (!fechaISO) return "";
+
+    const partes =
+        String(fechaISO)
+            .slice(0, 10)
+            .split("-");
+
+    if (partes.length !== 3) {
+        return String(fechaISO);
+    }
+
+    const fecha = new Date(
+        Number(partes[0]),
+        Number(partes[1]) - 1,
+        Number(partes[2])
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+        return String(fechaISO);
+    }
+
+    return fecha.toLocaleDateString(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =========================================================
    PANTALLA MÁS
 ========================================================= */
 
@@ -3747,12 +4058,12 @@ function pintarPantallaMas() {
     }
 
     if (esSi(config.mostrar_fotos)) {
-        opciones.push({
-            icono: "📷",
-            texto: "Fotos",
-            href: "fotos.html"
-        });
-    }
+    opciones.push({
+        icono: "📷",
+        texto: "Fotos",
+        pantalla: "fotos"
+    });
+}
 
     if (esSi(config.mostrar_ranking_historico)) {
         opciones.push({
