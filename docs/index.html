@@ -1,62 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>II Campeonato Sprint Pádel</title>
 
-    <!--
-        Se carga como respaldo inmediatamente.
-        Después se sustituirá por style.css?v=VERSION_WEB.
-    -->
-    <link
-        id="cssPrincipal"
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link id="cssPrincipal" rel="stylesheet" href="style.css">
+    <link id="cssFinalizado" rel="stylesheet" href="finalizado.css">
+    <link id="cssFinalizadoV2" rel="stylesheet" href="finalizado-v2.css">
 
-    <!--
-        Estilos específicos de la portada de celebración.
-        Solo se aplican cuando el estado del torneo es Finalizado.
-    -->
-    <link
-        id="cssFinalizado"
-        rel="stylesheet"
-        href="finalizado.css"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <!--
-        Lee Configuración!B13 desde el JSON.
-
-        Esta promesa se utilizará también al final
-        para cargar app.js con la misma versión.
-    -->
     <script>
         window.versionWebPromise = (
             async function obtenerVersionWeb() {
-
                 const URL_ESTADO =
                     "https://dtv79.github.io/Campeonato/estado_torneo.json";
 
@@ -65,9 +24,7 @@
                 try {
                     const respuesta = await fetch(
                         `${URL_ESTADO}?v=${Date.now()}`,
-                        {
-                            cache: "no-store"
-                        }
+                        { cache: "no-store" }
                     );
 
                     if (!respuesta.ok) {
@@ -77,14 +34,12 @@
                     }
 
                     const estado = await respuesta.json();
-                    const configuracion =
-                        estado?.configuracion || {};
+                    const configuracion = estado?.configuracion || {};
 
                     version =
                         configuracion.version_web ||
                         configuracion.version ||
                         version;
-
                 } catch (error) {
                     console.error(
                         "No se pudo leer Versión WEB. " +
@@ -93,90 +48,61 @@
                     );
                 }
 
-                const versionSegura =
-                    encodeURIComponent(version);
+                const versionSegura = encodeURIComponent(version);
 
-                const css =
-                    document.getElementById("cssPrincipal");
+                const hojas = [
+                    ["cssPrincipal", "style.css"],
+                    ["cssFinalizado", "finalizado.css"],
+                    ["cssFinalizadoV2", "finalizado-v2.css"]
+                ];
 
-                if (css) {
-                    css.href =
-                        `style.css?v=${versionSegura}`;
-                }
-
-                const cssFinalizado =
-                    document.getElementById("cssFinalizado");
-
-                if (cssFinalizado) {
-                    cssFinalizado.href =
-                        `finalizado.css?v=${versionSegura}`;
-                }
+                hojas.forEach(([id, archivo]) => {
+                    const enlace = document.getElementById(id);
+                    if (enlace) {
+                        enlace.href = `${archivo}?v=${versionSegura}`;
+                    }
+                });
 
                 return versionSegura;
             }
         )();
     </script>
 </head>
-
 <body>
-
 <div class="contenedor">
-
     <header class="cabecera">
-
         <div class="tituloSuperior"></div>
         <div class="tituloPrincipal"></div>
         <div class="subtitulo"></div>
 
-        <div
-            class="estadoCabecera"
-            id="estadoCabecera"
-        >
+        <div class="estadoCabecera" id="estadoCabecera">
             🟢 Cargando...
         </div>
 
         <div class="progresoCabecera">
-
             <div class="barra">
-                <div
-                    class="progreso"
-                    id="barraProgreso"
-                ></div>
+                <div class="progreso" id="barraProgreso"></div>
             </div>
-
-            <div
-                class="textoProgreso"
-                id="textoProgreso"
-            ></div>
-
+            <div class="textoProgreso" id="textoProgreso"></div>
         </div>
 
         <div class="actualizacion">
             <span>🕒 Última actualización:</span>
             <strong id="ultimaActualizacion">--</strong>
         </div>
-
     </header>
 
     <section class="gridDashboard">
-
         <div
             class="cardAcceso cardClasificacion"
             id="tarjetaCompeticion"
             data-seccion="competicion"
         >
             <div class="iconoAcceso">📊</div>
-
             <div>
-                <h4 id="tituloTarjetaCompeticion">
-                    Competición
-                </h4>
-
-                <p id="resumenCompeticion">
-                    Cargando...
-                </p>
+                <h4 id="tituloTarjetaCompeticion">Competición</h4>
+                <p id="resumenCompeticion">Cargando...</p>
             </div>
-
             <span class="flecha">→</span>
         </div>
 
@@ -186,15 +112,10 @@
             data-seccion="partidos"
         >
             <div class="iconoAcceso">🎾</div>
-
             <div>
                 <h4>Partidos</h4>
-
-                <p id="resumenPartidos">
-                    Cargando...
-                </p>
+                <p id="resumenPartidos">Cargando...</p>
             </div>
-
             <span class="flecha">→</span>
         </div>
 
@@ -204,15 +125,10 @@
             data-seccion="equipos"
         >
             <div class="iconoAcceso">👥</div>
-
             <div>
                 <h4>Equipos</h4>
-
-                <p id="resumenEquipos">
-                    Cargando...
-                </p>
+                <p id="resumenEquipos">Cargando...</p>
             </div>
-
             <span class="flecha">→</span>
         </div>
 
@@ -221,23 +137,11 @@
             id="tarjetaEspecial"
             data-seccion="especial"
         >
-            <div
-                class="iconoAcceso"
-                id="iconoTarjetaEspecial"
-            >
-                ⚔️
-            </div>
-
+            <div class="iconoAcceso" id="iconoTarjetaEspecial">⚔️</div>
             <div>
-                <h4 id="tituloTarjetaEspecial">
-                    Siguiente fase
-                </h4>
-
-                <p id="resumenEspecial">
-                    Pendiente de iniciar
-                </p>
+                <h4 id="tituloTarjetaEspecial">Siguiente fase</h4>
+                <p id="resumenEspecial">Pendiente de iniciar</p>
             </div>
-
             <span class="flecha">→</span>
         </div>
 
@@ -247,124 +151,78 @@
             data-seccion="ranking"
         >
             <div class="iconoAcceso">🏆</div>
-
             <div>
                 <h4>Ranking histórico</h4>
-
                 <p id="resumenRanking">
                     Clasificación individual de jugadores
                 </p>
             </div>
-
             <span class="flecha">→</span>
         </div>
-
     </section>
 
     <section class="tarjeta podioCard">
-
-        <h3 id="tituloPodio">
-            📊 Resumen de la competición
-        </h3>
-
-        <div id="podio">
-            Cargando...
-        </div>
-
+        <h3 id="tituloPodio">📊 Resumen de la competición</h3>
+        <div id="podio">Cargando...</div>
     </section>
 
-    <section
-        id="vistaDetalle"
-        class="vistaDetalle oculto"
-    >
+    <section id="vistaDetalle" class="vistaDetalle oculto">
         <div id="contenidoDetalle"></div>
     </section>
-
 </div>
 
 <nav class="bottomNav">
-
-    <button
-        class="navBtn navActivo"
-        data-pantalla="inicio"
-        type="button"
-    >
+    <button class="navBtn navActivo" data-pantalla="inicio" type="button">
         <span>🏠</span>
         <small>Inicio</small>
     </button>
 
-    <button
-        class="navBtn"
-        data-pantalla="competicion"
-        type="button"
-    >
+    <button class="navBtn" data-pantalla="competicion" type="button">
         <span>📊</span>
         <small>Competición</small>
     </button>
 
-    <button
-        class="navBtn"
-        data-pantalla="partidos"
-        type="button"
-    >
+    <button class="navBtn" data-pantalla="partidos" type="button">
         <span>🎾</span>
         <small>Partidos</small>
     </button>
 
-    <button
-        class="navBtn"
-        data-pantalla="equipos"
-        type="button"
-    >
+    <button class="navBtn" data-pantalla="equipos" type="button">
         <span>👥</span>
         <small>Equipos</small>
     </button>
 
-    <button
-        class="navBtn"
-        data-pantalla="mas"
-        type="button"
-    >
+    <button class="navBtn" data-pantalla="mas" type="button">
         <span>☰</span>
         <small>Más</small>
     </button>
-
 </nav>
 
-<!--
-    Carga app.js utilizando automáticamente
-    el valor de Configuración!B13.
--->
 <script>
     (
         async function cargarAplicacionVersionada() {
+            const version = await window.versionWebPromise;
 
-            const version =
-                await window.versionWebPromise;
+            function cargarScript(archivo) {
+                return new Promise((resolver, rechazar) => {
+                    const script = document.createElement("script");
+                    script.src = `${archivo}?v=${version}`;
+                    script.async = false;
+                    script.addEventListener("load", resolver, { once: true });
+                    script.addEventListener("error", rechazar, { once: true });
+                    document.body.appendChild(script);
+                });
+            }
 
-            const script =
-                document.createElement("script");
-
-            script.src =
-                `app.js?v=${version}`;
-
-            script.async = false;
-
-            script.addEventListener("load", () => {
-                const finalizado =
-                    document.createElement("script");
-
-                finalizado.src =
-                    `finalizado.js?v=${version}`;
-
-                finalizado.async = false;
-                document.body.appendChild(finalizado);
-            });
-
-            document.body.appendChild(script);
+            try {
+                await cargarScript("app.js");
+                await cargarScript("finalizado.js");
+                await cargarScript("finalizado-v2.js");
+            } catch (error) {
+                console.error("No se pudo cargar la aplicación.", error);
+            }
         }
     )();
 </script>
-
 </body>
 </html>
