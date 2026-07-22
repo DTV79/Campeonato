@@ -64,60 +64,13 @@
 
         </section>
 
-        <section class="listaCampeones">
-
-            <article class="campeonCard">
-
-                <div class="cabeceraCampeon">
-
-                    <div>
-                        <span class="edicionCampeon">
-                            EDICIÓN 2025
-                        </span>
-
-                        <h2>
-                            Diego Alfonsín
-                            <span>   &   </span>
-                            Diego Troncoso
-                        </h2>
-                    </div>
-
-                    <div class="trofeoCampeon">
-                        🏆
-                    </div>
-
-                </div>
-
-                <figure class="figuraCampeon">
-
-                    <img
-                        class="fotoCampeon"
-                        src="Imagenes/Campeones_2025.JPG"
-                        alt="Diego Alfonsín y Diego Troncoso, campeones de 2025"
-                    >
-
-                    <figcaption>
-                        Campeones de la edición de 2025
-                    </figcaption>
-
-                </figure>
-
-                <div class="datosCampeon">
-
-                    <div>
-                        <span>📅 Fecha</span>
-                        <strong>27 de septiembre de 2025</strong>
-                    </div>
-
-                    <div>
-                        <span>📍 Edición</span>
-                        <strong>I Campeonato Sprint Pádel Tui 2025</strong>
-                    </div>
-
-                </div>
-
-            </article>
-
+        <section
+            class="listaCampeones"
+            id="listaCampeones"
+        >
+            <div class="estadoPalmares">
+                Cargando campeones…
+            </div>
         </section>
 
     </main>
@@ -177,6 +130,271 @@
 </nav>
 
 <script>
+const JSON_FOTOS_URL =
+    "https://dtv79.github.io/Campeonato/fotos.json";
+
+cargarPalmares();
+
+async function cargarPalmares() {
+    const contenedor =
+        document.getElementById("listaCampeones");
+
+    try {
+        const respuesta = await fetch(
+            JSON_FOTOS_URL + "?v=" + Date.now(),
+            { cache: "no-store" }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `No se pudo cargar fotos.json (${respuesta.status})`
+            );
+        }
+
+        const textoJSON = await respuesta.text();
+        const origen = JSON.parse(
+            textoJSON.replace(
+                /(\d+)\.(?=\s*[,}])/g,
+                "$1"
+            )
+        );
+
+        const fotografias = Array.isArray(origen)
+            ? origen
+            : origen?.fotos || [];
+
+        const campeones = fotografias
+            .filter(esFotoPalmares)
+            .sort(ordenarCampeones);
+
+        if (!campeones.length) {
+            contenedor.innerHTML = `
+                <div class="estadoPalmares">
+                    <strong>Palmarés todavía vacío</strong>
+                    <p>Aún no hay campeones publicados.</p>
+                </div>
+            `;
+            return;
+        }
+
+        contenedor.innerHTML = campeones
+            .map(pintarCampeon)
+            .join("");
+
+    } catch (error) {
+        console.error(
+            "No se pudo cargar el palmarés:",
+            error
+        );
+
+        contenedor.innerHTML = `
+            <div class="estadoPalmares estadoPalmaresError">
+                <strong>No se pudo cargar el palmarés</strong>
+                <p>Inténtalo de nuevo dentro de unos minutos.</p>
+            </div>
+        `;
+    }
+}
+
+function esFotoPalmares(foto) {
+    return (
+        esVerdadero(foto?.mostrar) &&
+        esVerdadero(foto?.usar_en_palmares) &&
+        normalizarTexto(foto?.categoria) === "campeones"
+    );
+}
+
+function ordenarCampeones(a, b) {
+    const anoA = Number(obtenerAnoFoto(a)) || 0;
+    const anoB = Number(obtenerAnoFoto(b)) || 0;
+
+    if (anoA !== anoB) {
+        return anoB - anoA;
+    }
+
+    return Number(a?.orden || 0) -
+           Number(b?.orden || 0);
+}
+
+function pintarCampeon(foto) {
+    const ano = obtenerAnoFoto(foto);
+    const ganadores =
+        foto?.descripcion ||
+        foto?.campeones ||
+        foto?.equipo ||
+        "Campeones";
+
+    const nombreCampeonato =
+        foto?.titulo ||
+        foto?.nombre_campeonato ||
+        foto?.id_campeonato ||
+        (ano
+            ? `Campeonato Sprint Pádel Tui ${ano}`
+            : "Campeonato Sprint Pádel Tui");
+
+    const fecha = formatearFecha(foto?.fecha);
+    const ruta = normalizarRutaFoto(
+        foto?.ruta ||
+        foto?.url ||
+        foto?.archivo
+    );
+
+    const imagen = ruta
+        ? `
+            <figure class="figuraCampeon">
+                <img
+                    class="fotoCampeon"
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(
+                        `${ganadores}, campeones${ano ? ` de ${ano}` : ""}`
+                    )}"
+                    loading="lazy"
+                >
+
+                <figcaption>
+                    ${escaparHTML(
+                        ano
+                            ? `Campeones de la edición de ${ano}`
+                            : "Campeones del torneo"
+                    )}
+                </figcaption>
+            </figure>
+        `
+        : "";
+
+    return `
+        <article class="campeonCard">
+            <div class="cabeceraCampeon">
+                <div>
+                    <span class="edicionCampeon">
+                        ${ano
+                            ? `EDICIÓN ${escaparHTML(ano)}`
+                            : "CUADRO DE HONOR"}
+                    </span>
+
+                    <h2>${escaparHTML(ganadores)}</h2>
+                </div>
+
+                <div class="trofeoCampeon" aria-hidden="true">
+                    🏆
+                </div>
+            </div>
+
+            ${imagen}
+
+            <div class="datosCampeon">
+                ${fecha
+                    ? `
+                        <div>
+                            <span>📅 Fecha</span>
+                            <strong>${escaparHTML(fecha)}</strong>
+                        </div>
+                    `
+                    : ""}
+
+                <div>
+                    <span>📍 Edición</span>
+                    <strong>${escaparHTML(nombreCampeonato)}</strong>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function obtenerAnoFoto(foto) {
+    const texto = [
+        foto?.ano,
+        foto?.anio,
+        foto?.fecha,
+        foto?.codigo_campeonato,
+        foto?.id_campeonato,
+        foto?.titulo
+    ].filter(Boolean).join(" ");
+
+    const coincidencia =
+        texto.match(/\b(?:19|20)\d{2}\b/);
+
+    return coincidencia ? coincidencia[0] : "";
+}
+
+function normalizarRutaFoto(ruta) {
+    const texto = String(ruta || "")
+        .trim()
+        .replaceAll("\\", "/");
+
+    if (!texto) return "";
+
+    if (
+        texto.startsWith("http://") ||
+        texto.startsWith("https://")
+    ) {
+        return texto;
+    }
+
+    return texto.replace(/^\/+/, "");
+}
+
+function formatearFecha(fechaOriginal) {
+    if (!fechaOriginal) return "";
+
+    const coincidencia = String(fechaOriginal)
+        .match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (!coincidencia) {
+        return String(fechaOriginal);
+    }
+
+    const fecha = new Date(
+        Number(coincidencia[1]),
+        Number(coincidencia[2]) - 1,
+        Number(coincidencia[3])
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+        return String(fechaOriginal);
+    }
+
+    return fecha.toLocaleDateString(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+function esVerdadero(valor) {
+    if (valor === true) return true;
+
+    return ["si", "true", "1"].includes(
+        normalizarTexto(valor)
+    );
+}
+
+function normalizarTexto(texto) {
+    return String(texto || "")
+        .trim()
+        .toLocaleLowerCase("es")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function escaparHTML(texto) {
+    return String(texto ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function escaparAtributo(texto) {
+    return escaparHTML(texto);
+}
+</script>
+
+<script>
 (async function cargarNavegacionVersionada() {
     let version = Date.now();
 
@@ -216,4 +434,3 @@
 
 </body>
 </html>
-
