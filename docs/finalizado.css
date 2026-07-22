@@ -375,6 +375,10 @@ body.modoFinalizado{
     background:linear-gradient(135deg,#b45309,#78350f);
 }
 
+.modoFinalizado .cardEquiposFinal{
+    background:linear-gradient(135deg,#6d28d9,#4c1d95);
+}
+
 .cieloConfeti{
     position:fixed;
     inset:0;
@@ -496,16 +500,13 @@ body.modoFinalizado{
 }
 
 .modoFinalizado .listaOpcionesMas .opcionMas > strong{
-    padding-right:18px;
+    padding-right:0;
     font-size:13px;
     line-height:1.25;
 }
 
 .modoFinalizado .listaOpcionesMas .opcionMas > b{
-    position:absolute;
-    right:14px;
-    bottom:13px;
-    font-size:18px;
+    display:none !important;
 }
 
 .modoFinalizado .listaOpcionesMas .opcionEquiposMasFinal{
@@ -798,18 +799,19 @@ body.modoFinalizado{
     font-weight:800;
 }
 
-.detallePartidoExtremo strong{
+.detallePartidoExtremo .equipoPartidoExtremo{
     display:block;
     overflow-wrap:anywhere;
     font-size:12px;
     line-height:1.35;
 }
 
+.detallePartidoExtremo .equipoPartidoExtremoSegundo{
+    margin-top:3px;
+}
+
 .detallePartidoExtremo small{
-    display:block;
-    margin-top:6px;
-    font-size:11px;
-    font-weight:900;
+    display:none;
 }
 
 /* Palas Playa: premio humorístico */
