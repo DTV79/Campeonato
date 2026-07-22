@@ -1,0 +1,378 @@
+/* =========================================================
+   REGLAS Y AYUDA
+   Estilos exclusivos de normas.html
+========================================================= */
+
+.paginaNormas .cabeceraNormas{
+    background:
+        linear-gradient(135deg,#431c2b,#7c2d2d 55%,#c26645);
+}
+
+.presentacionNormas{
+    display:flex;
+    margin-bottom:18px;
+    padding:18px;
+    align-items:center;
+    gap:16px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 5px 18px rgba(15,23,42,.08);
+}
+
+.iconoNormas{
+    display:flex;
+    width:58px;
+    height:58px;
+    flex:0 0 58px;
+    align-items:center;
+    justify-content:center;
+    border-radius:18px;
+    background:#fff1e8;
+    font-size:30px;
+}
+
+.presentacionNormas h1{
+    margin:0 0 5px;
+    color:#0f172a;
+    font-size:20px;
+    font-weight:900;
+}
+
+.presentacionNormas p{
+    margin:0;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+.resumenEdicionNormas{
+    margin-bottom:16px;
+    padding:19px;
+    border-radius:22px;
+    background:
+        linear-gradient(135deg,#fff7ed,#ffedd5);
+    box-shadow:0 5px 18px rgba(154,52,18,.08);
+}
+
+.cabeceraResumenNormas{
+    display:flex;
+    margin-bottom:14px;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraResumenNormas span{
+    display:block;
+    margin-bottom:5px;
+    color:#9a3412;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+}
+
+.cabeceraResumenNormas h2{
+    margin:0;
+    color:#431c2b;
+    font-size:21px;
+    font-weight:900;
+    line-height:1.2;
+}
+
+.estadoResumenNormas{
+    flex:0 0 auto;
+    padding:6px 10px;
+    border-radius:999px;
+    background:white;
+    color:#9a3412;
+    font-size:11px;
+    font-weight:900;
+    box-shadow:0 3px 10px rgba(154,52,18,.08);
+}
+
+.descripcionResumenNormas{
+    margin:0 0 14px;
+    color:#7c2d12;
+    font-size:14px;
+    font-weight:700;
+    line-height:1.55;
+}
+
+.chipsNormas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.chipNorma{
+    display:inline-flex;
+    padding:7px 10px;
+    align-items:center;
+    gap:5px;
+    border:1px solid rgba(194,65,12,.12);
+    border-radius:999px;
+    background:rgba(255,255,255,.82);
+    color:#7c2d12;
+    font-size:12px;
+    font-weight:900;
+}
+
+.accionesNormas{
+    display:grid;
+    margin-bottom:14px;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.botonNormas{
+    width:100%;
+    padding:12px 14px;
+    border:none;
+    border-radius:14px;
+    background:#7c2d2d;
+    color:white;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(124,45,45,.18);
+}
+
+.botonNormas:active{
+    transform:scale(.98);
+}
+
+.botonNormasSecundario{
+    border:1px solid #ead8cc;
+    background:white;
+    color:#7c2d2d;
+    box-shadow:0 4px 12px rgba(15,23,42,.06);
+}
+
+.listaNormas{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.bloqueNorma{
+    overflow:hidden;
+    border:1px solid #ede3dc;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 5px 18px rgba(15,23,42,.07);
+}
+
+.bloqueNorma[open]{
+    border-color:#dfb9a6;
+}
+
+.bloqueNorma summary{
+    display:grid;
+    min-height:74px;
+    padding:16px;
+    grid-template-columns:46px 1fr 24px;
+    align-items:center;
+    gap:12px;
+    list-style:none;
+    cursor:pointer;
+}
+
+.bloqueNorma summary::-webkit-details-marker{
+    display:none;
+}
+
+.iconoBloqueNorma{
+    display:flex;
+    width:46px;
+    height:46px;
+    align-items:center;
+    justify-content:center;
+    border-radius:15px;
+    background:#fff7ed;
+    font-size:23px;
+}
+
+.tituloBloqueNorma{
+    min-width:0;
+}
+
+.tituloBloqueNorma strong{
+    display:block;
+    color:#0f172a;
+    font-size:15px;
+    font-weight:900;
+    line-height:1.25;
+}
+
+.tituloBloqueNorma small{
+    display:block;
+    margin-top:4px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.35;
+}
+
+.flechaBloqueNorma{
+    color:#a33a2b;
+    font-size:19px;
+    font-weight:900;
+    text-align:center;
+    transition:transform .2s ease;
+}
+
+.bloqueNorma[open] .flechaBloqueNorma{
+    transform:rotate(90deg);
+}
+
+.contenidoNorma{
+    padding:0 18px 18px;
+    border-top:1px solid #f1e8e2;
+    color:#334155;
+    font-size:14px;
+    line-height:1.65;
+}
+
+.contenidoNorma > :first-child{
+    margin-top:16px;
+}
+
+.contenidoNorma p{
+    margin:0 0 13px;
+}
+
+.contenidoNorma p:last-child{
+    margin-bottom:0;
+}
+
+.contenidoNorma ul,
+.contenidoNorma ol{
+    display:flex;
+    margin:0;
+    padding-left:20px;
+    flex-direction:column;
+    gap:9px;
+}
+
+.contenidoNorma li::marker{
+    color:#c2410c;
+    font-weight:900;
+}
+
+.destacadoNorma{
+    margin:14px 0;
+    padding:14px;
+    border-left:4px solid #c2410c;
+    border-radius:0 14px 14px 0;
+    background:#fff7ed;
+    color:#7c2d12;
+    font-weight:800;
+    line-height:1.55;
+}
+
+.datoNorma{
+    display:grid;
+    margin:10px 0;
+    padding:12px 13px;
+    grid-template-columns:1fr auto;
+    align-items:center;
+    gap:12px;
+    border-radius:14px;
+    background:#f8fafc;
+}
+
+.datoNorma span{
+    color:#64748b;
+    font-size:13px;
+    font-weight:800;
+}
+
+.datoNorma strong{
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+    text-align:right;
+}
+
+.etiquetaOpcionalNorma{
+    display:inline-block;
+    margin-top:11px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#e0f2fe;
+    color:#075985;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.avisoOrganizacion{
+    display:flex;
+    margin-top:18px;
+    padding:16px;
+    align-items:flex-start;
+    gap:12px;
+    border-radius:18px;
+    background:#431c2b;
+    color:white;
+    box-shadow:0 6px 18px rgba(67,28,43,.18);
+}
+
+.avisoOrganizacion span{
+    flex:0 0 auto;
+    font-size:21px;
+}
+
+.avisoOrganizacion p{
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.55;
+}
+
+.estadoCargaNormas,
+.errorNormas{
+    padding:18px;
+    border-radius:17px;
+    background:white;
+    color:#64748b;
+    font-size:13px;
+    font-weight:800;
+    line-height:1.5;
+    text-align:center;
+}
+
+.errorNormas{
+    border:1px solid #fecaca;
+    background:#fff1f2;
+    color:#9f1239;
+}
+
+@media (max-width:430px){
+    .cabeceraResumenNormas{
+        flex-direction:column;
+    }
+
+    .estadoResumenNormas{
+        align-self:flex-start;
+    }
+
+    .datoNorma{
+        grid-template-columns:1fr;
+        gap:4px;
+    }
+
+    .datoNorma strong{
+        text-align:left;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .flechaBloqueNorma,
+    .botonNormas{
+        transition:none;
+    }
+}

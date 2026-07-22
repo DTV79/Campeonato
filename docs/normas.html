@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#431c2b">
+
+    <title>Reglas del Campeonato</title>
+
+    <link id="cssPrincipal" rel="stylesheet" href="style.css">
+    <link id="cssNormas" rel="stylesheet" href="normas.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <script>
+        window.versionNormasPromise = (
+            async function obtenerVersionNormas() {
+                const URL_ESTADO =
+                    "https://dtv79.github.io/Campeonato/estado_torneo.json";
+
+                let version = Date.now();
+
+                try {
+                    const respuesta = await fetch(
+                        `${URL_ESTADO}?v=${Date.now()}`,
+                        { cache: "no-store" }
+                    );
+
+                    if (respuesta.ok) {
+                        const estado = await respuesta.json();
+                        const config = estado?.configuracion || {};
+
+                        version =
+                            config.version_web ||
+                            config.version ||
+                            version;
+                    }
+                } catch (error) {
+                    console.error(
+                        "No se pudo leer la versión WEB:",
+                        error
+                    );
+                }
+
+                const versionSegura = encodeURIComponent(version);
+
+                const archivosCSS = [
+                    ["cssPrincipal", "style.css"],
+                    ["cssNormas", "normas.css"]
+                ];
+
+                archivosCSS.forEach(([id, archivo]) => {
+                    const enlace = document.getElementById(id);
+
+                    if (enlace) {
+                        enlace.href = `${archivo}?v=${versionSegura}`;
+                    }
+                });
+
+                return versionSegura;
+            }
+        )();
+    </script>
+</head>
+
+<body class="paginaSecundaria paginaNormas">
+<div class="contenedor">
+
+    <header class="cabecera cabeceraNormas">
+        <div class="tituloSuperior">REGLAMENTO</div>
+        <div class="tituloPrincipal">Reglas y ayuda</div>
+        <div class="subtitulo">
+            Todo lo necesario para entender y disfrutar el campeonato
+        </div>
+    </header>
+
+    <main class="contenidoPagina">
+        <section class="presentacionNormas">
+            <span class="iconoNormas" aria-hidden="true">📜</span>
+
+            <div>
+                <h1>Reglas de esta edición</h1>
+                <p id="nombreEdicion">
+                    Cargando la configuración del campeonato…
+                </p>
+            </div>
+        </section>
+
+        <section
+            class="resumenEdicionNormas"
+            id="resumenEdicionNormas"
+            aria-live="polite"
+        >
+            <div class="estadoCargaNormas">
+                Preparando el resumen de la competición…
+            </div>
+        </section>
+
+        <section class="accionesNormas" aria-label="Acciones del reglamento">
+            <button
+                class="botonNormas"
+                id="btnAbrirNormas"
+                type="button"
+            >
+                Abrir todas
+            </button>
+
+            <button
+                class="botonNormas botonNormasSecundario"
+                id="btnCerrarNormas"
+                type="button"
+            >
+                Cerrar todas
+            </button>
+        </section>
+
+        <section
+            class="listaNormas"
+            id="listaNormas"
+            aria-live="polite"
+        >
+            <div class="estadoCargaNormas">
+                Cargando reglamento…
+            </div>
+        </section>
+
+        <aside class="avisoOrganizacion">
+            <span aria-hidden="true">ℹ️</span>
+            <p>
+                La organización podrá resolver cualquier situación no prevista,
+                procurando mantener la igualdad deportiva y el buen desarrollo
+                del campeonato.
+            </p>
+        </aside>
+    </main>
+</div>
+
+<nav class="bottomNav" aria-label="Navegación principal">
+    <a
+        class="navBtn"
+        data-nav="inicio"
+        href="index.html"
+    >
+        <span>🏠</span>
+        <small>Inicio</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="historia"
+        data-contenido-web="historia"
+        href="historia.html"
+    >
+        <span>📖</span>
+        <small>Historia</small>
+    </a>
+
+    <a
+        class="navBtn navActivo"
+        data-nav="normativa"
+        data-contenido-web="normativa"
+        href="normas.html"
+        aria-current="page"
+    >
+        <span>📜</span>
+        <small>Normas</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="campeones"
+        data-contenido-web="campeones"
+        href="campeones.html"
+    >
+        <span>🏆</span>
+        <small>Campeones</small>
+    </a>
+
+    <a
+        class="navBtn"
+        data-nav="mas"
+        href="index.html?pantalla=mas"
+    >
+        <span>☰</span>
+        <small>Más</small>
+    </a>
+</nav>
+
+<script>
+    (async function cargarScriptsNormas() {
+        const version = await window.versionNormasPromise;
+
+        function cargarScript(archivo) {
+            return new Promise((resolver, rechazar) => {
+                const script = document.createElement("script");
+                script.src = `${archivo}?v=${version}`;
+                script.async = false;
+                script.addEventListener("load", resolver, { once: true });
+                script.addEventListener("error", rechazar, { once: true });
+                document.body.appendChild(script);
+            });
+        }
+
+        try {
+            await cargarScript("normas.js");
+            await cargarScript("nav-pretorneo.js");
+        } catch (error) {
+            console.error(
+                "No se pudo cargar la página de reglas:",
+                error
+            );
+        }
+    })();
+</script>
+</body>
+</html>
