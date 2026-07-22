@@ -354,20 +354,6 @@
 
             ${hayFinal ? pintarTarjetaGranFinal(resumen) : ""}
 
-            <div class="honoresFinales">
-                <article class="honor honorOro">
-                    <span class="medallaHonor">🥇</span>
-                    <small>CAMPEONES</small>
-                    <strong>${escaparFinal(resumen.campeones)}</strong>
-                </article>
-
-                <article class="honor honorPlata">
-                    <span class="medallaHonor">🥈</span>
-                    <small>SUBCAMPEONES</small>
-                    <strong>${escaparFinal(resumen.subcampeones)}</strong>
-                </article>
-            </div>
-
             <article class="cifrasFinales">
                 <h2>El campeonato en cifras</h2>
 
@@ -662,6 +648,11 @@
         subtree: true
     });
 
+    document.addEventListener(
+        "click",
+        gestionarClickNavegacionFinal
+    );
+
     function esperarPortada(intentos = 0) {
         if (typeof datos !== "undefined" && datos) {
             aplicarAjustes();
@@ -687,6 +678,9 @@
         if (!esFinalizado()) return;
 
         compactarCabecera();
+        configurarRankingNavegacionFinal();
+        sincronizarNavegacionFinal();
+        agregarEquiposPantallaMas();
 
         const portada = document.getElementById("portadaFinalizada");
         if (!portada) return;
@@ -740,7 +734,9 @@
         let totalMinutos = 0;
         let totalSets = 0;
         let totalPuntos = 0;
+        let partidosConResultado = 0;
         let partidoMasLargo = null;
+        let partidoMasCorto = null;
 
         partidosConDuracion.forEach(partido => {
             const minutos = numeroV2(partido.duracion_min);
@@ -752,10 +748,22 @@
             ) {
                 partidoMasLargo = partido;
             }
+
+            if (
+                !partidoMasCorto ||
+                minutos < numeroV2(partidoMasCorto.duracion_min)
+            ) {
+                partidoMasCorto = partido;
+            }
         });
 
         jugados.forEach(partido => {
             const sets = obtenerSetsPartido(partido);
+
+            if (sets.length) {
+                partidosConResultado += 1;
+            }
+
             totalSets += sets.length;
 
             sets.forEach(set => {
@@ -765,6 +773,10 @@
 
         const mediaMinutos = partidosConDuracion.length
             ? Math.round(totalMinutos / partidosConDuracion.length)
+            : 0;
+
+        const mediaPuntos = partidosConResultado
+            ? Math.round(totalPuntos / partidosConResultado)
             : 0;
 
         const config = datos?.configuracion || {};
@@ -792,7 +804,9 @@
             totalSets,
             totalPuntos,
             mediaMinutos,
+            mediaPuntos,
             partidoMasLargo,
+            partidoMasCorto,
             ultimoPalas: obtenerUltimoEquipoPalas()
         };
     }
@@ -994,14 +1008,10 @@
         tarjeta.dataset.v2 = "1";
         tarjeta.classList.add("cifrasFinalesV2");
 
-        const nombrePartidoLargo = resumen.partidoMasLargo
-            ? `${nombreLocalV2(resumen.partidoMasLargo)} vs ${nombreVisitanteV2(resumen.partidoMasLargo)}`
-            : "";
-
         tarjeta.innerHTML = `
             <h2>El campeonato en cifras</h2>
             <p class="subtituloCifras">
-                Suma de la liga, los grupos, los cruces y la Copa Palas Playa
+                Liga, grupos, cruces y Copa Palas Playa
             </p>
 
             <div class="rejillaCifras rejillaCifrasAmpliada">
@@ -1015,6 +1025,11 @@
                     "Duración media",
                     "📊"
                 )}
+                ${pintarCifraV2(
+                    resumen.mediaPuntos || "—",
+                    "Puntos por partido",
+                    "🎯"
+                )}
                 ${pintarCifraV2(resumen.pistas || "—", "Pistas utilizadas", "📍")}
                 ${pintarCifraV2(
                     resumen.partidoMasLargo
@@ -1023,14 +1038,55 @@
                     "Partido más largo",
                     "⌛"
                 )}
+                ${pintarCifraV2(
+                    resumen.partidoMasCorto
+                        ? `${numeroV2(resumen.partidoMasCorto.duracion_min)} min`
+                        : "—",
+                    "Partido más corto",
+                    "⚡"
+                )}
             </div>
 
-            ${nombrePartidoLargo ? `
-                <div class="detallePartidoLargo">
-                    <span>⌛ El partido más largo fue</span>
-                    <strong>${escaparV2(nombrePartidoLargo)}</strong>
-                </div>
-            ` : ""}
+            <div class="detalleExtremosPartidos">
+                ${pintarDetallePartidoExtremo(
+                    "⌛",
+                    "El partido más largo",
+                    resumen.partidoMasLargo
+                )}
+                ${pintarDetallePartidoExtremo(
+                    "⚡",
+                    "El partido más corto",
+                    resumen.partidoMasCorto
+                )}
+            </div>
+        `;
+    }
+
+    function pintarDetallePartidoExtremo(
+        icono,
+        titulo,
+        partido
+    ) {
+        if (!partido) return "";
+
+        const local =
+            nombreLocalV2(partido) ||
+            "Equipo 1";
+
+        const visitante =
+            nombreVisitanteV2(partido) ||
+            "Equipo 2";
+
+        return `
+            <div class="detallePartidoExtremo">
+                <span>${icono} ${escaparV2(titulo)}</span>
+                <strong>
+                    ${escaparV2(local)} vs ${escaparV2(visitante)}
+                </strong>
+                <small>
+                    ${numeroV2(partido.duracion_min)} minutos
+                </small>
+            </div>
         `;
     }
 
@@ -1146,6 +1202,142 @@
 
         const despedida = portada.querySelector(".mensajeDespedida");
         portada.insertBefore(tarjeta, despedida || null);
+    }
+
+
+    /* =====================================================
+       NAVEGACIÓN FINALIZADA
+       Ranking sustituye a Equipos en la barra inferior.
+       Equipos se añade como acceso grande dentro de Más.
+    ===================================================== */
+
+    function configurarRankingNavegacionFinal() {
+        const config = datos?.configuracion || {};
+        const rankingVisible =
+            config.mostrar_ranking_historico === true ||
+            normalizarV2(
+                config.mostrar_ranking_historico
+            ) === "SI";
+
+        if (!rankingVisible) return;
+
+        const boton =
+            document.querySelector(
+                '.bottomNav .navBtn[data-pantalla="equipos"]'
+            ) ||
+            document.querySelector(
+                ".bottomNav .navRankingFinal"
+            );
+
+        if (!boton) return;
+
+        boton.classList.add("navRankingFinal");
+        boton.dataset.pantalla = "ranking";
+        boton.setAttribute(
+            "aria-label",
+            "Ranking histórico"
+        );
+        boton.title = "Ranking histórico";
+
+        const icono = boton.querySelector("span");
+        const texto = boton.querySelector("small");
+
+        if (icono && icono.textContent !== "🏆") {
+            icono.textContent = "🏆";
+        }
+
+        if (texto && texto.textContent !== "Ranking") {
+            texto.textContent = "Ranking";
+        }
+    }
+
+    function agregarEquiposPantallaMas() {
+        if (
+            typeof estadoUI === "undefined" ||
+            estadoUI.pantalla !== "mas"
+        ) {
+            return;
+        }
+
+        const lista = document.querySelector(
+            "#contenidoDetalle .listaOpcionesMas"
+        );
+
+        if (
+            !lista ||
+            lista.querySelector(
+                "#opcionEquiposMasFinal"
+            )
+        ) {
+            return;
+        }
+
+        const boton = document.createElement("button");
+        boton.id = "opcionEquiposMasFinal";
+        boton.className =
+            "opcionMas opcionEquiposMasFinal";
+        boton.type = "button";
+        boton.dataset.destinoPantalla = "equipos";
+        boton.innerHTML = `
+            <span>👥</span>
+            <strong>Equipos</strong>
+            <b>→</b>
+        `;
+
+        lista.prepend(boton);
+    }
+
+    function gestionarClickNavegacionFinal(evento) {
+        const ranking = evento.target.closest(
+            '.bottomNav .navBtn[data-pantalla="ranking"]'
+        );
+
+        const equipos = evento.target.closest(
+            "#opcionEquiposMasFinal"
+        );
+
+        if (!ranking && !equipos) return;
+
+        window.setTimeout(
+            sincronizarNavegacionFinal,
+            0
+        );
+    }
+
+    function sincronizarNavegacionFinal() {
+        if (typeof estadoUI === "undefined") return;
+
+        const pantalla = estadoUI.pantalla;
+
+        if (pantalla === "ranking") {
+            activarBotonNavegacionFinal(
+                document.querySelector(
+                    '.bottomNav .navBtn[data-pantalla="ranking"]'
+                )
+            );
+            return;
+        }
+
+        if (pantalla === "equipos") {
+            activarBotonNavegacionFinal(
+                document.querySelector(
+                    '.bottomNav .navBtn[data-pantalla="mas"]'
+                )
+            );
+        }
+    }
+
+    function activarBotonNavegacionFinal(boton) {
+        if (!boton) return;
+
+        document
+            .querySelectorAll(".bottomNav .navBtn")
+            .forEach(elemento => {
+                elemento.classList.toggle(
+                    "navActivo",
+                    elemento === boton
+                );
+            });
     }
 
     /* =====================================================
