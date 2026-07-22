@@ -376,3 +376,141 @@
         transition:none;
     }
 }
+
+/* =========================================================
+   TABLAS Y EXPLICACIONES DETALLADAS
+========================================================= */
+
+.tablaNormasContenedor{
+    overflow-x:auto;
+    margin:15px 0;
+    border:1px solid #e7ddd6;
+    border-radius:15px;
+    background:#fff;
+}
+
+.tablaNormas{
+    width:100%;
+    min-width:520px;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+.tablaNormas th,
+.tablaNormas td{
+    padding:11px 12px;
+    border-bottom:1px solid #eee6e1;
+    text-align:center;
+    vertical-align:middle;
+}
+
+.tablaNormas th:first-child,
+.tablaNormas td:first-child{
+    text-align:left;
+}
+
+.tablaNormas thead th{
+    background:#431c2b;
+    color:#fff;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.35px;
+    text-transform:uppercase;
+}
+
+.tablaNormas tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.tablaNormas tbody tr:nth-child(even){
+    background:#fffaf7;
+}
+
+.tablaPuntuacionNormas td:not(:first-child){
+    color:#7c2d2d;
+    font-size:15px;
+    font-weight:900;
+}
+
+.bloqueCriteriosNorma{
+    margin:15px 0;
+    padding:15px;
+    border:1px solid #e6eaf0;
+    border-radius:16px;
+    background:#f8fafc;
+}
+
+.bloqueCriteriosNorma > strong{
+    display:block;
+    margin-bottom:11px;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.listaCriteriosNorma{
+    counter-reset:criterioNorma;
+    padding-left:0!important;
+    list-style:none;
+}
+
+.listaCriteriosNorma li{
+    position:relative;
+    min-height:28px;
+    padding-left:37px;
+}
+
+.listaCriteriosNorma li::before{
+    counter-increment:criterioNorma;
+    content:counter(criterioNorma);
+    position:absolute;
+    top:0;
+    left:0;
+    display:flex;
+    width:25px;
+    height:25px;
+    align-items:center;
+    justify-content:center;
+    border-radius:9px;
+    background:#fff1e8;
+    color:#9a3412;
+    font-size:11px;
+    font-weight:900;
+}
+
+.ejemploNorma{
+    margin:15px 0;
+    padding:14px;
+    border:1px dashed #e2a986;
+    border-radius:15px;
+    background:#fffbeb;
+    color:#78350f;
+}
+
+.ejemploNorma strong{
+    display:block;
+    margin-bottom:5px;
+    font-size:12px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.ejemploNorma p{
+    margin:0;
+}
+
+.notaNorma{
+    margin-top:15px!important;
+    padding:12px 13px;
+    border-radius:13px;
+    background:#eff6ff;
+    color:#1e40af;
+    font-size:12px;
+    font-weight:800;
+}
+
+@media (max-width:430px){
+    .tablaNormas{
+        min-width:480px;
+    }
+}
