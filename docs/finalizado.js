@@ -446,6 +446,7 @@
         const tarjetaPartidos = document.getElementById("tarjetaPartidos");
         const tarjetaCruces = document.getElementById("tarjetaEquipos");
         const tarjetaPalas = document.getElementById("tarjetaEspecial");
+        const tarjetaEquiposFinal = obtenerTarjetaEquiposFinal();
 
         document.querySelector(".gridDashboard")?.classList.add("gridFinalizado");
 
@@ -494,6 +495,49 @@
             tarjetaPalas.classList.remove("tarjetaBloqueada");
             tarjetaPalas.removeAttribute("aria-disabled");
         }
+
+        configurarTarjeta(
+            tarjetaEquiposFinal,
+            "👥",
+            "Equipos",
+            "Consulta todos los equipos participantes",
+            "equipos"
+        );
+    }
+
+    function obtenerTarjetaEquiposFinal() {
+        let tarjeta =
+            document.getElementById("tarjetaRanking") ||
+            document.getElementById("tarjetaEquiposFinal");
+
+        if (!tarjeta) {
+            const grid = document.querySelector(".gridDashboard");
+            if (!grid) return null;
+
+            tarjeta = document.createElement("div");
+            tarjeta.id = "tarjetaEquiposFinal";
+            tarjeta.className = "cardAcceso cardEquiposFinal";
+            tarjeta.innerHTML = `
+                <div class="iconoAcceso">👥</div>
+                <div>
+                    <h4>Equipos</h4>
+                    <p>Consulta todos los equipos participantes</p>
+                </div>
+                <span class="flecha">→</span>
+            `;
+
+            grid.appendChild(tarjeta);
+        }
+
+        tarjeta.classList.remove(
+            "oculto",
+            "cardRanking",
+            "tarjetaBloqueada"
+        );
+        tarjeta.classList.add("cardEquiposFinal");
+        tarjeta.removeAttribute("aria-disabled");
+
+        return tarjeta;
     }
 
     function configurarTarjeta(tarjeta, icono, titulo, resumen, seccion) {
@@ -680,6 +724,7 @@
         compactarCabecera();
         configurarRankingNavegacionFinal();
         sincronizarNavegacionFinal();
+        limpiarPantallaMasFinal();
         agregarEquiposPantallaMas();
 
         const portada = document.getElementById("portadaFinalizada");
@@ -1080,12 +1125,12 @@
         return `
             <div class="detallePartidoExtremo">
                 <span>${icono} ${escaparV2(titulo)}</span>
-                <strong>
-                    ${escaparV2(local)} vs ${escaparV2(visitante)}
+                <strong class="equipoPartidoExtremo">
+                    ${escaparV2(local)}
                 </strong>
-                <small>
-                    ${numeroV2(partido.duracion_min)} minutos
-                </small>
+                <strong class="equipoPartidoExtremo equipoPartidoExtremoSegundo">
+                    ${escaparV2(visitante)}
+                </strong>
             </div>
         `;
     }
@@ -1251,6 +1296,38 @@
         }
     }
 
+    function limpiarPantallaMasFinal() {
+        if (
+            typeof estadoUI === "undefined" ||
+            estadoUI.pantalla !== "mas"
+        ) {
+            return;
+        }
+
+        const lista = document.querySelector(
+            "#contenidoDetalle .listaOpcionesMas"
+        );
+
+        if (!lista) return;
+
+        lista.querySelectorAll(".opcionMas").forEach(opcion => {
+            const destino = normalizarV2(
+                opcion.dataset.destinoPantalla
+            );
+            const texto = normalizarV2(opcion.textContent);
+
+            if (
+                destino === "RANKING" ||
+                texto.includes("RANKING HISTORICO")
+            ) {
+                opcion.remove();
+                return;
+            }
+
+            opcion.querySelector(":scope > b")?.remove();
+        });
+    }
+
     function agregarEquiposPantallaMas() {
         if (
             typeof estadoUI === "undefined" ||
@@ -1281,7 +1358,6 @@
         boton.innerHTML = `
             <span>👥</span>
             <strong>Equipos</strong>
-            <b>→</b>
         `;
 
         lista.prepend(boton);
