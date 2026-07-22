@@ -7,8 +7,6 @@
 
     <link id="cssPrincipal" rel="stylesheet" href="style.css">
     <link id="cssFinalizado" rel="stylesheet" href="finalizado.css">
-
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,8 +50,8 @@
 
                 const hojas = [
                     ["cssPrincipal", "style.css"],
-                    ["cssFinalizado", "finalizado.css"],
-                                 ];
+                    ["cssFinalizado", "finalizado.css"]
+                ];
 
                 hojas.forEach(([id, archivo]) => {
                     const enlace = document.getElementById(id);
@@ -230,7 +228,6 @@
             try {
                 await cargarScript("app.js");
                 await cargarScript("finalizado.js");
-               
             } catch (error) {
                 console.error("No se pudo cargar la aplicación.", error);
             }
