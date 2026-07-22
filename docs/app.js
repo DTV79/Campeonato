@@ -1293,14 +1293,92 @@ function obtenerFotosVisibles(origen = datosFotos) {
         : origen?.fotos || [];
 
     return fotos
-        .filter(foto =>
-            foto?.mostrar === true ||
-            esSi(foto?.mostrar)
-        )
+        .filter(foto => {
+            const visible =
+                foto?.mostrar === true ||
+                esSi(foto?.mostrar);
+
+            const esCampeones =
+                normalizarTextoFoto(
+                    foto?.categoria
+                ) === "campeones";
+
+            return visible && !esCampeones;
+        })
         .sort((a, b) =>
             numero(a?.orden) -
             numero(b?.orden)
         );
+}
+
+function normalizarTextoFoto(texto) {
+    return String(texto || "")
+        .trim()
+        .toLocaleLowerCase("es")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function agruparFotosPorCampeonato(fotos) {
+    const grupos = new Map();
+
+    fotos.forEach(foto => {
+        const id = String(
+            foto?.id_campeonato ||
+            foto?.ID_Campeonato ||
+            "sin-campeonato"
+        ).trim();
+
+        if (!grupos.has(id)) {
+            grupos.set(id, {
+                id,
+                titulo:
+                    foto?.nombre_campeonato ||
+                    foto?.campeonato ||
+                    id,
+                ano: obtenerAnoFoto(
+                    foto?.ano ||
+                    foto?.anio ||
+                    foto?.fecha ||
+                    id
+                ),
+                fotos: []
+            });
+        }
+
+        grupos.get(id).fotos.push(foto);
+    });
+
+    return [...grupos.values()]
+        .map(grupo => ({
+            ...grupo,
+            fotos: grupo.fotos.sort(
+                (a, b) =>
+                    numero(a?.orden) -
+                    numero(b?.orden)
+            )
+        }))
+        .sort((a, b) => {
+            if (a.ano !== b.ano) {
+                return b.ano - a.ano;
+            }
+
+            return b.id.localeCompare(
+                a.id,
+                "es",
+                { numeric: true }
+            );
+        });
+}
+
+function obtenerAnoFoto(valor) {
+    const coincidencia =
+        String(valor || "")
+            .match(/\b(?:19|20)\d{2}\b/);
+
+    return coincidencia
+        ? Number(coincidencia[0])
+        : 0;
 }
 
 
@@ -3844,6 +3922,9 @@ async function pintarPantallaFotos() {
         const fotos =
             obtenerFotosVisibles(origen);
 
+        const campeonatos =
+            agruparFotosPorCampeonato(fotos);
+
         if (!fotos.length) {
             contenido.innerHTML = `
                 <h2>📷 Fotos</h2>
@@ -3870,11 +3951,11 @@ async function pintarPantallaFotos() {
                 </div>
             </div>
 
-            <section class="galeriaFotos">
-                ${fotos
-                    .map(pintarTarjetaFoto)
+            <div class="galeriasPorCampeonato">
+                ${campeonatos
+                    .map(pintarGaleriaCampeonato)
                     .join("")}
-            </section>
+            </div>
         `;
 
     } catch (error) {
@@ -3892,6 +3973,36 @@ async function pintarPantallaFotos() {
             )}
         `;
     }
+}
+
+function pintarGaleriaCampeonato(grupo) {
+    const titulo =
+        grupo.titulo ||
+        (grupo.ano
+            ? `Campeonato ${grupo.ano}`
+            : "Campeonato");
+
+    return `
+        <section class="bloqueFotosCampeonato">
+            <div class="cabeceraSeccionFotos cabeceraCampeonatoFotos">
+                <div>
+                    <h3>${escaparHTML(titulo)}</h3>
+                    <p>
+                        ${grupo.fotos.length}
+                        ${grupo.fotos.length === 1
+                            ? "fotografía"
+                            : "fotografías"}
+                    </p>
+                </div>
+            </div>
+
+            <div class="galeriaFotos">
+                ${grupo.fotos
+                    .map(pintarTarjetaFoto)
+                    .join("")}
+            </div>
+        </section>
+    `;
 }
 
 function pintarTarjetaFoto(foto) {
