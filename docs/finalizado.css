@@ -282,53 +282,6 @@ body.modoFinalizado{
     letter-spacing:.8px;
 }
 
-.honoresFinales{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
-    margin-top:16px;
-}
-
-.honor{
-    min-width:0;
-    padding:20px 16px;
-    border-radius:22px;
-    text-align:center;
-    box-shadow:0 8px 22px rgba(15,23,42,.08);
-}
-
-.honorOro{
-    border:1px solid #fcd34d;
-    background:linear-gradient(145deg,#fffbeb,#fef3c7);
-    color:#78350f;
-}
-
-.honorPlata{
-    border:1px solid #cbd5e1;
-    background:linear-gradient(145deg,#fff,#eef2f6);
-    color:#334155;
-}
-
-.medallaHonor{
-    display:block;
-    margin-bottom:7px;
-    font-size:34px;
-}
-
-.honor small{
-    display:block;
-    margin-bottom:7px;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:1.2px;
-}
-
-.honor strong{
-    display:block;
-    overflow-wrap:anywhere;
-    font-size:15px;
-    line-height:1.3;
-}
 
 .cifrasFinales{
     margin-top:16px;
@@ -490,22 +443,89 @@ body.modoFinalizado{
         font-size:54px;
     }
 
-    .honoresFinales{
-        grid-template-columns:1fr;
-    }
 
     .rejillaCifras{
         grid-template-columns:1fr 1fr;
     }
 
-    .rejillaCifras div:last-child{
-        grid-column:1 / -1;
-    }
 
     .cabeceraGranFinal{
         align-items:flex-start;
         flex-direction:column;
         gap:4px;
+    }
+}
+
+
+/* =========================================================
+   NAVEGACIÓN FINALIZADA Y PANTALLA MÁS
+========================================================= */
+
+.modoFinalizado .bottomNav .navRankingFinal.navActivo,
+.modoFinalizado .bottomNav .navRankingFinal.navActivo small{
+    color:#7c3aed;
+}
+
+.modoFinalizado .listaOpcionesMas{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas{
+    position:relative;
+    display:flex;
+    min-width:0;
+    min-height:112px;
+    padding:17px 15px;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    background:linear-gradient(145deg,#fff,#f8fafc);
+    color:#1e293b;
+    text-align:left;
+    box-shadow:0 7px 19px rgba(15,23,42,.07);
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > span{
+    font-size:28px;
+    line-height:1;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > strong{
+    padding-right:18px;
+    font-size:13px;
+    line-height:1.25;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > b{
+    position:absolute;
+    right:14px;
+    bottom:13px;
+    font-size:18px;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionEquiposMasFinal{
+    border-color:#bae6fd;
+    background:linear-gradient(145deg,#f0f9ff,#e0f2fe);
+    color:#075985;
+}
+
+@media(max-width:380px){
+    .modoFinalizado .listaOpcionesMas{
+        gap:9px;
+    }
+
+    .modoFinalizado .listaOpcionesMas .opcionMas{
+        min-height:104px;
+        padding:14px 12px;
+    }
+
+    .detalleExtremosPartidos{
+        grid-template-columns:1fr;
     }
 }
 
@@ -750,26 +770,46 @@ body.modoFinalizado{
     font-size:11px;
 }
 
-.detallePartidoLargo{
+.detalleExtremosPartidos{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:11px;
     margin-top:13px;
-    padding:13px 15px;
+}
+
+.detallePartidoExtremo{
+    min-width:0;
+    padding:14px;
     border-radius:15px;
     background:#fef3c7;
     color:#78350f;
     text-align:center;
 }
 
-.detallePartidoLargo span{
-    display:block;
-    margin-bottom:4px;
-    font-size:11px;
-    font-weight:700;
+.detallePartidoExtremo:nth-child(2){
+    background:#eff6ff;
+    color:#1e3a8a;
 }
 
-.detallePartidoLargo strong{
+.detallePartidoExtremo span{
     display:block;
-    font-size:13px;
+    margin-bottom:5px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.detallePartidoExtremo strong{
+    display:block;
+    overflow-wrap:anywhere;
+    font-size:12px;
     line-height:1.35;
+}
+
+.detallePartidoExtremo small{
+    display:block;
+    margin-top:6px;
+    font-size:11px;
+    font-weight:900;
 }
 
 /* Palas Playa: premio humorístico */
