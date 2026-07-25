@@ -877,6 +877,9 @@ button{
     text-align:left;
 }
 
+.nombreEquipoMarcador strong{
+    display:block;
+}
 /* =========================================================
    SUSTITUCIONES EN PARTIDOS
 ========================================================= */
@@ -956,9 +959,7 @@ button{
     color:#6d28d9;
 }
 
-.nombreEquipoMarcador strong{
-    display:block;
-}
+
 
 .ganadorFila{
     background:#dcfce7;
