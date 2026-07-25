@@ -2928,7 +2928,9 @@ body.modoPretorneo{
 }
 
 
-/* La última tarjeta ocupa las dos columnas cuando queda sola */
-.tarjetaUltimaImpar{
+/* La última tarjeta ocupa todo el ancho
+   cuando el número de tarjetas visibles es impar */
+.gridDashboard > .tarjetaDashboardImpar{
     grid-column: 1 / -1;
+}
 }
