@@ -2761,31 +2761,33 @@ function pintarFilaMarcador(
     sustituciones = []
 ) {
     return `
-        <div class="
-            filaMarcador
-            ${ganador ? "ganadorFila" : ""}
-        ">
-            <div class="nombreEquipoMarcador">
+        <div class="bloqueEquipoMarcador">
 
-                ${dividirEquipo(nombre)
-                    .map(
-                        jugador => `
-                            <strong>
-                                ${escaparHTML(jugador)}
-                            </strong>
-                        `
-                    )
-                    .join("")}
+            <div class="
+                filaMarcador
+                ${ganador ? "ganadorFila" : ""}
+            ">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(nombre)
+                        .map(
+                            jugador => `
+                                <strong>
+                                    ${escaparHTML(jugador)}
+                                </strong>
+                            `
+                        )
+                        .join("")}
+                </div>
 
-                ${pintarSustitucionesEquipo(
-                    sustituciones
-                )}
-
+                <div>${sets[0][lado]}</div>
+                <div>${sets[1][lado]}</div>
+                <div>${sets[2][lado]}</div>
             </div>
 
-            <div>${sets[0][lado]}</div>
-            <div>${sets[1][lado]}</div>
-            <div>${sets[2][lado]}</div>
+            ${pintarSustitucionesEquipo(
+                sustituciones
+            )}
+
         </div>
     `;
 }
@@ -2801,7 +2803,7 @@ function pintarSustitucionesEquipo(
     }
 
     return `
-        <div class="sustitucionesEquipo">
+        <div class="lineaSustituciones">
 
             ${sustituciones
                 .map(
@@ -2810,7 +2812,11 @@ function pintarSustitucionesEquipo(
                             sustitucion
                         )
                 )
-                .join("")}
+                .join(`
+                    <span class="separadorSustituciones">
+                        ·
+                    </span>
+                `)}
 
         </div>
     `;
@@ -2838,12 +2844,6 @@ function pintarSustitucionPartido(
             "Libre"
         ).trim();
 
-    const equipoOrigen =
-        String(
-            sustitucion?.equipo_origen ||
-            ""
-        ).trim();
-
     const esCedido =
         normalizar(tipoCompleto)
             .includes("CEDIDO");
@@ -2853,42 +2853,33 @@ function pintarSustitucionPartido(
             ? "Cedido"
             : "Libre";
 
-    const detalleOrigen =
-        esCedido && equipoOrigen
-            ? ` · ${equipoOrigen}`
-            : "";
-
     return `
-        <div class="sustitucionPartido">
+        <span class="sustitucionInline">
 
             <span class="iconoSustitucion">
                 🔄
             </span>
 
-            <div class="datosSustitucion">
-
+            <span class="textoSustitucion">
                 <strong>
                     ${escaparHTML(sustituto)}
                 </strong>
 
-                <small>
-                    Sustituye a
+                sustituye a
+
+                <strong>
                     ${escaparHTML(ausente)}
-                    ${escaparHTML(detalleOrigen)}
-                </small>
+                </strong>
+            </span>
 
-            </div>
-
-            <span
-                class="
-                    tipoSustitucion
-                    ${esCedido ? "cedido" : "libre"}
-                "
-            >
+            <span class="
+                tipoSustitucionInline
+                ${esCedido ? "cedido" : "libre"}
+            ">
                 ${tipoVisible}
             </span>
 
-        </div>
+        </span>
     `;
 }
 
