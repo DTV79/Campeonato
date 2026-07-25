@@ -866,6 +866,59 @@ function pintarTarjetasDashboard() {
     document
         .getElementById("tarjetaRanking")
         ?.classList.add("oculto");
+        ajustarUltimaTarjetaDashboard();
+}
+
+function ajustarUltimaTarjetaDashboard() {
+    const contenedor =
+        document.querySelector(".gridDashboard");
+
+    if (!contenedor) return;
+
+    const tarjetas = [
+        ...contenedor.querySelectorAll(
+            ":scope > .cardAcceso"
+        )
+    ];
+
+    /*
+       Primero quitamos la ampliación anterior,
+       porque las tarjetas visibles pueden cambiar
+       según el estado y la configuración.
+    */
+    tarjetas.forEach(tarjeta => {
+        tarjeta.classList.remove(
+            "tarjetaDashboardImpar"
+        );
+    });
+
+    const tarjetasVisibles =
+        tarjetas.filter(tarjeta => {
+            const estilo =
+                window.getComputedStyle(tarjeta);
+
+            return (
+                !tarjeta.classList.contains("oculto") &&
+                !tarjeta.hidden &&
+                estilo.display !== "none" &&
+                estilo.visibility !== "hidden"
+            );
+        });
+
+    /*
+       Cuando queda un número impar de tarjetas,
+       la última ocupa las dos columnas.
+    */
+    if (
+        tarjetasVisibles.length > 1 &&
+        tarjetasVisibles.length % 2 !== 0
+    ) {
+        tarjetasVisibles
+            .at(-1)
+            .classList.add(
+                "tarjetaDashboardImpar"
+            );
+    }
 }
 
 function pintarTarjetaEliminatorias(config) {
@@ -1219,6 +1272,7 @@ async function prepararFotosPortada() {
         "oculto",
         !visible
     );
+    ajustarUltimaTarjetaDashboard();
 
     if (!visible) {
         delete tarjeta.dataset.seccion;
@@ -1243,7 +1297,7 @@ async function prepararFotosPortada() {
                     ? "1 fotografía publicada"
                     : `${fotos.length} fotografías publicadas`;
         }
-
+        ajustarUltimaTarjetaDashboard();
     } catch (error) {
         console.error(
             "No se pudieron cargar las fotografías.",
@@ -1254,6 +1308,7 @@ async function prepararFotosPortada() {
             resumen.textContent =
                 "Galería temporalmente no disponible";
         }
+        ajustarUltimaTarjetaDashboard();
     }
 }
 
@@ -1678,6 +1733,7 @@ function configurarTarjetasPretorneo() {
     });
     
 prepararFotosPortada();
+ajustarUltimaTarjetaDashboard();
 }
 
 
