@@ -2926,3 +2926,9 @@ body.modoPretorneo{
         padding:15px 16px 17px;
     }
 }
+
+
+/* La última tarjeta ocupa las dos columnas cuando queda sola */
+.tarjetaUltimaImpar{
+    grid-column: 1 / -1;
+}
