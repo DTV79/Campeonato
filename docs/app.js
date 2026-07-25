@@ -2652,49 +2652,246 @@ function pintarBloqueJornada(jornada, partidos, abierta, separarPorGrupo) {
 
 function pintarCardPartido(partido) {
     if (partidoEsDescanso(partido)) {
-        const equipo = partido.local || partido.visitante || "";
+        const equipo =
+            partido.local ||
+            partido.visitante ||
+            "";
+
         return `
             <article class="cardPartido descanso">
-                <div class="estadoPartido">💤 Descanso</div>
-                <div class="equipoPartido">${escaparHTML(equipo)}</div>
+                <div class="estadoPartido">
+                    💤 Descanso
+                </div>
+
+                <div class="equipoPartido">
+                    ${escaparHTML(equipo)}
+                </div>
             </article>
         `;
     }
 
-    const local = partido.local || "";
-    const visitante = partido.visitante || "";
-    const sets = obtenerSets(partido.resultado);
-    const finalizado = partidoFinalizado(partido);
-    const localGana = normalizar(partido.ganador) === normalizar(local);
-    const visitanteGana = normalizar(partido.ganador) === normalizar(visitante);
+    const local =
+        partido.local || "";
+
+    const visitante =
+        partido.visitante || "";
+
+    const sets =
+        obtenerSets(partido.resultado);
+
+    const finalizado =
+        partidoFinalizado(partido);
+
+    const localGana =
+        normalizar(partido.ganador) ===
+        normalizar(local);
+
+    const visitanteGana =
+        normalizar(partido.ganador) ===
+        normalizar(visitante);
+
+    const sustitucionesLocal =
+        Array.isArray(
+            partido.sustituciones_local
+        )
+            ? partido.sustituciones_local
+            : [];
+
+    const sustitucionesVisitante =
+        Array.isArray(
+            partido.sustituciones_visitante
+        )
+            ? partido.sustituciones_visitante
+            : [];
+
+    const haySustituciones =
+        sustitucionesLocal.length > 0 ||
+        sustitucionesVisitante.length > 0;
 
     return `
-        <article class="cardPartido marcador ${finalizado ? "jugado" : "pendiente"}">
+        <article
+            class="
+                cardPartido
+                marcador
+                ${finalizado ? "jugado" : "pendiente"}
+                ${haySustituciones ? "conSustitucion" : ""}
+            "
+        >
             <div class="estadoPartido">
-                ${finalizado ? "✅ Finalizado" : "⏳ Pendiente"}
+                ${
+                    finalizado
+                        ? "✅ Finalizado"
+                        : "⏳ Pendiente"
+                }
             </div>
+
             ${pintarMetaPartido(partido)}
+
             <div class="marcadorHeader">
-                <div></div><div>I</div><div>II</div><div>III</div>
+                <div></div>
+                <div>I</div>
+                <div>II</div>
+                <div>III</div>
             </div>
-            ${pintarFilaMarcador(local, sets, "local", localGana)}
-            ${pintarFilaMarcador(visitante, sets, "visitante", visitanteGana)}
+
+            ${pintarFilaMarcador(
+                local,
+                sets,
+                "local",
+                localGana,
+                sustitucionesLocal
+            )}
+
+            ${pintarFilaMarcador(
+                visitante,
+                sets,
+                "visitante",
+                visitanteGana,
+                sustitucionesVisitante
+            )}
         </article>
     `;
 }
 
-function pintarFilaMarcador(nombre, sets, lado, ganador) {
+function pintarFilaMarcador(
+    nombre,
+    sets,
+    lado,
+    ganador,
+    sustituciones = []
+) {
     return `
-        <div class="filaMarcador ${ganador ? "ganadorFila" : ""}">
+        <div class="
+            filaMarcador
+            ${ganador ? "ganadorFila" : ""}
+        ">
             <div class="nombreEquipoMarcador">
-                ${dividirEquipo(nombre).map(jugador => `<strong>${escaparHTML(jugador)}</strong>`).join("")}
+
+                ${dividirEquipo(nombre)
+                    .map(
+                        jugador => `
+                            <strong>
+                                ${escaparHTML(jugador)}
+                            </strong>
+                        `
+                    )
+                    .join("")}
+
+                ${pintarSustitucionesEquipo(
+                    sustituciones
+                )}
+
             </div>
+
             <div>${sets[0][lado]}</div>
             <div>${sets[1][lado]}</div>
             <div>${sets[2][lado]}</div>
         </div>
     `;
 }
+
+function pintarSustitucionesEquipo(
+    sustituciones
+) {
+    if (
+        !Array.isArray(sustituciones) ||
+        sustituciones.length === 0
+    ) {
+        return "";
+    }
+
+    return `
+        <div class="sustitucionesEquipo">
+
+            ${sustituciones
+                .map(
+                    sustitucion =>
+                        pintarSustitucionPartido(
+                            sustitucion
+                        )
+                )
+                .join("")}
+
+        </div>
+    `;
+}
+
+
+function pintarSustitucionPartido(
+    sustitucion
+) {
+    const ausente =
+        String(
+            sustitucion?.ausente ||
+            "Titular"
+        ).trim();
+
+    const sustituto =
+        String(
+            sustitucion?.sustituto ||
+            "Sustituto"
+        ).trim();
+
+    const tipoCompleto =
+        String(
+            sustitucion?.tipo ||
+            "Libre"
+        ).trim();
+
+    const equipoOrigen =
+        String(
+            sustitucion?.equipo_origen ||
+            ""
+        ).trim();
+
+    const esCedido =
+        normalizar(tipoCompleto)
+            .includes("CEDIDO");
+
+    const tipoVisible =
+        esCedido
+            ? "Cedido"
+            : "Libre";
+
+    const detalleOrigen =
+        esCedido && equipoOrigen
+            ? ` · ${equipoOrigen}`
+            : "";
+
+    return `
+        <div class="sustitucionPartido">
+
+            <span class="iconoSustitucion">
+                🔄
+            </span>
+
+            <div class="datosSustitucion">
+
+                <strong>
+                    ${escaparHTML(sustituto)}
+                </strong>
+
+                <small>
+                    Sustituye a
+                    ${escaparHTML(ausente)}
+                    ${escaparHTML(detalleOrigen)}
+                </small>
+
+            </div>
+
+            <span
+                class="
+                    tipoSustitucion
+                    ${esCedido ? "cedido" : "libre"}
+                "
+            >
+                ${tipoVisible}
+            </span>
+
+        </div>
+    `;
+}
+
 
 function pintarMetaPartido(partido) {
     const partes = [];
