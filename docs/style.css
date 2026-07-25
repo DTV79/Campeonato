@@ -877,6 +877,85 @@ button{
     text-align:left;
 }
 
+/* =========================================================
+   SUSTITUCIONES EN PARTIDOS
+========================================================= */
+
+.cardPartido.conSustitucion{
+    box-shadow:
+        0 4px 14px rgba(15,23,42,.08),
+        0 0 0 1px #bfdbfe;
+}
+
+.sustitucionesEquipo{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px dashed #cbd5e1;
+}
+
+.sustitucionPartido{
+    display:grid;
+    grid-template-columns:18px minmax(0,1fr) auto;
+    align-items:center;
+    gap:6px;
+    padding:6px 7px;
+    border-radius:10px;
+    background:#eff6ff;
+    color:#1e3a8a;
+}
+
+.iconoSustitucion{
+    font-size:13px;
+    line-height:1;
+}
+
+.datosSustitucion{
+    min-width:0;
+    text-align:left;
+}
+
+.nombreEquipoMarcador
+.datosSustitucion strong{
+    display:block;
+    overflow:hidden;
+    color:#1e3a8a;
+    font-size:12px;
+    font-weight:900;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.datosSustitucion small{
+    display:block;
+    margin-top:2px;
+    color:#475569;
+    font-size:10px;
+    font-weight:700;
+    line-height:1.3;
+}
+
+.tipoSustitucion{
+    display:inline-block;
+    padding:3px 6px;
+    border-radius:999px;
+    font-size:9px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.tipoSustitucion.libre{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.tipoSustitucion.cedido{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
 .nombreEquipoMarcador strong{
     display:block;
 }
