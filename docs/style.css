@@ -890,13 +890,103 @@ button{
         0 0 0 1px #bfdbfe;
 }
 
-.sustitucionesEquipo{
+/* =========================================================
+   SUSTITUCIONES EN UNA LÍNEA
+========================================================= */
+
+.bloqueEquipoMarcador{
+    width:100%;
+}
+
+.lineaSustituciones{
     display:flex;
-    flex-direction:column;
+    align-items:center;
     gap:6px;
-    margin-top:8px;
-    padding-top:8px;
-    border-top:1px dashed #cbd5e1;
+
+    width:100%;
+    box-sizing:border-box;
+
+    margin-top:2px;
+    padding:5px 8px;
+
+    border-top:1px dashed #bfdbfe;
+    background:#eff6ff;
+
+    color:#334155;
+    font-size:10px;
+    font-weight:700;
+    line-height:1.2;
+
+    white-space:nowrap;
+    overflow:hidden;
+}
+
+.sustitucionInline{
+    display:flex;
+    align-items:center;
+    gap:4px;
+
+    min-width:0;
+    overflow:hidden;
+}
+
+.iconoSustitucion{
+    flex:0 0 auto;
+    font-size:11px;
+    line-height:1;
+}
+
+.textoSustitucion{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.textoSustitucion strong{
+    color:#1e3a8a;
+    font-size:inherit;
+    font-weight:900;
+}
+
+.tipoSustitucionInline{
+    flex:0 0 auto;
+
+    padding:2px 5px;
+    border-radius:999px;
+
+    font-size:9px;
+    font-weight:900;
+}
+
+.tipoSustitucionInline.libre{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.tipoSustitucionInline.cedido{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+.separadorSustituciones{
+    flex:0 0 auto;
+    color:#94a3b8;
+}
+
+@media (max-width:480px){
+
+    .lineaSustituciones{
+        gap:4px;
+        padding:4px 6px;
+        font-size:9px;
+    }
+
+    .tipoSustitucionInline{
+        padding:2px 4px;
+        font-size:8px;
+    }
+
 }
 
 .sustitucionPartido{
