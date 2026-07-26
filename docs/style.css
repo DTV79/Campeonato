@@ -3080,6 +3080,12 @@ body.modoMantenimiento{
     font-size:40px;
 }
 
+.iconoMantenimientoPadel svg{
+    width:46px;
+    height:46px;
+    display:block;
+}
+
 .marcaMantenimiento{
     margin-bottom:10px;
     color:#9a3412;
@@ -3140,4 +3146,8 @@ body.modoMantenimiento{
     .mensajeMantenimiento{
         font-size:14px;
     }
+   .iconoMantenimientoPadel svg{
+    width:40px;
+    height:40px;
+   }
 }
