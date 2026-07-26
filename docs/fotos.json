@@ -1,6 +1,21 @@
 {
-  "ultima_actualizacion": "2026-07-26T17:35:38",
+  "ultima_actualizacion": "2026-07-26T18:10:30",
   "fotos": [
+    {
+      "id_foto": "F0003",
+      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
+      "codigo_campeonato": "CAMP-2025-01",
+      "archivo": "Carlos y Jaime.JPG",
+      "ruta": "Imagenes/CAMP-2025-01/Carlos y Jaime.JPG",
+      "categoria": "Partidos",
+      "jornada_fase": "Equipos",
+      "titulo": "Equipo:",
+      "descripcion": "Carlos & Jaime",
+      "autor": "Rosa Del Valle",
+      "fecha": "2025-09-27",
+      "orden": 1,
+      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
+    },
     {
       "id_foto": "F0001",
       "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
@@ -17,36 +32,6 @@
       "destacada": true,      "mostrar": true,      "usar_en_palmares": true
     },
     {
-      "id_foto": "F0002",
-      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
-      "codigo_campeonato": "CAMP-2025-01",
-      "archivo": "Alfonsín y Diego.JPG",
-      "ruta": "Imagenes/CAMP-2025-01/Alfonsín y Diego.JPG",
-      "categoria": "Partidos",
-      "jornada_fase": "Equipos",
-      "titulo": "Equipo:",
-      "descripcion": "Negro & Diego",
-      "autor": "Rosa Del Valle",
-      "fecha": "2025-09-27",
-      "orden": 1,
-      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
-    },
-    {
-      "id_foto": "F0003",
-      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
-      "codigo_campeonato": "CAMP-2025-01",
-      "archivo": "Carlos y Jaime.JPG",
-      "ruta": "Imagenes/CAMP-2025-01/Carlos y Jaime.JPG",
-      "categoria": "Partidos",
-      "jornada_fase": "Equipos",
-      "titulo": "Equipo:",
-      "descripcion": "Carlos & Jaime",
-      "autor": "Rosa Del Valle",
-      "fecha": "2025-09-27",
-      "orden": 2,
-      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
-    },
-    {
       "id_foto": "F0004",
       "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
       "codigo_campeonato": "CAMP-2025-01",
@@ -58,7 +43,7 @@
       "descripcion": "Javi & Toledo",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 3,
+      "orden": 2,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -73,7 +58,7 @@
       "descripcion": "Kaki & Rosa",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 4,
+      "orden": 3,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -86,6 +71,21 @@
       "jornada_fase": "Equipos",
       "titulo": "Equipo:",
       "descripcion": "Kike & José",
+      "autor": "Rosa Del Valle",
+      "fecha": "2025-09-27",
+      "orden": 4,
+      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
+    },
+    {
+      "id_foto": "F0002",
+      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
+      "codigo_campeonato": "CAMP-2025-01",
+      "archivo": "Alfonsín y Diego.JPG",
+      "ruta": "Imagenes/CAMP-2025-01/Alfonsín y Diego.JPG",
+      "categoria": "Partidos",
+      "jornada_fase": "Equipos",
+      "titulo": "Equipo:",
+      "descripcion": "Negro & Diego",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
       "orden": 5,
