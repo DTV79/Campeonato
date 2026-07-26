@@ -398,9 +398,75 @@ function pintarPantallaMantenimiento() {
                 class="tarjetaMantenimiento"
                 aria-labelledby="tituloMantenimiento"
             >
-                <div class="iconoMantenimiento">
-                    🛠️
-                </div>
+                <div class="iconoMantenimiento iconoMantenimientoPadel">
+    <svg
+        viewBox="0 0 64 64"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <!-- Pala izquierda -->
+        <g transform="rotate(-28 22 24)">
+            <ellipse
+                cx="22"
+                cy="22"
+                rx="11"
+                ry="14"
+                fill="#ef4444"
+                stroke="#431c2b"
+                stroke-width="2"
+            />
+            <rect
+                x="19.5"
+                y="35"
+                width="5"
+                height="15"
+                rx="2.5"
+                fill="#8b5e3c"
+                stroke="#431c2b"
+                stroke-width="1.5"
+            />
+            <circle cx="18" cy="18" r="1.2" fill="#ffd9d9"/>
+            <circle cx="22" cy="16" r="1.2" fill="#ffd9d9"/>
+            <circle cx="26" cy="18" r="1.2" fill="#ffd9d9"/>
+            <circle cx="18" cy="23" r="1.2" fill="#ffd9d9"/>
+            <circle cx="22" cy="22" r="1.2" fill="#ffd9d9"/>
+            <circle cx="26" cy="23" r="1.2" fill="#ffd9d9"/>
+            <circle cx="20" cy="28" r="1.2" fill="#ffd9d9"/>
+            <circle cx="24" cy="28" r="1.2" fill="#ffd9d9"/>
+        </g>
+
+        <!-- Pala derecha -->
+        <g transform="rotate(28 42 24)">
+            <ellipse
+                cx="42"
+                cy="22"
+                rx="11"
+                ry="14"
+                fill="#f59e0b"
+                stroke="#431c2b"
+                stroke-width="2"
+            />
+            <rect
+                x="39.5"
+                y="35"
+                width="5"
+                height="15"
+                rx="2.5"
+                fill="#8b5e3c"
+                stroke="#431c2b"
+                stroke-width="1.5"
+            />
+            <circle cx="38" cy="18" r="1.2" fill="#fff0c7"/>
+            <circle cx="42" cy="16" r="1.2" fill="#fff0c7"/>
+            <circle cx="46" cy="18" r="1.2" fill="#fff0c7"/>
+            <circle cx="38" cy="23" r="1.2" fill="#fff0c7"/>
+            <circle cx="42" cy="22" r="1.2" fill="#fff0c7"/>
+            <circle cx="46" cy="23" r="1.2" fill="#fff0c7"/>
+            <circle cx="40" cy="28" r="1.2" fill="#fff0c7"/>
+            <circle cx="44" cy="28" r="1.2" fill="#fff0c7"/>
+        </g>
+    </svg>
+</div>
 
                 <p
                     class="marcaMantenimiento"
