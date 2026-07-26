@@ -193,6 +193,19 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+    
+    const botonAviso =
+        evento.target.closest(
+            "[data-aviso-proxima-edicion]"
+        );
+
+    if (botonAviso) {
+        alternarAvisoProximaEdicion(
+            botonAviso
+        );
+        return;
+    }
+    
     const btnInfoRanking = evento.target.closest("#btnInfoRanking");
     if (btnInfoRanking) {
         mostrarInfoRanking();
@@ -1935,6 +1948,144 @@ function configurarBotonNav(
     }
 }
 
+function pintarAvisoProximaEdicion(
+    config
+) {
+    const mostrar =
+        config
+            .mostrar_aviso_proxima_edicion ===
+            true ||
+        esSi(
+            config
+                .mostrar_aviso_proxima_edicion
+        );
+
+    if (!mostrar) return "";
+
+    const titulo =
+        String(
+            config
+                .titulo_aviso_proxima_edicion ||
+            "Información importante"
+        ).trim();
+
+    const resumen =
+        String(
+            config
+                .texto_corto_aviso_proxima_edicion ||
+            ""
+        ).trim();
+
+    const detalle =
+        String(
+            config
+                .texto_ampliado_aviso_proxima_edicion ||
+            ""
+        ).trim();
+
+    if (!resumen && !detalle) {
+        return "";
+    }
+
+    const detalleHTML =
+        escaparHTML(detalle)
+            .replace(
+                /\r?\n/g,
+                "<br>"
+            );
+
+    return `
+        <section class="avisoProximaEdicion">
+
+            <div class="cabeceraAvisoProximaEdicion">
+                <span class="iconoAvisoProximaEdicion">
+                    ℹ️
+                </span>
+
+                <div>
+                    <strong>
+                        ${escaparHTML(titulo)}
+                    </strong>
+
+                    ${
+                        resumen
+                            ? `
+                                <p>
+                                    ${escaparHTML(resumen)}
+                                </p>
+                            `
+                            : ""
+                    }
+                </div>
+            </div>
+
+            ${
+                detalle
+                    ? `
+                        <button
+                            type="button"
+                            class="btnAvisoProximaEdicion"
+                            data-aviso-proxima-edicion
+                            aria-expanded="false"
+                        >
+                            Ver más
+                        </button>
+
+                        <div
+                            class="
+                                detalleAvisoProximaEdicion
+                                oculto
+                            "
+                        >
+                            ${detalleHTML}
+                        </div>
+                    `
+                    : ""
+            }
+
+        </section>
+    `;
+}
+
+
+function alternarAvisoProximaEdicion(
+    boton
+) {
+    const aviso =
+        boton.closest(
+            ".avisoProximaEdicion"
+        );
+
+    const detalle =
+        aviso?.querySelector(
+            ".detalleAvisoProximaEdicion"
+        );
+
+    if (!detalle) return;
+
+    const abrir =
+        detalle.classList.contains(
+            "oculto"
+        );
+
+    detalle.classList.toggle(
+        "oculto",
+        !abrir
+    );
+
+    boton.textContent =
+        abrir
+            ? "Ver menos"
+            : "Ver más";
+
+    boton.setAttribute(
+        "aria-expanded",
+        String(abrir)
+    );
+}
+
+
+
 function pintarPantallaInformacionPretorneo() {
     const contenido = obtenerContenidoDetalle();
 
@@ -1956,11 +2107,13 @@ function pintarPantallaInformacionPretorneo() {
     contenido.innerHTML = `
         <h2>📅 Campeonato</h2>
 
-        <section class="resumenPartidos">
+                <section class="resumenPartidos">
             <div class="estadoResumen">
                 🎾 Información de la próxima edición
             </div>
         </section>
+
+        ${pintarAvisoProximaEdicion(config)}
 
         <div class="listaOpcionesMas">
             ${pintarDatoPretorneo(
