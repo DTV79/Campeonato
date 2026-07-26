@@ -1,6 +1,8 @@
 const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
 const JSON_RANKING_URL = "https://dtv79.github.io/Campeonato/ranking_historico.json";
 const JSON_FOTOS_URL = "https://dtv79.github.io/Campeonato/fotos.json";
+const CLAVE_ACCESO_MANTENIMIENTO =
+    "campeonato_acceso_mantenimiento";
 
 let datos = null;
 let datosRanking = null;
@@ -99,26 +101,42 @@ async function iniciarApp() {
 
         datos = await respuesta.json();
 
-        inicializarEstadoUI();
+/*
+   Antes de preparar ninguna pantalla, comprobamos
+   si la web está en mantenimiento y si este navegador
+   tiene acceso privado.
+*/
+const accesoMantenimiento =
+    gestionarAccesoMantenimiento();
 
-        const parametros =
-            new URLSearchParams(
-                window.location.search
-            );
+if (
+    modoMantenimientoActivo() &&
+    !accesoMantenimiento
+) {
+    pintarPantallaMantenimiento();
+    return;
+}
 
-        const pantallaSolicitada =
-            parametros.get("pantalla") ||
-            "inicio";
+inicializarEstadoUI();
 
-        const faseSolicitada =
-            parametros.get("fase") ||
-            "";
+const parametros =
+    new URLSearchParams(
+        window.location.search
+    );
 
-        /*
-           Se prepara primero la portada, pero continúa
-           oculta mediante la clase appCargando.
-        */
-        pintarInicio();
+const pantallaSolicitada =
+    parametros.get("pantalla") ||
+    "inicio";
+
+const faseSolicitada =
+    parametros.get("fase") ||
+    "";
+
+/*
+   Se prepara primero la portada, pero continúa
+   oculta mediante la clase appCargando.
+*/
+pintarInicio();
 
         if (
             pantallaSolicitada ===
