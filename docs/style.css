@@ -1800,6 +1800,70 @@ body.modoPretorneo{
     line-height:1.4;
 }
 
+
+/* =========================================================
+   AVISO DE LA PRÓXIMA EDICIÓN
+========================================================= */
+
+.avisoProximaEdicion{
+    margin-bottom:16px;
+    padding:16px;
+    border:1px solid #edc7ad;
+    border-radius:18px;
+    background:#fff7ed;
+    box-shadow:0 4px 14px rgba(67,28,43,.07);
+}
+
+.cabeceraAvisoProximaEdicion{
+    display:grid;
+    grid-template-columns:30px minmax(0,1fr);
+    align-items:start;
+    gap:10px;
+}
+
+.iconoAvisoProximaEdicion{
+    font-size:20px;
+    line-height:1.2;
+}
+
+.cabeceraAvisoProximaEdicion strong{
+    display:block;
+    color:#7c2d12;
+    font-size:14px;
+    font-weight:900;
+    line-height:1.35;
+}
+
+.cabeceraAvisoProximaEdicion p{
+    margin-top:5px;
+    color:#7c4a31;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.5;
+}
+
+.btnAvisoProximaEdicion{
+    margin-top:12px;
+    padding:7px 11px;
+    border:1px solid #edc7ad;
+    border-radius:999px;
+    background:white;
+    color:#9a3412;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.detalleAvisoProximaEdicion{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid #f1d7c5;
+    color:#6e4935;
+    font-size:13px;
+    font-weight:600;
+    line-height:1.6;
+}
+
 /* =========================================================
    15. RESPONSIVE
 ========================================================= */
