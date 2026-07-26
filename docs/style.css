@@ -28,6 +28,31 @@ body{
     font-family:'Inter',sans-serif;
 }
 
+/* =========================================================
+   CARGA INICIAL DE LA APLICACIÓN
+   Evita mostrar durante unos instantes la portada incorrecta.
+========================================================= */
+
+body.appCargando .contenedor,
+body.appCargando .bottomNav{
+    visibility:hidden;
+}
+
+body.appCargando::before{
+    content:"Cargando campeonato…";
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fbf7f2;
+    color:#7c2d2d;
+    font-size:14px;
+    font-weight:800;
+}
+
+
 button,
 a{
     -webkit-tap-highlight-color:transparent;
