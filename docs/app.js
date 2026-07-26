@@ -84,96 +84,148 @@ function gestionarMensajeInscripciones(
 
 async function iniciarApp() {
     try {
-        const respuesta = await fetch(`${JSON_URL}?v=${Date.now()}`, {
-            cache: "no-store"
-        });
+        const respuesta = await fetch(
+            `${JSON_URL}?v=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
 
         if (!respuesta.ok) {
-            throw new Error(`No se pudo cargar el JSON (${respuesta.status})`);
+            throw new Error(
+                `No se pudo cargar el JSON (${respuesta.status})`
+            );
         }
 
         datos = await respuesta.json();
 
         inicializarEstadoUI();
-        pintarInicio();
-       
+
+        const parametros =
+            new URLSearchParams(
+                window.location.search
+            );
 
         const pantallaSolicitada =
-    new URLSearchParams(
-        window.location.search
-    ).get("pantalla");
-/*
-   Guardamos primero la pantalla solicitada
-   y después limpiamos la dirección.
+            parametros.get("pantalla") ||
+            "inicio";
 
-   La pantalla se abrirá esta vez, pero al
-   refrescar se abrirá siempre Inicio.
-*/
-if (pantallaSolicitada) {
-    limpiarPantallaDeURL();
-}
+        const faseSolicitada =
+            parametros.get("fase") ||
+            "";
 
-if (!pantallaSolicitada) {
-    return;
-}
-if (
-    pantallaSolicitada === "fotos"
-) {
-    if (
-        esSi(
-            obtenerConfiguracion()
-                .mostrar_fotos
-        )
-    ) {
-        abrirPantalla("fotos");
-    }
+        /*
+           Se prepara primero la portada, pero continúa
+           oculta mediante la clase appCargando.
+        */
+        pintarInicio();
 
-    return;
-}
-if (
-    pantallaSolicitada === "ranking"
-) {
-    if (
-        esSi(
-            obtenerConfiguracion()
-                .mostrar_ranking_historico
-        )
-    ) {
-        abrirPantalla("ranking");
-    }
+        if (
+            pantallaSolicitada ===
+            "inicio"
+        ) {
+            return;
+        }
 
-    return;
-}
+        if (
+            pantallaSolicitada ===
+            "fotos"
+        ) {
+            if (
+                esSi(
+                    obtenerConfiguracion()
+                        .mostrar_fotos
+                )
+            ) {
+                abrirPantalla(
+                    "fotos"
+                );
+            }
 
-if (esWebPrevia()) {
-    if (
-        pantallaSolicitada === "mas"
-    ) {
-        abrirPantalla("mas");
-    }
+            return;
+        }
 
-    return;
-}
+        if (
+            pantallaSolicitada ===
+            "ranking"
+        ) {
+            if (
+                esSi(
+                    obtenerConfiguracion()
+                        .mostrar_ranking_historico
+                )
+            ) {
+                abrirPantalla(
+                    "ranking"
+                );
+            }
 
-const pantallasPermitidas = [
-    "competicion",
-    "partidos",
-    "equipos",
-    "mas"
-];
+            return;
+        }
 
-if (
-    pantallasPermitidas.includes(
-        pantallaSolicitada
-    )
-) {
-    abrirPantalla(
-        pantallaSolicitada
-    );
-}
+        if (esWebPrevia()) {
+            const pantallasPrevias =
+                [
+                    "pretorneo_info",
+                    "mas"
+                ];
+
+            if (
+                pantallaSolicitada ===
+                "pretorneo_inscripcion"
+            ) {
+                if (
+                    esEstadoInscripciones()
+                ) {
+                    abrirPantalla(
+                        "pretorneo_inscripcion"
+                    );
+                }
+
+                return;
+            }
+
+            if (
+                pantallasPrevias.includes(
+                    pantallaSolicitada
+                )
+            ) {
+                abrirPantalla(
+                    pantallaSolicitada
+                );
+            }
+
+            return;
+        }
+
+        const pantallasPermitidas = [
+            "competicion",
+            "partidos",
+            "equipos",
+            "mas"
+        ];
+
+        if (
+            pantallasPermitidas.includes(
+                pantallaSolicitada
+            )
+        ) {
+            abrirPantalla(
+                pantallaSolicitada,
+                faseSolicitada
+            );
+        }
     } catch (error) {
         console.error(error);
         pintarErrorCarga();
+    } finally {
+        /*
+           Solo se hace visible la aplicación cuando
+           la pantalla correcta ya está preparada.
+        */
+        document.body.classList.remove(
+            "appCargando"
+        );
     }
 }
 
@@ -356,6 +408,29 @@ function abrirPantalla(pantalla, fase = "") {
 );
     estadoUI.pantalla = pantalla;
 
+        let faseURL = fase;
+
+    if (
+        pantalla === "competicion" &&
+        !faseURL
+    ) {
+        faseURL =
+            estadoUI.faseCompeticion;
+    }
+
+    if (
+        pantalla === "partidos" &&
+        !faseURL
+    ) {
+        faseURL =
+            estadoUI.fasePartidos;
+    }
+
+    actualizarPantallaEnURL(
+        pantalla,
+        faseURL
+    );
+
     if (esWebPrevia()) {
         if (pantalla === "pretorneo_info") {
             pintarPantallaInformacionPretorneo();
@@ -404,18 +479,83 @@ function ocultarInicio() {
     document.getElementById("vistaDetalle")?.classList.remove("oculto");
 }
 
-function limpiarPantallaDeURL() {
+function actualizarPantallaEnURL(
+    pantalla,
+    fase = ""
+) {
     const url = new URL(
         window.location.href
     );
 
     if (
-        !url.searchParams.has("pantalla")
+        !pantalla ||
+        pantalla === "inicio"
+    ) {
+        url.searchParams.delete(
+            "pantalla"
+        );
+
+        url.searchParams.delete(
+            "fase"
+        );
+    } else {
+        url.searchParams.set(
+            "pantalla",
+            pantalla
+        );
+
+        if (fase) {
+            url.searchParams.set(
+                "fase",
+                fase
+            );
+        } else {
+            url.searchParams.delete(
+                "fase"
+            );
+        }
+    }
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.pathname +
+        url.search +
+        url.hash
+    );
+}
+
+
+
+function limpiarPantallaDeURL() {
+    const url = new URL(
+        window.location.href
+    );
+
+    const tienePantalla =
+        url.searchParams.has(
+            "pantalla"
+        );
+
+    const tieneFase =
+        url.searchParams.has(
+            "fase"
+        );
+
+    if (
+        !tienePantalla &&
+        !tieneFase
     ) {
         return;
     }
 
-    url.searchParams.delete("pantalla");
+    url.searchParams.delete(
+        "pantalla"
+    );
+
+    url.searchParams.delete(
+        "fase"
+    );
 
     window.history.replaceState(
         {},
@@ -466,14 +606,33 @@ function activarNav(pantalla) {
 }
 
 function cambiarFaseSelector(boton) {
-    const contexto = boton.dataset.selectorFase;
-    const fase = boton.dataset.fase;
+    const contexto =
+        boton.dataset.selectorFase;
+
+    const fase =
+        boton.dataset.fase;
 
     if (contexto === "competicion") {
-        estadoUI.faseCompeticion = fase;
+        estadoUI.faseCompeticion =
+            fase;
+
+        actualizarPantallaEnURL(
+            "competicion",
+            fase
+        );
+
         pintarPantallaCompeticion();
-    } else if (contexto === "partidos") {
-        estadoUI.fasePartidos = fase;
+    } else if (
+        contexto === "partidos"
+    ) {
+        estadoUI.fasePartidos =
+            fase;
+
+        actualizarPantallaEnURL(
+            "partidos",
+            fase
+        );
+
         pintarPantallaPartidos();
     }
 }
@@ -1740,12 +1899,14 @@ function configurarTarjetasPretorneo() {
     [
     "tarjetaEquipos",
     "tarjetaEspecial",
-    "tarjetaRanking"
-].forEach(id => {
-        document.getElementById(id)?.classList.add("oculto");
-    });
-    
-prepararFotosPortada();
+    "tarjetaRanking",
+    "tarjetaFotos"
+    ].forEach(id => {
+    document
+        .getElementById(id)
+        ?.classList.add("oculto");
+});
+
 ajustarUltimaTarjetaDashboard();
 }
 
