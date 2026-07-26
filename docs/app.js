@@ -247,6 +247,202 @@ pintarInicio();
     }
 }
 
+/* =========================================================
+   MODO MANTENIMIENTO
+========================================================= */
+
+function gestionarAccesoMantenimiento() {
+    const url =
+        new URL(window.location.href);
+
+    const activarAcceso =
+        String(
+            url.searchParams.get("acceso") ||
+            ""
+        )
+            .trim()
+            .toLowerCase() ===
+        "mantenimiento";
+
+    const cerrarAcceso =
+        [
+            "si",
+            "sí",
+            "true",
+            "1"
+        ].includes(
+            String(
+                url.searchParams.get(
+                    "cerrar_acceso"
+                ) || ""
+            )
+                .trim()
+                .toLowerCase()
+        );
+
+    try {
+        if (cerrarAcceso) {
+            localStorage.removeItem(
+                CLAVE_ACCESO_MANTENIMIENTO
+            );
+        } else if (activarAcceso) {
+            localStorage.setItem(
+                CLAVE_ACCESO_MANTENIMIENTO,
+                "si"
+            );
+        }
+    } catch (error) {
+        console.warn(
+            "No se pudo guardar el acceso de mantenimiento.",
+            error
+        );
+    }
+
+    if (
+        activarAcceso ||
+        cerrarAcceso
+    ) {
+        url.searchParams.delete(
+            "acceso"
+        );
+
+        url.searchParams.delete(
+            "cerrar_acceso"
+        );
+
+        window.history.replaceState(
+            {},
+            document.title,
+            url.pathname +
+            url.search +
+            url.hash
+        );
+    }
+
+    try {
+        return (
+            localStorage.getItem(
+                CLAVE_ACCESO_MANTENIMIENTO
+            ) === "si"
+        );
+    } catch (error) {
+        return false;
+    }
+}
+
+
+function modoMantenimientoActivo() {
+    const config =
+        obtenerConfiguracion();
+
+    if (
+        config.modo_mantenimiento ===
+        true
+    ) {
+        return true;
+    }
+
+    const valor =
+        String(
+            config.modo_mantenimiento ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    return [
+        "si",
+        "sí",
+        "true",
+        "1"
+    ].includes(valor);
+}
+
+
+function pintarPantallaMantenimiento() {
+    const config =
+        obtenerConfiguracion();
+
+    const titulo =
+        String(
+            config.titulo_mantenimiento ||
+            "Web en mantenimiento"
+        ).trim();
+
+    const mensaje =
+        String(
+            config.mensaje_mantenimiento ||
+            "Estamos realizando algunas mejoras. Volveremos pronto."
+        ).trim();
+
+    const campeonato =
+        String(
+            config.nombre_campeonato ||
+            "Sprint Pádel Tui"
+        ).trim();
+
+    document.title =
+        titulo;
+
+    document.body.classList.remove(
+        "appCargando"
+    );
+
+    document.body.classList.add(
+        "modoMantenimiento"
+    );
+
+    document.body.innerHTML = `
+        <main class="pantallaMantenimiento">
+            <section
+                class="tarjetaMantenimiento"
+                aria-labelledby="tituloMantenimiento"
+            >
+                <div class="iconoMantenimiento">
+                    🛠️
+                </div>
+
+                <p
+                    class="marcaMantenimiento"
+                    id="marcaMantenimiento"
+                ></p>
+
+                <h1 id="tituloMantenimiento"></h1>
+
+                <p
+                    class="mensajeMantenimiento"
+                    id="mensajeMantenimiento"
+                ></p>
+
+                <small class="pieMantenimiento">
+                    Gracias por tu paciencia.
+                </small>
+            </section>
+        </main>
+    `;
+
+    document
+        .getElementById(
+            "marcaMantenimiento"
+        )
+        .textContent =
+        campeonato;
+
+    document
+        .getElementById(
+            "tituloMantenimiento"
+        )
+        .textContent =
+        titulo;
+
+    document
+        .getElementById(
+            "mensajeMantenimiento"
+        )
+        .textContent =
+        mensaje;
+}
+
 function inicializarEstadoUI() {
     estadoUI.faseCompeticion = obtenerFaseActualCompeticion();
     estadoUI.fasePartidos = obtenerFaseActualPartidos();
