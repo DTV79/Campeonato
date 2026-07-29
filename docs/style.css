@@ -3022,7 +3022,6 @@ body.modoPretorneo{
 .gridDashboard > .tarjetaDashboardImpar{
     grid-column: 1 / -1;
 }
-}
 
 
 
@@ -3307,5 +3306,1026 @@ body.modoMantenimiento{
     .datosAlbumFotos b{
         margin-top:14px;
         padding-top:0;
+    }
+}
+
+
+/* =========================================================
+   18. ESTADÍSTICAS GLOBALES Y POR CAMPEONATO
+========================================================= */
+
+.paginaEstadisticas{
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37,99,235,.12),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at bottom left,
+            rgba(124,58,237,.08),
+            transparent 34%
+        ),
+        #f4f6f9;
+}
+
+.paginaEstadisticas .cabeceraEstadisticas{
+    background:linear-gradient(135deg,#172554,#1d4ed8 58%,#7c3aed);
+}
+
+.controlAmbitoEstadisticas{
+    margin-bottom:16px;
+    padding:18px;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 6px 20px rgba(15,23,42,.08);
+}
+
+.cabeceraControlEstadisticas{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:14px;
+}
+
+.cabeceraControlEstadisticas div{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    gap:3px;
+}
+
+.cabeceraControlEstadisticas small,
+.cabeceraResumenEstadisticas small,
+.cabeceraPanelEstadisticas small,
+.tituloBloqueEstadisticas small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.1px;
+}
+
+.cabeceraControlEstadisticas strong{
+    color:#0f172a;
+    font-size:17px;
+    font-weight:900;
+}
+
+.cabeceraControlEstadisticas > span{
+    font-size:28px;
+}
+
+.botonesAmbitoEstadisticas{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+}
+
+.btnAmbitoEstadisticas{
+    padding:11px 10px;
+    border:1px solid #dbe3ef;
+    border-radius:14px;
+    background:#f8fafc;
+    color:#475569;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.btnAmbitoEstadisticas.activo{
+    border-color:#2563eb;
+    background:#2563eb;
+    color:white;
+    box-shadow:0 6px 14px rgba(37,99,235,.22);
+}
+
+.btnAmbitoEstadisticas:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+
+.selectorCampeonatoEstadisticas{
+    display:flex;
+    margin-top:13px;
+    flex-direction:column;
+    gap:6px;
+}
+
+.selectorCampeonatoEstadisticas span{
+    color:#64748b;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.selectorCampeonatoEstadisticas select{
+    width:100%;
+    padding:12px 13px;
+    border:1px solid #dbe3ef;
+    border-radius:14px;
+    background:white;
+    color:#0f172a;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:800;
+}
+
+.selectorPestanasEstadisticas{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+    padding:3px 1px 8px;
+    overflow-x:auto;
+    scrollbar-width:none;
+}
+
+.selectorPestanasEstadisticas::-webkit-scrollbar{
+    display:none;
+}
+
+.btnPestanaEstadisticas{
+    display:flex;
+    flex:0 0 auto;
+    padding:9px 12px;
+    align-items:center;
+    gap:6px;
+    border:1px solid #dbe3ef;
+    border-radius:999px;
+    background:white;
+    color:#475569;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+    box-shadow:0 3px 9px rgba(15,23,42,.05);
+}
+
+.btnPestanaEstadisticas.activo{
+    border-color:#1d4ed8;
+    background:#1d4ed8;
+    color:white;
+}
+
+.cabeceraResumenEstadisticas,
+.cabeceraPanelEstadisticas{
+    display:flex;
+    margin-bottom:16px;
+    padding:20px;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+    border-radius:24px;
+    background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+    box-shadow:0 6px 18px rgba(15,23,42,.07);
+}
+
+.cabeceraResumenEstadisticas h1,
+.cabeceraPanelEstadisticas h1{
+    margin:4px 0 5px;
+    color:#0f172a;
+    font-size:24px;
+    font-weight:900;
+    line-height:1.18;
+}
+
+.cabeceraResumenEstadisticas p,
+.cabeceraPanelEstadisticas p{
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.5;
+}
+
+.cabeceraResumenEstadisticas > span,
+.cabeceraPanelEstadisticas > span{
+    flex:0 0 auto;
+    font-size:38px;
+}
+
+.palmaresEstadisticas{
+    display:grid;
+    margin-bottom:16px;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.palmaresEstadisticas article{
+    display:flex;
+    min-width:0;
+    padding:15px;
+    flex-direction:column;
+    gap:4px;
+    border-radius:18px;
+    background:white;
+    box-shadow:0 5px 16px rgba(15,23,42,.07);
+}
+
+.palmaresEstadisticas article > span{
+    font-size:25px;
+}
+
+.palmaresEstadisticas small{
+    color:#92400e;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.8px;
+}
+
+.palmaresEstadisticas strong{
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+
+.gridMetricasEstadisticas{
+    display:grid;
+    margin-bottom:18px;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.metricaEstadisticas{
+    display:flex;
+    min-width:0;
+    min-height:105px;
+    padding:13px 8px;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    border-radius:17px;
+    background:white;
+    text-align:center;
+    box-shadow:0 5px 15px rgba(15,23,42,.07);
+}
+
+.metricaEstadisticas > span{
+    font-size:22px;
+}
+
+.metricaEstadisticas small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+}
+
+.metricaEstadisticas strong{
+    color:#1e3a8a;
+    font-size:18px;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.bloqueEstadisticas{
+    margin-top:18px;
+    padding:18px;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 6px 18px rgba(15,23,42,.07);
+}
+
+.tituloBloqueEstadisticas{
+    display:flex;
+    margin-bottom:15px;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+}
+
+.tituloBloqueEstadisticas h2{
+    margin-top:3px;
+    color:#0f172a;
+    font-size:18px;
+    font-weight:900;
+}
+
+.tituloBloqueEstadisticas > span{
+    font-size:26px;
+}
+
+.listaFasesEstadisticas{
+    display:flex;
+    flex-direction:column;
+    gap:11px;
+}
+
+.faseEstadisticas{
+    padding:13px;
+    border-radius:16px;
+    background:#f8fafc;
+}
+
+.cabeceraFaseEstadisticas{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraFaseEstadisticas strong{
+    color:#0f172a;
+    font-size:14px;
+    font-weight:900;
+}
+
+.cabeceraFaseEstadisticas b{
+    color:#1d4ed8;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.barraEstadisticas{
+    width:100%;
+    height:8px;
+    margin:9px 0;
+    overflow:hidden;
+    border-radius:999px;
+    background:#dbeafe;
+}
+
+.barraEstadisticas span{
+    display:block;
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg,#2563eb,#7c3aed);
+}
+
+.datosFaseEstadisticas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+}
+
+.gridComparativaEstadisticas{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.gridComparativaEstadisticas article{
+    display:flex;
+    padding:15px;
+    flex-direction:column;
+    gap:4px;
+    border-radius:16px;
+    background:#f8fafc;
+}
+
+.gridComparativaEstadisticas article > span{
+    font-size:24px;
+}
+
+.gridComparativaEstadisticas small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.gridComparativaEstadisticas strong{
+    color:#0f172a;
+    font-size:23px;
+    font-weight:900;
+}
+
+.gridComparativaEstadisticas b{
+    color:#1d4ed8;
+    font-size:11px;
+}
+
+.avisoDatosEstadisticas,
+.vacioEstadisticas{
+    display:flex;
+    margin-top:18px;
+    padding:17px;
+    align-items:flex-start;
+    gap:13px;
+    border-radius:18px;
+}
+
+.avisoDatosEstadisticas{
+    border:1px solid #fed7aa;
+    background:#fff7ed;
+}
+
+.avisoDatosEstadisticas > span,
+.vacioEstadisticas > span{
+    flex:0 0 auto;
+    font-size:25px;
+}
+
+.avisoDatosEstadisticas strong{
+    color:#9a3412;
+    font-size:14px;
+    font-weight:900;
+}
+
+.avisoDatosEstadisticas p,
+.vacioEstadisticas p{
+    margin-top:5px;
+    color:#64748b;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.55;
+}
+
+.vacioEstadisticas{
+    background:white;
+    box-shadow:0 5px 16px rgba(15,23,42,.07);
+}
+
+.vacioEstadisticas h2{
+    color:#0f172a;
+    font-size:17px;
+    font-weight:900;
+}
+
+.listaEquiposEstadisticas,
+.listaPistasEstadisticas,
+.listaParejasEstadisticas{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.equipoEstadisticas,
+.pistaEstadisticas,
+.listaParejasEstadisticas > article{
+    padding:16px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 6px 18px rgba(15,23,42,.08);
+}
+
+.cabeceraEquipoEstadisticas{
+    display:grid;
+    grid-template-columns:42px minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+}
+
+.cabeceraEquipoEstadisticas > span{
+    display:flex;
+    width:42px;
+    height:42px;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:15px;
+    font-weight:900;
+}
+
+.cabeceraEquipoEstadisticas div{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    gap:3px;
+}
+
+.cabeceraEquipoEstadisticas strong{
+    color:#0f172a;
+    font-size:15px;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.cabeceraEquipoEstadisticas small{
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+}
+
+.cabeceraEquipoEstadisticas > b{
+    color:#1d4ed8;
+    font-size:16px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.etiquetasEquipoEstadisticas{
+    display:flex;
+    margin-top:11px;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.etiquetasEquipoEstadisticas span{
+    padding:5px 8px;
+    border-radius:999px;
+    background:#fef3c7;
+    color:#92400e;
+    font-size:10px;
+    font-weight:900;
+}
+
+.gridDatosEquipoEstadisticas{
+    display:grid;
+    margin-top:13px;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+}
+
+.gridDatosEquipoEstadisticas > div{
+    display:flex;
+    min-width:0;
+    padding:9px 5px;
+    flex-direction:column;
+    gap:2px;
+    border-radius:12px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.gridDatosEquipoEstadisticas small,
+.gridDatosPistaEstadisticas small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.gridDatosEquipoEstadisticas strong,
+.gridDatosPistaEstadisticas strong{
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.gridDatosEquipoEstadisticas span{
+    color:#64748b;
+    font-size:9px;
+    font-weight:700;
+}
+
+.gridRecordsPartidosEstadisticas,
+.gridRecordsGeneralesEstadisticas,
+.gridRecordsSimplesEstadisticas{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:11px;
+}
+
+.recordPartidoEstadisticas,
+.recordGeneralEstadisticas,
+.gridRecordsSimplesEstadisticas article{
+    min-width:0;
+    padding:16px;
+    border-radius:20px;
+    background:white;
+    box-shadow:0 6px 18px rgba(15,23,42,.08);
+}
+
+.cabeceraRecordPartidoEstadisticas{
+    display:flex;
+    margin-bottom:12px;
+    align-items:center;
+    gap:8px;
+}
+
+.cabeceraRecordPartidoEstadisticas > span{
+    font-size:24px;
+}
+
+.cabeceraRecordPartidoEstadisticas small{
+    color:#1d4ed8;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+}
+
+.detalleRecordPartidoEstadisticas + .detalleRecordPartidoEstadisticas{
+    margin-top:11px;
+    padding-top:11px;
+    border-top:1px solid #e5e7eb;
+}
+
+.detalleRecordPartidoEstadisticas strong,
+.listaPartidosEstadisticas article > strong{
+    display:block;
+    color:#0f172a;
+    font-size:12px;
+    font-weight:900;
+    line-height:1.45;
+}
+
+.detalleRecordPartidoEstadisticas em,
+.listaPartidosEstadisticas em{
+    margin:0 4px;
+    color:#94a3b8;
+    font-size:10px;
+    font-style:normal;
+}
+
+.detalleRecordPartidoEstadisticas b,
+.listaPartidosEstadisticas article > b{
+    display:block;
+    margin-top:5px;
+    color:#7c3aed;
+    font-size:14px;
+    font-weight:900;
+}
+
+.detalleRecordPartidoEstadisticas p,
+.listaPartidosEstadisticas article > p{
+    margin-top:5px;
+    color:#64748b;
+    font-size:10px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+.gridJornadasEstadisticas{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.gridJornadasEstadisticas article{
+    display:flex;
+    min-width:0;
+    padding:11px 8px;
+    flex-direction:column;
+    gap:3px;
+    border-radius:13px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.gridJornadasEstadisticas small{
+    color:#1d4ed8;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.gridJornadasEstadisticas strong{
+    color:#0f172a;
+    font-size:11px;
+    font-weight:900;
+}
+
+.gridJornadasEstadisticas span,
+.gridJornadasEstadisticas b{
+    color:#64748b;
+    font-size:9px;
+    font-weight:800;
+}
+
+.detalleTodosPartidosEstadisticas{
+    margin-top:18px;
+    border-radius:18px;
+    background:white;
+    box-shadow:0 6px 18px rgba(15,23,42,.07);
+}
+
+.detalleTodosPartidosEstadisticas summary{
+    padding:16px;
+    color:#1d4ed8;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.listaPartidosEstadisticas{
+    display:flex;
+    padding:0 14px 14px;
+    flex-direction:column;
+    gap:9px;
+}
+
+.listaPartidosEstadisticas article{
+    padding:12px;
+    border-radius:14px;
+    background:#f8fafc;
+}
+
+.cabeceraPartidoEstadisticas{
+    display:flex;
+    margin-bottom:7px;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.cabeceraPartidoEstadisticas small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:800;
+}
+
+.cabeceraPartidoEstadisticas span{
+    color:#1d4ed8;
+    font-size:10px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.cabeceraPistaEstadisticas{
+    display:grid;
+    grid-template-columns:42px minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+}
+
+.cabeceraPistaEstadisticas > span{
+    display:flex;
+    width:42px;
+    height:42px;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    background:#ecfeff;
+    font-size:21px;
+}
+
+.cabeceraPistaEstadisticas div{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.cabeceraPistaEstadisticas small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+}
+
+.cabeceraPistaEstadisticas strong{
+    color:#0f172a;
+    font-size:16px;
+    font-weight:900;
+}
+
+.cabeceraPistaEstadisticas b{
+    color:#0369a1;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.gridDatosPistaEstadisticas{
+    display:grid;
+    margin-top:13px;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+}
+
+.gridDatosPistaEstadisticas > div{
+    display:flex;
+    padding:9px 5px;
+    flex-direction:column;
+    gap:3px;
+    border-radius:12px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.gridRecordsSimplesEstadisticas{
+    margin-bottom:15px;
+}
+
+.gridRecordsSimplesEstadisticas article{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    text-align:center;
+}
+
+.gridRecordsSimplesEstadisticas article > span{
+    font-size:27px;
+}
+
+.gridRecordsSimplesEstadisticas small,
+.recordGeneralEstadisticas > small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+}
+
+.gridRecordsSimplesEstadisticas strong{
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.gridRecordsSimplesEstadisticas b{
+    color:#1d4ed8;
+    font-size:12px;
+}
+
+.cabeceraParejaEstadisticas{
+    display:grid;
+    grid-template-columns:40px minmax(0,1fr) auto;
+    align-items:center;
+    gap:10px;
+}
+
+.cabeceraParejaEstadisticas > span{
+    font-size:25px;
+}
+
+.cabeceraParejaEstadisticas div{
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    gap:3px;
+}
+
+.cabeceraParejaEstadisticas strong{
+    color:#0f172a;
+    font-size:14px;
+    font-weight:900;
+    overflow-wrap:anywhere;
+}
+
+.cabeceraParejaEstadisticas small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:800;
+}
+
+.cabeceraParejaEstadisticas > b{
+    color:#1d4ed8;
+    font-size:14px;
+    font-weight:900;
+}
+
+.datosParejaEstadisticas{
+    display:flex;
+    margin-top:11px;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.datosParejaEstadisticas span{
+    padding:6px 8px;
+    border-radius:999px;
+    background:#f8fafc;
+    color:#475569;
+    font-size:10px;
+    font-weight:800;
+}
+
+.columnasRivalidadesEstadisticas{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.columnasRivalidadesEstadisticas > article{
+    padding:13px;
+    border-radius:15px;
+    background:#f8fafc;
+}
+
+.columnasRivalidadesEstadisticas h3{
+    margin-bottom:9px;
+    color:#1d4ed8;
+    font-size:12px;
+    font-weight:900;
+}
+
+.columnasRivalidadesEstadisticas article > div{
+    display:flex;
+    padding:8px 0;
+    flex-direction:column;
+    gap:2px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.columnasRivalidadesEstadisticas article > div:last-child{
+    border-bottom:none;
+}
+
+.columnasRivalidadesEstadisticas strong{
+    color:#0f172a;
+    font-size:10px;
+    font-weight:900;
+    line-height:1.35;
+}
+
+.columnasRivalidadesEstadisticas span,
+.columnasRivalidadesEstadisticas p{
+    color:#64748b;
+    font-size:9px;
+    font-weight:700;
+}
+
+.iconoRecordGeneralEstadisticas{
+    margin-bottom:7px;
+    font-size:28px;
+}
+
+.ganadoresRecordEstadisticas{
+    display:flex;
+    margin-top:10px;
+    flex-direction:column;
+    gap:8px;
+}
+
+.ganadoresRecordEstadisticas > div{
+    display:flex;
+    padding-top:8px;
+    flex-direction:column;
+    gap:2px;
+    border-top:1px solid #e5e7eb;
+}
+
+.ganadoresRecordEstadisticas strong{
+    color:#0f172a;
+    font-size:12px;
+    font-weight:900;
+    line-height:1.35;
+    overflow-wrap:anywhere;
+}
+
+.ganadoresRecordEstadisticas span{
+    color:#1d4ed8;
+    font-size:10px;
+    font-weight:900;
+}
+
+.recordGeneralEstadisticas > p{
+    margin-top:10px;
+    color:#64748b;
+    font-size:9px;
+    font-weight:700;
+}
+
+@media(max-width:600px){
+
+    .gridMetricasEstadisticas{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .gridRecordsPartidosEstadisticas,
+    .gridRecordsGeneralesEstadisticas{
+        grid-template-columns:1fr;
+    }
+
+    .gridDatosEquipoEstadisticas{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .gridJornadasEstadisticas,
+    .gridDatosPistaEstadisticas{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .columnasRivalidadesEstadisticas{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:420px){
+
+    .cabeceraResumenEstadisticas,
+    .cabeceraPanelEstadisticas{
+        padding:17px;
+    }
+
+    .cabeceraResumenEstadisticas h1,
+    .cabeceraPanelEstadisticas h1{
+        font-size:21px;
+    }
+
+    .cabeceraResumenEstadisticas > span,
+    .cabeceraPanelEstadisticas > span{
+        font-size:31px;
+    }
+
+    .palmaresEstadisticas{
+        grid-template-columns:1fr;
+    }
+
+    .gridMetricasEstadisticas{
+        gap:7px;
+    }
+
+    .metricaEstadisticas{
+        min-height:96px;
+        padding:11px 5px;
+    }
+
+    .metricaEstadisticas strong{
+        font-size:16px;
+    }
+
+    .gridComparativaEstadisticas,
+    .gridRecordsSimplesEstadisticas{
+        grid-template-columns:1fr;
     }
 }
