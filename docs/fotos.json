@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "2026-07-29T19:51:12",
+  "ultima_actualizacion": "2026-07-29T19:51:48",
   "fotos": [
     {
       "id_foto": "F0003",
@@ -149,7 +149,7 @@
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
       "orden": 1,
-      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
+      "destacada": true,      "mostrar": true,      "usar_en_palmares": false
     }
   ]
 }
