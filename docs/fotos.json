@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "2026-07-29T19:50:28",
+  "ultima_actualizacion": "2026-07-29T19:51:12",
   "fotos": [
     {
       "id_foto": "F0003",
@@ -13,7 +13,7 @@
       "descripcion": "Carlos & Jaime",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 1,
+      "orden": 2,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -43,7 +43,7 @@
       "descripcion": "Javi & Toledo",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 2,
+      "orden": 3,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -58,7 +58,7 @@
       "descripcion": "Kaki & Rosa",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 3,
+      "orden": 4,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -73,7 +73,7 @@
       "descripcion": "Kike & José",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 4,
+      "orden": 5,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -88,7 +88,7 @@
       "descripcion": "Negro & Diego",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 5,
+      "orden": 6,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -103,7 +103,7 @@
       "descripcion": "Nico & Manolo",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 6,
+      "orden": 7,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -118,7 +118,7 @@
       "descripcion": "Nunes & Pelón",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 7,
+      "orden": 8,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -133,7 +133,7 @@
       "descripcion": "Pedro & Pepe",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 8,
+      "orden": 9,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     },
     {
@@ -148,7 +148,7 @@
       "descripcion": "I Campeonato Sprint Pádel 2025",
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
-      "orden": 9,
+      "orden": 1,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     }
   ]
