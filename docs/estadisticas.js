@@ -60,6 +60,7 @@ async function iniciarPaginaEstadisticas() {
         }
 
         inicializarEstadoVistaEstadisticas();
+        configurarNavegacionEstadisticas();
         pintarCabeceraEstadisticas();
         pintarPaginaEstadisticas();
     } catch (error) {
@@ -164,14 +165,232 @@ function obtenerCampeonatoSeleccionado() {
         ) || null;
 }
 
-function pintarCabeceraEstadisticas() {
+
+/* =========================================================
+   NAVEGACIÓN INFERIOR
+   Conserva exactamente los accesos de la página principal.
+========================================================= */
+
+function configurarNavegacionEstadisticas() {
     const config =
         estadoCampeonato?.configuracion || {};
 
-    const nombre = String(
-        config.nombre_campeonato ||
-        "Sprint Pádel Tui"
-    ).trim();
+    const previa =
+        esWebPreviaEstadisticas();
+
+    document.body.classList.toggle(
+        "modoPretorneo",
+        previa
+    );
+
+    const botones = [1, 2, 3, 4, 5]
+        .map(numero =>
+            document.getElementById(
+                `navEstadisticas${numero}`
+            )
+        );
+
+    botones.forEach(boton => {
+        boton?.classList.remove("oculto");
+        boton?.classList.remove("navActivo");
+        boton?.removeAttribute("aria-current");
+    });
+
+    if (previa) {
+        configurarEnlaceNavEstadisticas(
+            botones[0],
+            "🏠",
+            "Inicio",
+            "index.html"
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[1],
+            "📖",
+            "Historia",
+            "historia.html"
+        );
+
+        botones[1]?.classList.toggle(
+            "oculto",
+            !esSiEstadisticas(
+                config.mostrar_historia
+            )
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[2],
+            "📜",
+            "Normas",
+            "normas.html"
+        );
+
+        botones[2]?.classList.toggle(
+            "oculto",
+            !esSiEstadisticas(
+                config.mostrar_normativa
+            )
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[3],
+            "🏆",
+            "Campeones",
+            "campeones.html"
+        );
+
+        botones[3]?.classList.toggle(
+            "oculto",
+            !esSiEstadisticas(
+                config.mostrar_campeones
+            )
+        );
+    } else {
+        configurarEnlaceNavEstadisticas(
+            botones[0],
+            "🏠",
+            "Inicio",
+            "index.html"
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[1],
+            "📊",
+            esModoGruposEstadisticas()
+                ? "Grupos"
+                : "Clasificación",
+            "index.html?pantalla=competicion"
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[2],
+            "🎾",
+            "Partidos",
+            "index.html?pantalla=partidos"
+        );
+
+        configurarEnlaceNavEstadisticas(
+            botones[3],
+            "👥",
+            "Equipos",
+            "index.html?pantalla=equipos"
+        );
+    }
+
+    configurarEnlaceNavEstadisticas(
+        botones[4],
+        "☰",
+        "Más",
+        "index.html?pantalla=mas"
+    );
+
+    botones[4]?.classList.add(
+        "navActivo"
+    );
+
+    botones[4]?.setAttribute(
+        "aria-current",
+        "page"
+    );
+}
+
+function configurarEnlaceNavEstadisticas(
+    enlace,
+    icono,
+    texto,
+    href
+) {
+    if (!enlace) return;
+
+    const iconoElemento =
+        enlace.querySelector("span");
+
+    const textoElemento =
+        enlace.querySelector("small");
+
+    if (iconoElemento) {
+        iconoElemento.textContent = icono;
+    }
+
+    if (textoElemento) {
+        textoElemento.textContent = texto;
+    }
+
+    enlace.href = href;
+}
+
+function esWebPreviaEstadisticas() {
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    const estado = normalizarTextoEstadisticas(
+        config.estado_torneo ||
+        config.estado ||
+        estadoCampeonato?.estado_torneo ||
+        "En juego"
+    )
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ");
+
+    return (
+        estado === "PRETORNEO" ||
+        estado.includes("INSCRIP")
+    );
+}
+
+function esModoGruposEstadisticas() {
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    const tipo = normalizarTextoEstadisticas(
+        config.tipo_campeonato ||
+        config.estructura_primera_fase_normalizada ||
+        config.estructura_primera_fase ||
+        ""
+    );
+
+    if (tipo) {
+        return (
+            tipo === "GRUPOS" ||
+            tipo.includes("GRUPO")
+        );
+    }
+
+    return (
+        (estadoCampeonato?.grupos?.clasificaciones || [])
+            .length > 0 ||
+        (estadoCampeonato?.grupos?.partidos || [])
+            .length > 0
+    );
+}
+
+function esSiEstadisticas(valor) {
+    if (valor === true) return true;
+
+    return [
+        "SI",
+        "SÍ",
+        "TRUE",
+        "1"
+    ].includes(
+        String(valor || "")
+            .trim()
+            .toUpperCase()
+    );
+}
+
+function normalizarTextoEstadisticas(valor) {
+    return String(valor || "")
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function pintarCabeceraEstadisticas() {
+    const marca = document.getElementById(
+        "marcaEstadisticas"
+    );
 
     const titulo = document.getElementById(
         "tituloEstadisticas"
@@ -185,12 +404,17 @@ function pintarCabeceraEstadisticas() {
         "fechaGeneracionEstadisticas"
     );
 
+    if (marca) {
+        marca.textContent = "HISTÓRICO Y RÉCORDS";
+    }
+
     if (titulo) {
         titulo.textContent = "Estadísticas";
     }
 
     if (subtitulo) {
-        subtitulo.textContent = nombre;
+        subtitulo.textContent =
+            "Resultados, rendimiento y curiosidades";
     }
 
     if (generado) {
@@ -201,7 +425,7 @@ function pintarCabeceraEstadisticas() {
     }
 
     document.title =
-        `Estadísticas · ${nombre}`;
+        "Estadísticas · Sprint Pádel Tui";
 }
 
 function pintarPaginaEstadisticas() {
