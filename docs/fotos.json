@@ -1,5 +1,5 @@
 {
-  "ultima_actualizacion": "2026-07-26T18:10:30",
+  "ultima_actualizacion": "2026-07-29T19:45:47",
   "fotos": [
     {
       "id_foto": "F0003",
@@ -134,6 +134,21 @@
       "autor": "Rosa Del Valle",
       "fecha": "2025-09-27",
       "orden": 8,
+      "destacada": false,      "mostrar": true,      "usar_en_palmares": false
+    },
+    {
+      "id_foto": "F0010",
+      "id_campeonato": "I Campeonato Sprint Pádel - Tui 2025",
+      "codigo_campeonato": "CAMP-2025-01",
+      "archivo": "Foto Grupo.JPG",
+      "ruta": "Imagenes/CAMP-2025-01/Foto Grupo.JPG",
+      "categoria": "Foto de grupo",
+      "jornada_fase": "Foto Grupal",
+      "titulo": "Foto Grupal:",
+      "descripcion": "I Campeonato Sprint Pádel 2025",
+      "autor": "Rosa Del Valle",
+      "fecha": "2025-09-27",
+      "orden": 9,
       "destacada": false,      "mostrar": true,      "usar_en_palmares": false
     }
   ]
