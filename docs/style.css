@@ -3151,167 +3151,9 @@ body.modoMantenimiento{
    }
 }
 
-/* =========================================================
-   17. ÁLBUMES DE FOTOGRAFÍAS POR CAMPEONATO
-========================================================= */
-
-.listaAlbumesFotos{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:18px;
-}
-
-.albumFotosCard{
-    display:flex;
-    min-width:0;
-    padding:0;
-    overflow:hidden;
-    flex-direction:column;
-    border:0;
-    border-radius:24px;
-    background:#ffffff;
-    color:#1d2939;
-    font-family:inherit;
-    text-align:left;
-    box-shadow:0 8px 24px rgba(15,23,42,.12);
-    cursor:pointer;
-    transition:transform .22s ease,box-shadow .22s ease;
-}
-
-.albumFotosCard:hover{
-    transform:translateY(-3px);
-    box-shadow:0 13px 30px rgba(15,23,42,.17);
-}
-
-.albumFotosCard:active{
-    transform:scale(.985);
-}
-
-.imagenAlbumFotos{
-    display:block;
-    width:100%;
-    overflow:hidden;
-    background:#e2e8f0;
-    aspect-ratio:16 / 10;
-}
-
-.imagenAlbumFotos img{
-    display:block;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center 30%;
-    transition:transform .35s ease;
-}
-
-.albumFotosCard:hover .imagenAlbumFotos img{
-    transform:scale(1.035);
-}
-
-.datosAlbumFotos{
-    display:flex;
-    min-height:150px;
-    padding:17px;
-    flex:1;
-    flex-direction:column;
-}
-
-.datosAlbumFotos small{
-    color:#9d174d;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:1px;
-    text-transform:uppercase;
-}
-
-.datosAlbumFotos strong{
-    display:block;
-    margin-top:7px;
-    color:#172033;
-    font-size:16px;
-    font-weight:900;
-    line-height:1.35;
-    overflow-wrap:anywhere;
-}
-
-.datosAlbumFotos span{
-    display:block;
-    margin-top:9px;
-    color:#64748b;
-    font-size:12px;
-    font-weight:800;
-}
-
-.datosAlbumFotos b{
-    display:block;
-    margin-top:auto;
-    padding-top:15px;
-    color:#be185d;
-    font-size:13px;
-    font-weight:900;
-}
-
-.btnVolverAlbumesFotos{
-    margin-bottom:16px;
-    padding:10px 13px;
-    border:0;
-    border-radius:999px;
-    background:#fdf2f8;
-    color:#9d174d;
-    font-family:inherit;
-    font-size:13px;
-    font-weight:900;
-    cursor:pointer;
-}
-
-.cabeceraAlbumFotos{
-    align-items:flex-start;
-}
-
-.cabeceraAlbumFotos small{
-    display:block;
-    margin-bottom:5px;
-    color:#9d174d;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:1px;
-    text-transform:uppercase;
-}
-
-.cabeceraAlbumFotos h2{
-    font-size:20px;
-    line-height:1.25;
-}
-
-@media(max-width:600px){
-
-    .listaAlbumesFotos{
-        grid-template-columns:1fr;
-        gap:16px;
-    }
-
-    .albumFotosCard{
-        border-radius:20px;
-    }
-
-    .imagenAlbumFotos{
-        aspect-ratio:16 / 9;
-    }
-
-    .datosAlbumFotos{
-        min-height:0;
-        padding:16px;
-    }
-
-    .datosAlbumFotos b{
-        margin-top:14px;
-        padding-top:0;
-    }
-}
-
 
 /* =========================================================
-   18. ESTADÍSTICAS GLOBALES Y POR CAMPEONATO
+   17. ESTADÍSTICAS GLOBALES Y POR CAMPEONATO
 ========================================================= */
 
 .paginaEstadisticas{
@@ -4328,4 +4170,91 @@ body.modoMantenimiento{
     .gridRecordsSimplesEstadisticas{
         grid-template-columns:1fr;
     }
+}
+
+/* =========================================================
+   ESTADÍSTICAS — AJUSTES V1.1
+========================================================= */
+
+.porcentajeParejaEstadisticas{
+    display:flex;
+    min-width:58px;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:1px;
+    color:#1d4ed8;
+    text-align:right;
+}
+
+.porcentajeParejaEstadisticas strong{
+    color:#1d4ed8;
+    font-size:18px;
+    font-weight:900;
+    line-height:1;
+}
+
+.porcentajeParejaEstadisticas small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.listaFasesPartidosEstadisticas{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.detalleFasePartidosEstadisticas{
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    background:white;
+}
+
+.detalleFasePartidosEstadisticas > summary{
+    display:flex;
+    padding:14px 15px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    list-style:none;
+}
+
+.detalleFasePartidosEstadisticas > summary::-webkit-details-marker{
+    display:none;
+}
+
+.detalleFasePartidosEstadisticas > summary::before{
+    content:"▶";
+    color:#2563eb;
+    font-size:10px;
+    transition:transform .2s ease;
+}
+
+.detalleFasePartidosEstadisticas[open] > summary::before{
+    transform:rotate(90deg);
+}
+
+.detalleFasePartidosEstadisticas > summary span{
+    flex:1;
+}
+
+.detalleFasePartidosEstadisticas > summary b{
+    color:#2563eb;
+    font-size:11px;
+    white-space:nowrap;
+}
+
+.detalleFasePartidosEstadisticas .listaPartidosEstadisticas{
+    padding-top:0;
+}
+
+.cabeceraPartidoEstadisticas{
+    justify-content:flex-start;
 }
