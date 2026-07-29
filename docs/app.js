@@ -16,7 +16,8 @@ const estadoUI = {
     faseCompeticion: "",
     fasePartidos: "",
     grupoCompeticion: {},
-    grupoPartidos: {}
+    grupoPartidos: {},
+    albumFotos: ""
 };
 
 if (document.readyState === "loading") {
@@ -525,6 +526,44 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+
+    const albumFotos =
+        evento.target.closest(
+            "[data-album-fotos]"
+        );
+
+    if (albumFotos) {
+        estadoUI.albumFotos =
+            albumFotos.dataset.albumFotos ||
+            "";
+
+        pintarPantallaFotos().then(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        return;
+    }
+
+    const volverAlbumesFotos =
+        evento.target.closest(
+            "#btnVolverAlbumesFotos"
+        );
+
+    if (volverAlbumesFotos) {
+        estadoUI.albumFotos = "";
+
+        pintarPantallaFotos().then(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        return;
+    }
     
     const botonAviso =
         evento.target.closest(
@@ -719,6 +758,7 @@ function abrirPantalla(pantalla, fase = "") {
         } else if (pantalla === "ranking") {
         pintarPantallaRanking();
         } else if (pantalla === "fotos") {
+        estadoUI.albumFotos = "";
         pintarPantallaFotos();
         } else if (pantalla === "mas") {
             pintarPantallaMas();
@@ -739,6 +779,7 @@ function abrirPantalla(pantalla, fase = "") {
     } else if (pantalla === "ranking") {
         pintarPantallaRanking();
     } else if (pantalla === "fotos") {
+        estadoUI.albumFotos = "";
         pintarPantallaFotos();
     } else if (pantalla === "mas") {
         pintarPantallaMas();
@@ -1794,28 +1835,42 @@ async function cargarDatosFotos() {
     return promesaFotos;
 }
 
-function obtenerFotosVisibles(origen = datosFotos) {
+function obtenerFotosPublicadas(origen = datosFotos) {
     const fotos = Array.isArray(origen)
         ? origen
         : origen?.fotos || [];
 
     return fotos
-        .filter(foto => {
-            const visible =
-                foto?.mostrar === true ||
-                esSi(foto?.mostrar);
-
-            const esCampeones =
-                normalizarTextoFoto(
-                    foto?.categoria
-                ) === "campeones";
-
-            return visible && !esCampeones;
-        })
+        .filter(foto =>
+            foto?.mostrar === true ||
+            esSi(foto?.mostrar)
+        )
         .sort((a, b) =>
             numero(a?.orden) -
-            numero(b?.orden)
+            numero(b?.orden) ||
+            String(a?.id_foto || "")
+                .localeCompare(
+                    String(b?.id_foto || ""),
+                    "es",
+                    { numeric: true }
+                )
         );
+}
+
+function obtenerFotosVisibles(origen = datosFotos) {
+    return obtenerFotosPublicadas(origen)
+        .filter(foto =>
+            normalizarTextoFoto(
+                foto?.categoria
+            ) !== "campeones"
+        );
+}
+
+function fotoEsDestacada(foto) {
+    return (
+        foto?.destacada === true ||
+        esSi(foto?.destacada)
+    );
 }
 
 function normalizarTextoFoto(texto) {
@@ -1826,15 +1881,44 @@ function normalizarTextoFoto(texto) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
-function agruparFotosPorCampeonato(fotos) {
-    const grupos = new Map();
+function obtenerIdCampeonatoFoto(foto) {
+    return String(
+        foto?.id_campeonato ||
+        foto?.ID_Campeonato ||
+        "sin-campeonato"
+    ).trim();
+}
 
-    fotos.forEach(foto => {
-        const id = String(
-            foto?.id_campeonato ||
-            foto?.ID_Campeonato ||
-            "sin-campeonato"
-        ).trim();
+function agruparFotosPorCampeonato(
+    fotosGaleria,
+    fotosPublicadas = fotosGaleria
+) {
+    const grupos = new Map();
+    const publicadasPorCampeonato =
+        new Map();
+
+    fotosPublicadas.forEach(foto => {
+        const id =
+            obtenerIdCampeonatoFoto(foto);
+
+        if (
+            !publicadasPorCampeonato
+                .has(id)
+        ) {
+            publicadasPorCampeonato.set(
+                id,
+                []
+            );
+        }
+
+        publicadasPorCampeonato
+            .get(id)
+            .push(foto);
+    });
+
+    fotosGaleria.forEach(foto => {
+        const id =
+            obtenerIdCampeonatoFoto(foto);
 
         if (!grupos.has(id)) {
             grupos.set(id, {
@@ -1857,14 +1941,32 @@ function agruparFotosPorCampeonato(fotos) {
     });
 
     return [...grupos.values()]
-        .map(grupo => ({
-            ...grupo,
-            fotos: grupo.fotos.sort(
-                (a, b) =>
-                    numero(a?.orden) -
-                    numero(b?.orden)
-            )
-        }))
+        .map(grupo => {
+            const fotosOrdenadas =
+                grupo.fotos.sort(
+                    (a, b) =>
+                        numero(a?.orden) -
+                        numero(b?.orden)
+                );
+
+            const candidatasPortada =
+                publicadasPorCampeonato
+                    .get(grupo.id) || [];
+
+            const portada =
+                candidatasPortada.find(
+                    fotoEsDestacada
+                ) ||
+                fotosOrdenadas[0] ||
+                candidatasPortada[0] ||
+                null;
+
+            return {
+                ...grupo,
+                fotos: fotosOrdenadas,
+                portada
+            };
+        })
         .sort((a, b) => {
             if (a.ano !== b.ano) {
                 return b.ano - a.ano;
@@ -4757,13 +4859,19 @@ async function pintarPantallaFotos() {
             return;
         }
 
-        const fotos =
+        const fotosPublicadas =
+            obtenerFotosPublicadas(origen);
+
+        const fotosGaleria =
             obtenerFotosVisibles(origen);
 
         const campeonatos =
-            agruparFotosPorCampeonato(fotos);
+            agruparFotosPorCampeonato(
+                fotosGaleria,
+                fotosPublicadas
+            );
 
-        if (!fotos.length) {
+        if (!fotosGaleria.length) {
             contenido.innerHTML = `
                 <h2>📷 Fotos</h2>
 
@@ -4776,25 +4884,29 @@ async function pintarPantallaFotos() {
             return;
         }
 
-        contenido.innerHTML = `
-            <div class="cabeceraSeccionFotos">
-                <div>
-                    <h2>📷 Fotos</h2>
-                    <p>
-                        ${fotos.length}
-                        ${fotos.length === 1
-                            ? "fotografía"
-                            : "fotografías"}
-                    </p>
-                </div>
-            </div>
+        const campeonatoActivo =
+            campeonatos.find(
+                campeonato =>
+                    campeonato.id ===
+                    estadoUI.albumFotos
+            );
 
-            <div class="galeriasPorCampeonato">
-                ${campeonatos
-                    .map(pintarGaleriaCampeonato)
-                    .join("")}
-            </div>
-        `;
+        if (campeonatoActivo) {
+            contenido.innerHTML =
+                pintarAlbumFotos(
+                    campeonatoActivo
+                );
+
+            return;
+        }
+
+        estadoUI.albumFotos = "";
+
+        contenido.innerHTML =
+            pintarListadoAlbumesFotos(
+                campeonatos,
+                fotosGaleria.length
+            );
 
     } catch (error) {
         console.error(
@@ -4813,7 +4925,46 @@ async function pintarPantallaFotos() {
     }
 }
 
-function pintarGaleriaCampeonato(grupo) {
+function pintarListadoAlbumesFotos(
+    campeonatos,
+    totalFotos
+) {
+    return `
+        <div class="cabeceraSeccionFotos">
+            <div>
+                <h2>📷 Álbumes</h2>
+                <p>
+                    ${campeonatos.length}
+                    ${campeonatos.length === 1
+                        ? "campeonato"
+                        : "campeonatos"}
+                    ·
+                    ${totalFotos}
+                    ${totalFotos === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </p>
+            </div>
+        </div>
+
+        <div class="listaAlbumesFotos">
+            ${campeonatos
+                .map(pintarAlbumCampeonato)
+                .join("")}
+        </div>
+    `;
+}
+
+function pintarAlbumCampeonato(grupo) {
+    const portada =
+        grupo.portada ||
+        grupo.fotos[0];
+
+    const ruta =
+        normalizarRutaFoto(
+            portada?.ruta
+        );
+
     const titulo =
         grupo.titulo ||
         (grupo.ano
@@ -4821,25 +4972,76 @@ function pintarGaleriaCampeonato(grupo) {
             : "Campeonato");
 
     return `
-        <section class="bloqueFotosCampeonato">
-            <div class="cabeceraSeccionFotos cabeceraCampeonatoFotos">
-                <div>
-                    <h3>${escaparHTML(titulo)}</h3>
-                    <p>
-                        ${grupo.fotos.length}
-                        ${grupo.fotos.length === 1
-                            ? "fotografía"
-                            : "fotografías"}
-                    </p>
-                </div>
-            </div>
+        <button
+            type="button"
+            class="albumFotosCard"
+            data-album-fotos="${escaparAtributo(grupo.id)}"
+            aria-label="Abrir álbum ${escaparAtributo(titulo)}"
+        >
+            <span class="imagenAlbumFotos">
+                <img
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(titulo)}"
+                    loading="lazy"
+                >
+            </span>
 
-            <div class="galeriaFotos">
-                ${grupo.fotos
-                    .map(pintarTarjetaFoto)
-                    .join("")}
+            <span class="datosAlbumFotos">
+                <small>
+                    ${grupo.ano || "ÁLBUM"}
+                </small>
+
+                <strong>
+                    ${escaparHTML(titulo)}
+                </strong>
+
+                <span>
+                    📷 ${grupo.fotos.length}
+                    ${grupo.fotos.length === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </span>
+
+                <b>Ver álbum →</b>
+            </span>
+        </button>
+    `;
+}
+
+function pintarAlbumFotos(grupo) {
+    const titulo =
+        grupo.titulo ||
+        (grupo.ano
+            ? `Campeonato ${grupo.ano}`
+            : "Campeonato");
+
+    return `
+        <button
+            class="btnVolverAlbumesFotos"
+            id="btnVolverAlbumesFotos"
+            type="button"
+        >
+            ← Volver a los campeonatos
+        </button>
+
+        <div class="cabeceraSeccionFotos cabeceraAlbumFotos">
+            <div>
+                <small>ÁLBUM DEL CAMPEONATO</small>
+                <h2>${escaparHTML(titulo)}</h2>
+                <p>
+                    ${grupo.fotos.length}
+                    ${grupo.fotos.length === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </p>
             </div>
-        </section>
+        </div>
+
+        <div class="galeriaFotos">
+            ${grupo.fotos
+                .map(pintarTarjetaFoto)
+                .join("")}
+        </div>
     `;
 }
 
