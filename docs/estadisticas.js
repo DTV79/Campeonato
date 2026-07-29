@@ -871,9 +871,15 @@ function pintarFasesEstadisticas(fases) {
                         <div class="datosFaseEstadisticas">
                             <span>${numeroEstadisticas(fase.sets)} sets</span>
                             <span>${numeroEstadisticas(fase.puntos)} puntos</span>
-                            <span>${formatearDuracionEstadisticas(
-                                fase.duracion_media_min
-                            )} de media</span>
+                            <span>${
+                                numeroEstadisticas(
+                                    fase.partidos_con_duracion
+                                ) > 0
+                                    ? `${formatearDuracionEstadisticas(
+                                        fase.duracion_media_min
+                                    )} de media`
+                                    : "Sin datos de duración"
+                            }</span>
                         </div>
                     </article>
                 `;
