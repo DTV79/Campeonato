@@ -60,7 +60,6 @@ async function iniciarPaginaEstadisticas() {
         }
 
         inicializarEstadoVistaEstadisticas();
-        configurarNavegacionEstadisticas();
         pintarCabeceraEstadisticas();
         pintarPaginaEstadisticas();
     } catch (error) {
@@ -165,232 +164,14 @@ function obtenerCampeonatoSeleccionado() {
         ) || null;
 }
 
-
-/* =========================================================
-   NAVEGACIÓN INFERIOR
-   Conserva exactamente los accesos de la página principal.
-========================================================= */
-
-function configurarNavegacionEstadisticas() {
-    const config =
-        estadoCampeonato?.configuracion || {};
-
-    const previa =
-        esWebPreviaEstadisticas();
-
-    document.body.classList.toggle(
-        "modoPretorneo",
-        previa
-    );
-
-    const botones = [1, 2, 3, 4, 5]
-        .map(numero =>
-            document.getElementById(
-                `navEstadisticas${numero}`
-            )
-        );
-
-    botones.forEach(boton => {
-        boton?.classList.remove("oculto");
-        boton?.classList.remove("navActivo");
-        boton?.removeAttribute("aria-current");
-    });
-
-    if (previa) {
-        configurarEnlaceNavEstadisticas(
-            botones[0],
-            "🏠",
-            "Inicio",
-            "index.html"
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[1],
-            "📖",
-            "Historia",
-            "historia.html"
-        );
-
-        botones[1]?.classList.toggle(
-            "oculto",
-            !esSiEstadisticas(
-                config.mostrar_historia
-            )
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[2],
-            "📜",
-            "Normas",
-            "normas.html"
-        );
-
-        botones[2]?.classList.toggle(
-            "oculto",
-            !esSiEstadisticas(
-                config.mostrar_normativa
-            )
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[3],
-            "🏆",
-            "Campeones",
-            "campeones.html"
-        );
-
-        botones[3]?.classList.toggle(
-            "oculto",
-            !esSiEstadisticas(
-                config.mostrar_campeones
-            )
-        );
-    } else {
-        configurarEnlaceNavEstadisticas(
-            botones[0],
-            "🏠",
-            "Inicio",
-            "index.html"
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[1],
-            "📊",
-            esModoGruposEstadisticas()
-                ? "Grupos"
-                : "Clasificación",
-            "index.html?pantalla=competicion"
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[2],
-            "🎾",
-            "Partidos",
-            "index.html?pantalla=partidos"
-        );
-
-        configurarEnlaceNavEstadisticas(
-            botones[3],
-            "👥",
-            "Equipos",
-            "index.html?pantalla=equipos"
-        );
-    }
-
-    configurarEnlaceNavEstadisticas(
-        botones[4],
-        "☰",
-        "Más",
-        "index.html?pantalla=mas"
-    );
-
-    botones[4]?.classList.add(
-        "navActivo"
-    );
-
-    botones[4]?.setAttribute(
-        "aria-current",
-        "page"
-    );
-}
-
-function configurarEnlaceNavEstadisticas(
-    enlace,
-    icono,
-    texto,
-    href
-) {
-    if (!enlace) return;
-
-    const iconoElemento =
-        enlace.querySelector("span");
-
-    const textoElemento =
-        enlace.querySelector("small");
-
-    if (iconoElemento) {
-        iconoElemento.textContent = icono;
-    }
-
-    if (textoElemento) {
-        textoElemento.textContent = texto;
-    }
-
-    enlace.href = href;
-}
-
-function esWebPreviaEstadisticas() {
-    const config =
-        estadoCampeonato?.configuracion || {};
-
-    const estado = normalizarTextoEstadisticas(
-        config.estado_torneo ||
-        config.estado ||
-        estadoCampeonato?.estado_torneo ||
-        "En juego"
-    )
-        .replaceAll("_", " ")
-        .replace(/\s+/g, " ");
-
-    return (
-        estado === "PRETORNEO" ||
-        estado.includes("INSCRIP")
-    );
-}
-
-function esModoGruposEstadisticas() {
-    const config =
-        estadoCampeonato?.configuracion || {};
-
-    const tipo = normalizarTextoEstadisticas(
-        config.tipo_campeonato ||
-        config.estructura_primera_fase_normalizada ||
-        config.estructura_primera_fase ||
-        ""
-    );
-
-    if (tipo) {
-        return (
-            tipo === "GRUPOS" ||
-            tipo.includes("GRUPO")
-        );
-    }
-
-    return (
-        (estadoCampeonato?.grupos?.clasificaciones || [])
-            .length > 0 ||
-        (estadoCampeonato?.grupos?.partidos || [])
-            .length > 0
-    );
-}
-
-function esSiEstadisticas(valor) {
-    if (valor === true) return true;
-
-    return [
-        "SI",
-        "SÍ",
-        "TRUE",
-        "1"
-    ].includes(
-        String(valor || "")
-            .trim()
-            .toUpperCase()
-    );
-}
-
-function normalizarTextoEstadisticas(valor) {
-    return String(valor || "")
-        .trim()
-        .toUpperCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-}
-
 function pintarCabeceraEstadisticas() {
-    const marca = document.getElementById(
-        "marcaEstadisticas"
-    );
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    const nombre = String(
+        config.nombre_campeonato ||
+        "Sprint Pádel Tui"
+    ).trim();
 
     const titulo = document.getElementById(
         "tituloEstadisticas"
@@ -404,17 +185,12 @@ function pintarCabeceraEstadisticas() {
         "fechaGeneracionEstadisticas"
     );
 
-    if (marca) {
-        marca.textContent = "HISTÓRICO Y RÉCORDS";
-    }
-
     if (titulo) {
         titulo.textContent = "Estadísticas";
     }
 
     if (subtitulo) {
-        subtitulo.textContent =
-            "Resultados, rendimiento y curiosidades";
+        subtitulo.textContent = nombre;
     }
 
     if (generado) {
@@ -425,7 +201,7 @@ function pintarCabeceraEstadisticas() {
     }
 
     document.title =
-        "Estadísticas · Sprint Pádel Tui";
+        `Estadísticas · ${nombre}`;
 }
 
 function pintarPaginaEstadisticas() {
@@ -871,15 +647,9 @@ function pintarFasesEstadisticas(fases) {
                         <div class="datosFaseEstadisticas">
                             <span>${numeroEstadisticas(fase.sets)} sets</span>
                             <span>${numeroEstadisticas(fase.puntos)} puntos</span>
-                            <span>${
-                                numeroEstadisticas(
-                                    fase.partidos_con_duracion
-                                ) > 0
-                                    ? `${formatearDuracionEstadisticas(
-                                        fase.duracion_media_min
-                                    )} de media`
-                                    : "Sin datos de duración"
-                            }</span>
+                            <span>${formatearDuracionEstadisticas(
+                                fase.duracion_media_min
+                            )} de media</span>
                         </div>
                     </article>
                 `;
@@ -1127,7 +897,7 @@ function pintarPartidosEstadisticas(ambito) {
                 <p>
                     ${esGlobal
                         ? "Récords acumulados de todos los campeonatos."
-                        : "Partidos destacados y distribución de esta edición."
+                        : "Partidos destacados y resultados de esta edición."
                     }
                 </p>
             </div>
@@ -1136,21 +906,8 @@ function pintarPartidosEstadisticas(ambito) {
 
         ${pintarRecordsPartidosEstadisticas(records)}
 
-        <section class="bloqueEstadisticas">
-            <div class="tituloBloqueEstadisticas">
-                <div>
-                    <small>DISTRIBUCIÓN</small>
-                    <h2>Por fase</h2>
-                </div>
-                <span>🧭</span>
-            </div>
-            ${pintarFasesEstadisticas(
-                ambito?.por_fase || []
-            )}
-        </section>
-
         ${!esGlobal
-            ? pintarJornadasYPartidosEstadisticas(ambito)
+            ? pintarPartidosAgrupadosPorFaseEstadisticas(ambito)
             : ""
         }
     `;
@@ -1163,14 +920,14 @@ function pintarRecordsPartidosEstadisticas(records) {
             "Partido más igualado",
             records.mas_igualados,
             partido =>
-                `${numeroEstadisticas(partido.diferencia_puntos)} puntos de diferencia`
+                `${formatearNumeroDecimalEstadisticas(partido.margen_medio_set)} puntos de margen medio por set`
         ],
         [
             "💥",
             "Mayor diferencia",
             records.mayor_diferencia,
             partido =>
-                `${numeroEstadisticas(partido.diferencia_puntos)} puntos de diferencia`
+                `${formatearNumeroDecimalEstadisticas(partido.margen_medio_set)} puntos de margen medio por set`
         ],
         [
             "🔥",
@@ -1275,54 +1032,48 @@ function pintarRecordPartidoEstadisticas(
     `;
 }
 
-function pintarJornadasYPartidosEstadisticas(campeonato) {
-    const jornadas = campeonato?.por_jornada || [];
+function pintarPartidosAgrupadosPorFaseEstadisticas(campeonato) {
     const partidos = campeonato?.partidos || [];
+
+    if (!partidos.length) {
+        return pintarVacioEstadisticas(
+            "Sin partidos",
+            "No hay partidos guardados para este campeonato."
+        );
+    }
+
+    const grupos = new Map();
+
+    partidos.forEach(partido => {
+        const fase = String(partido.fase || "Sin fase").trim() || "Sin fase";
+        if (!grupos.has(fase)) grupos.set(fase, []);
+        grupos.get(fase).push(partido);
+    });
 
     return `
         <section class="bloqueEstadisticas">
             <div class="tituloBloqueEstadisticas">
                 <div>
-                    <small>CALENDARIO</small>
-                    <h2>Partidos por jornada y fase</h2>
+                    <small>RESULTADOS</small>
+                    <h2>Partidos por fase</h2>
                 </div>
-                <span>📅</span>
+                <span>🎾</span>
             </div>
 
-            <div class="gridJornadasEstadisticas">
-                ${jornadas.map(jornada => `
-                    <article>
-                        <small>${escaparHTMLEstadisticas(
-                            jornada.fase || "Fase"
-                        )}</small>
-                        <strong>
-                            ${jornada.jornada
-                                ? `Jornada ${numeroEstadisticas(jornada.jornada)}`
-                                : escaparHTMLEstadisticas(
-                                    jornada.grupo_ronda || "Ronda"
-                                )
-                            }
-                        </strong>
-                        <span>${numeroEstadisticas(jornada.partidos)} partidos</span>
-                        ${jornada.grupo_ronda
-                            ? `<b>${escaparHTMLEstadisticas(
-                                jornada.grupo_ronda
-                            )}</b>`
-                            : ""
-                        }
-                    </article>
+            <div class="listaFasesPartidosEstadisticas">
+                ${[...grupos.entries()].map(([fase, lista], indice) => `
+                    <details class="detalleFasePartidosEstadisticas" ${indice === 0 ? "open" : ""}>
+                        <summary>
+                            <span>${escaparHTMLEstadisticas(fase)}</span>
+                            <b>${lista.length} ${lista.length === 1 ? "partido" : "partidos"}</b>
+                        </summary>
+                        <div class="listaPartidosEstadisticas">
+                            ${lista.map(pintarPartidoEstadisticas).join("")}
+                        </div>
+                    </details>
                 `).join("")}
             </div>
         </section>
-
-        <details class="detalleTodosPartidosEstadisticas">
-            <summary>
-                Ver los ${partidos.length} partidos del campeonato
-            </summary>
-            <div class="listaPartidosEstadisticas">
-                ${partidos.map(pintarPartidoEstadisticas).join("")}
-            </div>
-        </details>
     `;
 }
 
@@ -1333,7 +1084,6 @@ function pintarPartidoEstadisticas(partido) {
                 <small>${escaparHTMLEstadisticas(
                     detallePartidoEstadisticas(partido)
                 )}</small>
-                <span>${numeroEstadisticas(partido.total_puntos)} pts</span>
             </div>
             <strong>
                 ${escaparHTMLEstadisticas(partido.equipo1)}
@@ -1360,6 +1110,16 @@ function pintarPartidoEstadisticas(partido) {
             </p>
         </article>
     `;
+}
+
+function formatearNumeroDecimalEstadisticas(valor) {
+    const numero = Number(valor);
+    if (!Number.isFinite(numero)) return "—";
+
+    return numero.toLocaleString("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+    });
 }
 
 function detallePartidoEstadisticas(partido) {
@@ -1638,17 +1398,17 @@ function pintarParejaEstadisticas(pareja) {
                     )}</strong>
                     <small>${numeroEstadisticas(pareja.pj)} partidos juntos</small>
                 </div>
-                <b>${formatearPorcentajeEstadisticas(
-                    pareja.porcentaje_victorias
-                )}</b>
+                <b class="porcentajeParejaEstadisticas">
+                    <strong>${formatearPorcentajeEstadisticas(
+                        pareja.porcentaje_victorias
+                    )}</strong>
+                    <small>Victorias</small>
+                </b>
             </div>
             <div class="datosParejaEstadisticas">
                 <span>✅ ${numeroEstadisticas(pareja.pg)} PG</span>
                 <span>❌ ${numeroEstadisticas(pareja.pp)} PP</span>
                 <span>📚 ${numeroEstadisticas(pareja.sets_favor)}–${numeroEstadisticas(pareja.sets_contra)} sets</span>
-                <span>🔢 ${formatearDiferenciaEstadisticas(
-                    pareja.diferencia_puntos
-                )} puntos</span>
             </div>
         </article>
     `;
@@ -1851,7 +1611,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más títulos",
         records.mas_titulos,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.titulos)} títulos`
+        item => `${numeroEstadisticas(item.valor)} títulos`
     );
 
     agregarTarjetaListaRecordEstadisticas(
@@ -1860,7 +1620,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más finales",
         records.mas_finales,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.finales)} finales`
+        item => `${numeroEstadisticas(item.valor)} finales`
     );
 
     const porcentaje =
