@@ -67,25 +67,43 @@
 <body class="paginaSecundaria paginaEstadisticas appCargando">
     <div class="contenedor">
         <header class="cabecera cabeceraEstadisticas">
-            <div class="tituloSuperior">ESTADÍSTICAS</div>
-            <div
-                class="tituloPrincipal"
-                id="tituloEstadisticas"
-            >
-                Estadísticas
-            </div>
-            <div
-                class="subtitulo"
-                id="subtituloEstadisticas"
-            >
-                Sprint Pádel Tui
+            <div class="cabeceraEstadisticasSuperior">
+                <div class="identidadEstadisticas">
+                    <div
+                        class="tituloSuperior"
+                        id="marcaEstadisticas"
+                    >
+                        HISTÓRICO Y RÉCORDS
+                    </div>
+
+                    <div
+                        class="tituloPrincipal"
+                        id="tituloEstadisticas"
+                    >
+                        Estadísticas
+                    </div>
+
+                    <div
+                        class="subtitulo"
+                        id="subtituloEstadisticas"
+                    >
+                        Resultados, rendimiento y curiosidades
+                    </div>
+
+                    <div class="etiquetaCabeceraEstadisticas">
+                        Global · Por campeonato
+                    </div>
+                </div>
+
+                <div
+                    class="iconoCabeceraEstadisticas"
+                    aria-hidden="true"
+                >
+                    📊
+                </div>
             </div>
 
-            <div class="estadoCabecera">
-                Global y por campeonato
-            </div>
-
-            <div class="actualizacion">
+            <div class="actualizacion actualizacionEstadisticas">
                 <span>🕒 Datos generados:</span>
                 <strong id="fechaGeneracionEstadisticas">—</strong>
             </div>
@@ -102,32 +120,33 @@
         </main>
     </div>
 
-    <nav class="bottomNav">
-        <a class="navBtn" href="index.html">
+    <nav class="bottomNav" id="navegacionEstadisticas">
+        <a class="navBtn" id="navEstadisticas1" href="index.html">
             <span>🏠</span>
             <small>Inicio</small>
         </a>
 
-        <a class="navBtn" href="index.html?pantalla=ranking">
-            <span>🏆</span>
-            <small>Ranking</small>
+        <a class="navBtn" id="navEstadisticas2" href="index.html">
+            <span>📊</span>
+            <small>Competición</small>
         </a>
 
-        <button
+        <a class="navBtn" id="navEstadisticas3" href="index.html">
+            <span>🎾</span>
+            <small>Partidos</small>
+        </a>
+
+        <a class="navBtn" id="navEstadisticas4" href="index.html">
+            <span>👥</span>
+            <small>Equipos</small>
+        </a>
+
+        <a
             class="navBtn navActivo"
-            type="button"
+            id="navEstadisticas5"
+            href="index.html?pantalla=mas"
             aria-current="page"
         >
-            <span>📊</span>
-            <small>Estadísticas</small>
-        </button>
-
-        <a class="navBtn" href="index.html?pantalla=fotos">
-            <span>📷</span>
-            <small>Fotos</small>
-        </a>
-
-        <a class="navBtn" href="index.html?pantalla=mas">
             <span>☰</span>
             <small>Más</small>
         </a>
