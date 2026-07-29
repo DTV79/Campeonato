@@ -1845,7 +1845,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más títulos",
         records.mas_titulos,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.valor)} títulos`
+        item => `${numeroEstadisticas(item.titulos)} títulos`
     );
 
     agregarTarjetaListaRecordEstadisticas(
@@ -1854,7 +1854,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más finales",
         records.mas_finales,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.valor)} finales`
+        item => `${numeroEstadisticas(item.finales)} finales`
     );
 
     const porcentaje =
