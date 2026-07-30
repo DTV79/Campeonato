@@ -4214,13 +4214,19 @@ function mostrarInfoRanking() {
             <h4>Bonificaciones por rendimiento</h4>
 
             <div class="formulaRankingInfo">
+            <div>
+            <strong>Victorias</strong>
+            <span>
+                Hasta ${bonusVictorias} puntos:
+                ${bonusVictorias} × (PG / PJ)
+            </span>
+            </div>
                 <div>
-                    <strong>Victorias</strong>
-                    <span>Hasta ${bonusVictorias} pts × PG / PJ</span>
-                </div>
-                <div>
-                    <strong>Sets</strong>
-                    <span>Hasta ${bonusSets} pts × SG / (SG + SP)</span>
+                <strong>Sets</strong>
+                <span>
+                Hasta ${bonusSets} puntos:
+                ${bonusSets} × [SG / (SG + SP)]
+                </span>
                 </div>
             </div>
 
