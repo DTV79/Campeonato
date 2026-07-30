@@ -647,14 +647,34 @@ function pintarFasesEstadisticas(fases) {
                         <div class="datosFaseEstadisticas">
                             <span>${numeroEstadisticas(fase.sets)} sets</span>
                             <span>${numeroEstadisticas(fase.puntos)} puntos</span>
-                            <span>${formatearDuracionEstadisticas(
+                            ${pintarDuracionMediaFaseEstadisticas(
                                 fase.duracion_media_min
-                            )} de media</span>
+                            )}
                         </div>
                     </article>
                 `;
             }).join("")}
         </div>
+    `;
+}
+
+function pintarDuracionMediaFaseEstadisticas(valor) {
+    const minutos = Number(valor);
+
+    if (!Number.isFinite(minutos) || minutos <= 0) {
+        return `
+            <span class="sinDuracionFaseEstadisticas">
+                ⏱️ No disponemos de datos de duración
+            </span>
+        `;
+    }
+
+    return `
+        <span>
+            ⏱️ ${escaparHTMLEstadisticas(
+                formatearDuracionEstadisticas(minutos)
+            )} de media
+        </span>
     `;
 }
 
@@ -807,9 +827,12 @@ function pintarEquipoEstadisticas(
                         ${numeroEstadisticas(equipo.pp)} PP
                     </small>
                 </div>
-                <b>${formatearPorcentajeEstadisticas(
-                    equipo.porcentaje_victorias
-                )}</b>
+                <b class="porcentajeEquipoEstadisticas">
+                    <strong>${formatearPorcentajeEstadisticas(
+                        equipo.porcentaje_victorias
+                    )}</strong>
+                    <small>Victorias</small>
+                </b>
             </div>
 
             ${etiquetas.length
@@ -1020,10 +1043,15 @@ function pintarRecordPartidoEstadisticas(
                     )}</b>
                     <p>
                         ${escaparHTMLEstadisticas(
-                            obtenerValor(partido)
-                        )}
-                        · ${escaparHTMLEstadisticas(
-                            detallePartidoEstadisticas(partido)
+                            [
+                                obtenerValor(partido),
+                                detallePartidoEstadisticas(partido),
+                                obtenerPistaYDuracionPartidoEstadisticas(
+                                    partido
+                                )
+                            ]
+                                .filter(Boolean)
+                                .join(" · ")
                         )}
                     </p>
                 </div>
@@ -1078,6 +1106,11 @@ function pintarPartidosAgrupadosPorFaseEstadisticas(campeonato) {
 }
 
 function pintarPartidoEstadisticas(partido) {
+    const pistaYDuracion =
+        obtenerPistaYDuracionPartidoEstadisticas(
+            partido
+        );
+
     return `
         <article>
             <div class="cabeceraPartidoEstadisticas">
@@ -1097,19 +1130,46 @@ function pintarPartidoEstadisticas(partido) {
                 Ganador: ${escaparHTMLEstadisticas(
                     partido.ganador || "—"
                 )}
-                ${partido.pista
-                    ? ` · Pista ${escaparHTMLEstadisticas(partido.pista)}`
-                    : ""
-                }
-                ${partido.duracion_min
-                    ? ` · ${formatearDuracionEstadisticas(
-                        partido.duracion_min
+                ${pistaYDuracion
+                    ? ` · ${escaparHTMLEstadisticas(
+                        pistaYDuracion
                     )}`
                     : ""
                 }
             </p>
         </article>
     `;
+}
+
+function obtenerPistaYDuracionPartidoEstadisticas(
+    partido
+) {
+    const datos = [];
+
+    const pista = String(
+        partido?.pista ?? ""
+    ).trim();
+
+    if (pista) {
+        datos.push(`Pista ${pista}`);
+    }
+
+    const duracion = Number(
+        partido?.duracion_min
+    );
+
+    if (
+        Number.isFinite(duracion) &&
+        duracion > 0
+    ) {
+        datos.push(
+            formatearDuracionEstadisticas(
+                duracion
+            )
+        );
+    }
+
+    return datos.join(" · ");
 }
 
 function formatearNumeroDecimalEstadisticas(valor) {
@@ -1355,7 +1415,7 @@ function pintarParejasEstadisticas(ambito) {
             <div>
                 <small>COMPAÑEROS Y RIVALES</small>
                 <h1>Parejas y enfrentamientos</h1>
-                <p>Los jugadores se identifican mediante sus IDs reales.</p>
+                <p>Rendimiento conjunto, compañeros habituales y rivalidades del campeonato.</p>
             </div>
             <span>🤝</span>
         </section>
@@ -1515,7 +1575,7 @@ function pintarRecordsEstadisticas(ambito) {
             <div>
                 <small>LO MEJOR DEL HISTÓRICO</small>
                 <h1>Récords y curiosidades</h1>
-                <p>Los empates se muestran conjuntamente.</p>
+                <p>Las marcas más destacadas de cada edición.</p>
             </div>
             <span>⭐</span>
         </section>
@@ -1611,7 +1671,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más títulos",
         records.mas_titulos,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.valor)} títulos`
+        item => `${numeroEstadisticas(item.titulos)} títulos`
     );
 
     agregarTarjetaListaRecordEstadisticas(
@@ -1620,7 +1680,7 @@ function agregarRecordsJugadoresEstadisticas(
         "Más finales",
         records.mas_finales,
         item => item.jugador,
-        item => `${numeroEstadisticas(item.valor)} finales`
+        item => `${numeroEstadisticas(item.finales)} finales`
     );
 
     const porcentaje =
