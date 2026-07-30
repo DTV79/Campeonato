@@ -189,8 +189,9 @@ function pintarCabeceraEstadisticas() {
         titulo.textContent = "Estadísticas";
     }
 
-    if (subtitulo) {
-        subtitulo.textContent = nombre;
+   if (subtitulo) {
+    subtitulo.textContent =
+        "Resultados, rendimiento y curiosidades";
     }
 
     if (generado) {
@@ -201,8 +202,7 @@ function pintarCabeceraEstadisticas() {
     }
 
     document.title =
-        `Estadísticas · ${nombre}`;
-}
+    "Estadísticas · Sprint Pádel Tui";
 
 function pintarPaginaEstadisticas() {
     const contenido = document.getElementById(
@@ -833,11 +833,11 @@ function pintarEquipoEstadisticas(
                         ${numeroEstadisticas(equipo.pp)} PP
                     </small>
                 </div>
-                <b class="porcentajeEquipoEstadisticas">
-                    <strong>${formatearPorcentajeEstadisticas(
-                        equipo.porcentaje_victorias
-                    )}</strong>
-                    <small>Victorias</small>
+               <b class="porcentajeParejaEstadisticas">
+                <strong>${formatearPorcentajeEstadisticas(
+                equipo.porcentaje_victorias
+                )}</strong>
+                <small>Victorias</small>
                 </b>
             </div>
 
