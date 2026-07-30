@@ -165,14 +165,6 @@ function obtenerCampeonatoSeleccionado() {
 }
 
 function pintarCabeceraEstadisticas() {
-    const config =
-        estadoCampeonato?.configuracion || {};
-
-    const nombre = String(
-        config.nombre_campeonato ||
-        "Sprint Pádel Tui"
-    ).trim();
-
     const titulo = document.getElementById(
         "tituloEstadisticas"
     );
@@ -186,12 +178,13 @@ function pintarCabeceraEstadisticas() {
     );
 
     if (titulo) {
-        titulo.textContent = "Estadísticas";
+        titulo.textContent =
+            "Estadísticas";
     }
 
-   if (subtitulo) {
-    subtitulo.textContent =
-        "Resultados, rendimiento y curiosidades";
+    if (subtitulo) {
+        subtitulo.textContent =
+            "Resultados, rendimiento y curiosidades";
     }
 
     if (generado) {
@@ -202,7 +195,8 @@ function pintarCabeceraEstadisticas() {
     }
 
     document.title =
-    "Estadísticas · Sprint Pádel Tui";
+        "Estadísticas · Sprint Pádel Tui";
+} 
 
 function pintarPaginaEstadisticas() {
     const contenido = document.getElementById(
