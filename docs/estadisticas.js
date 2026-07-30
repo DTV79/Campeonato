@@ -447,10 +447,16 @@ function pintarResumenEstadisticas(ambito) {
         : ambito.nombre || "Resumen del campeonato";
 
     const descripcion = esGlobal
-        ? construirPeriodoGlobalEstadisticas(resumen)
-        : [ambito.fecha, ambito.tipo, ambito.estructura]
-            .filter(Boolean)
-            .join(" · ");
+    ? construirPeriodoGlobalEstadisticas(resumen)
+    : [
+        formatearFechaCampeonatoEstadisticas(
+            ambito.fecha
+        ),
+        ambito.tipo,
+        ambito.estructura
+    ]
+        .filter(Boolean)
+        .join(" · ");
 
     const metricas = esGlobal
         ? [
@@ -1984,6 +1990,26 @@ function pintarMantenimientoEstadisticas() {
             </section>
         </main>
     `;
+}
+
+function formatearFechaCampeonatoEstadisticas(valor) {
+    const texto =
+        String(valor || "").trim();
+
+    const partes =
+        texto.match(
+            /^(\d{4})-(\d{2})-(\d{2})$/
+        );
+
+    if (!partes) {
+        return texto;
+    }
+
+    const anio = partes[1];
+    const mes = partes[2];
+    const dia = partes[3];
+
+    return `${dia}/${mes}/${anio}`;
 }
 
 function formatearFechaHoraEstadisticas(valor) {
