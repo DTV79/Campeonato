@@ -12,114 +12,116 @@ const estadoVistaEstadisticas = {
     pestana: "resumen"
 };
 
+const MAX_ETIQUETAS_VISIBLES_EQUIPO_ESTADISTICAS = 4;
+
 const DEFINICIONES_ETIQUETAS_EQUIPOS_ESTADISTICAS = [
     {
         clave: "mas_victorias",
         icono: "🏆",
         nombre: "Más victorias",
-        criterio: "Mayor número de partidos ganados."
+        criterio: "Mayor número de victorias en la competición principal."
     },
     {
         clave: "mejor_porcentaje",
         icono: "📊",
         nombre: "Mejor porcentaje",
-        criterio: "Mayor porcentaje de victorias, con un mínimo de 3 partidos disputados."
-    },
-    {
-        clave: "mejor_balance_sets",
-        icono: "📈",
-        nombre: "Mejor balance de sets",
-        criterio: "Mayor diferencia entre sets ganados y perdidos."
-    },
-    {
-        clave: "mejor_balance_puntos",
-        icono: "➕",
-        nombre: "Mejor balance de puntos",
-        criterio: "Mayor diferencia entre puntos anotados y recibidos."
-    },
-    {
-        clave: "mejor_ataque",
-        icono: "⚡",
-        nombre: "Mejor ataque",
-        criterio: "Mayor media de puntos anotados por partido."
-    },
-    {
-        clave: "mejor_defensa",
-        icono: "🛡️",
-        nombre: "Mejor defensa",
-        criterio: "Menor media de puntos recibidos por partido."
-    },
-    {
-        clave: "mas_contundentes",
-        icono: "💥",
-        nombre: "Más contundentes",
-        criterio: "Mayor porcentaje de victorias por 2-0 sobre sus victorias totales; se exigen al menos 2 victorias."
-    },
-    {
-        clave: "reyes_decisivo",
-        icono: "🧠",
-        nombre: "Reyes del decisivo",
-        criterio: "Mayor porcentaje de victorias en partidos a tres sets; se exigen al menos 2 partidos con set decisivo."
-    },
-    {
-        clave: "remontadores",
-        icono: "🔄",
-        nombre: "Remontadores",
-        criterio: "Mayor número de victorias después de perder el primer set."
-    },
-    {
-        clave: "mejor_racha",
-        icono: "🔥",
-        nombre: "Mejor racha",
-        criterio: "Mayor número de victorias consecutivas."
+        criterio: "Mayor porcentaje de victorias, con un mínimo de 3 partidos. Desempates: más victorias y después más partidos."
     },
     {
         clave: "invictos",
         icono: "👑",
         nombre: "Invictos",
-        criterio: "Equipos que terminaron sin derrotas y disputaron al menos 3 partidos."
+        criterio: "Equipos sin derrotas, con un mínimo de 3 partidos disputados."
     },
     {
-        clave: "partidos_infarto",
-        icono: "😅",
-        nombre: "Partidos de infarto",
-        criterio: "Mayor número de partidos resueltos en el tercer set."
+        clave: "mejor_ataque",
+        icono: "⚡",
+        nombre: "Mejor ataque",
+        criterio: "Mayor media de puntos anotados por set, con un mínimo de 3 partidos."
+    },
+    {
+        clave: "mejor_defensa",
+        icono: "🛡️",
+        nombre: "Mejor defensa",
+        criterio: "Menor media de puntos recibidos por set, con un mínimo de 3 partidos."
+    },
+    {
+        clave: "mejor_balance_sets",
+        icono: "📈",
+        nombre: "Mejor balance de sets",
+        criterio: "Mayor saldo acumulado entre sets ganados y perdidos."
+    },
+    {
+        clave: "mejor_balance_puntos",
+        icono: "➕",
+        nombre: "Mejor balance de puntos",
+        criterio: "Mayor saldo acumulado entre puntos anotados y recibidos."
+    },
+    {
+        clave: "mas_contundentes",
+        icono: "💥",
+        nombre: "Más contundentes",
+        criterio: "Mayor porcentaje de victorias sin ceder ningún set sobre sus victorias totales. Se exigen al menos 3 victorias; desempates por más victorias limpias y mejor diferencia de sets."
+    },
+    {
+        clave: "reyes_decisivo",
+        icono: "🧠",
+        nombre: "Reyes del decisivo",
+        criterio: "Mejor porcentaje en partidos que llegaron 1-1 tras los dos primeros sets. Se exigen al menos 2 partidos decisivos."
+    },
+    {
+        clave: "remontadores",
+        icono: "🔄",
+        nombre: "Remontadores",
+        criterio: "Mayor número de victorias después de perder el primer set. Se exigen al menos 2 remontadas."
+    },
+    {
+        clave: "mejor_racha",
+        icono: "🔥",
+        nombre: "Mejor racha",
+        criterio: "Mayor número de victorias consecutivas según el orden deportivo de fases, jornadas y rondas. Se exige una racha mínima de 2."
     },
     {
         clave: "mata_gigantes",
         icono: "🐉",
         nombre: "Mata-gigantes",
-        criterio: "Mayor número de victorias frente a equipos que terminaron por encima en el ranking de equipos."
+        criterio: "Más victorias contra al menos 2 rivales distintos del top 3 que terminaron, como mínimo, 2 posiciones por encima. Se exigen al menos 2 victorias válidas y se usa la posición final histórica."
+    },
+    {
+        clave: "mas_victorias_limpias",
+        icono: "🧹",
+        nombre: "Más victorias limpias",
+        criterio: "Mayor número de victorias sin ceder ningún set: 3-0, 2-0 o cualquier formato equivalente."
     },
     {
         clave: "mejor_arranque",
         icono: "🚀",
         nombre: "Mejor arranque",
-        criterio: "Mayor porcentaje de primeros sets ganados, con un mínimo de 3 partidos."
+        criterio: "Mayor porcentaje de primeros sets ganados, con un mínimo de 3 partidos. Desempate por más primeros sets ganados."
     },
     {
         clave: "mejor_cierre",
         icono: "🔒",
         nombre: "Mejor cierre",
-        criterio: "Mayor porcentaje de victorias después de ganar el primer set; se exigen al menos 2 primeros sets ganados."
+        criterio: "Mayor porcentaje de victorias después de ganar el primer set. Se exigen al menos 3 primeros sets ganados."
     },
     {
         clave: "mas_luchadores",
         icono: "⚔️",
         nombre: "Más luchadores",
-        criterio: "Mayor media de sets disputados por partido."
+        criterio: "Mayor porcentaje de partidos en los que ambos equipos ganaron al menos un set. Se exigen al menos 2 partidos de este tipo."
     },
     {
         clave: "mas_eficaces",
         icono: "🎯",
         nombre: "Más eficaces",
-        criterio: "Mayor porcentaje de puntos anotados sobre el total de puntos disputados."
+        criterio: "Mayor porcentaje de puntos anotados sobre todos los puntos disputados, con un mínimo de 3 partidos."
     },
     {
-        clave: "mas_partidos_perfectos",
-        icono: "🧹",
-        nombre: "Más partidos perfectos",
-        criterio: "Mayor número de victorias por 2-0."
+        clave: "partidos_infarto",
+        icono: "😅",
+        nombre: "Partidos de infarto",
+        criterio: "Mayor número de partidos con un margen medio de 2 puntos o menos por set. Se exigen al menos 2 partidos así."
     }
 ];
 
@@ -884,7 +886,7 @@ function pintarEquiposEstadisticas(campeonato) {
             <div>
                 <small>RENDIMIENTO</small>
                 <h1>Estadísticas de equipos</h1>
-                <p>${equipos.length} equipos ordenados por victorias.</p>
+                <p>${equipos.length} equipos ordenados por victorias. Palas de Playa no interviene.</p>
             </div>
 
             <div class="accionesCabeceraPanelEstadisticas">
@@ -923,6 +925,15 @@ function pintarEquipoEstadisticas(
             records
         );
 
+    const visibles = etiquetas.slice(
+        0,
+        MAX_ETIQUETAS_VISIBLES_EQUIPO_ESTADISTICAS
+    );
+
+    const adicionales = etiquetas.slice(
+        MAX_ETIQUETAS_VISIBLES_EQUIPO_ESTADISTICAS
+    );
+
     return `
         <article class="equipoEstadisticas">
             <div class="cabeceraEquipoEstadisticas">
@@ -948,13 +959,34 @@ function pintarEquipoEstadisticas(
             ${etiquetas.length
                 ? `
                     <div class="etiquetasEquipoEstadisticas">
-                        ${etiquetas.map(etiqueta => `
-                            <span>
-                                ${escaparHTMLEstadisticas(
-                                    `${etiqueta.icono} ${etiqueta.nombre}`
-                                )}
-                            </span>
-                        `).join("")}
+                        ${visibles.map(etiqueta =>
+                            pintarEtiquetaEquipoEstadisticas(
+                                etiqueta,
+                                false
+                            )
+                        ).join("")}
+
+                        ${adicionales.map(etiqueta =>
+                            pintarEtiquetaEquipoEstadisticas(
+                                etiqueta,
+                                true
+                            )
+                        ).join("")}
+
+                        ${adicionales.length
+                            ? `
+                                <button
+                                    type="button"
+                                    class="btnMasEtiquetasEquipoEstadisticas"
+                                    data-toggle-etiquetas-equipo
+                                    data-total-ocultas="${adicionales.length}"
+                                    aria-expanded="false"
+                                >
+                                    +${adicionales.length} más
+                                </button>
+                            `
+                            : ""
+                        }
                     </div>
                 `
                 : ""
@@ -980,17 +1012,35 @@ function pintarEquipoEstadisticas(
                     formatearDecimalEstadisticas(
                         equipo.media_puntos_favor
                     ),
-                    "pts/partido"
+                    "pts/set"
                 )}
                 ${pintarDatoEquipoEstadisticas(
                     "Defensa",
                     formatearDecimalEstadisticas(
                         equipo.media_puntos_contra
                     ),
-                    "pts recibidos"
+                    "pts recibidos/set"
                 )}
             </div>
         </article>
+    `;
+}
+
+function pintarEtiquetaEquipoEstadisticas(
+    etiqueta,
+    esAdicional
+) {
+    return `
+        <span
+            ${esAdicional
+                ? "data-etiqueta-equipo-adicional hidden"
+                : ""
+            }
+        >
+            ${escaparHTMLEstadisticas(
+                `${etiqueta.icono} ${etiqueta.nombre}`
+            )}
+        </span>
     `;
 }
 
@@ -1022,40 +1072,42 @@ function calcularEtiquetasEquiposEstadisticas(
                 remontadas: 0,
                 primeros_sets_ganados: 0,
                 victorias_tras_ganar_primero: 0,
-                victorias_2_0: 0,
+                victorias_limpias: 0,
                 racha_actual: 0,
                 mejor_racha: 0,
-                mata_gigantes: 0
+                partidos_repartidos: 0,
+                partidos_infarto: 0,
+                mata_gigantes: 0,
+                brecha_mata_gigantes: 0,
+                rivales_mata_gigantes: new Set()
             }
         );
     });
 
-    const posiciones = new Map();
-    let equipoAnterior = null;
-    let posicionActual = 0;
+    const posicionesFinales = new Map();
 
-    equiposOrdenados.forEach((equipo, indice) => {
-        if (
-            !equipoAnterior ||
-            !tienenMismoRendimientoEtiquetasEquipoEstadisticas(
-                equipo,
-                equipoAnterior
-            )
-        ) {
-            posicionActual = indice + 1;
-        }
-
-        posiciones.set(
-            normalizarEstadisticas(equipo.equipo),
-            posicionActual
+    equiposOrdenados.forEach(equipo => {
+        const posicion = numeroEstadisticas(
+            equipo.posicion_final
         );
 
-        equipoAnterior = equipo;
+        if (posicion > 0) {
+            posicionesFinales.set(
+                normalizarEstadisticas(equipo.equipo),
+                posicion
+            );
+        }
     });
 
-    const partidos = Array.isArray(campeonato?.partidos)
+    const partidos = (Array.isArray(campeonato?.partidos)
         ? campeonato.partidos
-        : [];
+        : [])
+        .filter(partido =>
+            !esPartidoPalasPlayaEtiquetasEquipoEstadisticas(
+                partido
+            )
+        )
+        .sort(compararOrdenDeportivoPartidosEstadisticas);
 
     partidos.forEach(partido => {
         const clave1 = normalizarEstadisticas(
@@ -1076,13 +1128,17 @@ function calcularEtiquetasEquiposEstadisticas(
                 partido.resultado
             );
 
+        if (!sets.length) return;
+
         const sets1 = Number.isFinite(
             Number(partido.sets_equipo1)
         )
             ? numeroEstadisticas(
                 partido.sets_equipo1
             )
-            : sets.filter(set => set.puntos1 > set.puntos2).length;
+            : sets.filter(
+                set => set.puntos1 > set.puntos2
+            ).length;
 
         const sets2 = Number.isFinite(
             Number(partido.sets_equipo2)
@@ -1090,7 +1146,9 @@ function calcularEtiquetasEquiposEstadisticas(
             ? numeroEstadisticas(
                 partido.sets_equipo2
             )
-            : sets.filter(set => set.puntos2 > set.puntos1).length;
+            : sets.filter(
+                set => set.puntos2 > set.puntos1
+            ).length;
 
         let ganador = normalizarEstadisticas(
             partido.ganador
@@ -1132,9 +1190,15 @@ function calcularEtiquetasEquiposEstadisticas(
             }
         }
 
+        const dosPrimeros = sets.slice(0, 2);
         const esDecisivo =
-            sets.length >= 3 ||
-            sets1 + sets2 >= 3;
+            dosPrimeros.length === 2 &&
+            dosPrimeros.filter(
+                set => set.puntos1 > set.puntos2
+            ).length === 1 &&
+            dosPrimeros.filter(
+                set => set.puntos2 > set.puntos1
+            ).length === 1;
 
         if (esDecisivo) {
             extra1.partidos_decisivos += 1;
@@ -1146,12 +1210,29 @@ function calcularEtiquetasEquiposEstadisticas(
         }
 
         if (
-            (sets1 === 2 && sets2 === 0) ||
-            (sets1 === 0 && sets2 === 2)
+            Math.min(sets1, sets2) === 0
         ) {
             extras
                 .get(ganador)
-                .victorias_2_0 += 1;
+                .victorias_limpias += 1;
+        }
+
+        if (sets1 > 0 && sets2 > 0) {
+            extra1.partidos_repartidos += 1;
+            extra2.partidos_repartidos += 1;
+        }
+
+        const margenMedio = sets.reduce(
+            (total, set) =>
+                total + Math.abs(
+                    set.puntos1 - set.puntos2
+                ),
+            0
+        ) / sets.length;
+
+        if (margenMedio <= 2) {
+            extra1.partidos_infarto += 1;
+            extra2.partidos_infarto += 1;
         }
 
         [clave1, clave2].forEach(clave => {
@@ -1168,15 +1249,29 @@ function calcularEtiquetasEquiposEstadisticas(
             }
         });
 
+        const posicionGanador =
+            posicionesFinales.get(ganador);
+
+        const posicionPerdedor =
+            posicionesFinales.get(perdedor);
+
+        const diferenciaPosiciones =
+            posicionGanador - posicionPerdedor;
+
         if (
-            posiciones.has(ganador) &&
-            posiciones.has(perdedor) &&
-            posiciones.get(ganador) >
-                posiciones.get(perdedor)
+            Number.isFinite(posicionGanador) &&
+            Number.isFinite(posicionPerdedor) &&
+            posicionPerdedor <= 3 &&
+            diferenciaPosiciones >= 2
         ) {
-            extras
-                .get(ganador)
-                .mata_gigantes += 1;
+            const extraGanador = extras.get(ganador);
+
+            extraGanador.mata_gigantes += 1;
+            extraGanador.brecha_mata_gigantes +=
+                diferenciaPosiciones;
+            extraGanador.rivales_mata_gigantes.add(
+                perdedor
+            );
         }
     });
 
@@ -1185,294 +1280,478 @@ function calcularEtiquetasEquiposEstadisticas(
             normalizarEstadisticas(equipo.equipo)
         ) || {};
 
-    const seleccionarMaximo = (
-        obtenerValor,
-        esElegible = () => true,
-        exigirPositivo = false
-    ) =>
-        seleccionarExtremoEtiquetasEquipoEstadisticas(
-            equiposOrdenados,
-            obtenerValor,
-            esElegible,
-            true,
-            exigirPositivo
-        );
-
-    const seleccionarMinimo = (
-        obtenerValor,
-        esElegible = () => true
-    ) =>
-        seleccionarExtremoEtiquetasEquipoEstadisticas(
-            equiposOrdenados,
-            obtenerValor,
-            esElegible,
-            false,
-            false
-        );
-
     const minimoPartidos = 3;
 
     return {
-        mas_victorias: seleccionarMaximo(
-            equipo => numeroEstadisticas(equipo.pg),
-            () => true,
-            true
+        mas_victorias: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo =>
+                        numeroEstadisticas(equipo.pg),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(equipo.pg) > 0
         ),
 
-        mejor_porcentaje: seleccionarMaximo(
+        mejor_porcentaje: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        equipo.pg,
+                        equipo.pj
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(equipo.pg),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(equipo.pj),
+                    maximo: true
+                }
+            ],
             equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    equipo.pg,
-                    equipo.pj
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pj) >=
-                    minimoPartidos &&
+                numeroEstadisticas(equipo.pj) >= minimoPartidos &&
                 numeroEstadisticas(equipo.pg) > 0
         ),
 
-        mejor_balance_sets: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    equipo.diferencia_sets
-                )
-        ),
-
-        mejor_balance_puntos: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    equipo.diferencia_puntos
-                )
-        ),
-
-        mejor_ataque: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    equipo.puntos_favor,
-                    equipo.pj
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pj) > 0
-        ),
-
-        mejor_defensa: seleccionarMinimo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    equipo.puntos_contra,
-                    equipo.pj
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pj) > 0
-        ),
-
-        mas_contundentes: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    extraEquipo(equipo).victorias_2_0,
-                    equipo.pg
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pg) >= 2 &&
-                numeroEstadisticas(
-                    extraEquipo(equipo).victorias_2_0
-                ) > 0
-        ),
-
-        reyes_decisivo: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    extraEquipo(equipo).victorias_decisivo,
-                    extraEquipo(equipo).partidos_decisivos
-                ),
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo).partidos_decisivos
-                ) >= 2 &&
-                numeroEstadisticas(
-                    extraEquipo(equipo).victorias_decisivo
-                ) > 0
-        ),
-
-        remontadores: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo).remontadas
-                ),
-            () => true,
-            true
-        ),
-
-        mejor_racha: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo).mejor_racha
-                ),
-            () => true,
-            true
-        ),
-
         invictos: equiposOrdenados.filter(equipo =>
-            numeroEstadisticas(equipo.pj) >=
-                minimoPartidos &&
+            numeroEstadisticas(equipo.pj) >= minimoPartidos &&
             numeroEstadisticas(equipo.pp) === 0
         ),
 
-        partidos_infarto: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo).partidos_decisivos
-                ),
-            () => true,
-            true
+        mejor_ataque: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        equipo.puntos_favor,
+                        equipo.sets_jugados
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(equipo.pj) >= minimoPartidos
         ),
 
-        mata_gigantes: seleccionarMaximo(
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo).mata_gigantes
-                ),
-            () => true,
-            true
+        mejor_defensa: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        equipo.puntos_contra,
+                        equipo.sets_jugados
+                    ),
+                    maximo: false
+                }
+            ],
+            equipo => numeroEstadisticas(equipo.pj) >= minimoPartidos
         ),
 
-        mejor_arranque: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    extraEquipo(equipo).primeros_sets_ganados,
-                    equipo.pj
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pj) >=
-                minimoPartidos
+        mejor_balance_sets: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        equipo.diferencia_sets
+                    ),
+                    maximo: true
+                }
+            ]
         ),
 
-        mejor_cierre: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    extraEquipo(equipo)
-                        .victorias_tras_ganar_primero,
-                    extraEquipo(equipo)
-                        .primeros_sets_ganados
-                ),
-            equipo =>
-                numeroEstadisticas(
-                    extraEquipo(equipo)
-                        .primeros_sets_ganados
-                ) >= 2
+        mejor_balance_puntos: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        equipo.diferencia_puntos
+                    ),
+                    maximo: true
+                }
+            ]
         ),
 
-        mas_luchadores: seleccionarMaximo(
+        mas_contundentes: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        extraEquipo(equipo).victorias_limpias,
+                        equipo.pg
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).victorias_limpias
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        equipo.diferencia_sets
+                    ),
+                    maximo: true
+                }
+            ],
             equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    equipo.sets_jugados,
-                    equipo.pj
-                ),
-            equipo =>
-                numeroEstadisticas(equipo.pj) > 0
-        ),
-
-        mas_eficaces: seleccionarMaximo(
-            equipo =>
-                cocienteEtiquetasEquipoEstadisticas(
-                    equipo.puntos_favor,
-                    numeroEstadisticas(
-                        equipo.puntos_favor
-                    ) +
-                    numeroEstadisticas(
-                        equipo.puntos_contra
-                    )
-                ),
-            equipo =>
+                numeroEstadisticas(equipo.pg) >= 3 &&
                 numeroEstadisticas(
-                    equipo.puntos_favor
-                ) +
-                numeroEstadisticas(
-                    equipo.puntos_contra
+                    extraEquipo(equipo).victorias_limpias
                 ) > 0
         ),
 
-        mas_partidos_perfectos: seleccionarMaximo(
+        reyes_decisivo: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        extraEquipo(equipo).victorias_decisivo,
+                        extraEquipo(equipo).partidos_decisivos
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).victorias_decisivo
+                    ),
+                    maximo: true
+                }
+            ],
             equipo =>
                 numeroEstadisticas(
-                    extraEquipo(equipo).victorias_2_0
-                ),
-            () => true,
-            true
+                    extraEquipo(equipo).partidos_decisivos
+                ) >= 2
+        ),
+
+        remontadores: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).remontadas
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).remontadas
+            ) >= 2
+        ),
+
+        mejor_racha: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).mejor_racha
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).mejor_racha
+            ) >= 2
+        ),
+
+        mata_gigantes: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).mata_gigantes
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).brecha_mata_gigantes
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo =>
+                numeroEstadisticas(
+                    extraEquipo(equipo).mata_gigantes
+                ) >= 2 &&
+                (
+                    extraEquipo(equipo)
+                        .rivales_mata_gigantes?.size || 0
+                ) >= 2
+        ),
+
+        mas_victorias_limpias: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).victorias_limpias
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).victorias_limpias
+            ) > 0
+        ),
+
+        mejor_arranque: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        extraEquipo(equipo).primeros_sets_ganados,
+                        equipo.pj
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).primeros_sets_ganados
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(equipo.pj) >= minimoPartidos
+        ),
+
+        mejor_cierre: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        extraEquipo(equipo)
+                            .victorias_tras_ganar_primero,
+                        extraEquipo(equipo)
+                            .primeros_sets_ganados
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo)
+                            .victorias_tras_ganar_primero
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).primeros_sets_ganados
+            ) >= 3
+        ),
+
+        mas_luchadores: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        extraEquipo(equipo).partidos_repartidos,
+                        equipo.pj
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).partidos_repartidos
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).partidos_repartidos
+            ) >= 2
+        ),
+
+        mas_eficaces: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => cocienteEtiquetasEquipoEstadisticas(
+                        equipo.puntos_favor,
+                        numeroEstadisticas(equipo.puntos_favor) +
+                            numeroEstadisticas(equipo.puntos_contra)
+                    ),
+                    maximo: true
+                },
+                {
+                    valor: equipo => numeroEstadisticas(
+                        equipo.diferencia_puntos
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(equipo.pj) >= minimoPartidos
+        ),
+
+        partidos_infarto: seleccionarEquiposPorCriteriosEstadisticas(
+            equiposOrdenados,
+            [
+                {
+                    valor: equipo => numeroEstadisticas(
+                        extraEquipo(equipo).partidos_infarto
+                    ),
+                    maximo: true
+                }
+            ],
+            equipo => numeroEstadisticas(
+                extraEquipo(equipo).partidos_infarto
+            ) >= 2
         )
     };
 }
 
-function tienenMismoRendimientoEtiquetasEquipoEstadisticas(
-    equipo1,
-    equipo2
-) {
-    const campos = [
-        "pg",
-        "porcentaje_victorias",
-        "diferencia_sets",
-        "diferencia_puntos"
-    ];
-
-    return campos.every(campo =>
-        Math.abs(
-            numeroEstadisticas(equipo1?.[campo]) -
-            numeroEstadisticas(equipo2?.[campo])
-        ) < 0.0000001
-    );
-}
-
-function seleccionarExtremoEtiquetasEquipoEstadisticas(
+function seleccionarEquiposPorCriteriosEstadisticas(
     equipos,
-    obtenerValor,
-    esElegible,
-    buscarMaximo,
-    exigirPositivo
+    criterios,
+    esElegible = () => true
 ) {
-    const candidatos = equipos
-        .filter(esElegible)
-        .map(equipo => ({
-            equipo,
-            valor: Number(
-                obtenerValor(equipo)
-            )
-        }))
-        .filter(candidato =>
-            Number.isFinite(candidato.valor) &&
-            (
-                !exigirPositivo ||
-                candidato.valor > 0
-            )
-        );
+    const candidatos = equipos.filter(esElegible);
 
     if (!candidatos.length) {
         return [];
     }
 
-    const mejor = candidatos.reduce(
-        (acumulado, candidato) =>
-            buscarMaximo
-                ? Math.max(
-                    acumulado,
-                    candidato.valor
+    let restantes = [...candidatos];
+
+    for (const criterio of criterios) {
+        const evaluados = restantes
+            .map(equipo => ({
+                equipo,
+                valor: Number(
+                    criterio.valor(equipo)
                 )
-                : Math.min(
-                    acumulado,
-                    candidato.valor
-                ),
-        buscarMaximo
-            ? -Infinity
-            : Infinity
+            }))
+            .filter(item =>
+                Number.isFinite(item.valor)
+            );
+
+        if (!evaluados.length) {
+            return [];
+        }
+
+        const extremo = evaluados.reduce(
+            (acumulado, item) =>
+                criterio.maximo === false
+                    ? Math.min(acumulado, item.valor)
+                    : Math.max(acumulado, item.valor),
+            criterio.maximo === false
+                ? Infinity
+                : -Infinity
+        );
+
+        restantes = evaluados
+            .filter(item =>
+                Math.abs(item.valor - extremo) <
+                    0.0000001
+            )
+            .map(item => item.equipo);
+
+        if (restantes.length <= 1) {
+            break;
+        }
+    }
+
+    return restantes;
+}
+
+function esPartidoPalasPlayaEtiquetasEquipoEstadisticas(
+    partido
+) {
+    const fase = normalizarEstadisticas(
+        partido?.fase
+    )
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    return fase.includes("PALAS") &&
+        fase.includes("PLAYA");
+}
+
+function compararOrdenDeportivoPartidosEstadisticas(
+    partido1,
+    partido2
+) {
+    const orden1 = obtenerOrdenDeportivoPartidoEstadisticas(
+        partido1
     );
 
-    return candidatos
-        .filter(candidato =>
-            Math.abs(
-                candidato.valor - mejor
-            ) < 0.0000001
-        )
-        .map(candidato =>
-            candidato.equipo
+    const orden2 = obtenerOrdenDeportivoPartidoEstadisticas(
+        partido2
+    );
+
+    for (let i = 0; i < orden1.length; i += 1) {
+        if (orden1[i] !== orden2[i]) {
+            return orden1[i] - orden2[i];
+        }
+    }
+
+    return String(partido1?.id_partido || "")
+        .localeCompare(
+            String(partido2?.id_partido || ""),
+            "es",
+            { numeric: true }
         );
+}
+
+function obtenerOrdenDeportivoPartidoEstadisticas(
+    partido
+) {
+    const fase = normalizarEstadisticas(
+        partido?.fase
+    )
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    const ronda = normalizarEstadisticas(
+        partido?.grupo_ronda
+    )
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    let bloqueFase = 90;
+    let bloqueRonda = 0;
+
+    if (fase.includes("LIGUILLA")) {
+        bloqueFase = 10;
+    } else if (
+        fase === "GRUPOS" ||
+        fase.includes("PRIMERA FASE")
+    ) {
+        bloqueFase = 20;
+    } else if (fase.includes("REGRUPO")) {
+        bloqueFase = 30;
+    } else if (
+        fase.includes("CRUCE") ||
+        fase.includes("MATA") ||
+        ronda.includes("OCTAV") ||
+        ronda.includes("CUART") ||
+        ronda.includes("SEMI") ||
+        ronda.includes("FINAL")
+    ) {
+        bloqueFase = 40;
+
+        if (ronda.includes("OCTAV")) {
+            bloqueRonda = 10;
+        } else if (ronda.includes("CUART")) {
+            bloqueRonda = 20;
+        } else if (ronda.includes("SEMI")) {
+            bloqueRonda = 30;
+        } else if (ronda.includes("FINAL")) {
+            bloqueRonda = 40;
+        }
+    }
+
+    return [
+        bloqueFase,
+        bloqueRonda,
+        numeroEstadisticas(partido?.jornada),
+        numeroEstadisticas(partido?.orden)
+    ];
 }
 
 function cocienteEtiquetasEquipoEstadisticas(
@@ -1554,7 +1833,7 @@ function mostrarInfoEtiquetasEquiposEstadisticas() {
                                 Etiquetas de los equipos
                             </h2>
                             <p>
-                                En caso de empate, la etiqueta se muestra en todos los equipos que comparten el mejor registro.
+                                Se aplican los desempates indicados en cada criterio. Si el empate continúa, la etiqueta se comparte.
                             </p>
                         </div>
 
@@ -1595,7 +1874,7 @@ function mostrarInfoEtiquetasEquiposEstadisticas() {
                     </div>
 
                     <p class="notaModalEtiquetasEquiposEstadisticas">
-                        Ataque y defensa se calculan por partido para coincidir con los valores mostrados en cada tarjeta.
+                        Las etiquetas y los datos de equipo excluyen Palas de Playa. Ataque y defensa se calculan por set para comparar formatos de partido distintos.
                     </p>
                 </section>
             </div>
@@ -2565,6 +2844,41 @@ function agregarTarjetaListaRecordEstadisticas(
     `);
 }
 
+function alternarEtiquetasEquipoEstadisticas(
+    boton
+) {
+    const contenedor = boton.closest(
+        ".etiquetasEquipoEstadisticas"
+    );
+
+    if (!contenedor) return;
+
+    const adicionales = [
+        ...contenedor.querySelectorAll(
+            "[data-etiqueta-equipo-adicional]"
+        )
+    ];
+
+    const estabaExpandido =
+        boton.getAttribute("aria-expanded") ===
+        "true";
+
+    adicionales.forEach(etiqueta => {
+        etiqueta.hidden = estabaExpandido;
+    });
+
+    boton.setAttribute(
+        "aria-expanded",
+        String(!estabaExpandido)
+    );
+
+    boton.textContent = estabaExpandido
+        ? `+${numeroEstadisticas(
+            boton.dataset.totalOcultas
+        )} más`
+        : "Ver menos";
+}
+
 function gestionarTecladoEstadisticas(evento) {
     if (
         evento.key === "Escape" &&
@@ -2577,6 +2891,17 @@ function gestionarTecladoEstadisticas(evento) {
 }
 
 function gestionarClickEstadisticas(evento) {
+    const botonMasEtiquetas = evento.target.closest(
+        "[data-toggle-etiquetas-equipo]"
+    );
+
+    if (botonMasEtiquetas) {
+        alternarEtiquetasEquipoEstadisticas(
+            botonMasEtiquetas
+        );
+        return;
+    }
+
     const botonInfoEtiquetas = evento.target.closest(
         "#btnInfoEtiquetasEquiposEstadisticas"
     );
