@@ -4465,3 +4465,35 @@ body.modalEtiquetasEquiposEstadisticasAbierto{
 .cabeceraPartidoEstadisticas{
     justify-content:flex-start;
 }
+
+
+/* =========================================================
+   ETIQUETAS DE EQUIPO — 4 VISIBLES Y DESPLIEGUE
+========================================================= */
+
+.etiquetasEquipoEstadisticas
+[data-etiqueta-equipo-adicional][hidden]{
+    display:none !important;
+}
+
+.btnMasEtiquetasEquipoEstadisticas{
+    padding:5px 9px;
+    border:1px solid #bfdbfe;
+    border-radius:999px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-family:inherit;
+    font-size:10px;
+    font-weight:900;
+    line-height:1.25;
+    cursor:pointer;
+}
+
+.btnMasEtiquetasEquipoEstadisticas:hover{
+    background:#dbeafe;
+}
+
+.btnMasEtiquetasEquipoEstadisticas:focus-visible{
+    outline:3px solid rgba(37,99,235,.24);
+    outline-offset:2px;
+}
