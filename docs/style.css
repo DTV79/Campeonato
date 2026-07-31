@@ -4107,7 +4107,214 @@ body.modoMantenimiento{
     font-weight:700;
 }
 
+
+/* =========================================================
+   ETIQUETAS E INFORMACIÓN DE EQUIPOS
+========================================================= */
+
+.accionesCabeceraPanelEstadisticas{
+    display:flex;
+    flex:0 0 auto;
+    align-items:center;
+    gap:10px;
+}
+
+.accionesCabeceraPanelEstadisticas > span{
+    font-size:38px;
+    line-height:1;
+}
+
+.btnInfoEtiquetasEquiposEstadisticas{
+    display:flex;
+    width:38px;
+    height:38px;
+    padding:0;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #bfdbfe;
+    border-radius:50%;
+    background:white;
+    color:#1d4ed8;
+    font-size:18px;
+    line-height:1;
+    box-shadow:0 4px 12px rgba(37,99,235,.14);
+    cursor:pointer;
+}
+
+.btnInfoEtiquetasEquiposEstadisticas:focus-visible{
+    outline:3px solid rgba(37,99,235,.28);
+    outline-offset:2px;
+}
+
+.etiquetasEquipoEstadisticas span{
+    line-height:1.25;
+}
+
+body.modalEtiquetasEquiposEstadisticasAbierto{
+    overflow:hidden;
+}
+
+.overlayEtiquetasEquiposEstadisticas{
+    position:fixed;
+    inset:0;
+    z-index:200000;
+    display:flex;
+    padding:22px;
+    align-items:center;
+    justify-content:center;
+    background:rgba(15,23,42,.62);
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+}
+
+.modalEtiquetasEquiposEstadisticas{
+    display:flex;
+    width:100%;
+    max-width:560px;
+    max-height:min(82dvh,760px);
+    overflow:hidden;
+    flex-direction:column;
+    border-radius:24px;
+    background:white;
+    box-shadow:0 24px 70px rgba(15,23,42,.34);
+    animation:abrirDetalle .2s ease-out;
+}
+
+.cabeceraModalEtiquetasEquiposEstadisticas{
+    display:flex;
+    padding:20px 20px 16px;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    border-bottom:1px solid #e5e7eb;
+    background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+}
+
+.cabeceraModalEtiquetasEquiposEstadisticas small{
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.1px;
+}
+
+.cabeceraModalEtiquetasEquiposEstadisticas h2{
+    margin:4px 0 6px;
+    color:#0f172a;
+    font-size:22px;
+    font-weight:900;
+    line-height:1.2;
+}
+
+.cabeceraModalEtiquetasEquiposEstadisticas p{
+    max-width:430px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.5;
+}
+
+.cabeceraModalEtiquetasEquiposEstadisticas button{
+    display:flex;
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    border-radius:50%;
+    background:white;
+    color:#0f172a;
+    font-size:25px;
+    font-weight:800;
+    line-height:1;
+    box-shadow:0 3px 10px rgba(15,23,42,.10);
+    cursor:pointer;
+}
+
+.listaCriteriosEtiquetasEquiposEstadisticas{
+    display:flex;
+    padding:14px 18px;
+    overflow-y:auto;
+    flex-direction:column;
+    gap:8px;
+    overscroll-behavior:contain;
+}
+
+.listaCriteriosEtiquetasEquiposEstadisticas article{
+    display:grid;
+    padding:11px 12px;
+    grid-template-columns:30px minmax(0,1fr);
+    align-items:flex-start;
+    gap:9px;
+    border-radius:14px;
+    background:#f8fafc;
+}
+
+.listaCriteriosEtiquetasEquiposEstadisticas article > span{
+    font-size:20px;
+    line-height:1.2;
+    text-align:center;
+}
+
+.listaCriteriosEtiquetasEquiposEstadisticas strong{
+    display:block;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.listaCriteriosEtiquetasEquiposEstadisticas p{
+    margin-top:3px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+.notaModalEtiquetasEquiposEstadisticas{
+    padding:12px 18px 15px;
+    border-top:1px solid #e5e7eb;
+    background:#fff7ed;
+    color:#92400e;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.45;
+}
+
 @media(max-width:600px){
+
+    .overlayEtiquetasEquiposEstadisticas{
+        padding:14px;
+        align-items:flex-end;
+    }
+
+    .modalEtiquetasEquiposEstadisticas{
+        max-height:88dvh;
+        border-radius:22px 22px 18px 18px;
+    }
+
+    .cabeceraModalEtiquetasEquiposEstadisticas{
+        padding:17px 17px 14px;
+    }
+
+    .listaCriteriosEtiquetasEquiposEstadisticas{
+        padding:12px 14px;
+    }
+
+    .accionesCabeceraPanelEstadisticas{
+        flex-direction:column-reverse;
+        gap:8px;
+    }
+
+    .accionesCabeceraPanelEstadisticas > span{
+        font-size:31px;
+    }
+
+    .btnInfoEtiquetasEquiposEstadisticas{
+        width:34px;
+        height:34px;
+        font-size:16px;
+    }
 
     .gridMetricasEstadisticas{
         grid-template-columns:repeat(3,1fr);
