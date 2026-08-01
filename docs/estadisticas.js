@@ -24,7 +24,7 @@ const DEFINICIONES_ETIQUETAS_EQUIPOS_ESTADISTICAS = [
     {
         clave: "mejor_porcentaje",
         icono: "📊",
-        nombre: "Mejor porcentaje",
+        nombre: "Más regular",
         criterio: "Equipo con mayor proporción de victorias sobre partidos jugados. Se calcula como victorias divididas entre partidos disputados y se exige un mínimo de 3 partidos. En caso de empate se priorizan más victorias y después más partidos."
     },
     {
