@@ -4511,3 +4511,55 @@ body.modalEtiquetasEquiposEstadisticasAbierto{
     outline:3px solid rgba(37,99,235,.24);
     outline-offset:2px;
 }
+
+
+/* =========================================================
+   GRUPOS DEL PANEL DE ETIQUETAS
+========================================================= */
+
+.grupoCriteriosEtiquetasEquiposEstadisticas{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas + 
+.grupoCriteriosEtiquetasEquiposEstadisticas{
+    margin-top:8px;
+    padding-top:12px;
+    border-top:1px solid #e2e8f0;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas > header{
+    display:grid;
+    padding:2px 2px 4px;
+    grid-template-columns:30px minmax(0,1fr);
+    align-items:flex-start;
+    gap:9px;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas > header > span{
+    font-size:21px;
+    line-height:1.2;
+    text-align:center;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas h3{
+    color:#1e3a8a;
+    font-size:14px;
+    font-weight:900;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas > header p{
+    margin-top:2px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.grupoCriteriosEtiquetasEquiposEstadisticas > div{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
