@@ -179,6 +179,7 @@ async function iniciarPaginaEstadisticas() {
             return;
         }
 
+        configurarNavegacionEstadisticas();
         inicializarEstadoVistaEstadisticas();
         pintarCabeceraEstadisticas();
         pintarPaginaEstadisticas();
@@ -195,6 +196,236 @@ async function iniciarPaginaEstadisticas() {
         );
     }
 }
+
+
+/* =========================================================
+   NAVEGACIÓN INFERIOR
+   Mantiene exactamente la misma navegación que index.html
+   según el estado del campeonato.
+========================================================= */
+
+function configurarNavegacionEstadisticas() {
+    const botones = [
+        document.getElementById("navEstadisticas1"),
+        document.getElementById("navEstadisticas2"),
+        document.getElementById("navEstadisticas3"),
+        document.getElementById("navEstadisticas4"),
+        document.getElementById("navEstadisticas5")
+    ];
+
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    botones.forEach(boton => {
+        if (!boton) return;
+
+        boton.classList.remove(
+            "oculto",
+            "navActivo"
+        );
+
+        boton.removeAttribute(
+            "aria-current"
+        );
+    });
+
+    if (esWebPreviaEstadisticas()) {
+        configurarBotonNavegacionEstadisticas(
+            botones[0],
+            "🏠",
+            "Inicio",
+            "index.html"
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[1],
+            "📖",
+            "Historia",
+            "historia.html",
+            !esSiEstadisticas(
+                config.mostrar_historia
+            )
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[2],
+            "📜",
+            "Normas",
+            "normas.html",
+            !esSiEstadisticas(
+                config.mostrar_normativa
+            )
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[3],
+            "🏆",
+            "Campeones",
+            "campeones.html",
+            !esSiEstadisticas(
+                config.mostrar_campeones
+            )
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[4],
+            "☰",
+            "Más",
+            "index.html?pantalla=mas",
+            false,
+            true
+        );
+
+        return;
+    }
+
+    configurarBotonNavegacionEstadisticas(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "index.html"
+    );
+
+    configurarBotonNavegacionEstadisticas(
+        botones[1],
+        "📊",
+        esModoGruposEstadisticas()
+            ? "Grupos"
+            : "Clasificación",
+        "index.html?pantalla=competicion"
+    );
+
+    configurarBotonNavegacionEstadisticas(
+        botones[2],
+        "🎾",
+        "Partidos",
+        "index.html?pantalla=partidos"
+    );
+
+    configurarBotonNavegacionEstadisticas(
+        botones[3],
+        "👥",
+        "Equipos",
+        "index.html?pantalla=equipos"
+    );
+
+    configurarBotonNavegacionEstadisticas(
+        botones[4],
+        "☰",
+        "Más",
+        "index.html?pantalla=mas",
+        false,
+        true
+    );
+}
+
+
+function configurarBotonNavegacionEstadisticas(
+    boton,
+    icono,
+    texto,
+    href,
+    oculto = false,
+    activo = false
+) {
+    if (!boton) return;
+
+    const elementoIcono =
+        boton.querySelector("span");
+
+    const elementoTexto =
+        boton.querySelector("small");
+
+    if (elementoIcono) {
+        elementoIcono.textContent =
+            icono;
+    }
+
+    if (elementoTexto) {
+        elementoTexto.textContent =
+            texto;
+    }
+
+    boton.href = href;
+
+    boton.classList.toggle(
+        "oculto",
+        oculto
+    );
+
+    boton.classList.toggle(
+        "navActivo",
+        activo
+    );
+
+    if (activo) {
+        boton.setAttribute(
+            "aria-current",
+            "page"
+        );
+    } else {
+        boton.removeAttribute(
+            "aria-current"
+        );
+    }
+}
+
+
+function obtenerEstadoTorneoEstadisticas() {
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    const valor =
+        config.estado_torneo ||
+        config.estado ||
+        "En juego";
+
+    return normalizarEstadisticas(valor)
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ");
+}
+
+
+function esWebPreviaEstadisticas() {
+    const estado =
+        obtenerEstadoTorneoEstadisticas();
+
+    return (
+        estado === "PRETORNEO" ||
+        estado.includes("INSCRIP")
+    );
+}
+
+
+function esModoGruposEstadisticas() {
+    const config =
+        estadoCampeonato?.configuracion || {};
+
+    const modo = normalizarEstadisticas(
+        config.modo_torneo ||
+        config.formato_inicial ||
+        config.sistema_primera_fase ||
+        config.sistema_1_fase ||
+        ""
+    );
+
+    return modo.includes("GRUPO");
+}
+
+
+function esSiEstadisticas(valor) {
+    if (valor === true) return true;
+
+    return [
+        "SI",
+        "SÍ",
+        "TRUE",
+        "1"
+    ].includes(
+        normalizarEstadisticas(valor)
+    );
+}
+
 
 async function cargarJSONEstadisticas(url) {
     const respuesta = await fetch(
