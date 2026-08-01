@@ -17,111 +17,156 @@ const MAX_ETIQUETAS_VISIBLES_EQUIPO_ESTADISTICAS = 4;
 const DEFINICIONES_ETIQUETAS_EQUIPOS_ESTADISTICAS = [
     {
         clave: "mas_victorias",
+        grupo: "rendimiento",
         icono: "🏆",
         nombre: "Más victorias",
         criterio: "Equipo con mayor número total de partidos ganados en la competición principal. Premia la cantidad absoluta de victorias, aunque otro equipo pudiera tener un porcentaje de éxito parecido."
     },
     {
         clave: "mejor_porcentaje",
-        icono: "📊",
+        icono: "🥇",
         nombre: "Más regular",
-        criterio: "Equipo con mayor proporción de victorias sobre partidos jugados. Se calcula como victorias divididas entre partidos disputados y se exige un mínimo de 3 partidos. En caso de empate se priorizan más victorias y después más partidos."
+        grupo: "rendimiento",
+        criterio: "Premia la constancia: se concede al equipo con mayor porcentaje de victorias sobre partidos jugados. Se calcula dividiendo las victorias entre los partidos disputados. Se exige un mínimo de 3 partidos y, en caso de empate, se priorizan más victorias y después más partidos."
     },
     {
         clave: "invictos",
+        grupo: "rendimiento",
         icono: "👑",
         nombre: "Invictos",
         criterio: "Equipos que terminaron sin ninguna derrota y disputaron al menos 3 partidos. Puede aparecer en más de un equipo si todos cumplen esa condición."
     },
     {
         clave: "mejor_ataque",
+        grupo: "juego",
         icono: "⚡",
         nombre: "Mejor ataque",
         criterio: "Mayor media de puntos anotados por set. Se usa la media por set, y no por partido, para comparar de forma justa encuentros de dos y tres sets. Se exigen al menos 3 partidos."
     },
     {
         clave: "mejor_defensa",
+        grupo: "juego",
         icono: "🛡️",
         nombre: "Mejor defensa",
         criterio: "Menor media de puntos recibidos por set. Aquí gana el valor más bajo. Se calcula por set para que los distintos formatos de partido sean comparables y se exigen al menos 3 partidos."
     },
     {
         clave: "mejor_balance_sets",
+        grupo: "juego",
         icono: "📈",
         nombre: "Mejor balance de sets",
         criterio: "Mayor diferencia acumulada entre sets ganados y sets perdidos. Por ejemplo, 12 sets a favor y 5 en contra producen un balance de +7."
     },
     {
         clave: "mejor_balance_puntos",
+        grupo: "juego",
         icono: "➕",
         nombre: "Mejor balance de puntos",
         criterio: "Mayor diferencia acumulada entre puntos anotados y puntos recibidos durante toda la competición principal."
     },
     {
         clave: "mas_contundentes",
+        grupo: "especiales",
         icono: "💥",
         nombre: "Más contundentes",
         criterio: "Mayor porcentaje de sus victorias conseguido sin ceder ningún set. Cuenta igual una victoria 3-0, 2-0 o cualquier formato equivalente. Se exigen al menos 3 victorias; en empate se priorizan más victorias limpias y después mejor diferencia de sets."
     },
     {
         clave: "reyes_decisivo",
+        grupo: "caracter",
         icono: "🧠",
         nombre: "Reyes del decisivo",
         criterio: "Mejor porcentaje de victorias en partidos que llegaron empatados 1-1 después de los dos primeros sets y se resolvieron en el tercero. Se exigen al menos 2 partidos decisivos."
     },
     {
         clave: "remontadores",
+        grupo: "caracter",
         icono: "🔄",
         nombre: "Remontadores",
         criterio: "Mayor número de partidos ganados después de perder el primer set. Se exigen al menos 2 remontadas para que la etiqueta aparezca."
     },
     {
         clave: "mejor_racha",
+        grupo: "rendimiento",
         icono: "🔥",
         nombre: "Mejor racha",
         criterio: "Mayor número de victorias consecutivas siguiendo el orden deportivo real: fases, jornadas y rondas eliminatorias. Se exige una racha mínima de 2 victorias."
     },
     {
         clave: "mata_gigantes",
+        grupo: "especiales",
         icono: "🐉",
         nombre: "Mata-gigantes",
         criterio: "Premia victorias realmente destacadas frente a rivales del top 3 que terminaron al menos dos posiciones por encima. Se exigen 2 victorias válidas contra, como mínimo, 2 rivales distintos. La posición utilizada es la final guardada en HIST_EQUIPOS."
     },
     {
         clave: "mas_victorias_limpias",
+        grupo: "especiales",
         icono: "🧹",
         nombre: "Más victorias limpias",
         criterio: "Mayor número total de victorias sin perder ningún set. Cuenta una victoria 3-0, 2-0 o cualquier resultado equivalente. A diferencia de Más contundentes, aquí importa la cantidad y no el porcentaje."
     },
     {
         clave: "mejor_arranque",
+        grupo: "especiales",
         icono: "🚀",
         nombre: "Mejor arranque",
         criterio: "Mayor porcentaje de primeros sets ganados sobre partidos disputados. Se exigen al menos 3 partidos y, en caso de empate, se prioriza el mayor número absoluto de primeros sets ganados."
     },
     {
         clave: "mejor_cierre",
+        grupo: "caracter",
         icono: "🔒",
         nombre: "Mejor cierre",
         criterio: "Mayor porcentaje de victorias entre los partidos en los que el equipo ganó el primer set. Mide su capacidad para conservar una ventaja inicial. Se exigen al menos 3 primeros sets ganados."
     },
     {
         clave: "mas_luchadores",
+        grupo: "caracter",
         icono: "⚔️",
         nombre: "Más luchadores",
         criterio: "Mayor porcentaje de partidos en los que ambos equipos consiguieron ganar al menos un set. Refleja encuentros disputados y con reacción de ambos lados. Se exigen al menos 2 partidos de este tipo."
     },
     {
         clave: "mas_dominantes",
+        grupo: "juego",
         icono: "🎯",
         nombre: "Más dominante",
         criterio: "Equipo que ganó el mayor porcentaje de todos los puntos disputados. Se calcula como puntos anotados dividido entre puntos anotados más puntos recibidos. No mide solo las victorias: también refleja cuánto controló los marcadores. Se exigen al menos 3 partidos."
     },
     {
         clave: "partidos_infarto",
+        grupo: "especiales",
         icono: "😅",
         nombre: "Partidos de infarto",
         criterio: "Mayor número de partidos cuyo margen medio fue de 2 puntos o menos por set. Señala a los equipos que más veces estuvieron en encuentros especialmente igualados. Se exigen al menos 2 partidos así."
+    }
+];
+
+const GRUPOS_ETIQUETAS_EQUIPOS_ESTADISTICAS = [
+    {
+        clave: "rendimiento",
+        icono: "🏆",
+        nombre: "Rendimiento",
+        descripcion: "Resultados, constancia y continuidad competitiva."
+    },
+    {
+        clave: "juego",
+        icono: "⚔️",
+        nombre: "Juego",
+        descripcion: "Capacidad ofensiva, solidez defensiva y dominio de los marcadores."
+    },
+    {
+        clave: "caracter",
+        icono: "💪",
+        nombre: "Carácter",
+        descripcion: "Reacción, gestión de los momentos decisivos y capacidad para cerrar partidos."
+    },
+    {
+        clave: "especiales",
+        icono: "✨",
+        nombre: "Especiales",
+        descripcion: "Méritos y curiosidades que describen la forma particular de competir de cada equipo."
     }
 ];
 
@@ -2078,29 +2123,60 @@ function mostrarInfoEtiquetasEquiposEstadisticas() {
                     </div>
 
                     <div class="listaCriteriosEtiquetasEquiposEstadisticas">
-                        ${DEFINICIONES_ETIQUETAS_EQUIPOS_ESTADISTICAS
-                            .map(definicion => `
-                                <article>
-                                    <span aria-hidden="true">
-                                        ${definicion.icono}
-                                    </span>
-                                    <div>
-                                        <strong>
-                                            ${escaparHTMLEstadisticas(
-                                                definicion.nombre
-                                            )}
-                                        </strong>
-                                        <p>
-                                            ${escaparHTMLEstadisticas(
-                                                criteriosJSON[
-                                                    definicion.clave
-                                                ] ||
-                                                definicion.criterio
-                                            )}
-                                        </p>
-                                    </div>
-                                </article>
-                            `)
+                        ${GRUPOS_ETIQUETAS_EQUIPOS_ESTADISTICAS
+                            .map(grupo => {
+                                const definiciones =
+                                    DEFINICIONES_ETIQUETAS_EQUIPOS_ESTADISTICAS
+                                        .filter(definicion =>
+                                            definicion.grupo === grupo.clave
+                                        );
+
+                                return `
+                                    <section class="grupoCriteriosEtiquetasEquiposEstadisticas">
+                                        <header>
+                                            <span aria-hidden="true">
+                                                ${grupo.icono}
+                                            </span>
+                                            <div>
+                                                <h3>
+                                                    ${escaparHTMLEstadisticas(
+                                                        grupo.nombre
+                                                    )}
+                                                </h3>
+                                                <p>
+                                                    ${escaparHTMLEstadisticas(
+                                                        grupo.descripcion
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </header>
+
+                                        <div>
+                                            ${definiciones
+                                                .map(definicion => `
+                                                    <article>
+                                                        <span aria-hidden="true">
+                                                            ${definicion.icono}
+                                                        </span>
+                                                        <div>
+                                                            <strong>
+                                                                ${escaparHTMLEstadisticas(
+                                                                    definicion.nombre
+                                                                )}
+                                                            </strong>
+                                                            <p>
+                                                                ${escaparHTMLEstadisticas(
+                                                                    definicion.criterio
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </article>
+                                                `)
+                                                .join("")}
+                                        </div>
+                                    </section>
+                                `;
+                            })
                             .join("")}
                     </div>
 
@@ -2958,7 +3034,7 @@ function agregarRecordsJugadoresEstadisticas(
     agregarTarjetaListaRecordEstadisticas(
         tarjetas,
         "📈",
-        "Mejor porcentaje de victorias",
+        "Más regular",
         porcentaje.jugadores,
         item => item.jugador,
         item => `${formatearPorcentajeEstadisticas(
