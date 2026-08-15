@@ -4633,3 +4633,82 @@ body.modalEtiquetasEquiposEstadisticasAbierto{
     flex-direction:column;
     gap:8px;
 }
+
+
+/* =========================================================
+   NAVEGACIÓN INFERIOR FLOTANTE — MÓVIL
+========================================================= */
+
+@media(max-width:700px){
+
+    body{
+        padding-bottom:calc(106px + env(safe-area-inset-bottom));
+    }
+
+    .bottomNav{
+        right:12px !important;
+        bottom:calc(10px + env(safe-area-inset-bottom)) !important;
+        left:12px !important;
+        width:auto;
+        height:72px;
+        padding:6px 5px;
+        border:1px solid rgba(148,163,184,.24);
+        border-radius:24px;
+        background:rgba(255,255,255,.93);
+        box-shadow:
+            0 12px 34px rgba(15,23,42,.20),
+            0 2px 8px rgba(15,23,42,.10);
+        backdrop-filter:blur(18px) saturate(145%);
+        -webkit-backdrop-filter:blur(18px) saturate(145%);
+    }
+
+    .bottomNav .navBtn{
+        height:60px;
+        padding:6px 2px;
+        justify-content:center;
+        gap:4px;
+        border-radius:18px;
+        transition:
+            background-color .18s ease,
+            color .18s ease,
+            transform .18s ease;
+    }
+
+    .bottomNav .navBtn:active{
+        transform:scale(.96);
+    }
+
+    .bottomNav .navBtn.navActivo{
+        background:rgba(163,58,43,.10);
+    }
+
+    .bottomNav .navBtn span{
+        font-size:23px;
+    }
+
+    .bottomNav .navBtn small{
+        font-size:10px;
+        line-height:1.1;
+    }
+
+    .modoPretorneo .bottomNav{
+        border:1px solid rgba(163,58,43,.16);
+    }
+}
+
+@media(max-width:380px){
+
+    .bottomNav{
+        right:8px !important;
+        left:8px !important;
+        border-radius:22px;
+    }
+
+    .bottomNav .navBtn span{
+        font-size:21px;
+    }
+
+    .bottomNav .navBtn small{
+        font-size:9px;
+    }
+}
