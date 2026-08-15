@@ -4712,3 +4712,165 @@ body.modalEtiquetasEquiposEstadisticasAbierto{
         font-size:9px;
     }
 }
+
+
+/* =========================================================
+   FOTOGRAFÍAS — PORTADAS DE LOS ÁLBUMES
+========================================================= */
+
+.listaAlbumesFotos{
+    display:grid;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+}
+
+.albumFotosCard{
+    display:flex;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    padding:0;
+    overflow:hidden;
+    flex-direction:column;
+    border:0;
+    border-radius:22px;
+    background:#fff;
+    color:#172033;
+    font-family:inherit;
+    text-align:left;
+    box-shadow:0 8px 24px rgba(15,23,42,.12);
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.albumFotosCard:hover{
+    transform:translateY(-3px);
+    box-shadow:0 13px 30px rgba(15,23,42,.17);
+}
+
+.imagenAlbumFotos{
+    display:flex;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow:hidden;
+    align-items:center;
+    justify-content:center;
+    aspect-ratio:4 / 3;
+    background:#eef2f6;
+}
+
+.imagenAlbumFotos img{
+    display:block;
+    width:100%;
+    max-width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.datosAlbumFotos{
+    display:grid;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    padding:16px 17px 18px;
+    box-sizing:border-box;
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:baseline;
+    gap:6px 8px;
+}
+
+.datosAlbumFotos small{
+    color:#9d174d;
+    font-size:11px;
+    font-weight:900;
+}
+
+.datosAlbumFotos strong{
+    min-width:0;
+    max-width:100%;
+    color:#172033;
+    font-size:16px;
+    font-weight:900;
+    line-height:1.3;
+    overflow-wrap:anywhere;
+    white-space:normal;
+}
+
+.datosAlbumFotos > span{
+    grid-column:1 / -1;
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+}
+
+.datosAlbumFotos b{
+    grid-column:1 / -1;
+    margin-top:3px;
+    color:#9d174d;
+    font-size:12px;
+    font-weight:900;
+}
+
+.btnVolverAlbumesFotos{
+    max-width:100%;
+    margin-bottom:14px;
+    padding:10px 14px;
+    border:1px solid #f3c7d8;
+    border-radius:999px;
+    background:#fdf2f8;
+    color:#9d174d;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.cabeceraAlbumFotos,
+.cabeceraAlbumFotos > div,
+.cabeceraAlbumFotos h2{
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+}
+
+.cabeceraAlbumFotos small{
+    display:block;
+    margin-bottom:4px;
+    color:#9d174d;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.7px;
+}
+
+@media(max-width:600px){
+
+    .listaAlbumesFotos{
+        grid-template-columns:minmax(0,1fr);
+        gap:16px;
+    }
+
+    .albumFotosCard{
+        border-radius:20px;
+    }
+
+    .imagenAlbumFotos{
+        width:100%;
+        aspect-ratio:4 / 3;
+    }
+
+    .datosAlbumFotos{
+        padding:15px 16px 17px;
+    }
+
+    .datosAlbumFotos strong{
+        font-size:15px;
+    }
+}
