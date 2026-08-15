@@ -3017,6 +3017,76 @@ body.modoPretorneo{
 }
 
 
+/* =========================================================
+   FOTOGRAFÍAS — ÁLBUMES POR CAMPEONATO
+========================================================= */
+
+.galeriasPorCampeonato,
+.bloqueFotosCampeonato,
+.cabeceraCampeonatoFotos,
+.galeriaFotos,
+.tarjetaFoto,
+.enlaceImagenFoto,
+.datosFoto{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+}
+
+.bloqueFotosCampeonato{
+    overflow:hidden;
+}
+
+.bloqueFotosCampeonato + .bloqueFotosCampeonato{
+    margin-top:24px;
+}
+
+.cabeceraCampeonatoFotos > div,
+.cabeceraCampeonatoFotos h3,
+.datosFoto h3,
+.datosFoto p{
+    min-width:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:normal;
+    white-space:normal;
+}
+
+.enlaceImagenFoto img{
+    max-width:100%;
+}
+
+@media(max-width:600px){
+
+    .galeriasPorCampeonato,
+    .bloqueFotosCampeonato,
+    .galeriaFotos{
+        overflow-x:hidden;
+    }
+
+    .galeriaFotos{
+        width:100%;
+        grid-template-columns:minmax(0,1fr);
+    }
+
+    .cabeceraCampeonatoFotos{
+        width:100%;
+        padding:14px 16px;
+    }
+
+    .cabeceraCampeonatoFotos h3{
+        margin:0;
+        font-size:18px;
+        line-height:1.25;
+    }
+
+    .enlaceImagenFoto{
+        aspect-ratio:4 / 3;
+    }
+}
+
+
 /* La última tarjeta ocupa todo el ancho
    cuando el número de tarjetas visibles es impar */
 .gridDashboard > .tarjetaDashboardImpar{
