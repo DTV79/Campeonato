@@ -296,28 +296,34 @@
 .cabeceraJugadorISP small{
     display:block;
     margin-bottom:4px;
-    color:#99f6e4;
+    color:#99f6e4 !important;
     font-size:9px;
     font-weight:900;
     letter-spacing:1px;
 }
 
-.cabeceraJugadorISP h2{
+.cabeceraJugadorISP h2,
+.cabeceraJugadorISP > div > h2{
     margin:0;
-    color:white;
+    color:#ffffff !important;
     font-size:25px;
+    font-weight:900;
+    text-shadow:0 1px 2px rgba(0,0,0,.16);
 }
 
-.cabeceraJugadorISP p{
+.cabeceraJugadorISP p,
+.cabeceraJugadorISP > div > p{
     margin-top:5px;
-    color:#d1fae5;
+    color:#d1fae5 !important;
     font-size:12px;
     font-weight:700;
 }
 
-.cabeceraJugadorISP p strong{
-    color:white;
+.cabeceraJugadorISP p strong,
+.cabeceraJugadorISP > div > p > strong{
+    color:#ffffff !important;
     font-size:15px;
+    font-weight:900;
 }
 
 .metricasJugadorISP{
