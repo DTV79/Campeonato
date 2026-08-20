@@ -375,6 +375,18 @@
                 jugador._posicionCompartida ??
                 jugador.posicion
             );
+         const variacion =
+             numeroDecimalISP(
+                 jugador.variacion_ultimo_partido
+             );
+
+         const claseVariacion =
+             variacion > 0
+                 ? "ispSube"
+              : variacion < 0
+               ? "ispBaja"
+               : "ispIgual";
+       
 
         const medalla =
             posicion === 1
@@ -407,11 +419,11 @@
                     )}
                 </b>
 
-                <small>
-                    ${pintarVariacionTextoISP(
-                        jugador.variacion_ultimo_partido
-                    )}
-                </small>
+                <small class="${claseVariacion}">
+                ${pintarVariacionTextoISP(
+                 variacion
+                   )}
+               </small>
             </button>
         `;
     }
