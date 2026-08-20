@@ -1272,7 +1272,6 @@
                 </p>
 
                 <p>
-                    <strong>Elo no son unas siglas.</strong>
                     El nombre procede de <strong>Arpad Elo</strong>,
                     creador de un sistema de puntuación desarrollado
                     originalmente para el ajedrez. Su idea es comparar
