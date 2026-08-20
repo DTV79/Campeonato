@@ -255,7 +255,7 @@
 
             <div class="cabeceraTituloRanking cabeceraTituloISP">
                 <div>
-                    <small>RATING COMPETITIVO</small>
+                    <small>NIVEL COMPETITIVO</small>
                     <h2>⚡ Índice Sprint Pádel</h2>
                 </div>
 
