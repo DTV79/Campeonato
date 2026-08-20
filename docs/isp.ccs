@@ -1,0 +1,779 @@
+/* =========================================================
+   ISP — ÍNDICE SPRINT PÁDEL
+========================================================= */
+
+.selectorRankingTipo{
+    display:grid;
+    margin-bottom:20px;
+    padding:5px;
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+    border:1px solid #dbe4ea;
+    border-radius:16px;
+    background:#f1f5f9;
+}
+
+.selectorRankingTipo button{
+    padding:11px 12px;
+    border:0;
+    border-radius:12px;
+    background:transparent;
+    color:#64748b;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.selectorRankingTipo button.activo{
+    background:white;
+    color:#0f766e;
+    box-shadow:0 3px 10px rgba(15,23,42,.08);
+}
+
+.cabeceraTituloISP{
+    align-items:flex-end;
+}
+
+.cabeceraTituloISP > div > small{
+    display:block;
+    margin-bottom:4px;
+    color:#0f766e;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+}
+
+.cabeceraTituloISP h2{
+    color:#0f172a;
+}
+
+.btnInfoISP{
+    color:#0f766e;
+}
+
+.resumenISP{
+    display:grid;
+    margin-bottom:20px;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.resumenISP > div{
+    min-width:0;
+    padding:14px 9px;
+    border-radius:16px;
+    background:#ecfdf5;
+    text-align:center;
+}
+
+.resumenISP span,
+.resumenISP strong,
+.resumenISP small{
+    display:block;
+}
+
+.resumenISP span{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.resumenISP strong{
+    margin-top:5px;
+    overflow:hidden;
+    color:#0f172a;
+    font-size:17px;
+    font-weight:900;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.resumenISP small{
+    margin-top:3px;
+    color:#0f766e;
+    font-size:10px;
+    font-weight:900;
+}
+
+.bloqueISP{
+    border-top:3px solid #ccfbf1;
+}
+
+.cabeceraBloqueISP{
+    display:flex;
+    margin-bottom:14px;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraBloqueISP h3{
+    margin-bottom:4px;
+}
+
+.cabeceraBloqueISP p{
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.45;
+}
+
+.podioISP{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.podioJugadorISP{
+    display:flex;
+    min-width:0;
+    padding:15px 10px;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+    border:1px solid #d1fae5;
+    border-radius:17px;
+    background:linear-gradient(180deg,#f0fdfa,#ffffff);
+    color:#0f172a;
+    text-align:center;
+    cursor:pointer;
+}
+
+.podioJugadorISP .medallaISP{
+    font-size:25px;
+}
+
+.podioJugadorISP strong{
+    width:100%;
+    overflow:hidden;
+    font-size:13px;
+    font-weight:900;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.podioJugadorISP b{
+    color:#0f766e;
+    font-size:21px;
+    font-weight:900;
+}
+
+.podioJugadorISP small{
+    font-size:10px;
+    font-weight:900;
+}
+
+.listaISP{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+}
+
+.filaJugadorISP{
+    display:grid;
+    width:100%;
+    padding:13px;
+    grid-template-columns:42px minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+    border:1px solid #e2e8f0;
+    border-radius:15px;
+    background:white;
+    color:#0f172a;
+    text-align:left;
+    cursor:pointer;
+}
+
+.filaJugadorISP:active,
+.podioJugadorISP:active{
+    transform:scale(.985);
+}
+
+.puestoISP{
+    display:flex;
+    width:38px;
+    height:38px;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    background:#ccfbf1;
+    color:#115e59;
+    font-size:14px;
+    font-weight:900;
+}
+
+.datosJugadorISP{
+    min-width:0;
+}
+
+.datosJugadorISP strong,
+.datosJugadorISP small{
+    display:block;
+}
+
+.datosJugadorISP strong{
+    overflow:hidden;
+    font-size:14px;
+    font-weight:900;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.datosJugadorISP small{
+    margin-top:3px;
+    color:#64748b;
+    font-size:9px;
+    font-weight:800;
+}
+
+.valorJugadorISP{
+    min-width:68px;
+    text-align:right;
+}
+
+.valorJugadorISP strong,
+.valorJugadorISP small{
+    display:block;
+}
+
+.valorJugadorISP strong{
+    color:#0f766e;
+    font-size:18px;
+    font-weight:900;
+}
+
+.valorJugadorISP small{
+    margin-top:3px;
+    font-size:10px;
+    font-weight:900;
+}
+
+.ispSube{
+    color:#16a34a !important;
+}
+
+.ispBaja{
+    color:#dc2626 !important;
+}
+
+.ispIgual{
+    color:#64748b !important;
+}
+
+/* =========================================================
+   FICHA JUGADOR ISP
+========================================================= */
+
+.btnVolverISP{
+    margin-bottom:14px;
+}
+
+.cabeceraJugadorISP{
+    display:flex;
+    margin-bottom:15px;
+    padding:20px;
+    align-items:center;
+    gap:14px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#134e4a,#0f766e);
+    color:white;
+}
+
+.puestoJugadorISP{
+    display:flex;
+    width:58px;
+    height:58px;
+    flex:0 0 58px;
+    align-items:center;
+    justify-content:center;
+    border-radius:18px;
+    background:rgba(255,255,255,.16);
+    font-size:20px;
+    font-weight:900;
+}
+
+.cabeceraJugadorISP small{
+    display:block;
+    margin-bottom:4px;
+    color:#99f6e4;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.cabeceraJugadorISP h2{
+    margin:0;
+    color:white;
+    font-size:25px;
+}
+
+.cabeceraJugadorISP p{
+    margin-top:5px;
+    color:#d1fae5;
+    font-size:12px;
+    font-weight:700;
+}
+
+.cabeceraJugadorISP p strong{
+    color:white;
+    font-size:15px;
+}
+
+.metricasJugadorISP{
+    display:grid;
+    margin-bottom:18px;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.metricaJugadorISP{
+    min-width:0;
+    padding:13px 8px;
+    border-radius:15px;
+    background:#f0fdfa;
+    text-align:center;
+}
+
+.metricaJugadorISP > span{
+    display:block;
+    margin-bottom:5px;
+    font-size:18px;
+}
+
+.metricaJugadorISP small,
+.metricaJugadorISP strong{
+    display:block;
+}
+
+.metricaJugadorISP small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.metricaJugadorISP strong{
+    margin-top:4px;
+    color:#0f766e;
+    font-size:16px;
+    font-weight:900;
+}
+
+/* =========================================================
+   GRÁFICA
+========================================================= */
+
+.graficaISP{
+    width:100%;
+    overflow:hidden;
+    border-radius:16px;
+    background:#f8fafc;
+}
+
+.graficaISP svg{
+    display:block;
+    width:100%;
+    height:auto;
+}
+
+.lineaGuiaISP{
+    stroke:#dbe4ea;
+    stroke-width:1;
+    stroke-dasharray:4 5;
+}
+
+.ejeISP{
+    stroke:#94a3b8;
+    stroke-width:1.2;
+}
+
+.lineaEvolucionISP{
+    fill:none;
+    stroke:#0f766e;
+    stroke-width:4;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.puntoEvolucionISP{
+    fill:white;
+    stroke:#0f766e;
+    stroke-width:3;
+}
+
+.textoEjeISP{
+    fill:#64748b;
+    font-size:10px;
+    font-weight:800;
+}
+
+/* =========================================================
+   HISTORIAL
+========================================================= */
+
+.historialMovimientosISP{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.movimientoISP{
+    padding:13px;
+    border:1px solid #e2e8f0;
+    border-radius:15px;
+    background:white;
+}
+
+.cabeceraMovimientoISP{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.cabeceraMovimientoISP small,
+.cabeceraMovimientoISP strong{
+    display:block;
+}
+
+.cabeceraMovimientoISP small{
+    color:#64748b;
+    font-size:9px;
+    font-weight:800;
+}
+
+.cabeceraMovimientoISP strong{
+    margin-top:3px;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.cabeceraMovimientoISP > b{
+    min-width:65px;
+    font-size:15px;
+    font-weight:900;
+    text-align:right;
+    white-space:nowrap;
+}
+
+.rivalesMovimientoISP{
+    display:grid;
+    margin-top:11px;
+    grid-template-columns:1fr 1.5fr;
+    gap:8px;
+}
+
+.rivalesMovimientoISP > span{
+    min-width:0;
+    padding:9px 10px;
+    border-radius:11px;
+    background:#f8fafc;
+}
+
+.rivalesMovimientoISP small,
+.rivalesMovimientoISP strong{
+    display:block;
+}
+
+.rivalesMovimientoISP small{
+    margin-bottom:3px;
+    color:#64748b;
+    font-size:8px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.rivalesMovimientoISP strong{
+    color:#334155;
+    font-size:10px;
+    font-weight:800;
+    line-height:1.35;
+}
+
+.pieMovimientoISP{
+    display:flex;
+    margin-top:10px;
+    padding-top:9px;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-top:1px solid #f1f5f9;
+    color:#64748b;
+    font-size:9px;
+    font-weight:700;
+}
+
+.pieMovimientoISP strong{
+    color:#0f766e;
+    font-weight:900;
+}
+
+/* =========================================================
+   RÉCORDS
+========================================================= */
+
+.recordsISP,
+.recordsMovimientoISP{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.recordsISP article,
+.recordsMovimientoISP article{
+    padding:14px;
+    border-radius:15px;
+    background:#f0fdfa;
+}
+
+.recordsISP article > span,
+.recordsMovimientoISP article > span{
+    display:block;
+    margin-bottom:6px;
+    font-size:22px;
+}
+
+.recordsISP small,
+.recordsISP strong,
+.recordsISP b,
+.recordsMovimientoISP small,
+.recordsMovimientoISP strong,
+.recordsMovimientoISP p{
+    display:block;
+}
+
+.recordsISP small,
+.recordsMovimientoISP small{
+    color:#64748b;
+    font-size:8px;
+    font-weight:900;
+    text-transform:uppercase;
+}
+
+.recordsISP strong{
+    margin-top:4px;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:900;
+}
+
+.recordsISP b,
+.recordsMovimientoISP strong{
+    margin-top:5px;
+    color:#0f766e;
+    font-size:16px;
+    font-weight:900;
+}
+
+.recordsMovimientoISP p{
+    margin-top:4px;
+    color:#64748b;
+    font-size:9px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+/* =========================================================
+   MODAL INFO
+========================================================= */
+
+.globoInfoISP{
+    max-height:min(780px,90dvh);
+    overflow-y:auto;
+}
+
+.comparacionInfoISP{
+    display:grid;
+    margin-bottom:15px;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+}
+
+.comparacionInfoISP > div{
+    padding:12px;
+    border-radius:14px;
+    background:#f0fdfa;
+}
+
+.comparacionInfoISP strong,
+.comparacionInfoISP span{
+    display:block;
+}
+
+.comparacionInfoISP strong{
+    margin-bottom:5px;
+    color:#0f766e;
+    font-size:12px;
+}
+
+.comparacionInfoISP span{
+    color:#475569;
+    font-size:11px;
+    font-weight:700;
+    line-height:1.4;
+}
+
+.reglasInfoISP{
+    display:flex;
+    margin-bottom:15px;
+    flex-direction:column;
+    gap:7px;
+}
+
+.reglasInfoISP > div{
+    display:flex;
+    padding:9px 11px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-radius:12px;
+    background:#f8fafc;
+}
+
+.reglasInfoISP span{
+    color:#475569;
+    font-size:11px;
+    font-weight:800;
+}
+
+.reglasInfoISP strong{
+    color:#0f766e;
+    font-size:11px;
+    font-weight:900;
+    text-align:right;
+}
+
+.baremoISPInfo strong{
+    color:#0f766e;
+}
+
+.notaISPInfo{
+    margin-bottom:0 !important;
+    padding:11px 12px;
+    border-radius:13px;
+    background:#ecfdf5;
+    color:#065f46 !important;
+    font-size:11px !important;
+    font-weight:700;
+    line-height:1.5;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:600px){
+
+    .podioISP{
+        grid-template-columns:1fr;
+    }
+
+    .podioJugadorISP{
+        display:grid;
+        padding:12px;
+        grid-template-columns:38px minmax(0,1fr) auto;
+        text-align:left;
+    }
+
+    .podioJugadorISP .medallaISP{
+        grid-row:1 / span 2;
+        align-self:center;
+        text-align:center;
+    }
+
+    .podioJugadorISP strong{
+        text-align:left;
+    }
+
+    .podioJugadorISP b{
+        grid-column:3;
+        grid-row:1;
+        text-align:right;
+    }
+
+    .podioJugadorISP small{
+        grid-column:3;
+        grid-row:2;
+        text-align:right;
+    }
+}
+
+@media(max-width:430px){
+
+    .resumenISP{
+        gap:7px;
+    }
+
+    .resumenISP > div{
+        padding:12px 6px;
+    }
+
+    .resumenISP strong{
+        font-size:14px;
+    }
+
+    .metricasJugadorISP{
+        gap:7px;
+    }
+
+    .metricaJugadorISP{
+        padding:11px 5px;
+    }
+
+    .metricaJugadorISP strong{
+        font-size:14px;
+    }
+
+    .recordsISP,
+    .recordsMovimientoISP,
+    .comparacionInfoISP{
+        grid-template-columns:1fr;
+    }
+
+    .rivalesMovimientoISP{
+        grid-template-columns:1fr;
+    }
+
+    .pieMovimientoISP{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:380px){
+
+    .filaJugadorISP{
+        padding:11px 9px;
+        grid-template-columns:36px minmax(0,1fr) auto;
+        gap:8px;
+    }
+
+    .puestoISP{
+        width:34px;
+        height:34px;
+    }
+
+    .datosJugadorISP strong{
+        font-size:13px;
+    }
+
+    .valorJugadorISP strong{
+        font-size:16px;
+    }
+
+    .cabeceraJugadorISP{
+        padding:16px;
+    }
+
+    .puestoJugadorISP{
+        width:50px;
+        height:50px;
+        flex-basis:50px;
+    }
+
+    .cabeceraJugadorISP h2{
+        font-size:21px;
+    }
+}
