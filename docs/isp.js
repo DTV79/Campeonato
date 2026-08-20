@@ -223,13 +223,10 @@
     }
 
     function construirPantallaISP(origen) {
-        const ranking = [
-            ...(origen?.ranking || [])
-        ].sort(
-            (a, b) =>
-                numeroISP(a.posicion) -
-                numeroISP(b.posicion)
-        );
+        const ranking =
+            prepararRankingConEmpatesISP(
+                origen?.ranking || []
+            );
 
         const resumen =
             origen?.resumen || {};
@@ -248,7 +245,20 @@
         }
 
         const top3 =
-            ranking.slice(0, 3);
+            ranking.filter(
+                jugador =>
+                    numeroISP(
+                        jugador._posicionCompartida
+                    ) <= 3
+            );
+
+        const lideres =
+            ranking.filter(
+                jugador =>
+                    numeroISP(
+                        jugador._posicionCompartida
+                    ) === 1
+            );
 
         return `
             ${pintarSelectorRankingISP("isp")}
@@ -273,9 +283,18 @@
                     <span>Líder</span>
                     <strong>
                         ${escaparISP(
-                            resumen.lider ||
-                            ranking[0]?.jugador ||
-                            "—"
+                            lideres.length
+                                ? lideres
+                                    .map(
+                                        jugador =>
+                                            jugador.jugador
+                                    )
+                                    .join(" / ")
+                                : (
+                                    resumen.lider ||
+                                    ranking[0]?.jugador ||
+                                    "—"
+                                )
                         )}
                     </strong>
                     <small>
@@ -352,7 +371,10 @@
 
     function pintarPodioJugadorISP(jugador) {
         const posicion =
-            numeroISP(jugador.posicion);
+            numeroISP(
+                jugador._posicionCompartida ??
+                jugador.posicion
+            );
 
         const medalla =
             posicion === 1
@@ -422,6 +444,7 @@
             >
                 <span class="puestoISP">
                     ${numeroISP(
+                        jugador._posicionCompartida ??
                         jugador.posicion
                     )}
                 </span>
@@ -474,8 +497,13 @@
         const origen =
             await cargarDatosISP();
 
+        const ranking =
+            prepararRankingConEmpatesISP(
+                origen?.ranking || []
+            );
+
         const jugador =
-            (origen?.ranking || []).find(
+            ranking.find(
                 fila =>
                     String(
                         fila.id_jugador
@@ -546,6 +574,7 @@
             <section class="cabeceraJugadorISP">
                 <span class="puestoJugadorISP">
                     ${numeroISP(
+                        jugador._posicionCompartida ??
                         jugador.posicion
                     )}º
                 </span>
@@ -1093,32 +1122,57 @@
     ) {
         if (!ranking.length) return "";
 
-        const maximo =
-            [...ranking].sort(
-                (a, b) =>
-                    numeroDecimalISP(
-                        b.maximo_historico
-                    ) -
-                    numeroDecimalISP(
-                        a.maximo_historico
+        const valorMaximoHistorico =
+            Math.max(
+                ...ranking.map(
+                    jugador =>
+                        numeroDecimalISP(
+                            jugador.maximo_historico
+                        )
+                )
+            );
+
+        const jugadoresMaximo =
+            ranking.filter(
+                jugador =>
+                    mismoValorISP(
+                        jugador.maximo_historico,
+                        valorMaximoHistorico
                     )
-            )[0];
+            );
 
         const movimientos =
             [...(historial || [])];
 
-        const sorpresa =
+        const valorMayorSubida =
             movimientos.length
-                ? movimientos.sort(
-                    (a, b) =>
-                        numeroDecimalISP(
-                            b.variacion
-                        ) -
-                        numeroDecimalISP(
-                            a.variacion
-                        )
-                )[0]
+                ? Math.max(
+                    ...movimientos.map(
+                        movimiento =>
+                            numeroDecimalISP(
+                                movimiento.variacion
+                            )
+                    )
+                )
                 : null;
+
+        const jugadoresMayorSubida =
+            valorMayorSubida === null
+                ? []
+                : nombresUnicosISP(
+                    movimientos
+                        .filter(
+                            movimiento =>
+                                mismoValorISP(
+                                    movimiento.variacion,
+                                    valorMayorSubida
+                                )
+                        )
+                        .map(
+                            movimiento =>
+                                movimiento.jugador
+                        )
+                );
 
         return `
             <section class="bloqueRanking bloqueISP">
@@ -1127,33 +1181,40 @@
                 <div class="recordsISP">
                     <article>
                         <span>🚀</span>
-                        <small>Máximo histórico</small>
+                        <small>ISP más alto alcanzado</small>
                         <strong>
                             ${escaparISP(
-                                maximo?.jugador ||
-                                "—"
+                                jugadoresMaximo.length
+                                    ? jugadoresMaximo
+                                        .map(
+                                            jugador =>
+                                                jugador.jugador
+                                        )
+                                        .join(" / ")
+                                    : "—"
                             )}
                         </strong>
                         <b>
                             ${formatearISP(
-                                maximo?.maximo_historico
+                                valorMaximoHistorico
                             )} ISP
                         </b>
                     </article>
 
                     <article>
                         <span>💥</span>
-                        <small>Mayor subida</small>
+                        <small>Mayor subida en un partido</small>
                         <strong>
                             ${escaparISP(
-                                sorpresa?.jugador ||
-                                "—"
+                                jugadoresMayorSubida.length
+                                    ? jugadoresMayorSubida.join(" / ")
+                                    : "—"
                             )}
                         </strong>
                         <b>
-                            ${sorpresa
+                            ${valorMayorSubida !== null
                                 ? pintarVariacionTextoISP(
-                                    sorpresa.variacion
+                                    valorMayorSubida
                                 )
                                 : "—"}
                         </b>
@@ -1199,10 +1260,35 @@
                 <h3>⚡ ¿Qué es el ISP?</h3>
 
                 <p>
-                    El <strong>Índice Sprint Pádel</strong>
+                    El <strong>Índice Sprint Pádel (ISP)</strong>
                     mide el nivel competitivo de cada jugador.
+                    Está <strong>inspirado en el sistema Elo</strong>,
+                    adaptado a nuestros campeonatos de pádel.
+                </p>
+
+                <p>
+                    <strong>Elo no son unas siglas.</strong>
+                    El nombre procede de <strong>Arpad Elo</strong>,
+                    creador de un sistema de puntuación desarrollado
+                    originalmente para el ajedrez. Su idea básica es
+                    comparar el resultado real de un enfrentamiento
+                    con el resultado que cabría esperar según el nivel
+                    previo de los rivales.
+                </p>
+
+                <p>
+                    Por eso no todas las victorias y derrotas valen lo
+                    mismo: ganar a rivales con un ISP superior aporta
+                    más puntos, mientras que perder contra rivales con
+                    un ISP inferior penaliza más. Nuestro ISP adapta
+                    esa filosofía al pádel por parejas y añade factores
+                    propios como la fase del torneo y las victorias
+                    limpias.
+                </p>
+
+                <p>
                     No sustituye al Ranking Histórico:
-                    responde a una pregunta distinta.
+                    ambos responden a preguntas diferentes.
                 </p>
 
                 <div class="comparacionInfoISP">
@@ -1412,6 +1498,112 @@
     }
 
     /* =====================================================
+       EMPATES Y POSICIONES COMPARTIDAS
+    ===================================================== */
+
+    function prepararRankingConEmpatesISP(
+        rankingOrigen
+    ) {
+        const ranking = [
+            ...(rankingOrigen || [])
+        ].sort(
+            (a, b) => {
+                const diferencia =
+                    numeroDecimalISP(b.isp) -
+                    numeroDecimalISP(a.isp);
+
+                if (
+                    Math.abs(diferencia) >
+                    0.000001
+                ) {
+                    return diferencia;
+                }
+
+                return String(
+                    a.jugador || ""
+                ).localeCompare(
+                    String(
+                        b.jugador || ""
+                    ),
+                    "es",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+            }
+        );
+
+        let posicionCompartida = 0;
+        let valorAnterior = null;
+
+        ranking.forEach(
+            (jugador, indice) => {
+                const valorActual =
+                    numeroDecimalISP(
+                        jugador.isp
+                    );
+
+                if (
+                    indice === 0 ||
+                    !mismoValorISP(
+                        valorActual,
+                        valorAnterior
+                    )
+                ) {
+                    posicionCompartida += 1;
+                    valorAnterior =
+                        valorActual;
+                }
+
+                jugador._posicionCompartida =
+                    posicionCompartida;
+            }
+        );
+
+        return ranking;
+    }
+
+    function mismoValorISP(
+        valorA,
+        valorB
+    ) {
+        return Math.abs(
+            numeroDecimalISP(valorA) -
+            numeroDecimalISP(valorB)
+        ) < 0.000001;
+    }
+
+    function nombresUnicosISP(
+        nombres
+    ) {
+        const vistos = new Set();
+
+        return (nombres || []).filter(
+            nombre => {
+                const clave =
+                    String(
+                        nombre || ""
+                    )
+                        .trim()
+                        .toLocaleUpperCase(
+                            "es-ES"
+                        );
+
+                if (
+                    !clave ||
+                    vistos.has(clave)
+                ) {
+                    return false;
+                }
+
+                vistos.add(clave);
+                return true;
+            }
+        );
+    }
+
+
+    /* =====================================================
        UTILIDADES
     ===================================================== */
 
@@ -1568,3 +1760,4 @@
         return escaparISP(valor);
     }
 })();
+
