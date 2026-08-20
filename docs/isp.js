@@ -223,13 +223,10 @@
     }
 
     function construirPantallaISP(origen) {
-        const ranking = [
-            ...(origen?.ranking || [])
-        ].sort(
-            (a, b) =>
-                numeroISP(a.posicion) -
-                numeroISP(b.posicion)
-        );
+        const ranking =
+            prepararRankingConEmpatesISP(
+                origen?.ranking || []
+            );
 
         const resumen =
             origen?.resumen || {};
@@ -248,14 +245,27 @@
         }
 
         const top3 =
-            ranking.slice(0, 3);
+            ranking.filter(
+                jugador =>
+                    numeroISP(
+                        jugador._posicionCompartida
+                    ) <= 3
+            );
+
+        const lideres =
+            ranking.filter(
+                jugador =>
+                    numeroISP(
+                        jugador._posicionCompartida
+                    ) === 1
+            );
 
         return `
             ${pintarSelectorRankingISP("isp")}
 
             <div class="cabeceraTituloRanking cabeceraTituloISP">
                 <div>
-                    <small>RATING COMPETITIVO</small>
+                    <small>NIVEL COMPETITIVO</small>
                     <h2>⚡ Índice Sprint Pádel</h2>
                 </div>
 
@@ -273,9 +283,18 @@
                     <span>Líder</span>
                     <strong>
                         ${escaparISP(
-                            resumen.lider ||
-                            ranking[0]?.jugador ||
-                            "—"
+                            lideres.length
+                                ? lideres
+                                    .map(
+                                        jugador =>
+                                            jugador.jugador
+                                    )
+                                    .join(" / ")
+                                : (
+                                    resumen.lider ||
+                                    ranking[0]?.jugador ||
+                                    "—"
+                                )
                         )}
                     </strong>
                     <small>
@@ -352,7 +371,10 @@
 
     function pintarPodioJugadorISP(jugador) {
         const posicion =
-            numeroISP(jugador.posicion);
+            numeroISP(
+                jugador._posicionCompartida ??
+                jugador.posicion
+            );
 
         const medalla =
             posicion === 1
@@ -422,6 +444,7 @@
             >
                 <span class="puestoISP">
                     ${numeroISP(
+                        jugador._posicionCompartida ??
                         jugador.posicion
                     )}
                 </span>
@@ -474,8 +497,13 @@
         const origen =
             await cargarDatosISP();
 
+        const ranking =
+            prepararRankingConEmpatesISP(
+                origen?.ranking || []
+            );
+
         const jugador =
-            (origen?.ranking || []).find(
+            ranking.find(
                 fila =>
                     String(
                         fila.id_jugador
@@ -546,6 +574,7 @@
             <section class="cabeceraJugadorISP">
                 <span class="puestoJugadorISP">
                     ${numeroISP(
+                        jugador._posicionCompartida ??
                         jugador.posicion
                     )}º
                 </span>
@@ -1093,32 +1122,57 @@
     ) {
         if (!ranking.length) return "";
 
-        const maximo =
-            [...ranking].sort(
-                (a, b) =>
-                    numeroDecimalISP(
-                        b.maximo_historico
-                    ) -
-                    numeroDecimalISP(
-                        a.maximo_historico
+        const valorMaximoHistorico =
+            Math.max(
+                ...ranking.map(
+                    jugador =>
+                        numeroDecimalISP(
+                            jugador.maximo_historico
+                        )
+                )
+            );
+
+        const jugadoresMaximo =
+            ranking.filter(
+                jugador =>
+                    mismoNivelMostradoISP(
+                        jugador.maximo_historico,
+                        valorMaximoHistorico
                     )
-            )[0];
+            );
 
         const movimientos =
             [...(historial || [])];
 
-        const sorpresa =
+        const valorMayorSubida =
             movimientos.length
-                ? movimientos.sort(
-                    (a, b) =>
-                        numeroDecimalISP(
-                            b.variacion
-                        ) -
-                        numeroDecimalISP(
-                            a.variacion
-                        )
-                )[0]
+                ? Math.max(
+                    ...movimientos.map(
+                        movimiento =>
+                            numeroDecimalISP(
+                                movimiento.variacion
+                            )
+                    )
+                )
                 : null;
+
+        const jugadoresMayorSubida =
+            valorMayorSubida === null
+                ? []
+                : nombresUnicosISP(
+                    movimientos
+                        .filter(
+                            movimiento =>
+                                mismoNivelMostradoISP(
+                                    movimiento.variacion,
+                                    valorMayorSubida
+                                )
+                        )
+                        .map(
+                            movimiento =>
+                                movimiento.jugador
+                        )
+                );
 
         return `
             <section class="bloqueRanking bloqueISP">
@@ -1127,33 +1181,40 @@
                 <div class="recordsISP">
                     <article>
                         <span>🚀</span>
-                        <small>Máximo histórico</small>
+                        <small>ISP más alto alcanzado</small>
                         <strong>
                             ${escaparISP(
-                                maximo?.jugador ||
-                                "—"
+                                jugadoresMaximo.length
+                                    ? jugadoresMaximo
+                                        .map(
+                                            jugador =>
+                                                jugador.jugador
+                                        )
+                                        .join(" / ")
+                                    : "—"
                             )}
                         </strong>
                         <b>
                             ${formatearISP(
-                                maximo?.maximo_historico
+                                valorMaximoHistorico
                             )} ISP
                         </b>
                     </article>
 
                     <article>
                         <span>💥</span>
-                        <small>Mayor subida</small>
+                        <small>Mayor subida en un partido</small>
                         <strong>
                             ${escaparISP(
-                                sorpresa?.jugador ||
-                                "—"
+                                jugadoresMayorSubida.length
+                                    ? jugadoresMayorSubida.join(" / ")
+                                    : "—"
                             )}
                         </strong>
                         <b>
-                            ${sorpresa
+                            ${valorMayorSubida !== null
                                 ? pintarVariacionTextoISP(
-                                    sorpresa.variacion
+                                    valorMayorSubida
                                 )
                                 : "—"}
                         </b>
@@ -1177,6 +1238,11 @@
         const fases =
             criterios.factores_fase || {};
 
+        const partidosCalibracion =
+            numeroISP(
+                criterios.partidos_provisional
+            ) || 5;
+
         const overlay =
             document.createElement(
                 "div"
@@ -1199,17 +1265,36 @@
                 <h3>⚡ ¿Qué es el ISP?</h3>
 
                 <p>
-                    El <strong>Índice Sprint Pádel</strong>
+                    El <strong>Índice Sprint Pádel (ISP)</strong>
                     mide el nivel competitivo de cada jugador.
-                    No sustituye al Ranking Histórico:
-                    responde a una pregunta distinta.
+                    Está <strong>inspirado en el sistema Elo</strong>,
+                    adaptado a nuestros campeonatos de pádel.
+                </p>
+
+                <p>
+                    <strong>Elo no son unas siglas.</strong>
+                    El nombre procede de <strong>Arpad Elo</strong>,
+                    creador de un sistema de puntuación desarrollado
+                    originalmente para el ajedrez. Su idea es comparar
+                    el resultado real de un enfrentamiento con el
+                    resultado que cabría esperar según el nivel previo
+                    de los rivales.
+                </p>
+
+                <p>
+                    Por eso no todas las victorias y derrotas valen lo
+                    mismo: ganar a rivales con mayor nivel aporta más
+                    ISP, mientras que perder contra rivales con menor
+                    nivel penaliza más. Nuestro ISP añade además reglas
+                    propias para el pádel por parejas y para la
+                    importancia de cada fase del torneo.
                 </p>
 
                 <div class="comparacionInfoISP">
                     <div>
                         <strong>🏆 Ranking histórico</strong>
                         <span>
-                            Méritos y puntos acumulados
+                            Mide méritos y puntos acumulados
                             edición tras edición.
                         </span>
                     </div>
@@ -1217,8 +1302,8 @@
                     <div>
                         <strong>⚡ ISP</strong>
                         <span>
-                            Nivel demostrado según resultados
-                            y dificultad de los rivales.
+                            Mide el nivel competitivo demostrado
+                            según resultados y dificultad de rivales.
                         </span>
                     </div>
                 </div>
@@ -1235,26 +1320,22 @@
 
                     ${pintarReglaInfoISP(
                         "Periodo de calibración",
-                        `Primeros ${numeroISP(
-                            criterios.partidos_provisional
-                        ) || 5} partidos`
+                        `Primeros ${partidosCalibracion} partidos`
                     )}
 
                     ${pintarReglaInfoISP(
-                        "Rival más fuerte",
+                        "Rival de mayor nivel",
                         "Ganar da más ISP"
                     )}
 
                     ${pintarReglaInfoISP(
-                        "Rival más débil",
+                        "Rival de menor nivel",
                         "Perder resta más ISP"
                     )}
 
                     ${pintarReglaInfoISP(
-                        "Victoria limpia",
-                        `× ${formatearFactorISP(
-                            criterios.factor_victoria_limpia
-                        )}`
+                        "Nivel de la pareja",
+                        "Media del ISP de ambos jugadores"
                     )}
 
                     ${pintarReglaInfoISP(
@@ -1264,6 +1345,32 @@
                             : "No computa"
                     )}
                 </div>
+
+                <h4>Contundencia del resultado</h4>
+
+                <div class="baremoRankingInfo baremoISPInfo">
+                    <div>
+                        <span>Victoria / derrota ajustada</span>
+                        <strong>× 1,00</strong>
+                    </div>
+
+                    <div>
+                        <span>Victoria / derrota limpia</span>
+                        <strong>
+                            × ${formatearFactorISP(
+                                criterios.factor_victoria_limpia
+                            )}
+                        </strong>
+                    </div>
+                </div>
+
+                <p class="notaISPInfo">
+                    🧹 Se considera resultado limpio un
+                    <strong>3-0 en liguilla/grupos</strong> o un
+                    <strong>2-0 en eliminatorias</strong>. Este factor
+                    aumenta en un 10 % la variación que corresponda
+                    tanto al ganador como al perdedor.
+                </p>
 
                 <h4>Importancia de la fase</h4>
 
@@ -1295,20 +1402,27 @@
                 </div>
 
                 <p class="notaISPInfo">
+                    ✖️ <strong>Los dos factores son independientes y
+                    pueden aplicarse a la vez.</strong> Por ejemplo,
+                    una victoria 2-0 en semifinal aplica el factor de
+                    semifinal <strong>×1,08</strong> y también el factor
+                    de resultado limpio <strong>×1,10</strong>.
+                </p>
+
+                <p class="notaISPInfo">
                     🎯 Durante los primeros
-                    <strong>${numeroISP(
-                        criterios.partidos_provisional
-                    ) || 5} partidos</strong>
+                    <strong>${partidosCalibracion} partidos</strong>
                     el ISP varía más para situar rápidamente al jugador
                     en un nivel acorde a sus resultados.
-                    Esos partidos cuentan completamente.
+                    <strong>Esos partidos cuentan completamente.</strong>
                     Después, el índice se vuelve más estable.
                 </p>
 
                 <p class="notaISPInfo">
-                    👥 El nivel de una pareja se calcula
-                    con la media del ISP de los dos jugadores
-                    que disputaron realmente el partido.
+                    👥 El nivel de una pareja se calcula con la media
+                    del ISP de los dos jugadores que disputaron
+                    realmente el partido. Si existe una sustitución,
+                    el movimiento afecta a los jugadores que jugaron.
                 </p>
             </div>
         `;
@@ -1421,6 +1535,113 @@
             </div>
         `;
     }
+
+    /* =====================================================
+       EMPATES Y POSICIONES COMPARTIDAS
+    ===================================================== */
+
+    function prepararRankingConEmpatesISP(
+        rankingOrigen
+    ) {
+        const ranking =
+            [...(rankingOrigen || [])]
+                .sort(
+                    (a, b) => {
+                        const diferencia =
+                            claveNivelMostradoISP(b.isp) -
+                            claveNivelMostradoISP(a.isp);
+
+                        if (diferencia !== 0) {
+                            return diferencia;
+                        }
+
+                        return String(
+                            a.jugador || ""
+                        ).localeCompare(
+                            String(
+                                b.jugador || ""
+                            ),
+                            "es",
+                            {
+                                sensitivity: "base"
+                            }
+                        );
+                    }
+                );
+
+        let posicionCompartida = 0;
+        let nivelAnterior = null;
+
+        ranking.forEach(
+            (jugador, indice) => {
+                const nivelActual =
+                    claveNivelMostradoISP(
+                        jugador.isp
+                    );
+
+                if (
+                    indice === 0 ||
+                    nivelActual !== nivelAnterior
+                ) {
+                    posicionCompartida += 1;
+                    nivelAnterior = nivelActual;
+                }
+
+                jugador._posicionCompartida =
+                    posicionCompartida;
+            }
+        );
+
+        return ranking;
+    }
+
+    function claveNivelMostradoISP(
+        valor
+    ) {
+        return Math.round(
+            numeroDecimalISP(valor) * 10
+        );
+    }
+
+    function mismoNivelMostradoISP(
+        valorA,
+        valorB
+    ) {
+        return (
+            claveNivelMostradoISP(valorA) ===
+            claveNivelMostradoISP(valorB)
+        );
+    }
+
+    function nombresUnicosISP(
+        nombres
+    ) {
+        const vistos = new Set();
+
+        return (nombres || []).filter(
+            nombre => {
+                const clave =
+                    String(
+                        nombre || ""
+                    )
+                        .trim()
+                        .toLocaleUpperCase(
+                            "es-ES"
+                        );
+
+                if (
+                    !clave ||
+                    vistos.has(clave)
+                ) {
+                    return false;
+                }
+
+                vistos.add(clave);
+                return true;
+            }
+        );
+    }
+
 
     /* =====================================================
        UTILIDADES
