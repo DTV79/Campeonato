@@ -7,6 +7,8 @@
 
     <link id="cssPrincipal" rel="stylesheet" href="style.css">
     <link id="cssFinalizado" rel="stylesheet" href="finalizado.css">
+    <link id="cssISP" rel="stylesheet" href="isp.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -50,7 +52,8 @@
 
                 const hojas = [
                     ["cssPrincipal", "style.css"],
-                    ["cssFinalizado", "finalizado.css"]
+                    ["cssFinalizado", "finalizado.css"],
+                    ["cssISP", "isp.css"]
                 ];
 
                 hojas.forEach(([id, archivo]) => {
@@ -156,7 +159,8 @@
             </div>
             <span class="flecha">→</span>
         </div>
-                <div
+
+        <div
             class="cardAcceso cardFotos oculto"
             id="tarjetaFotos"
             data-seccion="fotos"
@@ -227,6 +231,7 @@
 
             try {
                 await cargarScript("app.js");
+                await cargarScript("isp.js");
                 await cargarScript("finalizado.js");
             } catch (error) {
                 console.error("No se pudo cargar la aplicación.", error);
