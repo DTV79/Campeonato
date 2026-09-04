@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Validar JSON
         shell: bash
@@ -39,7 +39,7 @@ jobs:
             ] | all)
           ' docs/supabase_jugadores.json > /dev/null
 
-      - name: Sincronizar con Supabase
+      - name: Comprobar clave secreta de Supabase
         shell: bash
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -51,6 +51,30 @@ jobs:
             echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
             exit 1
           fi
+
+          HTTP_CODE=$(curl --silent --show-error \
+            --output /tmp/supabase_root.json \
+            --write-out '%{http_code}' \
+            --header "apikey: ${SUPABASE_SECRET_KEY}" \
+            "${SUPABASE_URL%/}/rest/v1/")
+
+          echo "Comprobación de clave: HTTP ${HTTP_CODE}"
+
+          if [[ "${HTTP_CODE}" != "200" ]]; then
+            echo "La clave guardada en SUPABASE_SECRET_KEY no está actuando como clave secreta/service_role."
+            echo "Vuelve a copiar una clave sb_secret_... desde Supabase > Settings > API Keys > Secret keys."
+            exit 1
+          fi
+
+          echo "La clave secreta es válida y tiene nivel service_role."
+
+      - name: Sincronizar con Supabase
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
 
           jq -n \
             --slurpfile payload docs/supabase_jugadores.json \
