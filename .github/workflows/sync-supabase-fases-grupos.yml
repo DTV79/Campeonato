@@ -23,22 +23,29 @@ jobs:
       - name: Descargar repositorio
         uses: actions/checkout@v5
 
-      - name: Validar estado del torneo
+      - name: Preparar sincronización
+        id: preparar
         shell: bash
         run: |
           set -euo pipefail
 
+          echo "ready=false" >> "$GITHUB_OUTPUT"
           test -f docs/estado_torneo.json
-
           jq -e '.configuracion | type == "object"' docs/estado_torneo.json > /dev/null
-          jq -e '.configuracion.codigo_campeonato | type == "string" and length > 0' docs/estado_torneo.json > /dev/null
+
+          if ! jq -e '.configuracion.codigo_campeonato | type == "string" and length > 0' docs/estado_torneo.json > /dev/null 2>&1; then
+            echo "estado_torneo.json todavía no contiene codigo_campeonato. Es la subida preliminar de Excel; se omite esta ejecución sin marcar error."
+            exit 0
+          fi
 
           echo "Campeonato: $(jq -r '.configuracion.codigo_campeonato' docs/estado_torneo.json)"
           echo "Estado: $(jq -r '.configuracion.estado_torneo // ""' docs/estado_torneo.json)"
           echo "Tipo: $(jq -r '.configuracion.tipo_campeonato // ""' docs/estado_torneo.json)"
           echo "Estructura: $(jq -r '.configuracion.estructura_primera_fase // ""' docs/estado_torneo.json)"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
 
       - name: Sincronizar fases y grupos con Supabase
+        if: steps.preparar.outputs.ready == 'true'
         shell: bash
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
