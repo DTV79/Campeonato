@@ -33,6 +33,7 @@ jobs:
           test -f docs/ranking_historico.json
 
           jq -e '.configuracion | type == "object"' docs/estado_torneo.json > /dev/null
+          jq -e '.configuracion.codigo_campeonato | type == "string" and length > 0' docs/estado_torneo.json > /dev/null
           jq -e '.baremo | type == "object"' docs/ranking_historico.json > /dev/null
 
           jq -n \
@@ -43,10 +44,7 @@ jobs:
               configuracion: (
                 $estado[0].configuracion
                 + {
-                    codigo_campeonato: (
-                      $estado[0].configuracion.codigo_campeonato
-                      // "CAMP-2026-01"
-                    ),
+                    codigo_campeonato: $estado[0].configuracion.codigo_campeonato,
                     puntos_participacion: $ranking[0].baremo.participacion,
                     puntos_campeon: $ranking[0].baremo.campeon,
                     puntos_subcampeon: $ranking[0].baremo.subcampeon,
