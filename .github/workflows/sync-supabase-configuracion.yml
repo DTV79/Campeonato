@@ -1,0 +1,117 @@
+name: Sincronizar configuración con Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/estado_torneo.json'
+      - 'docs/ranking_historico.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase-configuracion
+  cancel-in-progress: false
+
+jobs:
+  sync-configuracion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
+      - name: Construir payload de configuración
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f docs/estado_torneo.json
+          test -f docs/ranking_historico.json
+
+          jq -e '.configuracion | type == "object"' docs/estado_torneo.json > /dev/null
+          jq -e '.baremo | type == "object"' docs/ranking_historico.json > /dev/null
+
+          jq -n \
+            --slurpfile estado docs/estado_torneo.json \
+            --slurpfile ranking docs/ranking_historico.json \
+            '{
+              origen: "Excel Campeonato",
+              configuracion: (
+                $estado[0].configuracion
+                + {
+                    codigo_campeonato: (
+                      $estado[0].configuracion.codigo_campeonato
+                      // "CAMP-2026-01"
+                    ),
+                    puntos_participacion: $ranking[0].baremo.participacion,
+                    puntos_campeon: $ranking[0].baremo.campeon,
+                    puntos_subcampeon: $ranking[0].baremo.subcampeon,
+                    puntos_semifinalista: $ranking[0].baremo.semifinalista,
+                    puntos_cuartos: $ranking[0].baremo.cuartos,
+                    puntos_octavos: $ranking[0].baremo.octavos,
+                    max_bonus_victorias: $ranking[0].baremo.max_bonus_victorias,
+                    max_bonus_sets: $ranking[0].baremo.max_bonus_sets,
+                    palas_playa_cuenta_bonus: $ranking[0].baremo.palas_playa_cuenta_bonus
+                  }
+              )
+            }' > /tmp/configuracion_payload.json
+
+          jq -e '
+            (.configuracion.codigo_campeonato | type == "string") and
+            (.configuracion.id_campeonato | type == "string") and
+            (.configuracion.nombre_campeonato | type == "string") and
+            (.configuracion.anio_campeonato != null) and
+            (.configuracion.estado_torneo | type == "string")
+          ' /tmp/configuracion_payload.json > /dev/null
+
+          echo "Payload preparado para:"
+          jq -r '
+            .configuracion.codigo_campeonato
+            + " | "
+            + .configuracion.nombre_campeonato
+            + " | estado="
+            + .configuracion.estado_torneo
+          ' /tmp/configuracion_payload.json
+
+      - name: Sincronizar configuración con Supabase
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload /tmp/configuracion_payload.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_body.json
+
+          HTTP_CODE=$(curl --silent --show-error \
+            --output /tmp/supabase_response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "apikey: ${SUPABASE_SECRET_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data-binary @/tmp/supabase_body.json \
+            "${SUPABASE_URL%/}/rest/v1/rpc/sync_configuracion_excel")
+
+          echo "HTTP ${HTTP_CODE}"
+          cat /tmp/supabase_response.json
+          echo
+
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "La sincronización de configuración con Supabase ha fallado."
+            exit 1
+          fi
+
+          jq -e '.ok == true' /tmp/supabase_response.json > /dev/null
+          echo "Configuración sincronizada correctamente."
