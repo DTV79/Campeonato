@@ -1,0 +1,82 @@
+name: Sincronizar Ranking Historico con Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/ranking_historico.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase-ranking-historico
+  cancel-in-progress: false
+
+jobs:
+  sync-ranking-historico:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
+      - name: Validar Ranking Historico
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f docs/ranking_historico.json
+          jq -e '.historial_ediciones | type == "array"' docs/ranking_historico.json > /dev/null
+          jq -e '.ranking | type == "array"' docs/ranking_historico.json > /dev/null
+          echo "Ediciones de jugadores recibidas: $(jq '.historial_ediciones | length' docs/ranking_historico.json)"
+
+      - name: Sincronizar Ranking Historico
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload docs/ranking_historico.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_ranking_body.json
+
+          for INTENTO in 1 2 3 4 5; do
+            HTTP_CODE=$(curl --silent --show-error \
+              --output /tmp/supabase_ranking_response.json \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "apikey: ${SUPABASE_SECRET_KEY}" \
+              --header 'Content-Type: application/json' \
+              --data-binary @/tmp/supabase_ranking_body.json \
+              "${SUPABASE_URL%/}/rest/v1/rpc/sync_ranking_historico_excel")
+
+            if [[ "${HTTP_CODE}" -ge 200 && "${HTTP_CODE}" -lt 300 ]] \
+               && jq -e '.ok == true' /tmp/supabase_ranking_response.json > /dev/null 2>&1; then
+              echo "HTTP ${HTTP_CODE}"
+              cat /tmp/supabase_ranking_response.json
+              echo
+              echo "Ranking Historico sincronizado correctamente."
+              exit 0
+            fi
+
+            echo "Intento ${INTENTO}/5: HTTP ${HTTP_CODE}"
+            cat /tmp/supabase_ranking_response.json || true
+            echo
+
+            if [[ "${INTENTO}" -lt 5 ]]; then
+              sleep 3
+            fi
+          done
+
+          echo "La sincronizacion del Ranking Historico ha fallado tras 5 intentos."
+          exit 1
