@@ -1,6 +1,9 @@
 const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
 const JSON_RANKING_URL = "https://dtv79.github.io/Campeonato/ranking_historico.json";
 const JSON_FOTOS_URL = "https://dtv79.github.io/Campeonato/fotos.json";
+const SUPABASE_URL = "https://imznjbnpecvnoivywnoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
 const CLAVE_ACCESO_MANTENIMIENTO =
     "campeonato_acceso_mantenimiento";
 
@@ -101,6 +104,7 @@ async function iniciarApp() {
         }
 
         datos = await respuesta.json();
+        datos = await cargarCompeticionDesdeSupabase(datos);
 
 /*
    Antes de preparar ninguna pantalla, comprobamos
@@ -116,6 +120,163 @@ if (
 ) {
     pintarPantallaMantenimiento();
     return;
+}
+
+/* =========================================================
+   SUPABASE CON RESPALDO AUTOMATICO EN estado_torneo.json
+========================================================= */
+
+async function cargarCompeticionDesdeSupabase(datosJSON) {
+    const codigo = String(
+        datosJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    if (!codigo) return datosJSON;
+
+    const controlador = new AbortController();
+    const temporizador = setTimeout(
+        () => controlador.abort(),
+        4000
+    );
+
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_competicion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                signal: controlador.signal,
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    p_codigo: codigo
+                })
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const remoto = await respuesta.json();
+
+        if (!remoto || typeof remoto !== "object") {
+            throw new Error("Respuesta de Supabase no valida");
+        }
+
+        const combinado = {
+            ...datosJSON,
+            grupos: {
+                ...(datosJSON.grupos || {})
+            },
+            regrupos: {
+                ...(datosJSON.regrupos || {})
+            }
+        };
+
+        combinado.clasificacion = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificacion_liguilla, "GR"),
+            datosJSON.clasificacion
+        );
+
+        combinado.grupos.clasificaciones = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificaciones_grupos, "GR"),
+            datosJSON?.grupos?.clasificaciones
+        );
+
+        combinado.regrupos.clasificaciones = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificaciones_regrupos, "RG"),
+            datosJSON?.regrupos?.clasificaciones
+        );
+
+        combinado.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_liguilla, "GR"),
+            datosJSON.partidos
+        );
+
+        combinado.grupos.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_grupos, "GR"),
+            datosJSON?.grupos?.partidos
+        );
+
+        combinado.regrupos.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_regrupos, "RG"),
+            datosJSON?.regrupos?.partidos
+        );
+
+        combinado.cruces = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.cruces, "MM"),
+            datosJSON.cruces
+        );
+
+        combinado.fuente_competicion = detectarFuenteCompeticion(
+            combinado,
+            datosJSON
+        );
+
+        return combinado;
+    } catch (error) {
+        console.warn(
+            "Supabase no disponible; se mantiene estado_torneo.json.",
+            error
+        );
+        return datosJSON;
+    } finally {
+        clearTimeout(temporizador);
+    }
+}
+
+function elegirListaMasCompleta(listaSupabase, listaJSON) {
+    const supabase = Array.isArray(listaSupabase)
+        ? listaSupabase
+        : [];
+    const respaldo = Array.isArray(listaJSON)
+        ? listaJSON
+        : [];
+
+    if (supabase.length < respaldo.length) {
+        return respaldo;
+    }
+
+    return supabase;
+}
+
+function normalizarListaSupabase(lista, codigoFase) {
+    if (!Array.isArray(lista)) return [];
+
+    return lista.map(elemento => {
+        const copia = { ...elemento };
+
+        if (codigoFase === "GR") {
+            copia.grupo = String(copia.grupo || "")
+                .replace(/^Grupo\s+/i, "")
+                .trim();
+        }
+
+        return copia;
+    });
+}
+
+function detectarFuenteCompeticion(combinado, original) {
+    const claves = [
+        [combinado.clasificacion, original.clasificacion],
+        [combinado?.grupos?.clasificaciones, original?.grupos?.clasificaciones],
+        [combinado?.regrupos?.clasificaciones, original?.regrupos?.clasificaciones],
+        [combinado.partidos, original.partidos],
+        [combinado?.grupos?.partidos, original?.grupos?.partidos],
+        [combinado?.regrupos?.partidos, original?.regrupos?.partidos],
+        [combinado.cruces, original.cruces]
+    ];
+
+    return claves.some(([actual, anterior]) =>
+        Array.isArray(actual) &&
+        Array.isArray(anterior) &&
+        actual !== anterior
+    )
+        ? "Supabase con respaldo JSON"
+        : "JSON de respaldo";
 }
 
 inicializarEstadoUI();
