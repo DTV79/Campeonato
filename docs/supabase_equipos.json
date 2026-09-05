@@ -1,1 +1,7 @@
-{"origen":"Excel Campeonato","codigo_campeonato":"CAMP-2026-01","formato_origen":"Sin definir","num_grupos_origen":0,"equipos":[]}
+{
+  "origen": "Excel Campeonato",
+  "codigo_campeonato": "CAMP-2026-01",
+  "formato_origen": "Sin definir",
+  "num_grupos_origen": 0,
+  "equipos": []
+}
