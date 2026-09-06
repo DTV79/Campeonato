@@ -4,6 +4,7 @@ const JSON_FOTOS_URL = "https://dtv79.github.io/Campeonato/fotos.json";
 const SUPABASE_URL = "https://imznjbnpecvnoivywnoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
+const CODIGO_CAMPEONATO_ACTIVO = "CAMP-2026-01";
 const CLAVE_ACCESO_MANTENIMIENTO =
     "campeonato_acceso_mantenimiento";
 
@@ -129,7 +130,8 @@ if (
 
 async function cargarConfiguracionDesdeSupabase(datosJSON) {
     const codigo = String(
-        datosJSON?.configuracion?.codigo_campeonato || ""
+        datosJSON?.configuracion?.codigo_campeonato ||
+        CODIGO_CAMPEONATO_ACTIVO
     ).trim();
 
     if (!codigo) return datosJSON;
@@ -188,7 +190,8 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
 
 async function cargarCompeticionDesdeSupabase(datosJSON) {
     const codigo = String(
-        datosJSON?.configuracion?.codigo_campeonato || ""
+        datosJSON?.configuracion?.codigo_campeonato ||
+        CODIGO_CAMPEONATO_ACTIVO
     ).trim();
 
     if (!codigo) return datosJSON;

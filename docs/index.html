@@ -36,10 +36,7 @@
                     const estado = await respuesta.json();
                     const configuracion = estado?.configuracion || {};
 
-                    version =
-                        configuracion.version_web ||
-                        configuracion.version ||
-                        version;
+                    version = Date.now();
                 } catch (error) {
                     console.error(
                         "No se pudo leer Versión WEB. " +
