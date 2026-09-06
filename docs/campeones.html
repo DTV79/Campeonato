@@ -1,0 +1,436 @@
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Campeones del Torneo</title>
+
+    <link rel="stylesheet" href="style.css?v=164">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+</head>
+
+<body class="paginaSecundaria">
+
+<div class="contenedor">
+
+    <header class="cabecera cabeceraCampeones">
+
+        
+
+        <div class="tituloSuperior">
+            PALMARÉS
+        </div>
+
+        <div class="tituloPrincipal">
+            Campeones
+        </div>
+
+        <div class="subtitulo">
+            Los nombres que ya forman parte de la historia
+        </div>
+
+    </header>
+
+    <main class="contenidoPagina">
+
+        <section class="presentacionPalmares">
+
+            <span class="iconoTrofeo">🏆</span>
+
+            <div>
+                <h2>Cuadro de honor</h2>
+
+                <p>
+                    Campeones de cada edición del Sprint Pádel Tui.
+                </p>
+            </div>
+
+        </section>
+
+        <section
+            class="listaCampeones"
+            id="listaCampeones"
+        >
+            <div class="estadoPalmares">
+                Cargando campeones…
+            </div>
+        </section>
+
+    </main>
+
+</div>
+
+<nav class="bottomNav">
+
+    <a
+        class="navBtn"
+        data-nav="inicio"
+        href="index.html"
+    >
+        <span>🏠</span>
+        <small>Inicio</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="historia"
+        data-contenido-web="historia"
+        href="historia.html"
+    >
+        <span>📖</span>
+        <small>Historia</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="normativa"
+        data-contenido-web="normativa"
+        href="normas.html"
+    >
+        <span>📜</span>
+        <small>Normas</small>
+    </a>
+
+    <a
+        class="navBtn oculto"
+        data-nav="campeones"
+        data-contenido-web="campeones"
+        href="campeones.html"
+    >
+        <span>🏆</span>
+        <small>Campeones</small>
+    </a>
+
+    <a
+        class="navBtn"
+        data-nav="mas"
+        href="index.html?pantalla=mas"
+    >
+        <span>☰</span>
+        <small>Más</small>
+    </a>
+
+</nav>
+
+<script>
+const JSON_FOTOS_URL =
+    "https://dtv79.github.io/Campeonato/fotos.json";
+
+cargarPalmares();
+
+async function cargarPalmares() {
+    const contenedor =
+        document.getElementById("listaCampeones");
+
+    try {
+        const respuesta = await fetch(
+            JSON_FOTOS_URL + "?v=" + Date.now(),
+            { cache: "no-store" }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `No se pudo cargar fotos.json (${respuesta.status})`
+            );
+        }
+
+        const textoJSON = await respuesta.text();
+        const origen = JSON.parse(
+            textoJSON.replace(
+                /(\d+)\.(?=\s*[,}])/g,
+                "$1"
+            )
+        );
+
+        const fotografias = Array.isArray(origen)
+            ? origen
+            : origen?.fotos || [];
+
+        const campeones = fotografias
+            .filter(esFotoPalmares)
+            .sort(ordenarCampeones);
+
+        if (!campeones.length) {
+            contenedor.innerHTML = `
+                <div class="estadoPalmares">
+                    <strong>Palmarés todavía vacío</strong>
+                    <p>Aún no hay campeones publicados.</p>
+                </div>
+            `;
+            return;
+        }
+
+        contenedor.innerHTML = campeones
+            .map(pintarCampeon)
+            .join("");
+
+    } catch (error) {
+        console.error(
+            "No se pudo cargar el palmarés:",
+            error
+        );
+
+        contenedor.innerHTML = `
+            <div class="estadoPalmares estadoPalmaresError">
+                <strong>No se pudo cargar el palmarés</strong>
+                <p>Inténtalo de nuevo dentro de unos minutos.</p>
+            </div>
+        `;
+    }
+}
+
+function esFotoPalmares(foto) {
+    return (
+        esVerdadero(foto?.mostrar) &&
+        esVerdadero(foto?.usar_en_palmares) &&
+        normalizarTexto(foto?.categoria) === "campeones"
+    );
+}
+
+function ordenarCampeones(a, b) {
+    const anoA = Number(obtenerAnoFoto(a)) || 0;
+    const anoB = Number(obtenerAnoFoto(b)) || 0;
+
+    if (anoA !== anoB) {
+        return anoB - anoA;
+    }
+
+    return Number(a?.orden || 0) -
+           Number(b?.orden || 0);
+}
+
+function pintarCampeon(foto) {
+    const ano = obtenerAnoFoto(foto);
+    const ganadores =
+        foto?.descripcion ||
+        foto?.campeones ||
+        foto?.equipo ||
+        "Campeones";
+
+    const nombreCampeonato =
+        foto?.titulo ||
+        foto?.nombre_campeonato ||
+        foto?.id_campeonato ||
+        (ano
+            ? `Campeonato Sprint Pádel Tui ${ano}`
+            : "Campeonato Sprint Pádel Tui");
+
+    const fecha = formatearFecha(foto?.fecha);
+    const ruta = normalizarRutaFoto(
+        foto?.ruta ||
+        foto?.url ||
+        foto?.archivo
+    );
+
+    const imagen = ruta
+        ? `
+            <figure class="figuraCampeon">
+                <img
+                    class="fotoCampeon"
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(
+                        `${ganadores}, campeones${ano ? ` de ${ano}` : ""}`
+                    )}"
+                    loading="lazy"
+                >
+
+                <figcaption>
+                    ${escaparHTML(
+                        ano
+                            ? `Campeones de la edición de ${ano}`
+                            : "Campeones del torneo"
+                    )}
+                </figcaption>
+            </figure>
+        `
+        : "";
+
+    return `
+        <article class="campeonCard">
+            <div class="cabeceraCampeon">
+                <div>
+                    <span class="edicionCampeon">
+                        ${ano
+                            ? `EDICIÓN ${escaparHTML(ano)}`
+                            : "CUADRO DE HONOR"}
+                    </span>
+
+                    <h2>${escaparHTML(ganadores)}</h2>
+                </div>
+
+                <div class="trofeoCampeon" aria-hidden="true">
+                    🏆
+                </div>
+            </div>
+
+            ${imagen}
+
+            <div class="datosCampeon">
+                ${fecha
+                    ? `
+                        <div>
+                            <span>📅 Fecha</span>
+                            <strong>${escaparHTML(fecha)}</strong>
+                        </div>
+                    `
+                    : ""}
+
+                <div>
+                    <span>📍 Edición</span>
+                    <strong>${escaparHTML(nombreCampeonato)}</strong>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function obtenerAnoFoto(foto) {
+    const texto = [
+        foto?.ano,
+        foto?.anio,
+        foto?.fecha,
+        foto?.codigo_campeonato,
+        foto?.id_campeonato,
+        foto?.titulo
+    ].filter(Boolean).join(" ");
+
+    const coincidencia =
+        texto.match(/\b(?:19|20)\d{2}\b/);
+
+    return coincidencia ? coincidencia[0] : "";
+}
+
+function normalizarRutaFoto(ruta) {
+    const texto = String(ruta || "")
+        .trim()
+        .replaceAll("\\", "/");
+
+    if (!texto) return "";
+
+    if (
+        texto.startsWith("http://") ||
+        texto.startsWith("https://")
+    ) {
+        return texto;
+    }
+
+    return texto.replace(/^\/+/, "");
+}
+
+function formatearFecha(fechaOriginal) {
+    if (!fechaOriginal) return "";
+
+    const coincidencia = String(fechaOriginal)
+        .match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (!coincidencia) {
+        return String(fechaOriginal);
+    }
+
+    const fecha = new Date(
+        Number(coincidencia[1]),
+        Number(coincidencia[2]) - 1,
+        Number(coincidencia[3])
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+        return String(fechaOriginal);
+    }
+
+    return fecha.toLocaleDateString(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+function esVerdadero(valor) {
+    if (valor === true) return true;
+
+    return ["si", "true", "1"].includes(
+        normalizarTexto(valor)
+    );
+}
+
+function normalizarTexto(texto) {
+    return String(texto || "")
+        .trim()
+        .toLocaleLowerCase("es")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function escaparHTML(texto) {
+    return String(texto ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function escaparAtributo(texto) {
+    return escaparHTML(texto);
+}
+</script>
+
+<script>
+(async function cargarNavegacionVersionada() {
+    let version = Date.now();
+
+    try {
+        const respuesta = await fetch(
+            "https://dtv79.github.io/Campeonato/estado_torneo.json?v=" +
+            Date.now(),
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (respuesta.ok) {
+            const datos = await respuesta.json();
+
+            version =
+                datos?.configuracion?.version_web ||
+                datos?.configuracion?.version ||
+                version;
+        }
+    } catch (error) {
+        console.error(
+            "No se pudo leer la versión WEB:",
+            error
+        );
+    }
+
+    const script = document.createElement("script");
+
+    script.src =
+        "nav-pretorneo.js?v=" +
+        encodeURIComponent(version);
+
+    document.body.appendChild(script);
+})();
+</script>
+
+</body>
+</html>

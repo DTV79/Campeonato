@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas · Sprint Pádel Tui</title>
+
+    <link
+        id="cssPrincipal"
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <script>
+        window.versionEstadisticasPromise = (
+            async function prepararPaginaEstadisticas() {
+                const URL_ESTADO = "estado_torneo.json";
+                let version = Date.now();
+
+                try {
+                    const respuesta = await fetch(
+                        `${URL_ESTADO}?v=${Date.now()}`,
+                        { cache: "no-store" }
+                    );
+
+                    if (!respuesta.ok) {
+                        throw new Error(
+                            `Error al cargar el estado: ${respuesta.status}`
+                        );
+                    }
+
+                    const estado = await respuesta.json();
+                    const config = estado?.configuracion || {};
+
+                    window.estadoInicialEstadisticas = estado;
+
+                    version =
+                        config.version_web ||
+                        config.version ||
+                        version;
+                } catch (error) {
+                    console.error(
+                        "No se pudo obtener la versión de la web.",
+                        error
+                    );
+                }
+
+                const versionSegura = encodeURIComponent(version);
+                const css = document.getElementById("cssPrincipal");
+
+                if (css) {
+                    css.href = `style.css?v=${versionSegura}`;
+                }
+
+                return versionSegura;
+            }
+        )();
+    </script>
+</head>
+<body class="paginaSecundaria paginaEstadisticas appCargando">
+    <div class="contenedor">
+        <header class="cabecera cabeceraEstadisticas">
+            <div class="cabeceraEstadisticasSuperior">
+                <div class="identidadEstadisticas">
+                    <div
+                        class="tituloSuperior"
+                        id="marcaEstadisticas"
+                    >
+                        HISTÓRICO Y RÉCORDS
+                    </div>
+
+                    <div
+                        class="tituloPrincipal"
+                        id="tituloEstadisticas"
+                    >
+                        Estadísticas
+                    </div>
+
+                    <div
+                        class="subtitulo"
+                        id="subtituloEstadisticas"
+                    >
+                        Resultados, rendimiento y curiosidades
+                    </div>
+
+                    <div class="etiquetaCabeceraEstadisticas">
+                        Global · Por campeonato
+                    </div>
+                </div>
+
+                <div
+                    class="iconoCabeceraEstadisticas"
+                    aria-hidden="true"
+                >
+                    📊
+                </div>
+            </div>
+
+            <div class="actualizacion actualizacionEstadisticas">
+                <span>🕒 Datos generados:</span>
+                <strong id="fechaGeneracionEstadisticas">—</strong>
+            </div>
+        </header>
+
+        <main
+            id="contenidoEstadisticas"
+            class="contenidoPagina"
+        >
+            <section class="tarjetaVacia">
+                <h3>⏳ Cargando estadísticas</h3>
+                <p>Estamos preparando el histórico del campeonato.</p>
+            </section>
+        </main>
+    </div>
+
+    <nav class="bottomNav" id="navegacionEstadisticas">
+        <a class="navBtn" id="navEstadisticas1" href="index.html">
+            <span>🏠</span>
+            <small>Inicio</small>
+        </a>
+
+        <a class="navBtn" id="navEstadisticas2" href="index.html">
+            <span>📊</span>
+            <small>Competición</small>
+        </a>
+
+        <a class="navBtn" id="navEstadisticas3" href="index.html">
+            <span>🎾</span>
+            <small>Partidos</small>
+        </a>
+
+        <a class="navBtn" id="navEstadisticas4" href="index.html">
+            <span>👥</span>
+            <small>Equipos</small>
+        </a>
+
+        <a
+            class="navBtn navActivo"
+            id="navEstadisticas5"
+            href="index.html?pantalla=mas"
+            aria-current="page"
+        >
+            <span>☰</span>
+            <small>Más</small>
+        </a>
+    </nav>
+
+    <script>
+        (
+            async function cargarEstadisticasVersionadas() {
+                const version =
+                    await window.versionEstadisticasPromise;
+
+                const script = document.createElement("script");
+                script.src = `estadisticas.js?v=${version}`;
+                script.async = false;
+                script.addEventListener(
+                    "error",
+                    error => {
+                        console.error(
+                            "No se pudo cargar estadisticas.js.",
+                            error
+                        );
+
+                        document.body.classList.remove(
+                            "appCargando"
+                        );
+                    },
+                    { once: true }
+                );
+
+                document.body.appendChild(script);
+            }
+        )();
+    </script>
+</body>
+</html>
+

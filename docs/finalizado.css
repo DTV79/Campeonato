@@ -1,0 +1,907 @@
+/* =========================================================
+   PORTADA ESPECIAL · CAMPEONATO FINALIZADO
+========================================================= */
+
+body.modoFinalizado{
+    background:
+        radial-gradient(circle at 12% 4%,rgba(250,204,21,.15),transparent 28%),
+        radial-gradient(circle at 88% 12%,rgba(217,119,6,.12),transparent 26%),
+        #f7f4ed;
+}
+
+.modoFinalizado .cabeceraCelebracion{
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(254,240,138,.45);
+    background:
+        radial-gradient(circle at 88% 5%,rgba(255,255,255,.28),transparent 22%),
+        linear-gradient(135deg,#451a03 0%,#92400e 42%,#d97706 72%,#facc15 125%);
+    box-shadow:0 16px 42px rgba(120,53,15,.28);
+}
+
+.modoFinalizado .cabeceraCelebracion::before,
+.modoFinalizado .cabeceraCelebracion::after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:50%;
+}
+
+.modoFinalizado .cabeceraCelebracion::before{
+    top:-88px;
+    right:-52px;
+}
+
+.modoFinalizado .cabeceraCelebracion::after{
+    right:42px;
+    bottom:-118px;
+}
+
+.modoFinalizado .cabeceraCelebracion > *{
+    position:relative;
+    z-index:1;
+}
+
+.modoFinalizado .estadoCabecera{
+    border:1px solid rgba(254,240,138,.55);
+    background:rgba(69,26,3,.35);
+    color:#fff7cc;
+    letter-spacing:.4px;
+    box-shadow:inset 0 0 20px rgba(250,204,21,.08);
+}
+
+.modoFinalizado .barra{
+    background:rgba(255,255,255,.2);
+}
+
+.modoFinalizado .barraFinalizado{
+    background:linear-gradient(90deg,#fde68a,#facc15,#f59e0b,#fde68a);
+    background-size:220% 100%;
+    animation:brilloBarraFinal 3s linear infinite;
+}
+
+.portadaFinalizada{
+    position:relative;
+    margin:20px 0 18px;
+}
+
+.coronaCampeones{
+    position:relative;
+    padding:30px 22px 26px;
+    overflow:hidden;
+    border:1px solid rgba(251,191,36,.65);
+    border-radius:28px;
+    background:
+        radial-gradient(circle at 50% -5%,rgba(254,240,138,.28),transparent 32%),
+        linear-gradient(155deg,#1c1917,#451a03 54%,#78350f);
+    color:white;
+    text-align:center;
+    box-shadow:0 18px 46px rgba(69,26,3,.28);
+}
+
+.coronaCampeones::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    opacity:.32;
+    background-image:
+        linear-gradient(115deg,transparent 35%,rgba(255,255,255,.12) 48%,transparent 61%);
+    background-size:230% 100%;
+    animation:brilloCorona 5.5s ease-in-out infinite;
+}
+
+.coronaCampeones > *{
+    position:relative;
+    z-index:2;
+}
+
+.selloEdicion{
+    display:inline-flex;
+    padding:7px 12px;
+    border:1px solid rgba(254,240,138,.48);
+    border-radius:999px;
+    background:rgba(250,204,21,.12);
+    color:#fef3c7;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.8px;
+}
+
+.trofeoFinal{
+    margin-top:16px;
+    font-size:62px;
+    line-height:1;
+    filter:drop-shadow(0 10px 14px rgba(0,0,0,.22));
+    animation:latidoTrofeo 2.8s ease-in-out infinite;
+}
+
+.tituloCampeones{
+    margin-top:12px;
+    color:#fde68a;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:2.8px;
+}
+
+.coronaCampeones h1{
+    max-width:560px;
+    margin:8px auto 0;
+    font-size:clamp(28px,7vw,46px);
+    font-weight:900;
+    line-height:1.03;
+    text-wrap:balance;
+}
+
+.textoCorona{
+    max-width:520px;
+    margin:13px auto 0;
+    color:#fef3c7;
+    font-size:14px;
+    line-height:1.5;
+    opacity:.88;
+}
+
+.fotoCampeones{
+    width:min(100%,500px);
+    margin:20px auto 0;
+    overflow:hidden;
+    border:3px solid rgba(254,240,138,.7);
+    border-radius:22px;
+    background:#292524;
+    box-shadow:0 14px 30px rgba(0,0,0,.28);
+}
+
+.fotoCampeones img{
+    display:block;
+    width:100%;
+    max-height:420px;
+    object-fit:cover;
+}
+
+.btnCelebrar{
+    margin-top:20px;
+    padding:11px 16px;
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    color:white;
+    font-size:13px;
+    font-weight:900;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+    transition:transform .2s ease,background .2s ease;
+}
+
+.btnCelebrar:active{
+    transform:scale(.96);
+}
+
+.destello{
+    position:absolute;
+    z-index:0;
+    width:190px;
+    height:190px;
+    border:1px solid rgba(254,240,138,.18);
+    border-radius:50%;
+}
+
+.destelloUno{
+    top:-105px;
+    left:-75px;
+}
+
+.destelloDos{
+    right:-85px;
+    bottom:-125px;
+}
+
+.granFinalCelebracion{
+    margin-top:16px;
+    padding:20px;
+    border:1px solid #fde68a;
+    border-radius:22px;
+    background:white;
+    box-shadow:0 10px 28px rgba(120,53,15,.12);
+}
+
+.cabeceraGranFinal{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #f3e8d0;
+}
+
+.cabeceraGranFinal span{
+    color:#92400e;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:1.4px;
+}
+
+.cabeceraGranFinal strong{
+    color:#64748b;
+    font-size:11px;
+}
+
+.equipoGranFinal{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px;
+    border-radius:16px;
+}
+
+.equipoGranFinal > span{
+    font-size:25px;
+}
+
+.equipoGranFinal div{
+    min-width:0;
+}
+
+.equipoGranFinal small{
+    display:block;
+    margin-bottom:3px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.equipoGranFinal strong{
+    display:block;
+    font-size:17px;
+    line-height:1.25;
+}
+
+.equipoCampeonFinal{
+    border:1px solid #fde68a;
+    background:linear-gradient(135deg,#fffbeb,#fef3c7);
+    color:#78350f;
+}
+
+.equipoSubcampeonFinal{
+    border:1px solid #e2e8f0;
+    background:#f8fafc;
+    color:#334155;
+}
+
+.marcadorFinal{
+    margin:9px 0;
+    padding:9px 12px;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    font-size:16px;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:.8px;
+}
+
+
+.cifrasFinales{
+    margin-top:16px;
+    padding:22px;
+    border-radius:22px;
+    background:#fff;
+    box-shadow:0 8px 24px rgba(15,23,42,.08);
+}
+
+.cifrasFinales h2{
+    margin-bottom:16px;
+    color:#1e293b;
+    font-size:18px;
+    text-align:center;
+}
+
+.rejillaCifras{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.rejillaCifras div{
+    padding:15px 8px;
+    border-radius:16px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.rejillaCifras strong{
+    display:block;
+    color:#92400e;
+    font-size:26px;
+    line-height:1;
+}
+
+.rejillaCifras span{
+    display:block;
+    margin-top:7px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+    line-height:1.25;
+}
+
+.mensajeDespedida{
+    margin-top:16px;
+    padding:24px 20px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:white;
+    text-align:center;
+    box-shadow:0 10px 28px rgba(15,23,42,.16);
+}
+
+.mensajeDespedida > span{
+    display:block;
+    margin-bottom:10px;
+    font-size:31px;
+}
+
+.mensajeDespedida p{
+    color:#e2e8f0;
+    font-size:14px;
+    line-height:1.55;
+}
+
+.mensajeDespedida strong{
+    display:block;
+    margin-top:10px;
+    color:#fde68a;
+    font-size:16px;
+}
+
+.mensajeDespedida small{
+    display:block;
+    margin-top:13px;
+    color:#94a3b8;
+    font-size:11px;
+}
+
+.modoFinalizado .gridFinalizado{
+    margin-top:18px;
+}
+
+.modoFinalizado .gridFinalizado .cardAcceso{
+    min-height:142px;
+}
+
+.modoFinalizado .cardCaminoTitulo{
+    background:linear-gradient(135deg,#b45309,#78350f);
+}
+
+.modoFinalizado .cardEquiposFinal{
+    background:linear-gradient(135deg,#6d28d9,#4c1d95);
+}
+
+.cieloConfeti{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    overflow:hidden;
+    pointer-events:none;
+}
+
+.piezaConfeti{
+    --color:#facc15;
+    position:absolute;
+    top:-24px;
+    left:var(--x);
+    width:10px;
+    height:17px;
+    border-radius:2px;
+    background:var(--color);
+    opacity:0;
+    transform:scale(var(--escala)) rotate(0deg);
+}
+
+.confetiActivo .piezaConfeti{
+    animation:caerConfeti var(--duracion) cubic-bezier(.18,.75,.28,1) var(--retardo) forwards;
+}
+
+.piezaConfeti[style*="--tono: 0"]{--color:#facc15;}
+.piezaConfeti[style*="--tono: 1"]{--color:#f97316;}
+.piezaConfeti[style*="--tono: 2"]{--color:#ec4899;}
+.piezaConfeti[style*="--tono: 3"]{--color:#22c55e;}
+.piezaConfeti[style*="--tono: 4"]{--color:#38bdf8;}
+.piezaConfeti[style*="--tono: 5"]{--color:#a855f7;}
+
+@keyframes caerConfeti{
+    0%{
+        opacity:0;
+        transform:translate3d(0,-4vh,0) scale(var(--escala)) rotate(0deg);
+    }
+    8%{opacity:1;}
+    100%{
+        opacity:.95;
+        transform:translate3d(calc((50vw - var(--x)) * .22),108vh,0) scale(var(--escala)) rotate(var(--giro));
+    }
+}
+
+@keyframes brilloBarraFinal{
+    to{background-position:-220% 0;}
+}
+
+@keyframes brilloCorona{
+    0%,35%{background-position:230% 0;}
+    70%,100%{background-position:-130% 0;}
+}
+
+@keyframes latidoTrofeo{
+    0%,100%{transform:translateY(0) scale(1);}
+    50%{transform:translateY(-4px) scale(1.04);}
+}
+
+@media (max-width:520px){
+    .coronaCampeones{
+        padding:27px 17px 23px;
+        border-radius:24px;
+    }
+
+    .trofeoFinal{
+        font-size:54px;
+    }
+
+
+    .rejillaCifras{
+        grid-template-columns:1fr 1fr;
+    }
+
+
+    .cabeceraGranFinal{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+}
+
+
+/* =========================================================
+   NAVEGACIÓN FINALIZADA Y PANTALLA MÁS
+========================================================= */
+
+.modoFinalizado .bottomNav .navRankingFinal.navActivo,
+.modoFinalizado .bottomNav .navRankingFinal.navActivo small{
+    color:#7c3aed;
+}
+
+.modoFinalizado .listaOpcionesMas{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas{
+    position:relative;
+    display:flex;
+    min-width:0;
+    min-height:112px;
+    padding:17px 15px;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    background:linear-gradient(145deg,#fff,#f8fafc);
+    color:#1e293b;
+    text-align:left;
+    box-shadow:0 7px 19px rgba(15,23,42,.07);
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > span{
+    font-size:28px;
+    line-height:1;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > strong{
+    padding-right:0;
+    font-size:13px;
+    line-height:1.25;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionMas > b{
+    display:none !important;
+}
+
+.modoFinalizado .listaOpcionesMas .opcionEquiposMasFinal{
+    border-color:#bae6fd;
+    background:linear-gradient(145deg,#f0f9ff,#e0f2fe);
+    color:#075985;
+}
+
+@media(max-width:380px){
+    .modoFinalizado .listaOpcionesMas{
+        gap:9px;
+    }
+
+    .modoFinalizado .listaOpcionesMas .opcionMas{
+        min-height:104px;
+        padding:14px 12px;
+    }
+
+    .detalleExtremosPartidos{
+        grid-template-columns:1fr;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .modoFinalizado *,
+    .modoFinalizado *::before,
+    .modoFinalizado *::after{
+        scroll-behavior:auto !important;
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        transition-duration:.01ms !important;
+    }
+
+    .cieloConfeti{
+        display:none !important;
+    }
+}
+
+/* =========================================================
+   AJUSTES V2 · CAMPEONATO FINALIZADO
+========================================================= */
+
+/* Cabecera: solo estado y última actualización */
+.modoFinalizado .cabeceraFinalCompacta{
+    padding:17px 20px;
+    border-radius:20px;
+}
+
+.modoFinalizado .cabeceraFinalCompacta .tituloSuperior,
+.modoFinalizado .cabeceraFinalCompacta .tituloPrincipal,
+.modoFinalizado .cabeceraFinalCompacta .subtitulo,
+.modoFinalizado .cabeceraFinalCompacta .progresoCabecera{
+    display:none !important;
+}
+
+.modoFinalizado .cabeceraFinalCompacta .estadoCabecera{
+    display:block;
+    width:max-content;
+    max-width:100%;
+    margin:0 auto;
+    padding:9px 15px;
+    text-align:center;
+}
+
+.modoFinalizado .cabeceraFinalCompacta .actualizacion{
+    margin-top:11px;
+    padding:7px 10px;
+    background:rgba(255,255,255,.11);
+    font-size:12px;
+}
+
+.modoFinalizado .cabeceraFinalCompacta .actualizacion strong{
+    font-size:13px;
+}
+
+/* Marcador deportivo de la Gran Final */
+.marcadorGranFinalV2{
+    padding:0;
+    overflow:hidden;
+    border:1px solid #e5d09b;
+    background:#fff;
+}
+
+.tituloMarcadorFinal{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:17px 18px;
+    background:linear-gradient(135deg,#1c1917,#451a03);
+    color:white;
+}
+
+.tituloMarcadorFinal div{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.tituloMarcadorFinal span{
+    color:#fde68a;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:1.3px;
+}
+
+.tituloMarcadorFinal strong{
+    font-size:12px;
+    font-weight:700;
+    opacity:.82;
+}
+
+.tituloMarcadorFinal > small{
+    padding:5px 8px;
+    border:1px solid rgba(254,240,138,.5);
+    border-radius:999px;
+    color:#fef3c7;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.cabeceraSetsFinal,
+.filaMarcadorFinal{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) repeat(var(--sets-final),48px);
+    align-items:stretch;
+}
+
+.cabeceraSetsFinal{
+    border-bottom:1px solid #e2e8f0;
+    background:#f8fafc;
+}
+
+.cabeceraSetsFinal span{
+    display:flex;
+    min-height:34px;
+    align-items:center;
+    justify-content:center;
+    padding:7px 4px;
+    border-left:1px solid #e2e8f0;
+    color:#64748b;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.7px;
+}
+
+.cabeceraSetsFinal span:first-child{
+    justify-content:flex-start;
+    padding-left:17px;
+    border-left:none;
+}
+
+.filaMarcadorFinal{
+    border-bottom:1px solid #e2e8f0;
+}
+
+.filaMarcadorFinal:last-child{
+    border-bottom:none;
+}
+
+.nombreEquipoMarcador{
+    display:flex;
+    min-width:0;
+    align-items:center;
+    gap:10px;
+    padding:15px 13px;
+}
+
+.nombreEquipoMarcador > span{
+    flex:0 0 auto;
+    font-size:23px;
+}
+
+.nombreEquipoMarcador div{
+    min-width:0;
+}
+
+.nombreEquipoMarcador small{
+    display:block;
+    margin-bottom:3px;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.nombreEquipoMarcador strong{
+    display:block;
+    overflow-wrap:anywhere;
+    font-size:15px;
+    line-height:1.2;
+}
+
+.puntoSetFinal{
+    display:flex;
+    min-height:66px;
+    align-items:center;
+    justify-content:center;
+    border-left:1px solid #e2e8f0;
+    color:#475569;
+    font-size:22px;
+    font-weight:800;
+}
+
+.setGanadoFinal{
+    color:#92400e;
+    font-weight:950;
+}
+
+.filaCampeonaFinal{
+    background:linear-gradient(90deg,#fffbeb,#fef3c7 58%,#fff8dc);
+    color:#78350f;
+}
+
+.filaCampeonaFinal .puntoSetFinal{
+    border-left-color:#efd99e;
+}
+
+.filaSubcampeonaFinal{
+    background:#fff;
+    color:#334155;
+}
+
+/* Cifras ampliadas */
+.subtituloCifras{
+    margin:-9px 0 17px;
+    color:#64748b;
+    font-size:12px;
+    line-height:1.4;
+    text-align:center;
+}
+
+.rejillaCifrasAmpliada{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:11px;
+}
+
+.rejillaCifrasAmpliada .cifraAmpliada{
+    display:flex;
+    min-height:122px;
+    padding:14px 8px;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #e7e5e4;
+    background:linear-gradient(145deg,#fff,#fafaf9);
+}
+
+.iconoCifra{
+    margin-bottom:7px;
+    font-size:23px !important;
+    line-height:1;
+}
+
+.rejillaCifrasAmpliada .cifraAmpliada strong{
+    font-size:22px;
+    line-height:1.05;
+}
+
+.rejillaCifrasAmpliada .cifraAmpliada > span:last-child{
+    max-width:120px;
+    font-size:11px;
+}
+
+.detalleExtremosPartidos{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:11px;
+    margin-top:13px;
+}
+
+.detallePartidoExtremo{
+    min-width:0;
+    padding:14px;
+    border-radius:15px;
+    background:#fef3c7;
+    color:#78350f;
+    text-align:center;
+}
+
+.detallePartidoExtremo:nth-child(2){
+    background:#eff6ff;
+    color:#1e3a8a;
+}
+
+.detallePartidoExtremo span{
+    display:block;
+    margin-bottom:5px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.detallePartidoExtremo .equipoPartidoExtremo{
+    display:block;
+    overflow-wrap:anywhere;
+    font-size:12px;
+    line-height:1.35;
+}
+
+.detallePartidoExtremo .equipoPartidoExtremoSegundo{
+    margin-top:3px;
+}
+
+.detallePartidoExtremo small{
+    display:none;
+}
+
+/* Palas Playa: premio humorístico */
+.farolilloPalasFinal{
+    display:flex;
+    margin-top:16px;
+    padding:22px 19px;
+    align-items:center;
+    gap:16px;
+    overflow:hidden;
+    border:1px solid #fdba74;
+    border-radius:22px;
+    background:
+        radial-gradient(circle at 100% 0,rgba(255,255,255,.4),transparent 28%),
+        linear-gradient(135deg,#fff7ed,#ffedd5);
+    color:#7c2d12;
+    box-shadow:0 8px 24px rgba(154,52,18,.12);
+}
+
+.cucharaFarolillo{
+    flex:0 0 auto;
+    font-size:55px;
+    transform:rotate(-12deg);
+    filter:drop-shadow(0 7px 7px rgba(124,45,18,.14));
+}
+
+.farolilloPalasFinal > div:last-child{
+    min-width:0;
+}
+
+.farolilloPalasFinal span{
+    display:block;
+    margin-bottom:5px;
+    color:#c2410c;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1.2px;
+}
+
+.farolilloPalasFinal h2{
+    margin:0 0 7px;
+    overflow-wrap:anywhere;
+    font-size:20px;
+    line-height:1.15;
+}
+
+.farolilloPalasFinal p{
+    margin:0;
+    color:#9a3412;
+    font-size:12px;
+    line-height:1.45;
+}
+
+.farolilloPalasFinal strong{
+    display:block;
+    margin-top:8px;
+    color:#7c2d12;
+    font-size:13px;
+}
+
+@media(max-width:430px){
+    .cabeceraSetsFinal,
+    .filaMarcadorFinal{
+        grid-template-columns:minmax(0,1fr) repeat(var(--sets-final),40px);
+    }
+
+    .nombreEquipoMarcador{
+        gap:7px;
+        padding:13px 9px;
+    }
+
+    .nombreEquipoMarcador > span{
+        font-size:19px;
+    }
+
+    .nombreEquipoMarcador strong{
+        font-size:12px;
+    }
+
+    .puntoSetFinal{
+        min-height:62px;
+        font-size:19px;
+    }
+
+    .farolilloPalasFinal{
+        align-items:flex-start;
+        gap:11px;
+    }
+
+    .cucharaFarolillo{
+        font-size:42px;
+    }
+}

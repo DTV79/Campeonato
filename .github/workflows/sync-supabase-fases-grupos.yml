@@ -1,0 +1,90 @@
+name: Sincronizar fases y grupos con Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/estado_torneo.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase-fases-grupos
+  cancel-in-progress: false
+
+jobs:
+  sync-fases-grupos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
+      - name: Preparar sincronización
+        id: preparar
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          test -f docs/estado_torneo.json
+          jq -e '.configuracion | type == "object"' docs/estado_torneo.json > /dev/null
+
+          if ! jq -e '.configuracion.codigo_campeonato | type == "string" and length > 0' docs/estado_torneo.json > /dev/null 2>&1; then
+            echo "estado_torneo.json todavía no contiene codigo_campeonato. Es la subida preliminar de Excel; se omite esta ejecución sin marcar error."
+            exit 0
+          fi
+
+          echo "Campeonato: $(jq -r '.configuracion.codigo_campeonato' docs/estado_torneo.json)"
+          echo "Estado: $(jq -r '.configuracion.estado_torneo // ""' docs/estado_torneo.json)"
+          echo "Tipo: $(jq -r '.configuracion.tipo_campeonato // ""' docs/estado_torneo.json)"
+          echo "Estructura: $(jq -r '.configuracion.estructura_primera_fase // ""' docs/estado_torneo.json)"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Sincronizar fases y grupos con Supabase
+        if: steps.preparar.outputs.ready == 'true'
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload docs/estado_torneo.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_body.json
+
+          HTTP_CODE=$(curl --silent --show-error \
+            --output /tmp/supabase_response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "apikey: ${SUPABASE_SECRET_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data-binary @/tmp/supabase_body.json \
+            "${SUPABASE_URL%/}/rest/v1/rpc/sync_fases_grupos_excel")
+
+          echo "HTTP ${HTTP_CODE}"
+          cat /tmp/supabase_response.json
+          echo
+
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "La sincronización de fases y grupos con Supabase ha fallado."
+            exit 1
+          fi
+
+          jq -e '.ok == true' /tmp/supabase_response.json > /dev/null
+
+          if jq -e '.configurado == false' /tmp/supabase_response.json > /dev/null 2>&1; then
+            echo "Estructura todavía sin definir. No se realizaron cambios en fases/grupos."
+          else
+            echo "Fases y grupos sincronizados correctamente."
+          fi

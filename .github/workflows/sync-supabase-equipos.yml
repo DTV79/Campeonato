@@ -1,0 +1,124 @@
+name: Sincronizar equipos con Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/supabase_equipos.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase-equipos
+  cancel-in-progress: false
+
+jobs:
+  sync-equipos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
+      - name: Validar JSON de equipos
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f docs/supabase_equipos.json
+          jq -e '.codigo_campeonato | type == "string" and length > 0' docs/supabase_equipos.json > /dev/null
+          jq -e '.equipos | type == "array"' docs/supabase_equipos.json > /dev/null
+
+          echo "Campeonato: $(jq -r '.codigo_campeonato' docs/supabase_equipos.json)"
+          echo "Formato: $(jq -r '.formato_origen // "Sin definir"' docs/supabase_equipos.json)"
+          echo "Nº grupos: $(jq -r '.num_grupos_origen // 0' docs/supabase_equipos.json)"
+          echo "Equipos recibidos: $(jq '.equipos | length' docs/supabase_equipos.json)"
+
+      - name: Sincronizar equipos con Supabase
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload docs/supabase_equipos.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_body.json
+
+          HTTP_CODE=$(curl --silent --show-error \
+            --output /tmp/supabase_response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "apikey: ${SUPABASE_SECRET_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data-binary @/tmp/supabase_body.json \
+            "${SUPABASE_URL%/}/rest/v1/rpc/sync_equipos_excel")
+
+          echo "HTTP ${HTTP_CODE}"
+          cat /tmp/supabase_response.json
+          echo
+
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "La sincronización de equipos con Supabase ha fallado."
+            exit 1
+          fi
+
+          jq -e '.ok == true' /tmp/supabase_response.json > /dev/null
+          echo "Equipos sincronizados correctamente."
+
+      - name: Sincronizar equipos con sus grupos iniciales
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          jq -n \
+            --slurpfile payload docs/supabase_equipos.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_grupos_body.json
+
+          # La creación de fases/grupos se dispara desde estado_torneo.json.
+          # Si ambas Actions coinciden en el tiempo, damos unos segundos para
+          # que GR/A-B-C-D exista antes de considerar la sincronización fallida.
+          for INTENTO in 1 2 3 4 5; do
+            HTTP_CODE=$(curl --silent --show-error \
+              --output /tmp/supabase_grupos_response.json \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "apikey: ${SUPABASE_SECRET_KEY}" \
+              --header 'Content-Type: application/json' \
+              --data-binary @/tmp/supabase_grupos_body.json \
+              "${SUPABASE_URL%/}/rest/v1/rpc/sync_equipos_grupos_excel")
+
+            if [[ "${HTTP_CODE}" -ge 200 && "${HTTP_CODE}" -lt 300 ]] \
+               && jq -e '.ok == true' /tmp/supabase_grupos_response.json > /dev/null 2>&1; then
+              echo "HTTP ${HTTP_CODE}"
+              cat /tmp/supabase_grupos_response.json
+              echo
+              echo "Asignación Equipos → Grupos sincronizada correctamente."
+              exit 0
+            fi
+
+            echo "Intento ${INTENTO}/5: HTTP ${HTTP_CODE}"
+            cat /tmp/supabase_grupos_response.json || true
+            echo
+
+            if [[ "${INTENTO}" -lt 5 ]]; then
+              sleep 3
+            fi
+          done
+
+          echo "La sincronización Equipos → Grupos ha fallado tras 5 intentos."
+          exit 1

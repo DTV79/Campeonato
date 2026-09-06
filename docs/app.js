@@ -1,0 +1,6387 @@
+const JSON_URL = "https://dtv79.github.io/Campeonato/estado_torneo.json";
+const JSON_RANKING_URL = "https://dtv79.github.io/Campeonato/ranking_historico.json";
+const JSON_FOTOS_URL = "https://dtv79.github.io/Campeonato/fotos.json";
+const SUPABASE_URL = "https://imznjbnpecvnoivywnoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
+const CLAVE_ACCESO_MANTENIMIENTO =
+    "campeonato_acceso_mantenimiento";
+
+let datos = null;
+let datosRanking = null;
+let promesaRanking = null;
+let datosFotos = null;
+let promesaFotos = null;
+let temporizadorCuentaAtras = null;
+
+const estadoUI = {
+    pantalla: "inicio",
+    faseCompeticion: "",
+    fasePartidos: "",
+    grupoCompeticion: {},
+    grupoPartidos: {},
+    albumFotos: ""
+};
+
+if (document.readyState === "loading") {
+    document.addEventListener(
+        "DOMContentLoaded",
+        iniciarApp,
+        { once: true }
+    );
+} else {
+    iniciarApp();
+}
+
+document.addEventListener(
+    "click",
+    gestionarClickGlobal
+);
+
+window.addEventListener(
+    "message",
+    gestionarMensajeInscripciones
+);
+
+function gestionarMensajeInscripciones(
+    evento
+) {
+
+    const origen =
+        String(evento.origin || "");
+
+    const origenGoogle =
+        origen.includes(
+            "googleusercontent.com"
+        ) ||
+        origen.includes(
+            "script.google.com"
+        );
+
+    if (!origenGoogle) return;
+
+    if (
+        evento.data?.tipo !==
+        "altura-inscripciones"
+    ) {
+        return;
+    }
+
+    const altura =
+        Number(evento.data.altura);
+
+    if (
+        !Number.isFinite(altura) ||
+        altura < 250
+    ) {
+        return;
+    }
+
+    const iframe =
+        document.querySelector(
+            ".iframeInscripciones"
+        );
+
+    if (!iframe) return;
+
+    iframe.style.height =
+        `${Math.ceil(altura) + 12}px`;
+}
+
+async function iniciarApp() {
+    try {
+        const respuesta = await fetch(
+            `${JSON_URL}?v=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `No se pudo cargar el JSON (${respuesta.status})`
+            );
+        }
+
+        datos = await respuesta.json();
+        datos = await cargarConfiguracionDesdeSupabase(datos);
+        datos = await cargarCompeticionDesdeSupabase(datos);
+
+/*
+   Antes de preparar ninguna pantalla, comprobamos
+   si la web está en mantenimiento y si este navegador
+   tiene acceso privado.
+*/
+const accesoMantenimiento =
+    gestionarAccesoMantenimiento();
+
+if (
+    modoMantenimientoActivo() &&
+    !accesoMantenimiento
+) {
+    pintarPantallaMantenimiento();
+    return;
+}
+
+/* =========================================================
+   SUPABASE CON RESPALDO AUTOMATICO EN estado_torneo.json
+========================================================= */
+
+async function cargarConfiguracionDesdeSupabase(datosJSON) {
+    const codigo = String(
+        datosJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    if (!codigo) return datosJSON;
+
+    const controlador = new AbortController();
+    const temporizador = setTimeout(
+        () => controlador.abort(),
+        4000
+    );
+
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                signal: controlador.signal,
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    p_codigo: codigo
+                })
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const remoto = await respuesta.json();
+
+        if (!remoto || typeof remoto !== "object") {
+            throw new Error("Respuesta de configuración no válida");
+        }
+
+        return {
+            ...datosJSON,
+            configuracion: {
+                ...(datosJSON.configuracion || {}),
+                ...remoto
+            },
+            fuente_configuracion: "supabase"
+        };
+    } catch (error) {
+        console.warn(
+            "Configuración de Supabase no disponible; se mantiene estado_torneo.json.",
+            error
+        );
+        return datosJSON;
+    } finally {
+        clearTimeout(temporizador);
+    }
+}
+
+async function cargarCompeticionDesdeSupabase(datosJSON) {
+    const codigo = String(
+        datosJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    if (!codigo) return datosJSON;
+
+    const controlador = new AbortController();
+    const temporizador = setTimeout(
+        () => controlador.abort(),
+        4000
+    );
+
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_competicion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                signal: controlador.signal,
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    p_codigo: codigo
+                })
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const remoto = await respuesta.json();
+
+        if (!remoto || typeof remoto !== "object") {
+            throw new Error("Respuesta de Supabase no valida");
+        }
+
+        const combinado = {
+            ...datosJSON,
+            grupos: {
+                ...(datosJSON.grupos || {})
+            },
+            regrupos: {
+                ...(datosJSON.regrupos || {})
+            }
+        };
+
+        combinado.clasificacion = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificacion_liguilla, "GR"),
+            datosJSON.clasificacion
+        );
+
+        combinado.grupos.clasificaciones = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificaciones_grupos, "GR"),
+            datosJSON?.grupos?.clasificaciones
+        );
+
+        combinado.regrupos.clasificaciones = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.clasificaciones_regrupos, "RG"),
+            datosJSON?.regrupos?.clasificaciones
+        );
+
+        combinado.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_liguilla, "GR"),
+            datosJSON.partidos
+        );
+
+        combinado.grupos.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_grupos, "GR"),
+            datosJSON?.grupos?.partidos
+        );
+
+        combinado.regrupos.partidos = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.partidos_regrupos, "RG"),
+            datosJSON?.regrupos?.partidos
+        );
+
+        combinado.cruces = elegirListaMasCompleta(
+            normalizarListaSupabase(remoto.cruces, "MM"),
+            datosJSON.cruces
+        );
+
+        combinado.fuente_competicion = detectarFuenteCompeticion(
+            combinado,
+            datosJSON
+        );
+
+        return combinado;
+    } catch (error) {
+        console.warn(
+            "Supabase no disponible; se mantiene estado_torneo.json.",
+            error
+        );
+        return datosJSON;
+    } finally {
+        clearTimeout(temporizador);
+    }
+}
+
+function elegirListaMasCompleta(listaSupabase, listaJSON) {
+    const supabase = Array.isArray(listaSupabase)
+        ? listaSupabase
+        : [];
+    const respaldo = Array.isArray(listaJSON)
+        ? listaJSON
+        : [];
+
+    if (supabase.length < respaldo.length) {
+        return respaldo;
+    }
+
+    return supabase;
+}
+
+function normalizarListaSupabase(lista, codigoFase) {
+    if (!Array.isArray(lista)) return [];
+
+    return lista.map(elemento => {
+        const copia = { ...elemento };
+
+        if (codigoFase === "GR") {
+            copia.grupo = String(copia.grupo || "")
+                .replace(/^Grupo\s+/i, "")
+                .trim();
+        }
+
+        return copia;
+    });
+}
+
+function detectarFuenteCompeticion(combinado, original) {
+    const claves = [
+        [combinado.clasificacion, original.clasificacion],
+        [combinado?.grupos?.clasificaciones, original?.grupos?.clasificaciones],
+        [combinado?.regrupos?.clasificaciones, original?.regrupos?.clasificaciones],
+        [combinado.partidos, original.partidos],
+        [combinado?.grupos?.partidos, original?.grupos?.partidos],
+        [combinado?.regrupos?.partidos, original?.regrupos?.partidos],
+        [combinado.cruces, original.cruces]
+    ];
+
+    return claves.some(([actual, anterior]) =>
+        Array.isArray(actual) &&
+        Array.isArray(anterior) &&
+        actual !== anterior
+    )
+        ? "Supabase con respaldo JSON"
+        : "JSON de respaldo";
+}
+
+inicializarEstadoUI();
+
+const parametros =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const pantallaSolicitada =
+    parametros.get("pantalla") ||
+    "inicio";
+
+const faseSolicitada =
+    parametros.get("fase") ||
+    "";
+
+/*
+   Se prepara primero la portada, pero continúa
+   oculta mediante la clase appCargando.
+*/
+pintarInicio();
+
+        if (
+            pantallaSolicitada ===
+            "inicio"
+        ) {
+            return;
+        }
+
+        if (
+            pantallaSolicitada ===
+            "fotos"
+        ) {
+            if (
+                esSi(
+                    obtenerConfiguracion()
+                        .mostrar_fotos
+                )
+            ) {
+                abrirPantalla(
+                    "fotos"
+                );
+            }
+
+            return;
+        }
+
+        if (
+            pantallaSolicitada ===
+            "ranking"
+        ) {
+            if (
+                esSi(
+                    obtenerConfiguracion()
+                        .mostrar_ranking_historico
+                )
+            ) {
+                abrirPantalla(
+                    "ranking"
+                );
+            }
+
+            return;
+        }
+
+        if (esWebPrevia()) {
+            const pantallasPrevias =
+                [
+                    "pretorneo_info",
+                    "mas"
+                ];
+
+            if (
+                pantallaSolicitada ===
+                "pretorneo_inscripcion"
+            ) {
+                if (
+                    esEstadoInscripciones()
+                ) {
+                    abrirPantalla(
+                        "pretorneo_inscripcion"
+                    );
+                }
+
+                return;
+            }
+
+            if (
+                pantallasPrevias.includes(
+                    pantallaSolicitada
+                )
+            ) {
+                abrirPantalla(
+                    pantallaSolicitada
+                );
+            }
+
+            return;
+        }
+
+        const pantallasPermitidas = [
+            "competicion",
+            "partidos",
+            "equipos",
+            "mas"
+        ];
+
+        if (
+            pantallasPermitidas.includes(
+                pantallaSolicitada
+            )
+        ) {
+            abrirPantalla(
+                pantallaSolicitada,
+                faseSolicitada
+            );
+        }
+    } catch (error) {
+        console.error(error);
+        pintarErrorCarga();
+    } finally {
+        /*
+           Solo se hace visible la aplicación cuando
+           la pantalla correcta ya está preparada.
+        */
+        document.body.classList.remove(
+            "appCargando"
+        );
+    }
+}
+
+/* =========================================================
+   MODO MANTENIMIENTO
+========================================================= */
+
+function gestionarAccesoMantenimiento() {
+    const url =
+        new URL(window.location.href);
+
+    const activarAcceso =
+        String(
+            url.searchParams.get("acceso") ||
+            ""
+        )
+            .trim()
+            .toLowerCase() ===
+        "mantenimiento";
+
+    const cerrarAcceso =
+        [
+            "si",
+            "sí",
+            "true",
+            "1"
+        ].includes(
+            String(
+                url.searchParams.get(
+                    "cerrar_acceso"
+                ) || ""
+            )
+                .trim()
+                .toLowerCase()
+        );
+
+    try {
+        if (cerrarAcceso) {
+            localStorage.removeItem(
+                CLAVE_ACCESO_MANTENIMIENTO
+            );
+        } else if (activarAcceso) {
+            localStorage.setItem(
+                CLAVE_ACCESO_MANTENIMIENTO,
+                "si"
+            );
+        }
+    } catch (error) {
+        console.warn(
+            "No se pudo guardar el acceso de mantenimiento.",
+            error
+        );
+    }
+
+    if (
+        activarAcceso ||
+        cerrarAcceso
+    ) {
+        url.searchParams.delete(
+            "acceso"
+        );
+
+        url.searchParams.delete(
+            "cerrar_acceso"
+        );
+
+        window.history.replaceState(
+            {},
+            document.title,
+            url.pathname +
+            url.search +
+            url.hash
+        );
+    }
+
+    try {
+        return (
+            localStorage.getItem(
+                CLAVE_ACCESO_MANTENIMIENTO
+            ) === "si"
+        );
+    } catch (error) {
+        return false;
+    }
+}
+
+
+function modoMantenimientoActivo() {
+    const config =
+        obtenerConfiguracion();
+
+    if (
+        config.modo_mantenimiento ===
+        true
+    ) {
+        return true;
+    }
+
+    const valor =
+        String(
+            config.modo_mantenimiento ||
+            ""
+        )
+            .trim()
+            .toLowerCase();
+
+    return [
+        "si",
+        "sí",
+        "true",
+        "1"
+    ].includes(valor);
+}
+
+
+function pintarPantallaMantenimiento() {
+    const config =
+        obtenerConfiguracion();
+
+    const titulo =
+        String(
+            config.titulo_mantenimiento ||
+            "Web en mantenimiento"
+        ).trim();
+
+    const mensaje =
+        String(
+            config.mensaje_mantenimiento ||
+            "Estamos realizando algunas mejoras. Volveremos pronto."
+        ).trim();
+
+    const campeonato =
+        String(
+            config.nombre_campeonato ||
+            "Sprint Pádel Tui"
+        ).trim();
+
+    document.title =
+        titulo;
+
+    document.body.classList.remove(
+        "appCargando"
+    );
+
+    document.body.classList.add(
+        "modoMantenimiento"
+    );
+
+    document.body.innerHTML = `
+        <main class="pantallaMantenimiento">
+            <section
+                class="tarjetaMantenimiento"
+                aria-labelledby="tituloMantenimiento"
+            >
+                <div class="iconoMantenimiento iconoMantenimientoPadel">
+    <svg
+        viewBox="0 0 64 64"
+        aria-hidden="true"
+        focusable="false"
+    >
+        <!-- Pala izquierda -->
+        <g transform="rotate(-28 22 24)">
+            <ellipse
+                cx="22"
+                cy="22"
+                rx="11"
+                ry="14"
+                fill="#ef4444"
+                stroke="#431c2b"
+                stroke-width="2"
+            />
+            <rect
+                x="19.5"
+                y="35"
+                width="5"
+                height="15"
+                rx="2.5"
+                fill="#8b5e3c"
+                stroke="#431c2b"
+                stroke-width="1.5"
+            />
+            <circle cx="18" cy="18" r="1.2" fill="#ffd9d9"/>
+            <circle cx="22" cy="16" r="1.2" fill="#ffd9d9"/>
+            <circle cx="26" cy="18" r="1.2" fill="#ffd9d9"/>
+            <circle cx="18" cy="23" r="1.2" fill="#ffd9d9"/>
+            <circle cx="22" cy="22" r="1.2" fill="#ffd9d9"/>
+            <circle cx="26" cy="23" r="1.2" fill="#ffd9d9"/>
+            <circle cx="20" cy="28" r="1.2" fill="#ffd9d9"/>
+            <circle cx="24" cy="28" r="1.2" fill="#ffd9d9"/>
+        </g>
+
+        <!-- Pala derecha -->
+        <g transform="rotate(28 42 24)">
+            <ellipse
+                cx="42"
+                cy="22"
+                rx="11"
+                ry="14"
+                fill="#f59e0b"
+                stroke="#431c2b"
+                stroke-width="2"
+            />
+            <rect
+                x="39.5"
+                y="35"
+                width="5"
+                height="15"
+                rx="2.5"
+                fill="#8b5e3c"
+                stroke="#431c2b"
+                stroke-width="1.5"
+            />
+            <circle cx="38" cy="18" r="1.2" fill="#fff0c7"/>
+            <circle cx="42" cy="16" r="1.2" fill="#fff0c7"/>
+            <circle cx="46" cy="18" r="1.2" fill="#fff0c7"/>
+            <circle cx="38" cy="23" r="1.2" fill="#fff0c7"/>
+            <circle cx="42" cy="22" r="1.2" fill="#fff0c7"/>
+            <circle cx="46" cy="23" r="1.2" fill="#fff0c7"/>
+            <circle cx="40" cy="28" r="1.2" fill="#fff0c7"/>
+            <circle cx="44" cy="28" r="1.2" fill="#fff0c7"/>
+        </g>
+    </svg>
+</div>
+
+                <p
+                    class="marcaMantenimiento"
+                    id="marcaMantenimiento"
+                ></p>
+
+                <h1 id="tituloMantenimiento"></h1>
+
+                <p
+                    class="mensajeMantenimiento"
+                    id="mensajeMantenimiento"
+                ></p>
+
+                <small class="pieMantenimiento">
+                    Gracias por tu paciencia.
+                </small>
+            </section>
+        </main>
+    `;
+
+    document
+        .getElementById(
+            "marcaMantenimiento"
+        )
+        .textContent =
+        campeonato;
+
+    document
+        .getElementById(
+            "tituloMantenimiento"
+        )
+        .textContent =
+        titulo;
+
+    document
+        .getElementById(
+            "mensajeMantenimiento"
+        )
+        .textContent =
+        mensaje;
+}
+
+function inicializarEstadoUI() {
+    estadoUI.faseCompeticion = obtenerFaseActualCompeticion();
+    estadoUI.fasePartidos = obtenerFaseActualPartidos();
+
+    for (const fase of ["grupos", "regrupos"]) {
+        const grupos = obtenerNombresGrupos(fase);
+        estadoUI.grupoCompeticion[fase] = grupos[0] || "";
+        estadoUI.grupoPartidos[fase] = "todos";
+    }
+}
+
+/* =========================================================
+   NAVEGACIÓN Y EVENTOS
+========================================================= */
+
+function gestionarClickGlobal(evento) {
+
+    const albumFotos =
+        evento.target.closest(
+            "[data-album-fotos]"
+        );
+
+    if (albumFotos) {
+        estadoUI.albumFotos =
+            albumFotos.dataset.albumFotos ||
+            "";
+
+        pintarPantallaFotos().then(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        return;
+    }
+
+    const volverAlbumesFotos =
+        evento.target.closest(
+            "#btnVolverAlbumesFotos"
+        );
+
+    if (volverAlbumesFotos) {
+        estadoUI.albumFotos = "";
+
+        pintarPantallaFotos().then(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+
+        return;
+    }
+    
+    const botonAviso =
+        evento.target.closest(
+            "[data-aviso-proxima-edicion]"
+        );
+
+    if (botonAviso) {
+        alternarAvisoProximaEdicion(
+            botonAviso
+        );
+        return;
+    }
+    
+    const btnInfoRanking = evento.target.closest("#btnInfoRanking");
+    if (btnInfoRanking) {
+        mostrarInfoRanking();
+        return;
+    }
+
+    const volverRanking = evento.target.closest("#btnVolverRanking");
+    if (volverRanking) {
+        pintarPantallaRanking();
+        return;
+    }
+
+    const jugadorRanking = evento.target.closest("[data-ranking-jugador]");
+    if (jugadorRanking) {
+        pintarDetalleJugadorRanking(jugadorRanking.dataset.rankingJugador);
+        return;
+    }
+
+    const btnInfo = evento.target.closest("#btnInfoOrden");
+    if (btnInfo) {
+        mostrarInfoOrden();
+        return;
+    }
+
+    const cerrarInfo = evento.target.closest("#cerrarInfoOrden");
+    if (cerrarInfo || evento.target.classList.contains("overlayInfo")) {
+        cerrarInfoOrden();
+        return;
+    }
+
+    const btnCompleta = evento.target.closest("#btnVistaCompleta");
+    if (btnCompleta) {
+        pintarClasificacionCompletaActual();
+        return;
+    }
+
+    const btnResumida = evento.target.closest("#btnVistaResumida");
+    if (btnResumida) {
+        pintarPantallaCompeticion();
+        return;
+    }
+
+    const selectorFase = evento.target.closest("[data-selector-fase]");
+    if (selectorFase) {
+        cambiarFaseSelector(selectorFase);
+        return;
+    }
+
+    const selectorGrupo = evento.target.closest("[data-selector-grupo]");
+    if (selectorGrupo) {
+        cambiarGrupoSelector(selectorGrupo);
+        return;
+    }
+
+    const cabeceraJornada = evento.target.closest(".cabeceraJornada");
+    if (cabeceraJornada) {
+        alternarJornada(cabeceraJornada);
+        return;
+    }
+
+    const filaClasificacion = evento.target.closest(
+        ".filaClasificacion[data-desplegable='true']"
+    );
+    if (filaClasificacion) {
+        alternarDetalleClasificacion(filaClasificacion);
+        return;
+    }
+
+    const opcionMas = evento.target.closest("[data-destino-pantalla]");
+    if (opcionMas) {
+        const pantalla = opcionMas.dataset.destinoPantalla;
+        const fase = opcionMas.dataset.destinoFase || "";
+        abrirPantalla(pantalla, fase);
+        return;
+    }
+
+    const enlaceDirecto = evento.target.closest("[data-href]");
+    if (enlaceDirecto) {
+        const href = enlaceDirecto.dataset.href;
+        if (href) window.location.href = href;
+        return;
+    }
+
+    const card =
+    evento.target.closest(".cardAcceso");
+
+if (card) {
+    if (
+        card.classList.contains(
+            "tarjetaBloqueada"
+        )
+    ) {
+        return;
+    }
+
+    const seccion =
+        card.dataset.seccion;
+
+    if (seccion === "competicion") {
+        abrirPantalla(
+            "competicion",
+            obtenerFaseClasificacionPrincipal()
+        );
+    } else if (
+        seccion === "eliminatorias"
+    ) {
+        abrirPantalla(
+            "competicion",
+            "cruces"
+        );
+    } else if (
+        seccion === "palas"
+    ) {
+        abrirPantalla(
+            "competicion",
+            "palas"
+        );
+    } else if (seccion) {
+        abrirPantalla(seccion);
+    }
+
+    return;
+}
+
+    const nav = evento.target.closest(".navBtn");
+    if (nav) {
+        const pantalla = nav.dataset.pantalla;
+        abrirPantalla(
+            pantalla,
+            pantalla === "competicion" ? obtenerFaseClasificacionPrincipal() : ""
+        );
+    }
+}
+
+function abrirPantalla(pantalla, fase = "") {
+    if (!datos) return;
+
+    if (pantalla === "inicio") {
+        mostrarInicio();
+        return;
+    }
+
+    ocultarInicio();
+    activarNav(
+    ["ranking", "fotos"].includes(pantalla)
+        ? "mas"
+        : pantalla
+);
+    estadoUI.pantalla = pantalla;
+
+        let faseURL = fase;
+
+    if (
+        pantalla === "competicion" &&
+        !faseURL
+    ) {
+        faseURL =
+            estadoUI.faseCompeticion;
+    }
+
+    if (
+        pantalla === "partidos" &&
+        !faseURL
+    ) {
+        faseURL =
+            estadoUI.fasePartidos;
+    }
+
+    actualizarPantallaEnURL(
+        pantalla,
+        faseURL
+    );
+
+    if (esWebPrevia()) {
+        if (pantalla === "pretorneo_info") {
+            pintarPantallaInformacionPretorneo();
+        } else if (pantalla === "pretorneo_inscripcion") {
+            pintarPantallaInscripciones();
+        } else if (pantalla === "ranking") {
+        pintarPantallaRanking();
+        } else if (pantalla === "fotos") {
+        estadoUI.albumFotos = "";
+        pintarPantallaFotos();
+        } else if (pantalla === "mas") {
+            pintarPantallaMas();
+        } else {
+            mostrarInicio();
+        }
+        return;
+    }
+
+    if (pantalla === "competicion") {
+        if (fase) estadoUI.faseCompeticion = fase;
+        pintarPantallaCompeticion();
+    } else if (pantalla === "partidos") {
+        if (fase) estadoUI.fasePartidos = fase;
+        pintarPantallaPartidos();
+    } else if (pantalla === "equipos") {
+        pintarPantallaEquipos();
+    } else if (pantalla === "ranking") {
+        pintarPantallaRanking();
+    } else if (pantalla === "fotos") {
+        estadoUI.albumFotos = "";
+        pintarPantallaFotos();
+    } else if (pantalla === "mas") {
+        pintarPantallaMas();
+    }
+}
+
+function abrirEspecialDesdePortada() {
+    const tarjeta = document.getElementById("tarjetaEspecial");
+    const pantalla = tarjeta?.dataset.destinoPantalla || "competicion";
+    const fase = tarjeta?.dataset.destinoFase || "";
+    abrirPantalla(pantalla, fase);
+}
+
+function ocultarInicio() {
+    document.querySelector(".cabecera")?.classList.add("oculto");
+    document.querySelector(".gridDashboard")?.classList.add("oculto");
+    document.querySelector(".podioCard")?.classList.add("oculto");
+    document.getElementById("vistaDetalle")?.classList.remove("oculto");
+}
+
+function actualizarPantallaEnURL(
+    pantalla,
+    fase = ""
+) {
+    const url = new URL(
+        window.location.href
+    );
+
+    if (
+        !pantalla ||
+        pantalla === "inicio"
+    ) {
+        url.searchParams.delete(
+            "pantalla"
+        );
+
+        url.searchParams.delete(
+            "fase"
+        );
+    } else {
+        url.searchParams.set(
+            "pantalla",
+            pantalla
+        );
+
+        if (fase) {
+            url.searchParams.set(
+                "fase",
+                fase
+            );
+        } else {
+            url.searchParams.delete(
+                "fase"
+            );
+        }
+    }
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.pathname +
+        url.search +
+        url.hash
+    );
+}
+
+
+
+function limpiarPantallaDeURL() {
+    const url = new URL(
+        window.location.href
+    );
+
+    const tienePantalla =
+        url.searchParams.has(
+            "pantalla"
+        );
+
+    const tieneFase =
+        url.searchParams.has(
+            "fase"
+        );
+
+    if (
+        !tienePantalla &&
+        !tieneFase
+    ) {
+        return;
+    }
+
+    url.searchParams.delete(
+        "pantalla"
+    );
+
+    url.searchParams.delete(
+        "fase"
+    );
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.pathname +
+        url.search +
+        url.hash
+    );
+}
+
+function mostrarInicio() {
+    estadoUI.pantalla = "inicio";
+
+    /*
+       Cuando volvemos a Inicio eliminamos
+       ?pantalla=mas, ?pantalla=partidos, etc.
+    */
+    limpiarPantallaDeURL();
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("oculto");
+
+    document
+        .querySelector(".gridDashboard")
+        ?.classList.remove("oculto");
+
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
+    document
+        .getElementById("vistaDetalle")
+        ?.classList.add("oculto");
+
+    activarNav("inicio");
+    pintarInicio();
+}
+
+function activarNav(pantalla) {
+    document.querySelectorAll(".navBtn").forEach(btn => {
+        btn.classList.remove("navActivo");
+    });
+
+    document
+        .querySelector(`.navBtn[data-pantalla="${pantalla}"]`)
+        ?.classList.add("navActivo");
+}
+
+function cambiarFaseSelector(boton) {
+    const contexto =
+        boton.dataset.selectorFase;
+
+    const fase =
+        boton.dataset.fase;
+
+    if (contexto === "competicion") {
+        estadoUI.faseCompeticion =
+            fase;
+
+        actualizarPantallaEnURL(
+            "competicion",
+            fase
+        );
+
+        pintarPantallaCompeticion();
+    } else if (
+        contexto === "partidos"
+    ) {
+        estadoUI.fasePartidos =
+            fase;
+
+        actualizarPantallaEnURL(
+            "partidos",
+            fase
+        );
+
+        pintarPantallaPartidos();
+    }
+}
+
+function cambiarGrupoSelector(boton) {
+    const contexto = boton.dataset.selectorGrupo;
+    const fase = boton.dataset.fase;
+    const grupo = boton.dataset.grupo;
+
+    if (contexto === "competicion") {
+        estadoUI.grupoCompeticion[fase] = grupo;
+        pintarPantallaCompeticion();
+    } else if (contexto === "partidos") {
+        estadoUI.grupoPartidos[fase] = grupo;
+        pintarPantallaPartidos();
+    } else if (contexto === "equipos") {
+        estadoUI.grupoEquipos = grupo;
+        pintarPantallaEquipos();
+    }
+}
+
+function alternarJornada(cabecera) {
+    const bloque = cabecera.closest(".bloqueJornada");
+    const lista = bloque?.querySelector(":scope > .listaPartidos");
+    const flecha = cabecera.querySelector(".flechaJornada");
+
+    if (!lista) return;
+
+    lista.classList.toggle("oculto");
+    if (flecha) {
+        flecha.textContent = lista.classList.contains("oculto") ? "▶" : "▼";
+    }
+}
+
+function alternarDetalleClasificacion(fila) {
+    const detalle = fila.querySelector(".detalleClasif");
+    const toggle = fila.querySelector(".toggleDetalles");
+
+    if (!detalle || !toggle) return;
+
+    detalle.classList.toggle("oculto");
+    toggle.textContent = detalle.classList.contains("oculto")
+        ? "▼ Ver estadísticas"
+        : "▲ Ocultar estadísticas";
+}
+
+function alternarDetalleEquipo(card) {
+    const detalle = card.querySelector(".detalleEquipo");
+    const flecha = card.querySelector(".flechaEquipo");
+
+    if (!detalle) return;
+
+    detalle.classList.toggle("oculto");
+    if (flecha) {
+        flecha.textContent = detalle.classList.contains("oculto") ? "▶" : "▼";
+    }
+}
+
+
+function pintarIdentidadCampeonato() {
+    const config = obtenerConfiguracion();
+
+    const nombreCompleto = String(
+        config.nombre_campeonato ||
+        "II CAMPEONATO - Sprint Pádel Tui"
+    ).trim();
+
+    /*
+       El nombre se divide mediante guiones:
+
+       Parte 1: título superior pequeño
+       Parte 2: título principal grande
+       Parte 3: subtítulo pequeño
+    */
+
+    const partes = nombreCompleto
+        .split(/\s*[-–—]\s*/)
+        .map(parte => parte.trim());
+
+    const tieneVariasPartes = partes.length >= 2;
+
+    const superior = tieneVariasPartes
+        ? partes[0]
+        : "CAMPEONATO";
+
+    const principal = tieneVariasPartes
+        ? partes[1]
+        : partes[0];
+
+    /*
+       Si hubiese más de tres partes, se unen a partir
+       de la tercera para no perder ningún texto.
+    */
+
+    const inferior = partes
+        .slice(2)
+        .filter(Boolean)
+        .join(" - ");
+
+    document.title = partes
+        .filter(Boolean)
+        .join(" · ");
+
+    setTextClase(
+        "tituloSuperior",
+        superior
+    );
+
+    setTextClase(
+        "tituloPrincipal",
+        principal
+    );
+
+    const subtitulo = document.querySelector(".subtitulo");
+
+    if (subtitulo) {
+        subtitulo.textContent = inferior;
+
+        subtitulo.classList.toggle(
+            "oculto",
+            !inferior
+        );
+    }
+
+    const textoNav = document.querySelector(
+        '.navBtn[data-pantalla="competicion"] small'
+    );
+
+    if (textoNav) {
+        textoNav.textContent = esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
+    }
+}
+
+function setTextClase(clase, texto) {
+    const elemento = document.querySelector(`.${clase}`);
+    if (elemento) elemento.textContent = texto;
+}
+
+function obtenerFaseClasificacionPrincipal() {
+    if (!esModoGrupos()) return "liguilla";
+    return hayRegruposGenerados() ? "regrupos" : "grupos";
+}
+
+function hayRegruposGenerados() {
+    return obtenerClasificacionFase("regrupos").length > 0 ||
+        obtenerPartidosFase("regrupos").length > 0 ||
+        obtenerEquiposAsignadosFase("regrupos").length > 0;
+}
+
+function debeMostrarCrucesPendientes() {
+    if ((datos?.cruces || []).length) return true;
+
+    if (esModoGrupos()) {
+        const config = obtenerConfiguracion();
+        return config.hay_regrupos
+            ? hayRegruposGenerados()
+            : obtenerNombresGrupos("grupos").length > 0;
+    }
+
+    const partidos = quitarDescansos(obtenerPartidosFase("liguilla"));
+    return partidos.length > 0 && partidos.every(partidoFinalizado);
+}
+
+function hayPartidosJugadosEnFase(fase) {
+    return quitarDescansos(obtenerPartidosFase(fase)).some(partidoFinalizado);
+}
+
+function hayPartidosJugadosEnGrupo(fase, grupo) {
+    return quitarDescansos(obtenerPartidosFase(fase)).some(partido =>
+        partido.grupo === grupo && partidoFinalizado(partido)
+    );
+}
+
+function obtenerEquiposAsignadosFase(fase) {
+    if (fase === "grupos") {
+        return datos?.equipos || [];
+    }
+
+    if (fase === "regrupos") {
+        const regrupos = datos?.regrupos || {};
+        const candidatos = [
+            regrupos.equipos,
+            regrupos.asignaciones,
+            regrupos.integrantes
+        ];
+
+        const lista = candidatos.find(Array.isArray);
+        return lista || [];
+    }
+
+    return [];
+}
+
+function obtenerFilasGrupoParaMostrar(fase, grupo) {
+    const clasificacion = obtenerClasificacionFase(fase).filter(
+        fila => fila.grupo === grupo
+    );
+
+    if (clasificacion.length) return clasificacion;
+
+    return obtenerEquiposAsignadosFase(fase)
+        .filter(equipo => equipo.grupo === grupo)
+        .map(normalizarEquipoComoClasificacion);
+}
+
+function normalizarEquipoComoClasificacion(equipo, indice = 0) {
+    return {
+        ...equipo,
+        fase: equipo.fase || "",
+        grupo: equipo.grupo || "",
+        posicion: 0,
+        posicion_actual: 0,
+        posicion_anterior: 0,
+        puntos: 0,
+        puntos_totales: 0,
+        pj: 0,
+        pg: 0,
+        pp: 0,
+        sets_favor: 0,
+        sets_contra: 0,
+        sets_diff: 0,
+        juegos_favor: 0,
+        juegos_contra: 0,
+        juegos_diff: 0,
+        orden: numero(equipo.orden) || indice + 1
+    };
+}
+
+function pintarFilaEquipoGrupoSinClasificacion(fila) {
+    return `
+        <article class="filaClasificacion">
+            <div class="lineaEquipo">
+                <div class="equipoFila">👥 ${escaparHTML(fila.equipo)}</div>
+            </div>
+            <div class="datosFila">${escaparHTML(nombreGrupoVisible(fila.grupo))}</div>
+        </article>
+    `;
+}
+
+/* =========================================================
+   PORTADA
+========================================================= */
+
+function pintarInicio() {
+    pintarIdentidadCampeonato();
+
+    if (esWebPrevia()) {
+        pintarInicioPretorneo();
+        return;
+    }
+
+    detenerCuentaAtrasCampeonato();
+    restaurarBloqueActualizacionCompeticion();
+
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
+    pintarFecha(datos.ultima_actualizacion);
+    configurarPortadaCompeticion();
+    pintarEstadoCabecera();
+    pintarTarjetasDashboard();
+    pintarResumenPortada();
+}
+
+function pintarFecha(fechaISO) {
+    const elemento = document.getElementById("ultimaActualizacion");
+    if (!elemento || !fechaISO) return;
+
+    const fecha = new Date(fechaISO);
+
+    elemento.textContent = Number.isNaN(fecha.getTime())
+        ? fechaISO
+        : fecha.toLocaleString("es-ES", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+}
+
+function pintarEstadoCabecera() {
+    const estado = obtenerEstadoCompeticion();
+
+    setText("estadoCabecera", estado.titulo);
+    setText("textoProgreso", estado.texto);
+
+    const barra = document.getElementById("barraProgreso");
+    if (barra) {
+        barra.style.width = `${estado.porcentaje}%`;
+        barra.className = `progreso ${estado.claseBarra}`;
+    }
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.toggle("cabeceraFinalizada", estado.finalizado);
+}
+
+function pintarTarjetasDashboard() {
+    const config = obtenerConfiguracion();
+    const equipos = datos.equipos || [];
+
+    const faseActual =
+        obtenerFaseActualCompeticion();
+
+    const faseClasificacion =
+        obtenerFaseClasificacionPrincipal();
+
+    const partidosActuales =
+        obtenerPartidosFase(faseActual);
+
+    const partidosSinDescanso =
+        quitarDescansos(partidosActuales);
+
+    const tituloClasificacion =
+        esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
+
+    setText(
+        "tituloTarjetaCompeticion",
+        tituloClasificacion
+    );
+
+    if (esModoGrupos()) {
+        const grupos =
+            obtenerNombresGrupos(faseClasificacion);
+
+        setHTML(
+            "resumenCompeticion",
+            `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
+            `${grupos.length} ` +
+            `${grupos.length === 1 ? "grupo" : "grupos"} · ` +
+            `${equipos.length} equipos`
+        );
+    } else {
+        const lider =
+            datos.clasificacion?.[0]?.equipo ||
+            "Sin datos";
+
+        setHTML(
+            "resumenCompeticion",
+            `🥇 ${escaparHTML(lider)}<br>` +
+            `${equipos.length} equipos participantes`
+        );
+    }
+
+    if (!partidosSinDescanso.length) {
+        setHTML(
+            "resumenPartidos",
+            `${escaparHTML(nombreFase(faseActual))}<br>` +
+            `Jornadas pendientes de generar`
+        );
+    } else if (
+        ["liguilla", "grupos", "regrupos"]
+            .includes(faseActual)
+    ) {
+        const jornada =
+            obtenerJornadaActual(partidosSinDescanso);
+
+        const partidosJornada =
+            partidosSinDescanso.filter(
+                partido =>
+                    Number(partido.jornada) ===
+                    Number(jornada)
+            );
+
+        const jugados =
+            partidosJornada
+                .filter(partidoFinalizado)
+                .length;
+
+        const pendientes =
+            partidosJornada
+                .filter(partidoPendiente)
+                .length;
+
+        setHTML(
+            "resumenPartidos",
+            `Jornada ${jornada}<br>` +
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`
+        );
+    } else {
+        const totalJugados =
+            partidosSinDescanso
+                .filter(partidoFinalizado)
+                .length;
+
+        setHTML(
+            "resumenPartidos",
+            `${escaparHTML(nombreFase(faseActual))}<br>` +
+            `${totalJugados} jugados · ` +
+            `${partidosSinDescanso.length - totalJugados} pendientes`
+        );
+    }
+
+    pintarTarjetaEliminatorias(config);
+    pintarTarjetaPalas(config);
+
+    document
+        .getElementById("tarjetaRanking")
+        ?.classList.add("oculto");
+        ajustarUltimaTarjetaDashboard();
+}
+
+function ajustarUltimaTarjetaDashboard() {
+    const contenedor =
+        document.querySelector(".gridDashboard");
+
+    if (!contenedor) return;
+
+    const tarjetas = [
+        ...contenedor.querySelectorAll(
+            ":scope > .cardAcceso"
+        )
+    ];
+
+    /*
+       Primero quitamos la ampliación anterior,
+       porque las tarjetas visibles pueden cambiar
+       según el estado y la configuración.
+    */
+    tarjetas.forEach(tarjeta => {
+        tarjeta.classList.remove(
+            "tarjetaDashboardImpar"
+        );
+    });
+
+    const tarjetasVisibles =
+        tarjetas.filter(tarjeta => {
+            const estilo =
+                window.getComputedStyle(tarjeta);
+
+            return (
+                !tarjeta.classList.contains("oculto") &&
+                !tarjeta.hidden &&
+                estilo.display !== "none" &&
+                estilo.visibility !== "hidden"
+            );
+        });
+
+    /*
+       Cuando queda un número impar de tarjetas,
+       la última ocupa las dos columnas.
+    */
+    if (
+        tarjetasVisibles.length > 1 &&
+        tarjetasVisibles.length % 2 !== 0
+    ) {
+        tarjetasVisibles
+            .at(-1)
+            .classList.add(
+                "tarjetaDashboardImpar"
+            );
+    }
+}
+
+function pintarTarjetaEliminatorias(config) {
+    const tarjeta =
+        document.getElementById("tarjetaEquipos");
+
+    if (!tarjeta) return;
+
+    const cruces =
+        datos?.cruces || [];
+
+    const hayEquipos =
+        hayEquiposRealesEnPartidos(cruces);
+
+    let resumen;
+
+    if (hayEquipos) {
+        const jugados =
+            cruces.filter(partidoFinalizado).length;
+
+        const pendientes =
+            cruces.length - jugados;
+
+        resumen =
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`;
+    } else {
+        const ronda =
+            config.ronda_inicial_eliminatorias ||
+            "";
+
+        resumen = ronda
+            ? `${escaparHTML(ronda)} pendientes de generar`
+            : "Pendientes de generar";
+    }
+
+    configurarTarjetaPortada(
+        tarjeta,
+        "⚔️",
+        "Eliminatorias",
+        resumen,
+        hayEquipos ? "eliminatorias" : ""
+    );
+
+    tarjeta.classList.remove("cardPalas");
+    tarjeta.classList.add("cardCruces");
+
+    configurarBloqueoTarjeta(
+        tarjeta,
+        !hayEquipos
+    );
+}
+
+
+function pintarTarjetaPalas(config) {
+    const tarjeta =
+        document.getElementById("tarjetaEspecial");
+
+    if (!tarjeta) return;
+
+    const hayCopa =
+        config.hay_copa_palas_playa === true ||
+        esSi(config.hay_copa_palas_playa);
+
+    const rondas =
+        datos?.palas_playa || [];
+
+    const partidos =
+        rondas.flatMap(
+            ronda => ronda.partidos || []
+        );
+
+    const hayEquipos =
+        hayCopa &&
+        hayEquiposRealesEnPartidos(partidos);
+
+    let resumen;
+
+    if (!hayCopa) {
+        resumen =
+            "No se disputa esta edición";
+    } else if (!hayEquipos) {
+        resumen =
+            "Pendiente de generar";
+    } else {
+        const jugados =
+            partidos.filter(partidoFinalizado).length;
+
+        const pendientes =
+            partidos.length - jugados;
+
+        resumen =
+            `${jugados} jugados · ` +
+            `${pendientes} pendientes`;
+    }
+
+    configurarTarjetaPortada(
+        tarjeta,
+        "🏖️",
+        "Palas de playa",
+        resumen,
+        hayEquipos ? "palas" : ""
+    );
+
+    tarjeta.classList.remove(
+        "cardCruces",
+        "cardClasificacion"
+    );
+
+    tarjeta.classList.add("cardPalas");
+
+    configurarBloqueoTarjeta(
+        tarjeta,
+        !hayEquipos
+    );
+}
+
+
+function configurarBloqueoTarjeta(
+    tarjeta,
+    bloqueada
+) {
+    if (!tarjeta) return;
+
+    tarjeta.classList.toggle(
+        "tarjetaBloqueada",
+        bloqueada
+    );
+
+    if (bloqueada) {
+        tarjeta.setAttribute(
+            "aria-disabled",
+            "true"
+        );
+
+        delete tarjeta.dataset.seccion;
+        delete tarjeta.dataset.destinoPantalla;
+        delete tarjeta.dataset.destinoFase;
+    } else {
+        tarjeta.removeAttribute(
+            "aria-disabled"
+        );
+    }
+}
+
+
+function hayEquiposRealesEnPartidos(partidos) {
+    return partidos.some(partido => {
+        const local =
+            partido.local ||
+            partido.equipo1 ||
+            partido.equipo_a ||
+            "";
+
+        const visitante =
+            partido.visitante ||
+            partido.equipo2 ||
+            partido.equipo_b ||
+            "";
+
+        return esNombreEquipoReal(local) ||
+            esNombreEquipoReal(visitante);
+    });
+}
+
+
+function esNombreEquipoReal(nombre) {
+    const texto =
+        normalizar(nombre);
+
+    if (!texto) return false;
+
+    const textosPendientes = [
+        "POR DEFINIR",
+        "PENDIENTE",
+        "GANADOR",
+        "PERDEDOR",
+        "CLASIFICADO",
+        "PRIMERO DE",
+        "SEGUNDO DE",
+        "TERCERO DE"
+    ];
+
+    return !textosPendientes.some(
+        pendiente =>
+            texto.includes(pendiente)
+    );
+}
+
+function pintarTarjetaEspecial(config) {
+    const tarjeta = document.getElementById("tarjetaEspecial");
+    const icono = document.getElementById("iconoTarjetaEspecial");
+    const titulo = document.getElementById("tituloTarjetaEspecial");
+    const resumen = document.getElementById("resumenEspecial");
+
+    if (!tarjeta || !icono || !titulo || !resumen) return;
+
+    tarjeta.classList.remove("cardCruces", "cardPalas", "cardClasificacion");
+
+    if ((datos.cruces || []).length) {
+        const cruces = datos.cruces || [];
+        const jugados = cruces.filter(partidoFinalizado).length;
+
+        tarjeta.classList.add("cardCruces");
+        tarjeta.dataset.destinoPantalla = "competicion";
+        tarjeta.dataset.destinoFase = "cruces";
+        icono.textContent = "⚔️";
+        titulo.textContent = "Eliminatorias";
+        resumen.innerHTML = `${jugados} jugados · ${cruces.length - jugados} pendientes`;
+        return;
+    }
+
+    if (esModoGrupos() && config.hay_regrupos && !hayRegruposGenerados()) {
+        tarjeta.classList.add("cardClasificacion");
+        tarjeta.dataset.destinoPantalla = "competicion";
+        tarjeta.dataset.destinoFase = "regrupos";
+        icono.textContent = "🔁";
+        titulo.textContent = "ReGrupos";
+        resumen.innerHTML = "Pendientes de generar";
+        return;
+    }
+
+    if (debeMostrarCrucesPendientes()) {
+        tarjeta.classList.add("cardCruces");
+        tarjeta.dataset.destinoPantalla = "competicion";
+        tarjeta.dataset.destinoFase = "cruces";
+        icono.textContent = "⚔️";
+        titulo.textContent = "Eliminatorias";
+        resumen.innerHTML = config.ronda_inicial_eliminatorias
+            ? `${escaparHTML(config.ronda_inicial_eliminatorias)} pendientes de generar`
+            : "Pendientes de generar";
+        return;
+    }
+
+    if ((datos.palas_playa || []).length) {
+        tarjeta.classList.add("cardPalas");
+        tarjeta.dataset.destinoPantalla = "competicion";
+        tarjeta.dataset.destinoFase = "palas";
+        icono.textContent = "🏖️";
+        titulo.textContent = "Copa Palas Playa";
+        resumen.innerHTML = "Competición del farolillo";
+        return;
+    }
+
+    tarjeta.classList.add("cardCruces");
+    tarjeta.dataset.destinoPantalla = "competicion";
+    tarjeta.dataset.destinoFase = "cruces";
+    icono.textContent = "⚔️";
+    titulo.textContent = "Siguiente fase";
+    resumen.innerHTML = config.ronda_inicial_eliminatorias
+        ? `${escaparHTML(config.ronda_inicial_eliminatorias)} pendientes de generar`
+        : "Pendiente de iniciar";
+}
+
+async function prepararRankingHistoricoPortada() {
+    const config = obtenerConfiguracion();
+
+    if (!esSi(config.mostrar_ranking_historico)) {
+        pintarTarjetaRankingPortada(config);
+        return;
+    }
+
+    try {
+        await cargarDatosRankingHistorico();
+        pintarTarjetaRankingPortada(config);
+    } catch (error) {
+        console.error("No se pudo cargar el ranking histórico.", error);
+
+        const resumen = document.getElementById("resumenRanking");
+        if (resumen) {
+            resumen.innerHTML = "Ranking temporalmente no disponible";
+        }
+    }
+}
+
+function pintarTarjetaRankingPortada(config = obtenerConfiguracion()) {
+    const tarjeta = document.getElementById("tarjetaRanking");
+    const resumen = document.getElementById("resumenRanking");
+
+    if (!tarjeta) return;
+
+    const visible =
+        esSi(config.mostrar_ranking_historico) &&
+        !esWebPrevia();
+
+    tarjeta.classList.toggle("oculto", !visible);
+
+    if (!visible) return;
+
+    tarjeta.dataset.seccion = "ranking";
+
+    const ranking = datosRanking?.ranking || [];
+    const lider = ranking[0];
+
+    if (!resumen) return;
+
+    if (lider) {
+        resumen.innerHTML =
+            `🥇 ${escaparHTML(lider.jugador)}<br>` +
+            `${formatearPuntosRanking(lider.puntos)} pts · ${ranking.length} jugadores`;
+    } else {
+        resumen.innerHTML = "Clasificación individual de jugadores";
+    }
+}
+
+async function cargarDatosRankingHistorico() {
+    if (datosRanking) return datosRanking;
+
+    if (!promesaRanking) {
+        promesaRanking = fetch(
+            `${JSON_RANKING_URL}?v=${Date.now()}`,
+            { cache: "no-store" }
+        )
+            .then(respuesta => {
+                if (!respuesta.ok) {
+                    throw new Error(
+                        `No se pudo cargar el ranking (${respuesta.status})`
+                    );
+                }
+
+                return respuesta.json();
+            })
+            .then(ranking => {
+                datosRanking = ranking;
+                return ranking;
+            })
+            .catch(error => {
+                promesaRanking = null;
+                throw error;
+            });
+    }
+
+    return promesaRanking;
+}
+
+/* =========================================================
+   DATOS Y TARJETA DE FOTOGRAFÍAS
+========================================================= */
+
+async function prepararFotosPortada() {
+    const config = obtenerConfiguracion();
+    const tarjeta =
+        document.getElementById("tarjetaFotos");
+
+    if (!tarjeta) return;
+
+    const visible =
+        esSi(config.mostrar_fotos);
+
+    tarjeta.classList.toggle(
+        "oculto",
+        !visible
+    );
+    ajustarUltimaTarjetaDashboard();
+
+    if (!visible) {
+        delete tarjeta.dataset.seccion;
+        return;
+    }
+
+    tarjeta.dataset.seccion = "fotos";
+
+    const resumen =
+        document.getElementById("resumenFotos");
+
+    try {
+        const origen =
+            await cargarDatosFotos();
+
+        const fotos =
+            obtenerFotosVisibles(origen);
+
+        if (resumen) {
+            resumen.textContent =
+                fotos.length === 1
+                    ? "1 fotografía publicada"
+                    : `${fotos.length} fotografías publicadas`;
+        }
+        ajustarUltimaTarjetaDashboard();
+    } catch (error) {
+        console.error(
+            "No se pudieron cargar las fotografías.",
+            error
+        );
+
+        if (resumen) {
+            resumen.textContent =
+                "Galería temporalmente no disponible";
+        }
+        ajustarUltimaTarjetaDashboard();
+    }
+}
+
+async function cargarDatosFotos() {
+    if (datosFotos) return datosFotos;
+
+    if (!promesaFotos) {
+        promesaFotos = fetch(
+            `${JSON_FOTOS_URL}?v=${Date.now()}`,
+            { cache: "no-store" }
+        )
+            .then(respuesta => {
+                if (!respuesta.ok) {
+                    throw new Error(
+                        `No se pudo cargar fotos.json (${respuesta.status})`
+                    );
+                }
+
+                return respuesta.json();
+            })
+            .then(origen => {
+                datosFotos = origen;
+                return origen;
+            })
+            .catch(error => {
+                promesaFotos = null;
+                throw error;
+            });
+    }
+
+    return promesaFotos;
+}
+
+function obtenerFotosPublicadas(origen = datosFotos) {
+    const fotos = Array.isArray(origen)
+        ? origen
+        : origen?.fotos || [];
+
+    return fotos
+        .filter(foto =>
+            foto?.mostrar === true ||
+            esSi(foto?.mostrar)
+        )
+        .sort((a, b) =>
+            numero(a?.orden) -
+            numero(b?.orden) ||
+            String(a?.id_foto || "")
+                .localeCompare(
+                    String(b?.id_foto || ""),
+                    "es",
+                    { numeric: true }
+                )
+        );
+}
+
+function obtenerFotosVisibles(origen = datosFotos) {
+    return obtenerFotosPublicadas(origen)
+        .filter(foto =>
+            normalizarTextoFoto(
+                foto?.categoria
+            ) !== "campeones"
+        );
+}
+
+function fotoEsDestacada(foto) {
+    return (
+        foto?.destacada === true ||
+        esSi(foto?.destacada)
+    );
+}
+
+function normalizarTextoFoto(texto) {
+    return String(texto || "")
+        .trim()
+        .toLocaleLowerCase("es")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function obtenerIdCampeonatoFoto(foto) {
+    return String(
+        foto?.id_campeonato ||
+        foto?.ID_Campeonato ||
+        "sin-campeonato"
+    ).trim();
+}
+
+function agruparFotosPorCampeonato(
+    fotosGaleria,
+    fotosPublicadas = fotosGaleria
+) {
+    const grupos = new Map();
+    const publicadasPorCampeonato =
+        new Map();
+
+    fotosPublicadas.forEach(foto => {
+        const id =
+            obtenerIdCampeonatoFoto(foto);
+
+        if (
+            !publicadasPorCampeonato
+                .has(id)
+        ) {
+            publicadasPorCampeonato.set(
+                id,
+                []
+            );
+        }
+
+        publicadasPorCampeonato
+            .get(id)
+            .push(foto);
+    });
+
+    fotosGaleria.forEach(foto => {
+        const id =
+            obtenerIdCampeonatoFoto(foto);
+
+        if (!grupos.has(id)) {
+            grupos.set(id, {
+                id,
+                titulo:
+                    foto?.nombre_campeonato ||
+                    foto?.campeonato ||
+                    id,
+                ano: obtenerAnoFoto(
+                    foto?.ano ||
+                    foto?.anio ||
+                    foto?.fecha ||
+                    id
+                ),
+                fotos: []
+            });
+        }
+
+        grupos.get(id).fotos.push(foto);
+    });
+
+    return [...grupos.values()]
+        .map(grupo => {
+            const fotosOrdenadas =
+                grupo.fotos.sort(
+                    (a, b) =>
+                        numero(a?.orden) -
+                        numero(b?.orden)
+                );
+
+            const candidatasPortada =
+                publicadasPorCampeonato
+                    .get(grupo.id) || [];
+
+            const portada =
+                candidatasPortada.find(
+                    fotoEsDestacada
+                ) ||
+                fotosOrdenadas[0] ||
+                candidatasPortada[0] ||
+                null;
+
+            return {
+                ...grupo,
+                fotos: fotosOrdenadas,
+                portada
+            };
+        })
+        .sort((a, b) => {
+            if (a.ano !== b.ano) {
+                return b.ano - a.ano;
+            }
+
+            return b.id.localeCompare(
+                a.id,
+                "es",
+                { numeric: true }
+            );
+        });
+}
+
+function obtenerAnoFoto(valor) {
+    const coincidencia =
+        String(valor || "")
+            .match(/\b(?:19|20)\d{2}\b/);
+
+    return coincidencia
+        ? Number(coincidencia[0])
+        : 0;
+}
+
+
+function pintarResumenPortada() {
+    const fase = obtenerFaseActualCompeticion();
+
+    if (fase === "cruces") {
+        pintarResumenCrucesPortada();
+        return;
+    }
+
+    if (fase === "palas") {
+        pintarResumenPalasPortada();
+        return;
+    }
+
+    if (esModoGrupos()) {
+        const faseGrupos = fase === "regrupos" ? "regrupos" : "grupos";
+        const nombresGrupos = obtenerNombresGrupos(faseGrupos);
+        const faseIniciada = hayPartidosJugadosEnFase(faseGrupos);
+
+        if (!faseIniciada) {
+            setText(
+                "tituloPodio",
+                faseGrupos === "regrupos"
+                    ? "🔁 Equipos de los ReGrupos"
+                    : "👥 Equipos de cada grupo"
+            );
+
+            const htmlEquipos = nombresGrupos.map(grupo => {
+                const filas = obtenerFilasGrupoParaMostrar(faseGrupos, grupo);
+                const nombres = filas.map(fila => escaparHTML(fila.equipo));
+
+                return `
+                    <div class="equipoPodio">
+                        <span>
+                            <strong>${escaparHTML(nombreGrupoVisible(grupo))}</strong><br>
+                            ${nombres.length ? nombres.join("<br>") : "Equipos pendientes"}
+                        </span>
+                    </div>
+                `;
+            }).join("");
+
+            setHTML(
+                "podio",
+                htmlEquipos || pintarVacioInline(
+                    faseGrupos === "regrupos"
+                        ? "ReGrupos pendientes de generar"
+                        : "Equipos pendientes de asignar"
+                )
+            );
+            return;
+        }
+
+        setText(
+            "tituloPodio",
+            faseGrupos === "regrupos"
+                ? "🔁 Líderes de ReGrupos"
+                : "📊 Líderes de cada grupo"
+        );
+
+        const html = nombresGrupos.map(grupo => {
+            const filas = ordenarClasificacionGrupo(
+                obtenerFilasGrupoParaMostrar(faseGrupos, grupo)
+            );
+            const lider = filas[0];
+
+            return `
+                <div class="equipoPodio oro">
+                    <span>
+                        🏆 ${escaparHTML(nombreGrupoVisible(grupo))}:<br>
+                        <strong>${escaparHTML(lider?.equipo || "Sin datos")}</strong>
+                    </span>
+                </div>
+            `;
+        }).join("");
+
+        setHTML("podio", html || pintarVacioInline("Clasificaciones pendientes"));
+        return;
+    }
+
+    setText("tituloPodio", "🥇 Clasificación provisional");
+
+    const top3 = (datos.clasificacion || []).slice(0, 3);
+    const clases = ["oro", "plata", "bronce"];
+    const medallas = ["🥇", "🥈", "🥉"];
+
+    setHTML(
+        "podio",
+        top3.length
+            ? top3.map((equipo, indice) => `
+                <div class="equipoPodio ${clases[indice]}">
+                    <span>${medallas[indice]} ${escaparHTML(equipo.equipo)}</span>
+                </div>
+            `).join("")
+            : pintarVacioInline("Clasificación pendiente")
+    );
+}
+
+function pintarResumenCrucesPortada() {
+    const cruces = datos.cruces || [];
+    const final = cruces.find(partido => normalizar(partido.fase) === "FINAL");
+    const finalizado = cruces.length > 0 && cruces.every(partidoFinalizado);
+
+    if (finalizado && final?.ganador) {
+        setText("tituloPodio", "🏆 Campeones del torneo");
+        setHTML(
+            "podio",
+            `<div class="equipoPodio oro"><span>🥇 ${escaparHTML(final.ganador)}</span></div>`
+        );
+        return;
+    }
+
+    const faseActual = obtenerFaseActualCruces(cruces);
+    const partidosFase = cruces.filter(partido => partido.fase === faseActual);
+
+    setText("tituloPodio", `⚔️ ${tituloFaseSinIcono(faseActual)}`);
+    setHTML(
+        "podio",
+        partidosFase.map(partido => `
+            <div class="equipoPodio">
+                <span>
+                    ${escaparHTML(partido.local || "Por definir")}<br>
+                    <small>vs</small><br>
+                    ${escaparHTML(partido.visitante || "Por definir")}
+                </span>
+            </div>
+        `).join("") || pintarVacioInline("Cruces pendientes")
+    );
+}
+
+function pintarResumenPalasPortada() {
+    setText("tituloPodio", "🏖️ Copa Palas Playa");
+    setHTML(
+        "podio",
+        `<div class="equipoPodio"><span>🥄 El que pierde continúa jugando</span></div>`
+    );
+}
+
+/* =========================================================
+   MODO PRETORNEO E INSCRIPCIONES
+========================================================= */
+
+function pintarInicioPretorneo() {
+    const inscripcionesAbiertas = esEstadoInscripciones();
+
+    document.body.classList.add("modoPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.add("cabeceraPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("cabeceraFinalizada");
+
+    document
+        .querySelector(".podioCard")
+        ?.classList.add("oculto");
+
+    configurarNavegacionPretorneo();
+    configurarTarjetasPretorneo();
+    iniciarCuentaAtrasCampeonato();
+
+    setText(
+        "estadoCabecera",
+        inscripcionesAbiertas
+            ? "🟢 Inscripciones abiertas"
+            : "🟠 Información previa"
+    );
+}
+
+function configurarPortadaCompeticion() {
+    document
+        .querySelector(".podioCard")
+        ?.classList.remove("oculto");
+
+    document.body.classList.remove("modoPretorneo");
+
+    document
+        .querySelector(".cabecera")
+        ?.classList.remove("cabeceraPretorneo");
+
+    configurarNavegacionCompeticion();
+
+    const tituloClasificacion =
+        esModoGrupos()
+            ? "Grupos"
+            : "Clasificación";
+
+    configurarTarjetaPortada(
+        document.getElementById("tarjetaCompeticion"),
+        "📊",
+        tituloClasificacion,
+        "Cargando...",
+        "competicion"
+    );
+
+    configurarTarjetaPortada(
+        document.getElementById("tarjetaPartidos"),
+        "🎾",
+        "Partidos",
+        "Cargando...",
+        "partidos"
+    );
+
+    /*
+       Reutilizamos la antigua tarjeta Equipos
+       para mostrar Eliminatorias.
+    */
+    const tarjetaEliminatorias =
+        document.getElementById("tarjetaEquipos");
+
+    configurarTarjetaPortada(
+        tarjetaEliminatorias,
+        "⚔️",
+        "Eliminatorias",
+        "Pendientes de generar",
+        "eliminatorias"
+    );
+
+    tarjetaEliminatorias?.classList.remove("cardPalas");
+    tarjetaEliminatorias?.classList.add("cardCruces");
+
+    /*
+       Reutilizamos la antigua tarjeta Especial
+       para mostrar Palas de playa.
+    */
+    const tarjetaPalas =
+        document.getElementById("tarjetaEspecial");
+
+    configurarTarjetaPortada(
+        tarjetaPalas,
+        "🏖️",
+        "Palas de playa",
+        "Pendiente de generar",
+        "palas"
+    );
+
+    tarjetaPalas?.classList.remove(
+        "cardCruces",
+        "cardClasificacion"
+    );
+
+    tarjetaPalas?.classList.add("cardPalas");
+
+    /*
+       El Ranking histórico no aparece nunca
+       en la portada de la competición.
+    */
+    document
+        .getElementById("tarjetaRanking")
+        ?.classList.add("oculto");
+        prepararFotosPortada();
+}
+
+function configurarTarjetasPretorneo() {
+    const inscripcionesAbiertas = esEstadoInscripciones();
+
+    configurarTarjetaPortada(
+        document.getElementById("tarjetaCompeticion"),
+        "📅",
+        "Campeonato",
+        "Información de la próxima edición",
+        "pretorneo_info"
+    );
+
+    const tarjetaInscripciones =
+        document.getElementById("tarjetaPartidos");
+
+    configurarTarjetaPortada(
+        tarjetaInscripciones,
+        "✍️",
+        "Inscripciones",
+        inscripcionesAbiertas
+            ? "El plazo de inscripción está abierto"
+            : "En breve se abrirá el plazo de inscripciones",
+        inscripcionesAbiertas
+            ? "pretorneo_inscripcion"
+            : ""
+    );
+
+    if (!inscripcionesAbiertas && tarjetaInscripciones) {
+        tarjetaInscripciones.classList.add("tarjetaBloqueada");
+        tarjetaInscripciones.setAttribute("aria-disabled", "true");
+
+        delete tarjetaInscripciones.dataset.seccion;
+        delete tarjetaInscripciones.dataset.href;
+    }
+
+    [
+    "tarjetaEquipos",
+    "tarjetaEspecial",
+    "tarjetaRanking",
+    "tarjetaFotos"
+    ].forEach(id => {
+    document
+        .getElementById(id)
+        ?.classList.add("oculto");
+});
+
+ajustarUltimaTarjetaDashboard();
+}
+
+
+function configurarTarjetaPortada(
+    tarjeta,
+    icono,
+    titulo,
+    resumen,
+    seccion = "",
+    href = ""
+) {
+    if (!tarjeta) return;
+
+    tarjeta.classList.remove(
+        "oculto",
+        "tarjetaBloqueada"
+    );
+
+    tarjeta.removeAttribute("aria-disabled");
+
+    const iconoElemento =
+        tarjeta.querySelector(".iconoAcceso");
+
+    const tituloElemento =
+        tarjeta.querySelector("h4");
+
+    const resumenElemento =
+        tarjeta.querySelector("p");
+
+    if (iconoElemento) {
+        iconoElemento.textContent = icono;
+    }
+
+    if (tituloElemento) {
+        tituloElemento.textContent = titulo;
+    }
+
+    if (resumenElemento) {
+        resumenElemento.innerHTML = resumen;
+    }
+
+    if (seccion) {
+        tarjeta.dataset.seccion = seccion;
+    } else {
+        delete tarjeta.dataset.seccion;
+    }
+
+    if (href) {
+        tarjeta.dataset.href = href;
+    } else {
+        delete tarjeta.dataset.href;
+    }
+
+    delete tarjeta.dataset.destinoPantalla;
+    delete tarjeta.dataset.destinoFase;
+}
+
+function configurarNavegacionPretorneo() {
+    const botones = [
+        ...document.querySelectorAll(
+            ".bottomNav .navBtn"
+        )
+    ];
+
+    const config = obtenerConfiguracion();
+
+    configurarBotonNav(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "inicio"
+    );
+
+    configurarBotonNav(
+        botones[1],
+        "📖",
+        "Historia",
+        "",
+        "historia.html"
+    );
+
+    botones[1]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_historia)
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "📜",
+        "Normas",
+        "",
+        "normas.html"
+    );
+
+    botones[2]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_normativa)
+    );
+
+    configurarBotonNav(
+        botones[3],
+        "🏆",
+        "Campeones",
+        "",
+        "campeones.html"
+    );
+
+    botones[3]?.classList.toggle(
+        "oculto",
+        !esSi(config.mostrar_campeones)
+    );
+
+    configurarBotonNav(
+        botones[4],
+        "☰",
+        "Más",
+        "mas"
+    );
+}
+
+function configurarNavegacionCompeticion() {
+    const botones = [
+        ...document.querySelectorAll(
+            ".bottomNav .navBtn"
+        )
+    ];
+
+    configurarBotonNav(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "inicio"
+    );
+
+    configurarBotonNav(
+        botones[1],
+        "📊",
+        esModoGrupos() ? "Grupos" : "Clasificación",
+        "competicion"
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "🎾",
+        "Partidos",
+        "partidos"
+    );
+
+    configurarBotonNav(
+        botones[3],
+        "👥",
+        "Equipos",
+        "equipos"
+    );
+
+    configurarBotonNav(
+        botones[4],
+        "☰",
+        "Más",
+        "mas"
+    );
+}
+
+function configurarBotonNav(
+    boton,
+    icono,
+    texto,
+    pantalla = "",
+    href = ""
+) {
+    if (!boton) return;
+
+    boton.classList.remove("oculto");
+
+    const iconoElemento =
+        boton.querySelector("span");
+
+    const textoElemento =
+        boton.querySelector("small");
+
+    if (iconoElemento) {
+        iconoElemento.textContent = icono;
+    }
+
+    if (textoElemento) {
+        textoElemento.textContent = texto;
+    }
+
+    if (pantalla) {
+        boton.dataset.pantalla = pantalla;
+    } else {
+        delete boton.dataset.pantalla;
+    }
+
+    if (href) {
+        boton.dataset.href = href;
+    } else {
+        delete boton.dataset.href;
+    }
+}
+
+function pintarAvisoProximaEdicion(
+    config
+) {
+    const mostrar =
+        config
+            .mostrar_aviso_proxima_edicion ===
+            true ||
+        esSi(
+            config
+                .mostrar_aviso_proxima_edicion
+        );
+
+    if (!mostrar) return "";
+
+    const titulo =
+        String(
+            config
+                .titulo_aviso_proxima_edicion ||
+            "Información importante"
+        ).trim();
+
+    const resumen =
+        String(
+            config
+                .texto_corto_aviso_proxima_edicion ||
+            ""
+        ).trim();
+
+    const detalle =
+        String(
+            config
+                .texto_ampliado_aviso_proxima_edicion ||
+            ""
+        ).trim();
+
+    if (!resumen && !detalle) {
+        return "";
+    }
+
+    const detalleHTML =
+        escaparHTML(detalle)
+            .replace(
+                /\r?\n/g,
+                "<br>"
+            );
+
+    return `
+        <section class="avisoProximaEdicion">
+
+            <div class="cabeceraAvisoProximaEdicion">
+                <span class="iconoAvisoProximaEdicion">
+                    ℹ️
+                </span>
+
+                <div>
+                    <strong>
+                        ${escaparHTML(titulo)}
+                    </strong>
+
+                    ${
+                        resumen
+                            ? `
+                                <p>
+                                    ${escaparHTML(resumen)}
+                                </p>
+                            `
+                            : ""
+                    }
+                </div>
+            </div>
+
+            ${
+                detalle
+                    ? `
+                        <button
+                            type="button"
+                            class="btnAvisoProximaEdicion"
+                            data-aviso-proxima-edicion
+                            aria-expanded="false"
+                        >
+                            Ver más
+                        </button>
+
+                        <div
+                            class="
+                                detalleAvisoProximaEdicion
+                                oculto
+                            "
+                        >
+                            ${detalleHTML}
+                        </div>
+                    `
+                    : ""
+            }
+
+        </section>
+    `;
+}
+
+
+function alternarAvisoProximaEdicion(
+    boton
+) {
+    const aviso =
+        boton.closest(
+            ".avisoProximaEdicion"
+        );
+
+    const detalle =
+        aviso?.querySelector(
+            ".detalleAvisoProximaEdicion"
+        );
+
+    if (!detalle) return;
+
+    const abrir =
+        detalle.classList.contains(
+            "oculto"
+        );
+
+    detalle.classList.toggle(
+        "oculto",
+        !abrir
+    );
+
+    boton.textContent =
+        abrir
+            ? "Ver menos"
+            : "Ver más";
+
+    boton.setAttribute(
+        "aria-expanded",
+        String(abrir)
+    );
+}
+
+
+
+function pintarPantallaInformacionPretorneo() {
+    const contenido = obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const config = obtenerConfiguracion();
+
+    const tipoCampeonato = String(
+        config.tipo_campeonato ||
+        config.sistema_primera_fase ||
+        "Pendiente de confirmar"
+    );
+
+    const rondaInicial = String(
+        config.ronda_inicial_eliminatorias ||
+        "Pendiente de confirmar"
+    );
+
+    contenido.innerHTML = `
+        <h2>📅 Campeonato</h2>
+
+                <section class="resumenPartidos">
+            <div class="estadoResumen">
+                🎾 Información de la próxima edición
+            </div>
+        </section>
+
+        ${pintarAvisoProximaEdicion(config)}
+
+        <div class="listaOpcionesMas">
+            ${pintarDatoPretorneo(
+                "📅",
+                "Fecha",
+                formatearFechaCampeonato()
+            )}
+
+            ${pintarDatoPretorneo(
+                "📍",
+                "Lugar",
+                obtenerLugarCampeonato()
+            )}
+
+            ${pintarDatoPretorneo(
+                "🕒",
+                "Horario",
+                obtenerHorarioCampeonato() || "Pendiente de confirmar"
+                )}
+
+            ${pintarDatoPretorneo(
+                "🏁",
+                "Primera fase",
+                tipoCampeonato
+            )}
+
+            ${pintarDatoPretorneo(
+                "⚔️",
+                "Eliminatorias",
+                rondaInicial
+            )}
+
+           ${pintarDatoPretorneo(
+    "🏖️",
+    "Copa Palas Playa",
+    textoSiNoPendiente(
+        config.hay_copa_palas_playa
+    )
+)}
+        </div>
+    `;
+}
+
+function pintarDatoPretorneo(
+    icono,
+    titulo,
+    valor
+) {
+    return `
+        <div class="opcionMas datoPretorneo">
+            <span>${icono}</span>
+
+            <strong>
+                ${escaparHTML(titulo)}
+                <small>${escaparHTML(valor)}</small>
+            </strong>
+
+            <b></b>
+        </div>
+    `;
+}
+
+function pintarPantallaInscripciones() {
+
+    const contenido =
+        obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const abiertas =
+        esEstadoInscripciones();
+
+    const url =
+        obtenerURLInscripcion();
+
+    const urlIntegrada = url
+        ? `${url}${url.includes("?") ? "&" : "?"}embed=1`
+        : "";
+
+    contenido.innerHTML = `
+        <h2>✍️ Inscripciones</h2>
+
+        
+
+        ${
+            abiertas && urlIntegrada
+                ? `
+                    <div class="marcoInscripciones">
+
+                     <iframe
+                        class="iframeInscripciones"
+                        src="${escaparAtributo(urlIntegrada)}"
+                        title="Formulario de inscripción"
+                        loading="eager"
+                        scrolling="no"
+                        ></iframe>
+
+                    </div>
+                `
+                : pintarTarjetaVacia(
+                    abiertas
+                        ? "Formulario pendiente"
+                        : "Próximamente",
+
+                    abiertas
+                        ? "Las inscripciones están activadas, pero falta indicar el enlace del formulario."
+                        : "El formulario aparecerá cuando el estado cambie a Inscripciones."
+                )
+        }
+    `;
+}
+
+function pintarPantallaMasPretorneo() {
+    const contenido = obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    const config = obtenerConfiguracion();
+    const opciones = [];
+
+    if (esSi(config.mostrar_fotos)) {
+    opciones.push({
+        icono: "📷",
+        texto: "Fotos",
+        pantalla: "fotos"
+    });
+}
+
+    if (esSi(config.mostrar_ranking_historico)) {
+        opciones.push({
+            icono: "📈",
+            texto: "Ranking histórico",
+            pantalla: "ranking"
+        });
+    }
+
+    if (esSi(config.mostrar_estadisticas)) {
+        opciones.push({
+            icono: "📊",
+            texto: "Estadísticas",
+            href: "estadisticas.html"
+        });
+    }
+
+    contenido.innerHTML = `
+        <h2>☰ Más</h2>
+
+        ${
+            opciones.length
+                ? pintarListaOpcionesMas(opciones)
+                : pintarTarjetaVacia(
+                    "Sin más secciones",
+                    "No hay contenido adicional habilitado."
+                )
+        }
+    `;
+}
+
+/* =========================================================
+   PANTALLA COMPETICIÓN
+========================================================= */
+
+function pintarPantallaCompeticion() {
+    const contenido =
+        obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    /*
+       En el selector de clasificación solamente
+       pueden aparecer las fases clasificatorias.
+    */
+    const fasesClasificacion =
+        obtenerFasesCompeticionDisponibles()
+            .filter(fase =>
+                [
+                    "liguilla",
+                    "grupos",
+                    "regrupos"
+                ].includes(fase.clave)
+            );
+
+    const faseEspecial =
+        ["cruces", "palas"]
+            .includes(
+                estadoUI.faseCompeticion
+            );
+
+    if (
+        !faseEspecial &&
+        !fasesClasificacion.some(
+            fase =>
+                fase.clave ===
+                estadoUI.faseCompeticion
+        )
+    ) {
+        estadoUI.faseCompeticion =
+            obtenerFaseClasificacionPrincipal();
+    }
+
+    const fase =
+        estadoUI.faseCompeticion;
+
+    let titulo;
+
+    if (fase === "cruces") {
+        titulo = "⚔️ Eliminatorias";
+    } else if (fase === "palas") {
+        titulo = "🏖️ Palas de playa";
+    } else if (fase === "regrupos") {
+        titulo = "🔁 ReGrupos";
+    } else if (fase === "grupos") {
+        titulo = "📊 Grupos";
+    } else {
+        titulo = "📊 Clasificación";
+    }
+
+    let html = `<h2>${titulo}</h2>`;
+
+    /*
+       Los botones superiores solamente aparecen
+       dentro de las fases de clasificación.
+       Nunca se mostrarán Eliminatorias ni Palas.
+    */
+    if (!faseEspecial) {
+        html += pintarSelectorFases(
+            fasesClasificacion,
+            fase,
+            "competicion"
+        );
+    }
+
+    if (fase === "liguilla") {
+        html += pintarClasificacionLiguilla();
+    } else if (
+        fase === "grupos" ||
+        fase === "regrupos"
+    ) {
+        html += pintarClasificacionesPorGrupos(
+            fase
+        );
+    } else if (fase === "cruces") {
+        html += pintarContenidoCruces();
+    } else if (fase === "palas") {
+        html += pintarContenidoPalas();
+    }
+
+    contenido.innerHTML = html;
+}
+
+
+function pintarSelectorFases(
+    fases,
+    seleccionada,
+    contexto
+) {
+    if (
+        !Array.isArray(fases) ||
+        fases.length <= 1
+    ) {
+        return "";
+    }
+
+    return `
+        <div class="selectorFases">
+            ${fases.map(fase => `
+                <button
+                    type="button"
+                    class="selectorBtn ${
+                        fase.clave === seleccionada
+                            ? "selectorActivo"
+                            : ""
+                    }"
+                    data-selector-fase="${contexto}"
+                    data-fase="${fase.clave}"
+                >
+                    ${fase.icono}
+                    ${escaparHTML(fase.nombre)}
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
+function pintarClasificacionLiguilla() {
+    const mostrarCoef = mostrarCoeficiente();
+    const clasificacion = datos.clasificacion || [];
+
+    return `
+        <div class="modoOrden">
+            <div>
+                <span>🏆 Sistema de clasificación</span>
+                <strong>${escaparHTML(textoModoOrden(datos.modo_orden))}</strong>
+            </div>
+            <button class="btnInfoOrden" id="btnInfoOrden" type="button">ℹ️</button>
+        </div>
+
+        <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
+            📋 Ver clasificación completa
+        </button>
+
+        <div class="listaClasificacion separacionSuperior">
+            ${clasificacion.map(equipo => pintarFilaClasificacionLiguilla(equipo, mostrarCoef)).join("")}
+        </div>
+    `;
+}
+
+function pintarFilaClasificacionLiguilla(equipo, mostrarCoef) {
+    const movimiento = obtenerMovimiento(equipo);
+    const posicion = Number(equipo.posicion_actual || 0);
+    const medalla = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    return `
+        <article class="filaClasificacion" data-desplegable="true">
+            <div class="lineaEquipo">
+                <div class="equipoFila">${medalla} ${escaparHTML(equipo.equipo)}</div>
+                <div class="${movimiento.clase} movimientoFila">${movimiento.texto}</div>
+            </div>
+
+            <div class="datosFila">
+                🔢 ${numero(equipo.puntos_totales)} pts · 🎾 ${numero(equipo.pj)} PJ
+                ${numero(equipo.descanso) > 0 ? ` · 💤 ${numero(equipo.descanso)}` : ""}
+            </div>
+
+            <div class="etiquetaEspecial">${obtenerEtiquetaLiguilla(equipo)}</div>
+            ${pintarDetalleEstadisticas(normalizarClasificacion(equipo), mostrarCoef)}
+        </article>
+    `;
+}
+
+function pintarClasificacionesPorGrupos(fase) {
+    const nombresGrupos = obtenerNombresGrupos(fase);
+
+    if (!nombresGrupos.length) {
+        const titulo = fase === "regrupos" ? "Segunda fase · ReGrupos" : "Primera fase · Grupos";
+        const texto = fase === "regrupos"
+            ? "Los ReGrupos todavía no han sido generados."
+            : "Los equipos todavía no han sido asignados a sus grupos.";
+
+        return `
+            <div class="cabeceraSeccion">
+                <span>${fase === "regrupos" ? "🔁" : "📊"}</span>
+                <div>
+                    <h3>${titulo}</h3>
+                    <p>Pendiente</p>
+                </div>
+            </div>
+            ${pintarTarjetaVacia("⏳ Pendiente de generar", texto)}
+        `;
+    }
+
+    const seleccionado = nombresGrupos.includes(estadoUI.grupoCompeticion[fase])
+        ? estadoUI.grupoCompeticion[fase]
+        : nombresGrupos[0];
+
+    estadoUI.grupoCompeticion[fase] = seleccionado;
+
+    const filas = obtenerFilasGrupoParaMostrar(fase, seleccionado);
+    const grupoIniciado = hayPartidosJugadosEnGrupo(fase, seleccionado);
+
+    const titulo = fase === "regrupos"
+        ? "Segunda fase · ReGrupos"
+        : "Primera fase · Grupos";
+
+    return `
+        <div class="cabeceraSeccion">
+            <span>${fase === "regrupos" ? "🔁" : "📊"}</span>
+            <div>
+                <h3>${titulo}</h3>
+                <p>${filas.length} equipos en ${escaparHTML(nombreGrupoVisible(seleccionado))}</p>
+            </div>
+        </div>
+
+        ${pintarSelectorGrupos(nombresGrupos, seleccionado, "competicion", fase, false)}
+
+        ${grupoIniciado ? `
+            <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
+                📋 Ver tabla completa de ${escaparHTML(nombreGrupoVisible(seleccionado))}
+            </button>
+        ` : `
+            <section class="resumenPartidos separacionSuperior">
+                <div class="estadoResumen">👥 Equipos asignados</div>
+                <p>La clasificación aparecerá cuando se juegue el primer partido del grupo.</p>
+            </section>
+        `}
+
+        <div class="listaClasificacion separacionSuperior">
+            ${filas.length
+                ? (grupoIniciado
+                    ? ordenarClasificacionGrupo(filas)
+                        .map(fila => pintarFilaClasificacionGrupo(fila, fase, filas.length))
+                        .join("")
+                    : filas.map(pintarFilaEquipoGrupoSinClasificacion).join(""))
+                : pintarTarjetaVacia("Equipos pendientes", "Todavía no hay equipos asignados a este grupo.")}
+        </div>
+    `;
+}
+
+function pintarSelectorGrupos(grupos, seleccionado, contexto, fase, incluirTodos) {
+    const opciones = incluirTodos ? ["todos", ...grupos] : grupos;
+
+    if (opciones.length <= 1) return "";
+
+    return `
+        <div class="selectorGrupos">
+            ${opciones.map(grupo => `
+                <button
+                    type="button"
+                    class="selectorGrupoBtn ${grupo === seleccionado ? "selectorGrupoActivo" : ""}"
+                    data-selector-grupo="${contexto}"
+                    data-fase="${fase}"
+                    data-grupo="${escaparAtributo(grupo)}"
+                >
+                    ${grupo === "todos" ? "Todos" : escaparHTML(nombreGrupoVisible(grupo))}
+                </button>
+            `).join("")}
+        </div>
+    `;
+}
+
+function pintarFilaClasificacionGrupo(filaOriginal, fase, totalEquipos) {
+    const fila = normalizarClasificacion(filaOriginal);
+    const posicion = fila.posicion_actual;
+    const medalla = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    return `
+        <article class="filaClasificacion" data-desplegable="true">
+            <div class="lineaEquipo">
+                <div class="equipoFila">${medalla} ${escaparHTML(fila.equipo)}</div>
+                <div class="movimientoFila igual">${fila.puntos_totales} pts</div>
+            </div>
+
+            <div class="datosFila">
+                🎾 ${fila.pj} PJ · ✅ ${fila.pg} PG · ❌ ${fila.pp} PP
+            </div>
+
+            <div class="etiquetaEspecial">
+                ${obtenerEtiquetaGrupo(fila, fase, totalEquipos)}
+            </div>
+
+            ${pintarDetalleEstadisticas(fila, false)}
+        </article>
+    `;
+}
+
+function pintarDetalleEstadisticas(equipo, mostrarCoef) {
+    return `
+        <div class="toggleDetalles">▼ Ver estadísticas</div>
+
+        <div class="detalleClasif oculto">
+            <div class="grupoStats">
+                <h5>Partidos</h5>
+                <div><span>Ganados</span><strong>${equipo.pg}</strong></div>
+                <div><span>Perdidos</span><strong>${equipo.pp}</strong></div>
+            </div>
+
+            ${mostrarCoef ? `
+                <div class="grupoStats">
+                    <h5>Coeficiente</h5>
+                    <div><span>Coeficiente</span><strong>${equipo.coeficiente}</strong></div>
+                </div>
+            ` : ""}
+
+            <div class="grupoStats">
+                <h5>Sets</h5>
+                <div><span>Ganados</span><strong>${equipo.sets_ganados}</strong></div>
+                <div><span>Perdidos</span><strong>${equipo.sets_perdidos}</strong></div>
+                <div><span>Diferencia</span><strong>${formatoDiff(equipo.sets_diff)}</strong></div>
+            </div>
+
+            <div class="grupoStats">
+                <h5>Juegos</h5>
+                <div><span>Ganados</span><strong>${equipo.puntos_ganados}</strong></div>
+                <div><span>Perdidos</span><strong>${equipo.puntos_perdidos}</strong></div>
+                <div><span>Diferencia</span><strong>${formatoDiff(equipo.puntos_diff)}</strong></div>
+            </div>
+        </div>
+    `;
+}
+
+function pintarClasificacionCompletaActual() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    const fase = estadoUI.faseCompeticion;
+
+    if (fase === "liguilla") {
+        contenido.innerHTML = pintarTablaCompletaLiguilla();
+        return;
+    }
+
+    if (fase === "grupos" || fase === "regrupos") {
+        contenido.innerHTML = pintarTablaCompletaGrupo(fase);
+    }
+}
+
+function pintarTablaCompletaLiguilla() {
+    const mostrarCoef = mostrarCoeficiente();
+
+    return `
+        <h2>📋 Clasificación completa</h2>
+        <div class="tablaScroll">
+            <table class="tablaClasificacion">
+                <thead>
+                    <tr>
+                        <th>MOV</th><th>POS</th><th>EQUIPO</th><th>PTOS</th>
+                        ${mostrarCoef ? "<th>COEF</th>" : ""}
+                        <th>PJ</th><th>PG</th><th>PP</th><th>DES</th>
+                        <th>SG</th><th>SP</th><th>SD</th>
+                        <th>JGan</th><th>JPer</th><th>JDif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${(datos.clasificacion || []).map(equipo => {
+                        const mov = obtenerMovimiento(equipo);
+                        return `
+                            <tr>
+                                <td><span class="${mov.clase} movTabla">${mov.texto}</span></td>
+                                <td><strong>${numero(equipo.posicion_actual)}</strong></td>
+                                <td class="equipoTabla">${escaparHTML(equipo.equipo)}</td>
+                                <td>${numero(equipo.puntos_totales)}</td>
+                                ${mostrarCoef ? `<td>${numero(equipo.coeficiente)}</td>` : ""}
+                                <td>${numero(equipo.pj)}</td>
+                                <td>${numero(equipo.pg)}</td>
+                                <td>${numero(equipo.pp)}</td>
+                                <td>${numero(equipo.descanso)}</td>
+                                <td>${numero(equipo.sets_ganados)}</td>
+                                <td>${numero(equipo.sets_perdidos)}</td>
+                                <td>${formatoDiff(equipo.sets_diff)}</td>
+                                <td>${numero(equipo.puntos_ganados)}</td>
+                                <td>${numero(equipo.puntos_perdidos)}</td>
+                                <td>${formatoDiff(equipo.puntos_diff)}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        </div>
+        <button class="btnVistaCompleta" id="btnVistaResumida" type="button">
+            ← Volver a vista resumida
+        </button>
+    `;
+}
+
+function pintarTablaCompletaGrupo(fase) {
+    const grupo = estadoUI.grupoCompeticion[fase];
+    const filas = ordenarClasificacionGrupo(
+        obtenerClasificacionFase(fase).filter(fila => fila.grupo === grupo)
+    ).map(normalizarClasificacion);
+
+    return `
+        <h2>📋 ${escaparHTML(nombreGrupoVisible(grupo))}</h2>
+        <div class="tablaScroll">
+            <table class="tablaClasificacion">
+                <thead>
+                    <tr>
+                        <th>POS</th><th>EQUIPO</th><th>PTOS</th><th>PJ</th>
+                        <th>PG</th><th>PP</th><th>SF</th><th>SC</th>
+                        <th>SD</th><th>JF</th><th>JC</th><th>JD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filas.map(fila => `
+                        <tr>
+                            <td><strong>${fila.posicion_actual}</strong></td>
+                            <td class="equipoTabla">${escaparHTML(fila.equipo)}</td>
+                            <td>${fila.puntos_totales}</td>
+                            <td>${fila.pj}</td><td>${fila.pg}</td><td>${fila.pp}</td>
+                            <td>${fila.sets_ganados}</td><td>${fila.sets_perdidos}</td>
+                            <td>${formatoDiff(fila.sets_diff)}</td>
+                            <td>${fila.puntos_ganados}</td><td>${fila.puntos_perdidos}</td>
+                            <td>${formatoDiff(fila.puntos_diff)}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        </div>
+        <button class="btnVistaCompleta" id="btnVistaResumida" type="button">
+            ← Volver a vista resumida
+        </button>
+    `;
+}
+
+/* =========================================================
+   PANTALLA PARTIDOS
+========================================================= */
+
+function pintarPantallaPartidos() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    const fases = obtenerFasesPartidosDisponibles();
+
+    if (!fases.some(fase => fase.clave === estadoUI.fasePartidos)) {
+        estadoUI.fasePartidos = obtenerFaseActualPartidos();
+    }
+
+    const fase = estadoUI.fasePartidos;
+
+    let html = `
+        <h2>🎾 Partidos</h2>
+        ${pintarSelectorFases(fases, fase, "partidos")}
+    `;
+
+    if (fase === "liguilla") {
+        html += pintarJornadasFase("liguilla", "todos");
+    } else if (fase === "grupos" || fase === "regrupos") {
+        const grupos = obtenerNombresGrupos(fase);
+        const grupoSeleccionado = estadoUI.grupoPartidos[fase] || "todos";
+        estadoUI.grupoPartidos[fase] = grupoSeleccionado;
+
+        html += pintarSelectorGrupos(
+            grupos,
+            grupoSeleccionado,
+            "partidos",
+            fase,
+            true
+        );
+        html += pintarJornadasFase(fase, grupoSeleccionado);
+    } else if (fase === "cruces") {
+        html += pintarContenidoCruces();
+    } else if (fase === "palas") {
+        html += pintarContenidoPalas();
+    }
+
+    contenido.innerHTML = html;
+}
+
+function pintarJornadasFase(fase, grupoSeleccionado) {
+    const todosPartidos = obtenerPartidosFase(fase);
+    const partidos = grupoSeleccionado === "todos"
+        ? todosPartidos
+        : todosPartidos.filter(partido => partido.grupo === grupoSeleccionado);
+
+    if (!partidos.length) {
+        return pintarTarjetaVacia(
+            "⏳ Partidos pendientes",
+            "Todavía no hay jornadas generadas para esta fase."
+        );
+    }
+
+    const partidosValidos = quitarDescansos(partidos);
+    const jornadaActual = obtenerJornadaActual(partidosValidos);
+    const partidosJornadaActual = partidosValidos.filter(
+        partido => Number(partido.jornada) === Number(jornadaActual)
+    );
+    const jugadosActual = partidosJornadaActual.filter(partidoFinalizado).length;
+    const pendientesActual = partidosJornadaActual.filter(partidoPendiente).length;
+    const porcentaje = partidosJornadaActual.length
+        ? Math.round(jugadosActual / partidosJornadaActual.length * 100)
+        : 0;
+
+    const jornadas = [...new Set(partidos.map(partido => Number(partido.jornada)))]
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+
+    return `
+        <section class="resumenPartidos separacionSuperior">
+            <div class="estadoResumen">
+                ${pendientesActual === 0
+                    ? `✅ Jornada ${jornadaActual} finalizada`
+                    : `🟢 Jornada ${jornadaActual} en juego`}
+            </div>
+            <div class="barra">
+                <div class="progreso" style="width:${porcentaje}%"></div>
+            </div>
+            <p>${jugadosActual} jugados · ${pendientesActual} pendientes · ${porcentaje}%</p>
+        </section>
+
+        <div class="listaJornadas">
+            ${jornadas.map(jornada => {
+                const partidosJornada = partidos.filter(
+                    partido => Number(partido.jornada) === jornada
+                );
+                return pintarBloqueJornada(
+                    jornada,
+                    partidosJornada,
+                    jornada === jornadaActual,
+                    grupoSeleccionado === "todos" && (fase === "grupos" || fase === "regrupos")
+                );
+            }).join("")}
+        </div>
+    `;
+}
+
+function pintarBloqueJornada(jornada, partidos, abierta, separarPorGrupo) {
+    const sinDescanso = quitarDescansos(partidos);
+    const jugados = sinDescanso.filter(partidoFinalizado).length;
+    const pendientes = sinDescanso.filter(partidoPendiente).length;
+    const total = sinDescanso.length;
+
+    let estado = "⏳ Próxima";
+    let clase = "proxima";
+
+    if (total > 0 && pendientes === 0) {
+        estado = "✅ Finalizada";
+        clase = "finalizada";
+    } else if (abierta && pendientes > 0) {
+        estado = "🟢 En juego";
+        clase = "enJuego";
+    }
+
+    let tarjetas = "";
+
+    if (separarPorGrupo) {
+        tarjetas = [...agruparPor(partidos, partido => partido.grupo || "Sin grupo").entries()]
+            .sort((a, b) => ordenarNombreGrupo(a[0], b[0]))
+            .map(([grupo, partidosGrupo]) => `
+                <div class="grupoPartidos">
+                    <h4>${escaparHTML(nombreGrupoVisible(grupo))}</h4>
+                    ${ordenarPartidos(partidosGrupo).map(pintarCardPartido).join("")}
+                </div>
+            `).join("");
+    } else {
+        tarjetas = ordenarPartidos(partidos).map(pintarCardPartido).join("");
+    }
+
+    return `
+        <section class="bloqueJornada">
+            <div class="cabeceraJornada ${clase}">
+                <div>
+                    <span class="chipJornada">${estado}</span>
+                    <h3>Jornada ${jornada}</h3>
+                    <p>${jugados}/${total} partidos</p>
+                </div>
+                <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
+            </div>
+            <div class="listaPartidos ${abierta ? "" : "oculto"}">
+                ${tarjetas}
+            </div>
+        </section>
+    `;
+}
+
+function pintarCardPartido(partido) {
+    if (partidoEsDescanso(partido)) {
+        const equipo =
+            partido.local ||
+            partido.visitante ||
+            "";
+
+        return `
+            <article class="cardPartido descanso">
+                <div class="estadoPartido">
+                    💤 Descanso
+                </div>
+
+                <div class="equipoPartido">
+                    ${escaparHTML(equipo)}
+                </div>
+            </article>
+        `;
+    }
+
+    const local =
+        partido.local || "";
+
+    const visitante =
+        partido.visitante || "";
+
+    const sets =
+        obtenerSets(partido.resultado);
+
+    const finalizado =
+        partidoFinalizado(partido);
+
+    const localGana =
+        normalizar(partido.ganador) ===
+        normalizar(local);
+
+    const visitanteGana =
+        normalizar(partido.ganador) ===
+        normalizar(visitante);
+
+    const sustitucionesLocal =
+        Array.isArray(
+            partido.sustituciones_local
+        )
+            ? partido.sustituciones_local
+            : [];
+
+    const sustitucionesVisitante =
+        Array.isArray(
+            partido.sustituciones_visitante
+        )
+            ? partido.sustituciones_visitante
+            : [];
+
+    const haySustituciones =
+        sustitucionesLocal.length > 0 ||
+        sustitucionesVisitante.length > 0;
+
+    return `
+        <article
+            class="
+                cardPartido
+                marcador
+                ${finalizado ? "jugado" : "pendiente"}
+                ${haySustituciones ? "conSustitucion" : ""}
+            "
+        >
+            <div class="estadoPartido">
+                ${
+                    finalizado
+                        ? "✅ Finalizado"
+                        : "⏳ Pendiente"
+                }
+            </div>
+
+            ${pintarMetaPartido(partido)}
+
+            <div class="marcadorHeader">
+                <div></div>
+                <div>I</div>
+                <div>II</div>
+                <div>III</div>
+            </div>
+
+            ${pintarFilaMarcador(
+                local,
+                sets,
+                "local",
+                localGana,
+                sustitucionesLocal
+            )}
+
+            ${pintarFilaMarcador(
+                visitante,
+                sets,
+                "visitante",
+                visitanteGana,
+                sustitucionesVisitante
+            )}
+        </article>
+    `;
+}
+
+function pintarFilaMarcador(
+    nombre,
+    sets,
+    lado,
+    ganador,
+    sustituciones = []
+) {
+    return `
+        <div class="bloqueEquipoMarcador">
+
+            <div class="
+                filaMarcador
+                ${ganador ? "ganadorFila" : ""}
+            ">
+                <div class="nombreEquipoMarcador">
+                    ${dividirEquipo(nombre)
+                        .map(
+                            jugador => `
+                                <strong>
+                                    ${escaparHTML(jugador)}
+                                </strong>
+                            `
+                        )
+                        .join("")}
+                </div>
+
+                <div>${sets[0][lado]}</div>
+                <div>${sets[1][lado]}</div>
+                <div>${sets[2][lado]}</div>
+            </div>
+
+            ${pintarSustitucionesEquipo(
+                sustituciones
+            )}
+
+        </div>
+    `;
+}
+
+function pintarSustitucionesEquipo(
+    sustituciones
+) {
+    if (
+        !Array.isArray(sustituciones) ||
+        sustituciones.length === 0
+    ) {
+        return "";
+    }
+
+    return `
+        <div class="lineaSustituciones">
+
+            ${sustituciones
+                .map(
+                    sustitucion =>
+                        pintarSustitucionPartido(
+                            sustitucion
+                        )
+                )
+                .join(`
+                    <span class="separadorSustituciones">
+                        ·
+                    </span>
+                `)}
+
+        </div>
+    `;
+}
+
+
+function pintarSustitucionPartido(
+    sustitucion
+) {
+    const ausente =
+        String(
+            sustitucion?.ausente ||
+            "Titular"
+        ).trim();
+
+    const sustituto =
+        String(
+            sustitucion?.sustituto ||
+            "Sustituto"
+        ).trim();
+
+    const tipoCompleto =
+        String(
+            sustitucion?.tipo ||
+            "Libre"
+        ).trim();
+
+    const esCedido =
+        normalizar(tipoCompleto)
+            .includes("CEDIDO");
+
+    const tipoVisible =
+        esCedido
+            ? "Cedido"
+            : "Libre";
+
+    return `
+        <span class="sustitucionInline">
+
+            <span class="iconoSustitucion">
+                🔄
+            </span>
+
+            <span class="textoSustitucion">
+                <strong>
+                    ${escaparHTML(sustituto)}
+                </strong>
+
+                sustituye a
+
+                <strong>
+                    ${escaparHTML(ausente)}
+                </strong>
+            </span>
+
+            <span class="
+                tipoSustitucionInline
+                ${esCedido ? "cedido" : "libre"}
+            ">
+                ${tipoVisible}
+            </span>
+
+        </span>
+    `;
+}
+
+
+function pintarMetaPartido(partido) {
+    const partes = [];
+
+    if (partido.grupo) partes.push(nombreGrupoVisible(partido.grupo));
+    if (partido.pista !== null && partido.pista !== undefined && partido.pista !== "") {
+        partes.push(`Pista ${partido.pista}`);
+    }
+    if (partido.duracion_min !== null && partido.duracion_min !== undefined && partido.duracion_min !== "") {
+        partes.push(`${partido.duracion_min} min`);
+    }
+
+    return partes.length
+        ? `<div class="metaPartido">${escaparHTML(partes.join(" · "))}</div>`
+        : "";
+}
+
+/* =========================================================
+   PANTALLA EQUIPOS
+========================================================= */
+
+function pintarPantallaEquipos() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    const equipos = [...(datos.equipos || [])].sort(
+        (a, b) => numero(a.orden) - numero(b.orden)
+    );
+
+    const grupos = esModoGrupos()
+        ? [...new Set(equipos.map(equipo => equipo.grupo).filter(Boolean))]
+            .sort(ordenarNombreGrupo)
+        : [];
+
+    if (!estadoUI.grupoEquipos) estadoUI.grupoEquipos = "todos";
+
+    const filtrados = estadoUI.grupoEquipos === "todos"
+        ? equipos
+        : equipos.filter(equipo => equipo.grupo === estadoUI.grupoEquipos);
+
+    contenido.innerHTML = `
+        <h2>👥 Equipos</h2>
+
+        <section class="resumenPartidos">
+            <div class="estadoResumen">${equipos.length} equipos participantes</div>
+            <p>${esModoGrupos() ? "Filtra por grupo para localizar un equipo." : "Listado de equipos participantes."}</p>
+        </section>
+
+        ${esModoGrupos()
+            ? pintarSelectorGrupos(grupos, estadoUI.grupoEquipos, "equipos", "equipos", true)
+            : ""}
+
+        <div class="listaEquipos separacionSuperior">
+            ${filtrados.map(pintarCardEquipo).join("") ||
+                pintarTarjetaVacia("Sin equipos", "No hay equipos para este filtro.")}
+        </div>
+    `;
+}
+
+function pintarCardEquipo(equipo) {
+    const ficha = obtenerFichaEquipo(equipo);
+    const jugadores = dividirEquipo(equipo.equipo);
+    const etiquetas = [];
+
+    if (ficha.grupoInicial) etiquetas.push(ficha.grupoInicial);
+    if (ficha.regrupo) etiquetas.push(ficha.regrupo);
+    if (ficha.clasificacion?.pj > 0) {
+        etiquetas.push(`${ficha.clasificacion.pj} PJ`);
+        etiquetas.push(`${ficha.clasificacion.puntos_totales} pts`);
+    }
+
+    return `
+        <article class="cardEquipo">
+            <div class="cabeceraEquipo">
+                <div class="iconoEquipo">👥</div>
+                <div class="nombreEquipoFicha">
+                    ${jugadores.map(jugador => `<strong>${escaparHTML(jugador)}</strong>`).join("")}
+                </div>
+                <span></span>
+            </div>
+
+            ${etiquetas.length ? `
+                <div class="resumenEquipo">
+                    ${etiquetas.map(etiqueta => `<span>${escaparHTML(etiqueta)}</span>`).join("")}
+                </div>
+            ` : ""}
+
+            <div class="datosFila">
+                🎾 Próximo partido: <strong>${escaparHTML(ficha.proximo?.rival || "Sin partido pendiente")}</strong>
+                ${ficha.proximo?.detalle ? `<br>${escaparHTML(ficha.proximo.detalle)}` : ""}
+            </div>
+        </article>
+    `;
+}
+
+function obtenerFichaEquipo(equipo) {
+    const faseClasificacion = obtenerFaseClasificacionPrincipal();
+    const grupoInicial = equipo.grupo ? nombreGrupoVisible(equipo.grupo) : "";
+
+    const filaRegrupo = obtenerClasificacionFase("regrupos").find(
+        fila => mismoEquipoPorIDsONombre(fila, equipo)
+    ) || obtenerEquiposAsignadosFase("regrupos").find(
+        fila => mismoEquipoPorIDsONombre(fila, equipo)
+    );
+
+    const regrupo = filaRegrupo?.grupo || "";
+
+    let filaClasificacion = null;
+
+    if (faseClasificacion === "regrupos") {
+        filaClasificacion = obtenerClasificacionFase("regrupos").find(
+            fila => mismoEquipoPorIDsONombre(fila, equipo)
+        );
+    } else if (faseClasificacion === "grupos") {
+        filaClasificacion = obtenerClasificacionFase("grupos").find(
+            fila => mismoEquipoPorIDsONombre(fila, equipo)
+        );
+    } else {
+        filaClasificacion = (datos.clasificacion || []).find(
+            fila => normalizar(fila.equipo) === normalizar(equipo.equipo)
+        );
+    }
+
+    const clasificacion = filaClasificacion
+        ? normalizarClasificacion(filaClasificacion)
+        : null;
+
+    return {
+        grupoInicial,
+        regrupo: regrupo ? nombreGrupoVisible(regrupo) : "",
+        clasificacion,
+        proximo: obtenerProximoPartidoEquipo(equipo.equipo, obtenerFaseActualCompeticion())
+    };
+}
+
+function obtenerProximoPartidoEquipo(
+    nombreEquipo,
+    fasePreferida
+) {
+    const partidosPalas =
+        obtenerPartidosFase("palas");
+
+    const hayPalasPendientes =
+        partidosPalas.some(partidoPendiente);
+
+    /*
+       Si la Copa Palas Playa está en juego,
+       se busca primero en ella.
+    */
+    const ordenFases = (
+        hayPalasPendientes
+            ? [
+                "palas",
+                fasePreferida,
+                "cruces",
+                "regrupos",
+                "grupos",
+                "liguilla"
+            ]
+            : [
+                fasePreferida,
+                "cruces",
+                "regrupos",
+                "grupos",
+                "liguilla",
+                "palas"
+            ]
+    ).filter(
+        (fase, indice, lista) =>
+            fase &&
+            lista.indexOf(fase) === indice
+    );
+
+    for (const fase of ordenFases) {
+        const partido =
+            obtenerPartidosFase(fase).find(
+                item => {
+                    if (!partidoPendiente(item)) {
+                        return false;
+                    }
+
+                    const local =
+                        item.local ||
+                        item.equipo1 ||
+                        item.equipo_a ||
+                        "";
+
+                    const visitante =
+                        item.visitante ||
+                        item.equipo2 ||
+                        item.equipo_b ||
+                        "";
+
+                    return [
+                        local,
+                        visitante
+                    ].some(
+                        nombre =>
+                            normalizar(nombre) ===
+                            normalizar(nombreEquipo)
+                    );
+                }
+            );
+
+        if (!partido) continue;
+
+        const local =
+            partido.local ||
+            partido.equipo1 ||
+            partido.equipo_a ||
+            "";
+
+        const visitante =
+            partido.visitante ||
+            partido.equipo2 ||
+            partido.equipo_b ||
+            "";
+
+        const rival =
+            normalizar(local) ===
+            normalizar(nombreEquipo)
+                ? visitante
+                : local;
+
+        const partes = [];
+
+        if (fase === "palas") {
+            partes.push("Copa Palas Playa");
+
+            if (partido.ronda) {
+                partes.push(
+                    `Ronda ${partido.ronda}`
+                );
+            }
+        } else if (partido.grupo) {
+            partes.push(
+                nombreGrupoVisible(partido.grupo)
+            );
+        } else if (fase === "cruces") {
+            partes.push(
+                partido.fase ||
+                "Eliminatorias"
+            );
+        }
+
+        if (partido.jornada) {
+            partes.push(
+                `Jornada ${partido.jornada}`
+            );
+        }
+
+        if (partido.pista) {
+            partes.push(
+                `Pista ${partido.pista}`
+            );
+        }
+
+        return {
+            rival,
+            detalle: partes.join(" · ")
+        };
+    }
+
+    return null;
+}
+
+/* =========================================================
+   ELIMINATORIAS
+========================================================= */
+
+function pintarContenidoCruces() {
+    const cruces = datos.cruces || [];
+
+    if (!cruces.length) {
+        return pintarTarjetaVacia(
+            "⏳ Todavía no generadas",
+            "Las eliminatorias aparecerán aquí cuando se creen desde Excel."
+        );
+    }
+
+    const fases = [...new Set(cruces.map(partido => partido.fase))];
+    const faseActual = obtenerFaseActualCruces(cruces);
+
+    return `
+        <div class="listaJornadas separacionSuperior">
+            ${fases.map(fase => {
+                const partidosFase = cruces.filter(partido => partido.fase === fase);
+                const jugados = partidosFase.filter(partidoFinalizado).length;
+                const pendientes = partidosFase.length - jugados;
+                const abierta = fase === faseActual;
+
+                return `
+                    <section class="bloqueJornada">
+                        <div class="cabeceraJornada ${pendientes === 0 ? "finalizada" : "enJuego"}">
+                            <div>
+                                <span class="chipJornada">
+                                    ${pendientes === 0 ? "✅ Finalizada" : "🟢 En juego"}
+                                </span>
+                                <h3>${escaparHTML(fase)}</h3>
+                                <p>${jugados}/${partidosFase.length} partidos</p>
+                            </div>
+                            <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
+                        </div>
+                        <div class="listaPartidos ${abierta ? "" : "oculto"}">
+                            ${partidosFase.map(pintarCardPartido).join("")}
+                        </div>
+                    </section>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+function obtenerFaseActualCruces(cruces) {
+    const fases = [...new Set(cruces.map(partido => partido.fase))];
+
+    for (const fase of fases) {
+        if (cruces.filter(partido => partido.fase === fase).some(partidoPendiente)) {
+            return fase;
+        }
+    }
+
+    return fases[fases.length - 1] || "";
+}
+
+/* =========================================================
+   PALAS DE PLAYA
+========================================================= */
+
+function pintarContenidoPalas() {
+    const rondas = datos.palas_playa || [];
+
+    if (!rondas.length) {
+        return pintarTarjetaVacia(
+            "⏳ Todavía no iniciada",
+            "La Copa Palas Playa aparecerá aquí cuando se genere desde Excel."
+        );
+    }
+
+    const rondaActual = obtenerRondaActualPalas(rondas);
+
+    return `
+        <section class="resumenPartidos resumenPalas separacionSuperior">
+            <div class="estadoResumen">🥄 El que pierde sigue jugando</div>
+            <p>Ganar un partido significa salvarse del farolillo.</p>
+        </section>
+
+        <div class="listaJornadas">
+            ${rondas.map(ronda => {
+                const partidos = ronda.partidos || [];
+                const jugados = partidos.filter(partidoFinalizado).length;
+                const pendientes = partidos.length - jugados;
+                const abierta = Number(ronda.ronda) === Number(rondaActual);
+
+                return `
+                    <section class="bloqueJornada">
+                        <div class="cabeceraJornada ${pendientes === 0 ? "finalizada" : abierta ? "enJuego" : "proxima"}">
+                            <div>
+                                <span class="chipJornada">
+                                    ${pendientes === 0 ? "✅ Finalizada" : abierta ? "🟢 En juego" : "⏳ Próxima"}
+                                </span>
+                                <h3>${escaparHTML(ronda.nombre || `Ronda ${ronda.ronda}`)}</h3>
+                                <p>${jugados}/${partidos.length} partidos</p>
+                                ${ronda.descansa ? `<p>💤 Descansa: <strong>${escaparHTML(ronda.descansa)}</strong></p>` : ""}
+                            </div>
+                            <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
+                        </div>
+                        <div class="listaPartidos ${abierta ? "" : "oculto"}">
+                            ${partidos.map(pintarCardPalas).join("")}
+                        </div>
+                    </section>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+function obtenerRondaActualPalas(rondas) {
+    const pendiente = rondas.find(ronda => (ronda.partidos || []).some(partidoPendiente));
+    return pendiente?.ronda || rondas[rondas.length - 1]?.ronda || 1;
+}
+
+function pintarCardPalas(partido) {
+    const local = partido.local || partido.equipo1 || partido.equipo_a || "";
+    const visitante = partido.visitante || partido.equipo2 || partido.equipo_b || "";
+    const sets = obtenerSets(partido.resultado);
+    const finalizado = partidoFinalizado(partido);
+    const localGana = normalizar(partido.ganador) === normalizar(local);
+    const visitanteGana = normalizar(partido.ganador) === normalizar(visitante);
+    const localPierde = finalizado && visitanteGana;
+    const visitantePierde = finalizado && localGana;
+    const salvado = localGana ? local : visitanteGana ? visitante : "";
+    const sigue = localPierde ? local : visitantePierde ? visitante : "";
+
+    return `
+        <article class="cardPartido marcador pendientePalas">
+            <div class="estadoPartido">${finalizado ? "✅ Finalizado" : "⏳ Pendiente"}</div>
+            ${pintarMetaPartido(partido)}
+            <div class="marcadorHeader">
+                <div></div><div>I</div><div>II</div><div>III</div>
+            </div>
+            ${pintarFilaPalas(local, sets, "local", localPierde)}
+            ${pintarFilaPalas(visitante, sets, "visitante", visitantePierde)}
+            ${finalizado ? `
+                <div class="infoPalas">
+                    ${partido.es_final === true
+                        ? `🥄 Farolillo rojo: <strong>${escaparHTML(sigue)}</strong>`
+                        : `🛟 Se salva: <strong>${escaparHTML(salvado)}</strong>`}
+                </div>
+            ` : ""}
+        </article>
+    `;
+}
+
+function pintarFilaPalas(nombre, sets, lado, pierde) {
+    return `
+        <div class="filaMarcador ${pierde ? "perdedorPalas" : ""}">
+            <div class="nombreEquipoMarcador">
+                ${dividirEquipo(nombre).map(jugador => `<strong>${escaparHTML(jugador)}</strong>`).join("")}
+            </div>
+            <div>${sets[0][lado]}</div>
+            <div>${sets[1][lado]}</div>
+            <div>${sets[2][lado]}</div>
+        </div>
+    `;
+}
+
+/* =========================================================
+   RANKING HISTÓRICO
+========================================================= */
+
+async function pintarPantallaRanking() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    contenido.innerHTML = `
+        <h2>🏆 Ranking histórico</h2>
+        <section class="tarjetaVacia cargandoRanking">
+            <h3>⏳ Cargando clasificación</h3>
+            <p>Estamos consultando el histórico de jugadores.</p>
+        </section>
+    `;
+
+    try {
+        const ranking = await cargarDatosRankingHistorico();
+
+        if (estadoUI.pantalla !== "ranking") return;
+
+        contenido.innerHTML = construirPantallaRanking(ranking);
+    } catch (error) {
+        console.error(error);
+
+        contenido.innerHTML = `
+            <h2>🏆 Ranking histórico</h2>
+            ${pintarTarjetaVacia(
+                "No se pudo cargar el ranking",
+                "Comprueba que ranking_historico.json esté publicado y vuelve a intentarlo."
+            )}
+        `;
+    }
+}
+
+function construirPantallaRanking(origen) {
+    const ranking = [...(origen?.ranking || [])].sort(
+        (a, b) => numero(a.posicion) - numero(b.posicion)
+    );
+
+    const resumen = origen?.resumen || {};
+    const top3 = ranking.filter(
+    jugador =>
+        obtenerPosicionCompartidaRanking(jugador) <= 3
+);
+
+    if (!ranking.length) {
+        return `
+            <h2>🏆 Ranking histórico</h2>
+            ${pintarTarjetaVacia(
+                "Ranking pendiente",
+                "Todavía no hay jugadores guardados en el histórico."
+            )}
+        `;
+    }
+
+    return `
+        <div class="cabeceraTituloRanking">
+            <h2>🏆 Ranking histórico</h2>
+            <button
+                class="btnInfoOrden btnInfoRanking"
+                id="btnInfoRanking"
+                type="button"
+                aria-label="Información sobre la puntuación del ranking"
+                title="Cómo se calculan los puntos"
+            >ℹ️</button>
+        </div>
+
+        <section class="resumenRankingHistorico">
+            <div>
+                <span>Última edición</span>
+                <strong>${escaparHTML(resumen.ultima_edicion || "—")}</strong>
+            </div>
+            <div>
+                <span>Ediciones</span>
+                <strong>${numero(resumen.numero_ediciones)}</strong>
+            </div>
+            <div>
+                <span>Jugadores</span>
+                <strong>${numero(resumen.numero_jugadores) || ranking.length}</strong>
+            </div>
+        </section>
+
+        <section class="bloqueRanking">
+            <h3>🥇 Podio histórico</h3>
+            <div class="podioRankingHistorico">
+                ${top3.map(jugador =>
+    pintarPodioRankingJugador(jugador)
+).join("")}
+            </div>
+        </section>
+
+        <section class="bloqueRanking">
+            <div class="cabeceraBloqueRanking">
+                <div>
+                    <h3>Clasificación completa</h3>
+                    <p>Pulsa un jugador para ver su historial.</p>
+                </div>
+            </div>
+
+            <div class="listaRankingHistorico">
+                ${ranking.map(pintarFilaRankingJugador).join("")}
+            </div>
+        </section>
+
+        ${pintarRecordsRanking(ranking)}
+    `;
+}
+
+function mostrarInfoRanking() {
+    const baremo = datosRanking?.baremo || {};
+
+    const puntosParticipacion = formatearPuntosRanking(baremo.participacion);
+    const puntosCampeon = formatearPuntosRanking(baremo.campeon);
+    const puntosSubcampeon = formatearPuntosRanking(baremo.subcampeon);
+    const puntosSemifinalista = formatearPuntosRanking(baremo.semifinalista);
+    const puntosCuartos = formatearPuntosRanking(baremo.cuartos);
+    const puntosOctavos = formatearPuntosRanking(baremo.octavos);
+    const bonusVictorias = formatearPuntosRanking(baremo.max_bonus_victorias);
+    const bonusSets = formatearPuntosRanking(baremo.max_bonus_sets);
+    const maximoEdicion = formatearPuntosRanking(baremo.maximo_posible_edicion);
+
+    const palasCuenta = baremo.palas_playa_cuenta_bonus === true;
+
+    const overlay = document.createElement("div");
+    overlay.className = "overlayInfo";
+    overlay.id = "overlayInfoOrden";
+
+    overlay.innerHTML = `
+        <div class="globoInfo globoInfoRanking">
+            <button id="cerrarInfoOrden" class="cerrarInfo" type="button">×</button>
+
+            <h3>🏆 Cómo se calcula el ranking</h3>
+
+            <p>
+                Los puntos de cada jugador se calculan de forma individual y se
+                acumulan edición tras edición. Los valores que aparecen aquí se
+                leen automáticamente de la hoja <strong>Configuración</strong>.
+            </p>
+
+            <div class="baremoRankingInfo">
+                ${pintarLineaBaremoRanking("Participar", puntosParticipacion)}
+                ${pintarLineaBaremoRanking("Campeón", puntosCampeon)}
+                ${pintarLineaBaremoRanking("Subcampeón", puntosSubcampeon)}
+                ${pintarLineaBaremoRanking("Semifinalista", puntosSemifinalista)}
+                ${pintarLineaBaremoRanking("Cuartos de final", puntosCuartos)}
+                ${pintarLineaBaremoRanking("Octavos de final", puntosOctavos)}
+            </div>
+
+            <h4>Bonificaciones por rendimiento</h4>
+
+            <div class="formulaRankingInfo">
+            <div>
+            <strong>Victorias</strong>
+            <span>
+                Hasta ${bonusVictorias} puntos:
+                ${bonusVictorias} × (PG / PJ)
+            </span>
+            </div>
+                <div>
+                <strong>Sets</strong>
+                <span>
+                Hasta ${bonusSets} puntos:
+                ${bonusSets} × [SG / (SG + SP)]
+                </span>
+                </div>
+            </div>
+
+            <div class="ejemploInfo">
+                <strong>Puntos de la edición</strong><br>
+                Participación + resultado final + bonus de victorias + bonus de sets.
+                <br><br>
+                <strong>Máximo actual:</strong> ${maximoEdicion} puntos por edición.
+            </div>
+
+            <p class="notaRankingInfo">
+                🏖️ Copa Palas Playa:
+                <strong>${palasCuenta ? "sí cuenta" : "no cuenta"}</strong>
+                en los bonus de victorias y sets. No concede puntos directos.
+            </p>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function pintarLineaBaremoRanking(concepto, puntos) {
+    return `
+        <div>
+            <span>${escaparHTML(concepto)}</span>
+            <strong>${escaparHTML(puntos)} pts</strong>
+        </div>
+    `;
+}
+
+function pintarPodioRankingJugador(jugador) {
+    const posicion = obtenerPosicionCompartidaRanking(jugador);
+
+    const medalla = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    const clase = posicion === 1
+        ? "primero"
+        : posicion === 2
+            ? "segundo"
+            : posicion === 3
+                ? "tercero"
+                : "";
+
+    return `
+        <button
+            type="button"
+            class="podioRankingJugador ${clase}"
+            data-ranking-jugador="${escaparAtributo(jugador.id_jugador)}"
+        >
+            <span class="medallaRanking">${medalla}</span>
+            <strong>${escaparHTML(jugador.jugador)}</strong>
+            <b>${formatearPuntosRanking(jugador.puntos)} pts</b>
+            <small>
+                ${numero(jugador.titulos)} títulos ·
+                ${numero(jugador.ediciones)} ediciones
+            </small>
+        </button>
+    `;
+}
+
+function obtenerPosicionCompartidaRanking(jugador) {
+    const ranking = datosRanking?.ranking || [];
+    const puntosJugador = numero(jugador.puntos);
+
+    const primeraCoincidencia = ranking.findIndex(
+        item => numero(item.puntos) === puntosJugador
+    );
+
+    return primeraCoincidencia >= 0
+        ? primeraCoincidencia + 1
+        : numero(jugador.posicion);
+}
+
+function pintarFilaRankingJugador(jugador) {
+    const posicion = obtenerPosicionCompartidaRanking(jugador);
+    const movimiento = obtenerMovimientoRanking(jugador);
+    const posicionVisible = posicion === 1
+        ? "🥇"
+        : posicion === 2
+            ? "🥈"
+            : posicion === 3
+                ? "🥉"
+                : `${posicion}.`;
+
+    return `
+        <button
+            type="button"
+            class="filaRankingHistorico"
+            data-ranking-jugador="${escaparAtributo(jugador.id_jugador)}"
+        >
+            <span class="posicionRankingHistorico">${posicionVisible}</span>
+
+            <span class="datosJugadorRanking">
+                <strong>${escaparHTML(jugador.jugador)}</strong>
+                <small>
+                    ${numero(jugador.ediciones)} ediciones ·
+                    ${numero(jugador.titulos)} títulos ·
+                    ${formatearPorcentajeRanking(jugador.porcentaje_victorias)} victorias
+                </small>
+            </span>
+
+            <span class="derechaRanking">
+    <strong>${formatearPuntosRanking(jugador.puntos)}</strong>
+    <small>puntos</small>
+
+    ${numero(datosRanking?.resumen?.numero_ediciones) > 1
+        ? `<b class="${movimiento.clase}">${movimiento.texto}</b>`
+        : ""
+    }
+</span>
+        </button>
+    `;
+}
+
+function pintarRecordsRanking(ranking) {
+    const masTitulos = [...ranking].sort(
+        (a, b) => numero(b.titulos) - numero(a.titulos) || numero(a.posicion) - numero(b.posicion)
+    )[0];
+
+    const masParticipaciones = [...ranking].sort(
+        (a, b) => numero(b.ediciones) - numero(a.ediciones) || numero(a.posicion) - numero(b.posicion)
+    )[0];
+
+    const candidatosPorcentaje = ranking.filter(
+        jugador => numero(jugador.pj) > 0
+    );
+
+    const mejorPorcentaje = [...candidatosPorcentaje].sort(
+        (a, b) => numero(b.porcentaje_victorias) - numero(a.porcentaje_victorias)
+    )[0];
+
+    return `
+        <section class="bloqueRanking recordsRanking">
+            <h3>📚 Récords históricos</h3>
+            <div class="gridRecordsRanking">
+                ${pintarRecordRanking(
+                    "🏆",
+                    "Más títulos",
+                    masTitulos?.jugador || "—",
+                    `${numero(masTitulos?.titulos)} títulos`
+                )}
+                ${pintarRecordRanking(
+                    "🎾",
+                    "Más ediciones",
+                    masParticipaciones?.jugador || "—",
+                    `${numero(masParticipaciones?.ediciones)} ediciones`
+                )}
+                ${pintarRecordRanking(
+                    "📈",
+                    "Mejor % victorias",
+                    mejorPorcentaje?.jugador || "—",
+                    mejorPorcentaje
+                        ? formatearPorcentajeRanking(mejorPorcentaje.porcentaje_victorias)
+                        : "—"
+                )}
+            </div>
+        </section>
+    `;
+}
+
+function pintarRecordRanking(icono, titulo, jugador, valor) {
+    return `
+        <article class="recordRanking">
+            <span>${icono}</span>
+            <small>${escaparHTML(titulo)}</small>
+            <strong>${escaparHTML(jugador)}</strong>
+            <b>${escaparHTML(valor)}</b>
+        </article>
+    `;
+}
+
+function pintarDetalleJugadorRanking(idJugador) {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido || !datosRanking) return;
+
+    const jugador = (datosRanking.ranking || []).find(
+        fila => String(fila.id_jugador) === String(idJugador)
+    );
+
+    if (!jugador) return;
+
+    const historial = (datosRanking.historial_ediciones || [])
+        .filter(fila => String(fila.id_jugador) === String(idJugador))
+        .sort((a, b) => numero(b.anio) - numero(a.anio));
+
+    const mejorEdicion = historial.length > 1
+    ? [...historial].sort(
+        (a, b) =>
+            numero(b.puntos_edicion) -
+            numero(a.puntos_edicion)
+      )[0]
+    : null;
+
+    
+
+    const parejasHistoricas =
+    obtenerParejasHistoricasJugador(historial);
+
+    contenido.innerHTML = `
+        <button class="btnVolverRanking" id="btnVolverRanking" type="button">
+            ← Volver al ranking
+        </button>
+
+        <section class="cabeceraJugadorRanking">
+    <span class="puestoJugadorRanking">
+        ${obtenerPosicionCompartidaRanking(jugador)}º
+    </span>
+
+    <div>
+        <small>RANKING HISTÓRICO</small>
+        <h2>${escaparHTML(jugador.jugador)}</h2>
+        <p>${formatearPuntosRanking(jugador.puntos)} puntos acumulados</p>
+    </div>
+</section>
+
+        <section class="metricasJugadorRanking">
+            ${pintarMetricaRanking("🏆", "Títulos", numero(jugador.titulos))}
+            ${pintarMetricaRanking("🥈", "Finales", numero(jugador.finales))}
+            ${pintarMetricaRanking("📅", "Ediciones", numero(jugador.ediciones))}
+            ${pintarMetricaRanking("📈", "Victorias", formatearPorcentajeRanking(jugador.porcentaje_victorias))}
+            ${pintarMetricaRanking("🎾", "Partidos", numero(jugador.pj))}
+            ${pintarMetricaRanking("✅", "Ganados", numero(jugador.pg))}
+        </section>
+
+        ${mejorEdicion
+    ? `
+  
+        <section class="bloqueRanking mejorEdicionRanking">
+            <h3>⭐ Mejor edición</h3>
+
+            <article class="edicionJugadorRanking">
+                <div class="cabeceraEdicionRanking">
+                    <div>
+                        <span>${numero(mejorEdicion.anio)}</span>
+
+                        <strong>
+                            ${escaparHTML(
+                                mejorEdicion.resultado_final ||
+                                "Participación"
+                            )}
+                        </strong>
+                    </div>
+
+                    <b>
+                        ${formatearPuntosRanking(
+                            mejorEdicion.puntos_edicion
+                        )} pts
+                    </b>
+                </div>
+
+                <div class="parejaEdicionRanking">
+                    <small>Pareja</small>
+
+                    <strong>
+                        ${escaparHTML(
+                            mejorEdicion.pareja ||
+                            "Sin pareja registrada"
+                        )}
+                    </strong>
+                </div>
+
+                <div class="datosEdicionRanking">
+                    <span>🎾 ${numero(mejorEdicion.pj)} PJ</span>
+                    <span>✅ ${numero(mejorEdicion.pg)} PG</span>
+                    <span>❌ ${numero(mejorEdicion.pp)} PP</span>
+
+                    <span>
+                        📊 ${formatearPorcentajeRanking(
+                            mejorEdicion.porcentaje_victorias
+                        )} victorias
+                    </span>
+                </div>
+            </article>
+        </section>
+      `
+    : ""
+}
+
+${historial.length > 1 && parejasHistoricas.length
+    ? `
+        <section class="bloqueRanking parejasHistoricasRanking">
+            <h3>🤝 Parejas históricas</h3>
+
+            <div class="listaParejasHistoricas">
+                ${parejasHistoricas
+                    .map(pintarParejaHistoricaJugador)
+                    .join("")
+                }
+            </div>
+        </section>
+      `
+    : ""
+}
+
+        <section class="bloqueRanking">
+            <h3>Historial por ediciones</h3>
+            <div class="historialJugadorRanking">
+                ${historial.length
+                    ? historial.map(pintarEdicionJugadorRanking).join("")
+                    : pintarTarjetaVacia(
+                        "Sin ediciones",
+                        "No se encontraron participaciones para este jugador."
+                    )}
+            </div>
+        </section>
+    `;
+}
+
+function pintarMetricaRanking(icono, titulo, valor) {
+    return `
+        <article>
+            <span>${icono}</span>
+            <small>${escaparHTML(titulo)}</small>
+            <strong>${escaparHTML(valor)}</strong>
+        </article>
+    `;
+}
+
+function obtenerParejasHistoricasJugador(historial) {
+    const parejas = new Map();
+
+    (historial || []).forEach(edicion => {
+        const idPareja = String(
+            edicion.id_pareja || edicion.pareja || ""
+        ).trim();
+
+        if (!idPareja) return;
+
+        if (!parejas.has(idPareja)) {
+            parejas.set(idPareja, {
+                id_pareja: edicion.id_pareja || "",
+                pareja: edicion.pareja || "Sin datos",
+                ediciones: 0,
+                pj: 0,
+                pg: 0,
+                pp: 0,
+                titulos: 0,
+                finales: 0,
+                puntos: 0,
+                anios: []
+            });
+        }
+
+        const pareja = parejas.get(idPareja);
+
+        pareja.ediciones += 1;
+        pareja.pj += numero(edicion.pj);
+        pareja.pg += numero(edicion.pg);
+        pareja.pp += numero(edicion.pp);
+        pareja.puntos += numero(edicion.puntos_edicion);
+
+        if (edicion.anio) {
+            pareja.anios.push(numero(edicion.anio));
+        }
+
+        const resultado = String(
+            edicion.resultado_final || ""
+        )
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .toUpperCase();
+
+        if (
+            numero(edicion.posicion_final) === 1 ||
+            resultado === "CAMPEON"
+        ) {
+            pareja.titulos += 1;
+        }
+
+        if (
+            numero(edicion.posicion_final) === 2 ||
+            resultado === "SUBCAMPEON"
+        ) {
+            pareja.finales += 1;
+        }
+    });
+
+    return [...parejas.values()]
+        .map(pareja => ({
+            ...pareja,
+
+            porcentaje_victorias:
+                pareja.pj > 0
+                    ? pareja.pg / pareja.pj
+                    : 0,
+
+            anios: [...new Set(pareja.anios)]
+                .sort((a, b) => b - a)
+        }))
+        .sort((a, b) =>
+            numero(b.titulos) - numero(a.titulos) ||
+            numero(b.puntos) - numero(a.puntos) ||
+            numero(b.pg) - numero(a.pg) ||
+            String(a.pareja).localeCompare(
+                String(b.pareja),
+                "es",
+                { sensitivity: "base" }
+            )
+        );
+}
+
+function pintarParejaHistoricaJugador(pareja) {
+    const resumenResultados = [];
+
+    if (numero(pareja.titulos) > 0) {
+        resumenResultados.push(
+            `🏆 ${numero(pareja.titulos)} ${
+                numero(pareja.titulos) === 1
+                    ? "título"
+                    : "títulos"
+            }`
+        );
+    }
+
+    if (numero(pareja.finales) > 0) {
+        resumenResultados.push(
+            `🥈 ${numero(pareja.finales)} ${
+                numero(pareja.finales) === 1
+                    ? "subcampeonato"
+                    : "subcampeonatos"
+            }`
+        );
+    }
+
+    return `
+        <article class="parejaHistoricaJugador">
+            <div class="cabeceraParejaHistorica">
+                <div>
+                    <small>COMPAÑERO</small>
+                    <strong>
+                        ${escaparHTML(pareja.pareja)}
+                    </strong>
+                </div>
+
+                <b>
+                    ${numero(pareja.ediciones)}
+                    ${numero(pareja.ediciones) === 1
+                        ? "edición"
+                        : "ediciones"
+                    }
+                </b>
+            </div>
+
+            <div class="datosParejaHistorica">
+                <span>🎾 ${numero(pareja.pj)} PJ</span>
+                <span>✅ ${numero(pareja.pg)} PG</span>
+                <span>❌ ${numero(pareja.pp)} PP</span>
+
+                <span>
+                    📈 ${formatearPorcentajeRanking(
+                        pareja.porcentaje_victorias
+                    )}
+                </span>
+            </div>
+
+            ${resumenResultados.length
+                ? `
+                    <div class="resultadosParejaHistorica">
+                        ${resumenResultados
+                            .map(resultado =>
+                                `<span>${escaparHTML(resultado)}</span>`
+                            )
+                            .join("")
+                        }
+                    </div>
+                  `
+                : ""
+            }
+
+            <div class="pieParejaHistorica">
+                <span>
+                    ${formatearPuntosRanking(pareja.puntos)}
+                    puntos conseguidos juntos
+                </span>
+
+                <small>
+                    ${pareja.anios.join(" · ")}
+                </small>
+            </div>
+        </article>
+    `;
+}
+
+function pintarEdicionJugadorRanking(edicion) {
+    const resultado = formatearResultadoRanking(edicion.resultado_final);
+
+    return `
+        <article class="edicionJugadorRanking">
+            <div class="cabeceraEdicionRanking">
+                <div>
+                    <span>${escaparHTML(edicion.anio || "—")}</span>
+                    <strong>${resultado}</strong>
+                </div>
+                <b>+${formatearPuntosRanking(edicion.puntos_edicion)} pts</b>
+            </div>
+
+            <div class="parejaEdicionRanking">
+                <small>Pareja</small>
+                <strong>${escaparHTML(edicion.pareja || "Sin datos")}</strong>
+            </div>
+
+            <div class="datosEdicionRanking">
+                <span>🎾 ${numero(edicion.pj)} PJ</span>
+                <span>✅ ${numero(edicion.pg)} PG</span>
+                <span>❌ ${numero(edicion.pp)} PP</span>
+                <span>📈 ${formatearPorcentajeRanking(edicion.porcentaje_victorias)}</span>
+            </div>
+
+            <div class="desglosePuntosRanking">
+                <span>Participación <strong>${formatearPuntosRanking(edicion.puntos_participacion)}</strong></span>
+                <span>Resultado <strong>${formatearPuntosRanking(edicion.puntos_resultado)}</strong></span>
+                <span>Rendimiento <strong>${formatearPuntosRanking(edicion.puntos_rendimiento)}</strong></span>
+                <span>Acumulado <strong>${formatearPuntosRanking(edicion.puntos_acumulados)}</strong></span>
+            </div>
+        </article>
+    `;
+}
+
+function obtenerMovimientoRanking(jugador) {
+    const actual = numero(jugador.posicion);
+    const anterior = numero(jugador.posicion_anterior);
+
+    if (!anterior) {
+        return { texto: "NUEVO", clase: "movRankingNuevo" };
+    }
+
+    const diferencia = anterior - actual;
+
+    if (diferencia > 0) {
+        return { texto: `▲ ${diferencia}`, clase: "sube" };
+    }
+
+    if (diferencia < 0) {
+        return { texto: `▼ ${Math.abs(diferencia)}`, clase: "baja" };
+    }
+
+    return { texto: "—", clase: "igual" };
+}
+
+function formatearPorcentajeRanking(valor) {
+    const n = Number(valor);
+    if (!Number.isFinite(n)) return "0%";
+
+    const porcentaje = Math.abs(n) <= 1 ? n * 100 : n;
+
+    return `${porcentaje.toLocaleString("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1
+    })}%`;
+}
+
+function formatearPuntosRanking(valor) {
+    return numero(valor).toLocaleString("es-ES", {
+        maximumFractionDigits: 1
+    });
+}
+
+function formatearResultadoRanking(resultado) {
+    const valor = normalizar(resultado)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    if (valor === "CAMPEON") return "🏆 Campeón";
+    if (valor === "SUBCAMPEON") return "🥈 Subcampeón";
+    if (valor === "SEMIFINALISTA") return "⚔️ Semifinalista";
+    if (valor === "CUARTOS") return "🎾 Cuartos de final";
+    if (valor === "OCTAVOS") return "🎾 Octavos de final";
+
+    return escaparHTML(resultado || "Participante");
+}
+
+function pintarListaOpcionesMas(opciones) {
+    return `
+        <div class="listaOpcionesMas">
+            ${opciones.map(opcion => {
+                if (opcion.href) {
+                    return `
+                        <a
+                            class="opcionMas"
+                            href="${escaparAtributo(opcion.href)}"
+                        >
+                            <span>${opcion.icono}</span>
+                            <strong>${escaparHTML(opcion.texto)}</strong>
+                            <b>→</b>
+                        </a>
+                    `;
+                }
+
+                return `
+                    <button
+                        class="opcionMas"
+                        type="button"
+                        data-destino-pantalla="${escaparAtributo(opcion.pantalla || "") }"
+                        data-destino-fase="${escaparAtributo(opcion.fase || "") }"
+                    >
+                        <span>${opcion.icono}</span>
+                        <strong>${escaparHTML(opcion.texto)}</strong>
+                        <b>→</b>
+                    </button>
+                `;
+            }).join("")}
+        </div>
+    `;
+}
+
+/* =========================================================
+   PANTALLA FOTOGRAFÍAS
+========================================================= */
+
+async function pintarPantallaFotos() {
+    const contenido =
+        obtenerContenidoDetalle();
+
+    if (!contenido) return;
+
+    contenido.innerHTML = `
+        <h2>📷 Fotos</h2>
+
+        <div class="tarjetaVacia">
+            <strong>Cargando fotografías…</strong>
+        </div>
+    `;
+
+    try {
+        const origen =
+            await cargarDatosFotos();
+
+        if (estadoUI.pantalla !== "fotos") {
+            return;
+        }
+
+        const fotosPublicadas =
+            obtenerFotosPublicadas(origen);
+
+        const fotosGaleria =
+            obtenerFotosVisibles(origen);
+
+        const campeonatos =
+            agruparFotosPorCampeonato(
+                fotosGaleria,
+                fotosPublicadas
+            );
+
+        if (!fotosGaleria.length) {
+            contenido.innerHTML = `
+                <h2>📷 Fotos</h2>
+
+                ${pintarTarjetaVacia(
+                    "Galería vacía",
+                    "Todavía no hay fotografías publicadas."
+                )}
+            `;
+
+            return;
+        }
+
+        const campeonatoActivo =
+            campeonatos.find(
+                campeonato =>
+                    campeonato.id ===
+                    estadoUI.albumFotos
+            );
+
+        if (campeonatoActivo) {
+            contenido.innerHTML =
+                pintarAlbumFotos(
+                    campeonatoActivo
+                );
+
+            return;
+        }
+
+        estadoUI.albumFotos = "";
+
+        contenido.innerHTML =
+            pintarListadoAlbumesFotos(
+                campeonatos,
+                fotosGaleria.length
+            );
+
+    } catch (error) {
+        console.error(
+            "No se pudo pintar la galería.",
+            error
+        );
+
+        contenido.innerHTML = `
+            <h2>📷 Fotos</h2>
+
+            ${pintarTarjetaVacia(
+                "No se pudieron cargar las fotografías",
+                "Comprueba que fotos.json esté publicado y vuelve a intentarlo."
+            )}
+        `;
+    }
+}
+
+function pintarListadoAlbumesFotos(
+    campeonatos,
+    totalFotos
+) {
+    return `
+        <div class="cabeceraSeccionFotos">
+            <div>
+                <h2>📷 Álbumes</h2>
+                <p>
+                    ${campeonatos.length}
+                    ${campeonatos.length === 1
+                        ? "campeonato"
+                        : "campeonatos"}
+                    ·
+                    ${totalFotos}
+                    ${totalFotos === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </p>
+            </div>
+        </div>
+
+        <div class="listaAlbumesFotos">
+            ${campeonatos
+                .map(pintarAlbumCampeonato)
+                .join("")}
+        </div>
+    `;
+}
+
+function pintarAlbumCampeonato(grupo) {
+    const portada =
+        grupo.portada ||
+        grupo.fotos[0];
+
+    const ruta =
+        normalizarRutaFoto(
+            portada?.ruta
+        );
+
+    const titulo =
+        grupo.titulo ||
+        (grupo.ano
+            ? `Campeonato ${grupo.ano}`
+            : "Campeonato");
+
+    return `
+        <button
+            type="button"
+            class="albumFotosCard"
+            data-album-fotos="${escaparAtributo(grupo.id)}"
+            aria-label="Abrir álbum ${escaparAtributo(titulo)}"
+        >
+            <span class="imagenAlbumFotos">
+                <img
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(titulo)}"
+                    loading="lazy"
+                >
+            </span>
+
+            <span class="datosAlbumFotos">
+                <small>
+                    ${grupo.ano || "ÁLBUM"}
+                </small>
+
+                <strong>
+                    ${escaparHTML(titulo)}
+                </strong>
+
+                <span>
+                    📷 ${grupo.fotos.length}
+                    ${grupo.fotos.length === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </span>
+
+                <b>Ver álbum →</b>
+            </span>
+        </button>
+    `;
+}
+
+function pintarAlbumFotos(grupo) {
+    const titulo =
+        grupo.titulo ||
+        (grupo.ano
+            ? `Campeonato ${grupo.ano}`
+            : "Campeonato");
+
+    return `
+        <button
+            class="btnVolverAlbumesFotos"
+            id="btnVolverAlbumesFotos"
+            type="button"
+        >
+            ← Volver a los campeonatos
+        </button>
+
+        <div class="cabeceraSeccionFotos cabeceraAlbumFotos">
+            <div>
+                <small>ÁLBUM DEL CAMPEONATO</small>
+                <h2>${escaparHTML(titulo)}</h2>
+                <p>
+                    ${grupo.fotos.length}
+                    ${grupo.fotos.length === 1
+                        ? "fotografía"
+                        : "fotografías"}
+                </p>
+            </div>
+        </div>
+
+        <div class="galeriaFotos">
+            ${grupo.fotos
+                .map(pintarTarjetaFoto)
+                .join("")}
+        </div>
+    `;
+}
+
+function pintarTarjetaFoto(foto) {
+    const ruta =
+        normalizarRutaFoto(foto?.ruta);
+
+    const titulo =
+        foto?.titulo ||
+        foto?.nombre ||
+        "Fotografía del campeonato";
+
+    const descripcion =
+        foto?.descripcion || "";
+
+    const fecha =
+        formatearFechaFoto(foto?.fecha);
+
+    return `
+        <article class="tarjetaFoto">
+            <a
+                class="enlaceImagenFoto"
+                href="${escaparAtributo(ruta)}"
+                target="_blank"
+                rel="noopener"
+                aria-label="Ver ${escaparAtributo(titulo)}"
+            >
+                <img
+                    src="${escaparAtributo(ruta)}"
+                    alt="${escaparAtributo(titulo)}"
+                    loading="lazy"
+                >
+            </a>
+
+            <div class="datosFoto">
+                <h3>${escaparHTML(titulo)}</h3>
+
+                ${
+                    descripcion
+                        ? `<p>${escaparHTML(descripcion)}</p>`
+                        : ""
+                }
+
+                ${
+                    fecha
+                        ? `<small>📅 ${escaparHTML(fecha)}</small>`
+                        : ""
+                }
+            </div>
+        </article>
+    `;
+}
+
+function normalizarRutaFoto(ruta) {
+    const texto =
+        String(ruta || "")
+            .trim()
+            .replaceAll("\\", "/");
+
+    if (!texto) return "";
+
+    if (
+        texto.startsWith("http://") ||
+        texto.startsWith("https://")
+    ) {
+        return texto;
+    }
+
+    return texto.replace(/^\/+/, "");
+}
+
+function formatearFechaFoto(fechaISO) {
+    if (!fechaISO) return "";
+
+    const partes =
+        String(fechaISO)
+            .slice(0, 10)
+            .split("-");
+
+    if (partes.length !== 3) {
+        return String(fechaISO);
+    }
+
+    const fecha = new Date(
+        Number(partes[0]),
+        Number(partes[1]) - 1,
+        Number(partes[2])
+    );
+
+    if (Number.isNaN(fecha.getTime())) {
+        return String(fechaISO);
+    }
+
+    return fecha.toLocaleDateString(
+        "es-ES",
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =========================================================
+   PANTALLA MÁS
+========================================================= */
+
+function pintarPantallaMas() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    if (esWebPrevia()) {
+        pintarPantallaMasPretorneo();
+        return;
+    }
+
+    const config = obtenerConfiguracion();
+    const opciones = [];
+
+    if ((datos.cruces || []).length) {
+        opciones.push({
+            icono: "⚔️",
+            texto: "Eliminatorias",
+            pantalla: "competicion",
+            fase: "cruces"
+        });
+    }
+
+    /*
+       Solo aparece cuando la Copa Palas Playa
+       ya ha sido generada.
+    */
+    if ((datos.palas_playa || []).length) {
+        opciones.push({
+            icono: "🏖️",
+            texto: "Copa Palas Playa",
+            pantalla: "competicion",
+            fase: "palas"
+        });
+    }
+
+    if (esSi(config.mostrar_historia)) {
+        opciones.push({
+            icono: "📖",
+            texto: "Historia",
+            href: "historia.html"
+        });
+    }
+
+    if (esSi(config.mostrar_campeones)) {
+        opciones.push({
+            icono: "🏆",
+            texto: "Campeones",
+            href: "campeones.html"
+        });
+    }
+
+    if (esSi(config.mostrar_normativa)) {
+        opciones.push({
+            icono: "📜",
+            texto: "Normativa",
+            href: "normas.html"
+        });
+    }
+
+    if (esSi(config.mostrar_fotos)) {
+    opciones.push({
+        icono: "📷",
+        texto: "Fotos",
+        pantalla: "fotos"
+    });
+}
+
+    if (esSi(config.mostrar_ranking_historico)) {
+        opciones.push({
+            icono: "📈",
+            texto: "Ranking histórico",
+            pantalla: "ranking"
+        });
+    }
+
+    if (esSi(config.mostrar_estadisticas)) {
+        opciones.push({
+            icono: "📊",
+            texto: "Estadísticas",
+            href: "estadisticas.html"
+        });
+    }
+
+    contenido.innerHTML = `
+        <h2>☰ Más</h2>
+        ${pintarListaOpcionesMas(opciones)}
+    `;
+}
+
+/* =========================================================
+   ESTADO DE LA COMPETICIÓN
+========================================================= */
+
+function obtenerEstadoCompeticion() {
+    const fase = obtenerFaseActualCompeticion();
+
+    if (fase === "cruces") {
+        return obtenerEstadoCruces();
+    }
+
+    if (fase === "palas") {
+        return obtenerEstadoPalas();
+    }
+
+    const partidos = quitarDescansos(obtenerPartidosFase(fase));
+
+    if (!partidos.length) {
+        return {
+            titulo: `⏳ ${nombreFase(fase)} pendiente`,
+            texto: "Todavía no hay partidos generados",
+            porcentaje: 0,
+            claseBarra: "barraLiguilla",
+            finalizado: false
+        };
+    }
+
+    const pendientesTotales = partidos.filter(partidoPendiente).length;
+
+    if (pendientesTotales === 0) {
+    const jornada =
+        obtenerJornadaActual(partidos);
+
+    const partidosJornada =
+        partidos.filter(
+            partido =>
+                Number(partido.jornada) ===
+                Number(jornada)
+        );
+
+    return {
+        titulo:
+            `✅ ${nombreFase(fase)} · Jornada ${jornada} finalizada`,
+
+        texto:
+            `${partidosJornada.length} de ` +
+            `${partidosJornada.length} partidos · ` +
+            `Siguiente jornada pendiente de generar`,
+
+        porcentaje: 100,
+        claseBarra: "barraLiguilla",
+        finalizado: false
+    };
+}
+
+    const jornada = obtenerJornadaActual(partidos);
+    const partidosJornada = partidos.filter(
+        partido => Number(partido.jornada) === Number(jornada)
+    );
+    const jugados = partidosJornada.filter(partidoFinalizado).length;
+    const porcentaje = partidosJornada.length
+        ? Math.round(jugados / partidosJornada.length * 100)
+        : 0;
+
+    return {
+        titulo: `🟢 ${nombreFase(fase)} · Jornada ${jornada}`,
+        texto: `${jugados} de ${partidosJornada.length} partidos de la jornada · ${porcentaje}%`,
+        porcentaje,
+        claseBarra: "barraLiguilla",
+        finalizado: false
+    };
+}
+
+function obtenerEstadoCruces() {
+    const cruces = datos.cruces || [];
+    const finalizado = cruces.length > 0 && cruces.every(partidoFinalizado);
+
+    if (finalizado) {
+        const final = cruces.find(partido => normalizar(partido.fase) === "FINAL");
+        return {
+            titulo: "🏆 Campeonato finalizado",
+            texto: final?.ganador
+                ? `🥇 Campeones: ${final.ganador}`
+                : "¡Tenemos campeones!",
+            porcentaje: 100,
+            claseBarra: "barraFinalizado",
+            finalizado: true
+        };
+    }
+
+    const fase = obtenerFaseActualCruces(cruces);
+    const partidosFase = cruces.filter(partido => partido.fase === fase);
+    const jugados = partidosFase.filter(partidoFinalizado).length;
+    const porcentaje = partidosFase.length
+        ? Math.round(jugados / partidosFase.length * 100)
+        : 0;
+
+    return {
+        titulo: tituloFase(fase),
+        texto: `${jugados} de ${partidosFase.length} partidos`,
+        porcentaje,
+        claseBarra: claseBarraFase(fase),
+        finalizado: false
+    };
+}
+
+function obtenerEstadoPalas() {
+    const partidos = obtenerPartidosFase("palas");
+    const jugados = partidos.filter(partidoFinalizado).length;
+    const porcentaje = partidos.length ? Math.round(jugados / partidos.length * 100) : 0;
+
+    return {
+        titulo: "🏖️ Copa Palas Playa",
+        texto: `${jugados} de ${partidos.length} partidos`,
+        porcentaje,
+        claseBarra: "barraLiguilla",
+        finalizado: false
+    };
+}
+
+/* =========================================================
+   MODELO DE DATOS Y FASES
+========================================================= */
+
+function obtenerConfiguracion() {
+    return datos?.configuracion || {};
+}
+
+function obtenerEstadoTorneo() {
+    const config = obtenerConfiguracion();
+    const valor = config.estado_torneo || config.estado || "En juego";
+
+    return normalizar(valor)
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ");
+}
+
+function esEstadoPretorneo() {
+    return obtenerEstadoTorneo() === "PRETORNEO";
+}
+
+function esEstadoInscripciones() {
+    return obtenerEstadoTorneo().includes("INSCRIP");
+}
+
+function esWebPrevia() {
+    return esEstadoPretorneo() || esEstadoInscripciones();
+}
+
+function obtenerLugarCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.lugar_campeonato ||
+        config.localidad ||
+        config.lugar ||
+        "Tui"
+    ).trim();
+}
+
+function obtenerHorarioCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.horario_campeonato ||
+        config.horario ||
+        ""
+    ).trim();
+}
+
+function obtenerFechaHoraInicioCampeonato() {
+    const fechaTexto = String(
+        obtenerFechaCampeonato() || ""
+    ).trim();
+
+    const horarioTexto = String(
+        obtenerHorarioCampeonato() || ""
+    ).trim();
+
+    let dia;
+    let mes;
+    let anio;
+
+    let coincidencia = fechaTexto.match(
+        /^(\d{4})-(\d{2})-(\d{2})/
+    );
+
+    if (coincidencia) {
+        anio = Number(coincidencia[1]);
+        mes = Number(coincidencia[2]);
+        dia = Number(coincidencia[3]);
+    } else {
+        coincidencia = fechaTexto.match(
+            /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/
+        );
+
+        if (coincidencia) {
+            dia = Number(coincidencia[1]);
+            mes = Number(coincidencia[2]);
+            anio = Number(coincidencia[3]);
+        }
+    }
+
+    if (!dia || !mes || !anio) {
+        return null;
+    }
+
+    const coincidenciaHora = horarioTexto.match(
+        /(\d{1,2})[:.](\d{2})/
+    );
+
+    const hora = coincidenciaHora
+        ? Number(coincidenciaHora[1])
+        : 0;
+
+    const minutos = coincidenciaHora
+        ? Number(coincidenciaHora[2])
+        : 0;
+
+    const fechaInicio = new Date(
+        anio,
+        mes - 1,
+        dia,
+        hora,
+        minutos,
+        0,
+        0
+    );
+
+    return Number.isNaN(fechaInicio.getTime())
+        ? null
+        : fechaInicio;
+}
+
+function iniciarCuentaAtrasCampeonato() {
+    detenerCuentaAtrasCampeonato();
+
+    const contenedor =
+        document.querySelector(".actualizacion");
+
+    if (!contenedor) return;
+
+    contenedor.classList.add("cuentaAtras");
+
+    const actualizar = () => {
+        const fechaInicio =
+            obtenerFechaHoraInicioCampeonato();
+
+        if (!fechaInicio) {
+            contenedor.innerHTML = `
+                <span class="cuentaAtrasMensaje">
+                    📅 Fecha y horario pendientes de confirmar
+                </span>
+            `;
+            return;
+        }
+
+        const diferencia =
+            fechaInicio.getTime() - Date.now();
+
+        if (diferencia <= 0) {
+            contenedor.innerHTML = `
+                <span class="cuentaAtrasMensaje">
+                    🎾 El campeonato ya ha comenzado
+                </span>
+            `;
+            return;
+        }
+
+        const totalMinutos = Math.floor(
+            diferencia / 60000
+        );
+
+        const dias = Math.floor(
+            totalMinutos / 1440
+        );
+
+        const horas = Math.floor(
+            (totalMinutos % 1440) / 60
+        );
+
+        const minutos = totalMinutos % 60;
+
+        contenedor.innerHTML = `
+            <span class="cuentaAtrasTitulo">
+                ⏳ Faltan para el inicio
+            </span>
+
+            <div class="cuentaAtrasValores">
+                <div>
+                    <strong>${dias}</strong>
+                    <small>días</small>
+                </div>
+
+                <div>
+                    <strong>${horas}</strong>
+                    <small>horas</small>
+                </div>
+
+                <div>
+                    <strong>${minutos}</strong>
+                    <small>min</small>
+                </div>
+            </div>
+        `;
+    };
+
+    actualizar();
+
+    temporizadorCuentaAtras = setInterval(
+        actualizar,
+        30000
+    );
+}
+
+function detenerCuentaAtrasCampeonato() {
+    if (temporizadorCuentaAtras) {
+        clearInterval(temporizadorCuentaAtras);
+        temporizadorCuentaAtras = null;
+    }
+}
+
+function restaurarBloqueActualizacionCompeticion() {
+    const contenedor =
+        document.querySelector(".actualizacion");
+
+    if (!contenedor) return;
+
+    contenedor.classList.remove("cuentaAtras");
+
+    contenedor.innerHTML = `
+        <span>🕒 Última actualización:</span>
+        <strong id="ultimaActualizacion">--</strong>
+    `;
+}
+function obtenerFechaCampeonato() {
+    const config = obtenerConfiguracion();
+
+    return config.fecha_campeonato || config.fecha || "";
+}
+
+function formatearFechaCampeonato() {
+    const valor = String(obtenerFechaCampeonato() || "").trim();
+
+    if (!valor) {
+        return "Fecha pendiente de confirmar";
+    }
+
+    let fecha = null;
+    let coincidencia = valor.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (coincidencia) {
+        fecha = new Date(
+            Number(coincidencia[1]),
+            Number(coincidencia[2]) - 1,
+            Number(coincidencia[3])
+        );
+    } else {
+        coincidencia = valor.match(
+            /^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/
+        );
+
+        if (coincidencia) {
+            fecha = new Date(
+                Number(coincidencia[3]),
+                Number(coincidencia[2]) - 1,
+                Number(coincidencia[1])
+            );
+        }
+    }
+
+    if (!fecha || Number.isNaN(fecha.getTime())) {
+        return valor;
+    }
+
+    const texto = fecha.toLocaleDateString("es-ES", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+function obtenerURLInscripcion() {
+    const config = obtenerConfiguracion();
+
+    return String(
+        config.url_inscripcion ||
+        config.url_inscripciones ||
+        config.enlace_inscripcion ||
+        config.formulario_inscripcion ||
+        ""
+    ).trim();
+}
+
+function esModoGrupos() {
+    const config = obtenerConfiguracion();
+    const tipoCampeonato = normalizar(config.tipo_campeonato);
+
+    // Si el JSON indica expresamente el tipo de campeonato,
+    // ese valor es el que manda.
+    if (tipoCampeonato) {
+        return tipoCampeonato === "GRUPOS";
+    }
+
+    // Compatibilidad con JSON antiguos que no tuvieran
+    // el campo tipo_campeonato.
+    const hayClasificacionGrupos =
+        (datos?.grupos?.clasificaciones || []).length > 0;
+
+    const hayPartidosGrupos =
+        (datos?.grupos?.partidos || []).length > 0;
+
+    return hayClasificacionGrupos || hayPartidosGrupos;
+}
+
+function obtenerFasesCompeticionDisponibles() {
+    const fases = [];
+    const config = obtenerConfiguracion();
+
+    if (esModoGrupos()) {
+        fases.push({ clave: "grupos", nombre: "Grupos", icono: "📊" });
+
+        if (config.hay_regrupos) {
+            fases.push({ clave: "regrupos", nombre: "ReGrupos", icono: "🔁" });
+        }
+    } else {
+        fases.push({ clave: "liguilla", nombre: "Clasificación", icono: "📊" });
+    }
+
+    if ((datos.cruces || []).length || debeMostrarCrucesPendientes()) {
+        fases.push({ clave: "cruces", nombre: "Eliminatorias", icono: "⚔️" });
+    }
+
+    if ((datos.palas_playa || []).length) {
+        fases.push({ clave: "palas", nombre: "Palas", icono: "🏖️" });
+    }
+
+    return fases;
+}
+
+function obtenerFasesPartidosDisponibles() {
+    return obtenerFasesCompeticionDisponibles().filter(
+        fase => obtenerPartidosFase(fase.clave).length > 0 || ["liguilla", "grupos"].includes(fase.clave)
+    );
+}
+
+function obtenerFaseActualCompeticion() {
+    const cruces = datos?.cruces || [];
+
+    if (esModoGrupos()) {
+        const partidosGrupos = quitarDescansos(obtenerPartidosFase("grupos"));
+        const partidosRegrupos = quitarDescansos(obtenerPartidosFase("regrupos"));
+        const hayRegrupos = partidosRegrupos.length > 0 ||
+            obtenerClasificacionFase("regrupos").length > 0;
+
+        const regruposEmpezados = partidosRegrupos.some(partidoFinalizado);
+
+        if (partidosGrupos.some(partidoPendiente) && !regruposEmpezados) {
+            return "grupos";
+        }
+
+        if (hayRegrupos && partidosRegrupos.some(partidoPendiente)) {
+            return "regrupos";
+        }
+
+        if (cruces.length) {
+            return "cruces";
+        }
+
+        if (hayRegrupos) {
+            return "regrupos";
+        }
+
+        return "grupos";
+    }
+
+    const partidosLiguilla = quitarDescansos(obtenerPartidosFase("liguilla"));
+
+    if (partidosLiguilla.some(partidoPendiente)) {
+        return "liguilla";
+    }
+
+    if (cruces.length) {
+        return "cruces";
+    }
+
+    return "liguilla";
+}
+
+function obtenerFaseActualPartidos() {
+    const faseCompeticion = obtenerFaseActualCompeticion();
+    if (obtenerPartidosFase(faseCompeticion).length) return faseCompeticion;
+
+    if (esModoGrupos()) return "grupos";
+    return "liguilla";
+}
+
+function obtenerClasificacionFase(fase) {
+    if (fase === "liguilla") return datos?.clasificacion || [];
+    if (fase === "grupos") return datos?.grupos?.clasificaciones || [];
+    if (fase === "regrupos") return datos?.regrupos?.clasificaciones || [];
+    return [];
+}
+
+function obtenerPartidosFase(fase) {
+    if (fase === "liguilla") return datos?.partidos || [];
+    if (fase === "grupos") return datos?.grupos?.partidos || [];
+    if (fase === "regrupos") return datos?.regrupos?.partidos || [];
+    if (fase === "cruces") return datos?.cruces || [];
+    if (fase === "palas") {
+        return (datos?.palas_playa || []).flatMap(ronda => ronda.partidos || []);
+    }
+    return [];
+}
+
+function obtenerNombresGrupos(fase) {
+    const desdeClasificacion = obtenerClasificacionFase(fase).map(fila => fila.grupo);
+    const desdePartidos = obtenerPartidosFase(fase).map(partido => partido.grupo);
+    const desdeAsignaciones = obtenerEquiposAsignadosFase(fase).map(equipo => equipo.grupo);
+
+    return [...new Set([
+        ...desdeClasificacion,
+        ...desdePartidos,
+        ...desdeAsignaciones
+    ].filter(Boolean))].sort(ordenarNombreGrupo);
+}
+
+function nombreFase(fase) {
+    const nombres = {
+        liguilla: "Liguilla",
+        grupos: "Grupos",
+        regrupos: "ReGrupos",
+        cruces: "Eliminatorias",
+        palas: "Copa Palas Playa"
+    };
+    return nombres[fase] || fase || "Competición";
+}
+
+/* =========================================================
+   AUXILIARES DE CLASIFICACIÓN
+========================================================= */
+
+function normalizarClasificacion(fila) {
+    return {
+        ...fila,
+        equipo: fila.equipo || "",
+        posicion_actual: numero(fila.posicion ?? fila.posicion_actual),
+        posicion_anterior: numero(fila.posicion_anterior ?? fila.posicion ?? fila.posicion_actual),
+        puntos_totales: numero(fila.puntos ?? fila.puntos_totales),
+        coeficiente: numero(fila.coeficiente),
+        pj: numero(fila.pj),
+        pg: numero(fila.pg),
+        pp: numero(fila.pp),
+        descanso: numero(fila.descanso),
+        sets_ganados: numero(fila.sets_favor ?? fila.sets_ganados),
+        sets_perdidos: numero(fila.sets_contra ?? fila.sets_perdidos),
+        sets_diff: numero(fila.sets_diff),
+        puntos_ganados: numero(fila.juegos_favor ?? fila.puntos_ganados),
+        puntos_perdidos: numero(fila.juegos_contra ?? fila.puntos_perdidos),
+        puntos_diff: numero(fila.juegos_diff ?? fila.puntos_diff)
+    };
+}
+
+function ordenarClasificacionGrupo(filas) {
+    return [...filas].sort((a, b) =>
+        numero(a.posicion ?? a.posicion_actual) - numero(b.posicion ?? b.posicion_actual)
+    );
+}
+
+function mostrarCoeficiente() {
+    return !esModoGrupos() && datos.modo_orden === "Opción C";
+}
+
+function obtenerMovimiento(equipo) {
+    const actual = numero(equipo.posicion_actual);
+    const anterior = numero(equipo.posicion_anterior || actual);
+    const diferencia = anterior - actual;
+
+    if (diferencia > 0) return { texto: `▲ ${diferencia}`, clase: "sube" };
+    if (diferencia < 0) return { texto: `▼ ${Math.abs(diferencia)}`, clase: "baja" };
+    return { texto: "—", clase: "igual" };
+}
+
+function obtenerEtiquetaLiguilla(equipo) {
+    const posicion = numero(equipo.posicion_actual);
+    const total = (datos.clasificacion || []).length;
+
+    if (posicion === 1) return "⭐ Líder";
+    if (posicion === 2) return "🥈 Al acecho";
+    if (posicion === 3) return "🥉 Podio";
+    if (posicion >= 4 && posicion <= 8) return "⚔️ Playoff";
+    if (posicion === total) return "🥄 Farolillo";
+    return "🚣 A remar";
+}
+
+function obtenerEtiquetaGrupo(equipo, fase, totalEquipos) {
+    if (!hayPartidosJugadosEnGrupo(fase, equipo.grupo)) {
+        return "👥 Equipo asignado";
+    }
+
+    const config = obtenerConfiguracion();
+    const posicion = numero(equipo.posicion_actual);
+
+    if (posicion === 1) return "⭐ Líder del grupo";
+
+    if (fase === "grupos" && config.hay_regrupos) {
+        const pasan = numero(config.equipos_pasan_a_regrupos);
+        if (pasan > 0 && posicion <= pasan) return "🔁 Pasa a ReGrupos";
+    }
+
+    if (fase === "regrupos" || !config.hay_regrupos) {
+        const pasan = numero(config.equipos_pasan_a_cruces_por_grupo);
+        if (pasan > 0 && posicion <= pasan) return "⚔️ Pasa a eliminatorias";
+    }
+
+    if (posicion === totalEquipos) return "🥄 Farolillo del grupo";
+    return "🎾 En competición";
+}
+
+function textoModoOrden(modo) {
+    if (modo === "Opción A") return "Rendimiento proporcional";
+    if (modo === "Opción B") return "Constancia y participación";
+    if (modo === "Opción C") return "Eficacia real";
+    return modo || "Sistema no definido";
+}
+
+/* =========================================================
+   INFORMACIÓN DEL SISTEMA DE CLASIFICACIÓN
+========================================================= */
+
+function mostrarInfoOrden() {
+    const info = obtenerInfoOrden(datos.modo_orden);
+    const overlay = document.createElement("div");
+
+    overlay.className = "overlayInfo";
+    overlay.id = "overlayInfoOrden";
+    overlay.innerHTML = `
+        <div class="globoInfo">
+            <button id="cerrarInfoOrden" class="cerrarInfo" type="button">×</button>
+            <h3>${escaparHTML(info.titulo)}</h3>
+            <p>${info.descripcion}</p>
+            <div class="ejemploInfo">${info.ejemplo}</div>
+            <h4>Orden de criterios</h4>
+            <ol>${info.criterios.map(criterio => `<li>${escaparHTML(criterio)}</li>`).join("")}</ol>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+}
+
+function cerrarInfoOrden() {
+    document.getElementById("overlayInfoOrden")?.remove();
+}
+
+function obtenerInfoOrden(modo) {
+    if (modo === "Opción A") {
+        return {
+            titulo: "Opción A · Rendimiento proporcional",
+            descripcion: "Prioriza los puntos totales y usa el coeficiente para compensar descansos.",
+            ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 12 pts / 7 PJ = 1,71<br><strong>A va por delante.</strong>",
+            criterios: [
+                "Puntos totales", "Coeficiente", "Diferencia de sets", "Sets ganados",
+                "Diferencia de juegos", "Juegos ganados", "Partidos jugados", "Sorteo"
+            ]
+        };
+    }
+
+    if (modo === "Opción B") {
+        return {
+            titulo: "Opción B · Constancia y participación",
+            descripcion: "Premia a quien suma los mismos puntos jugando más partidos.",
+            ejemplo: "A: 12 pts / 6 PJ<br>B: 12 pts / 7 PJ<br><strong>B va por delante.</strong>",
+            criterios: [
+                "Puntos totales", "Partidos jugados", "Diferencia de sets",
+                "Sets ganados", "Diferencia de juegos", "Juegos ganados", "Sorteo"
+            ]
+        };
+    }
+
+    return {
+        titulo: "Opción C · Eficacia real",
+        descripcion: "Ordena principalmente por rendimiento por partido.",
+        ejemplo: "A: 12 pts / 6 PJ = 2,00<br>B: 11 pts / 5 PJ = 2,20<br><strong>B va por delante.</strong>",
+        criterios: [
+            "Coeficiente", "Puntos totales", "Diferencia de sets", "Sets ganados",
+            "Diferencia de juegos", "Juegos ganados", "Partidos jugados", "Sorteo"
+        ]
+    };
+}
+
+/* =========================================================
+   AUXILIARES DE PARTIDOS
+========================================================= */
+
+function obtenerJornadaActual(partidos) {
+    const jornadas = [...new Set(
+        partidos.map(partido => Number(partido.jornada)).filter(Number.isFinite)
+    )].sort((a, b) => a - b);
+
+    for (const jornada of jornadas) {
+        const partidosJornada = partidos.filter(
+            partido => Number(partido.jornada) === jornada
+        );
+        if (partidosJornada.some(partidoPendiente)) return jornada;
+    }
+
+    return jornadas[jornadas.length - 1] || 1;
+}
+
+function partidoFinalizado(partido) {
+    return ["JUGADO", "FINALIZADO"].includes(normalizar(partido?.estado));
+}
+
+function partidoEsDescanso(partido) {
+    return normalizar(partido?.estado) === "DESCANSO" ||
+        ["SI", "SÍ"].includes(normalizar(partido?.descanso));
+}
+
+function partidoPendiente(partido) {
+    return !partidoEsDescanso(partido) && !partidoFinalizado(partido);
+}
+
+function quitarDescansos(partidos) {
+    return (partidos || []).filter(partido => !partidoEsDescanso(partido));
+}
+
+function ordenarPartidos(partidos) {
+    return [...(partidos || [])].sort((a, b) =>
+        numero(a.orden ?? a.id) - numero(b.orden ?? b.id)
+    );
+}
+
+function dividirEquipo(nombre) {
+    return String(nombre || "")
+        .split("/")
+        .map(jugador => jugador.trim())
+        .filter(Boolean);
+}
+
+function obtenerSets(resultado) {
+    const sets = [
+        { local: "-", visitante: "-" },
+        { local: "-", visitante: "-" },
+        { local: "-", visitante: "-" }
+    ];
+
+    if (!Array.isArray(resultado)) return sets;
+
+    resultado.slice(0, 3).forEach((set, indice) => {
+        const partes = String(set).split("-");
+        sets[indice].local = partes[0] || "-";
+        sets[indice].visitante = partes[1] || "-";
+    });
+
+    return sets;
+}
+
+/* =========================================================
+   AUXILIARES GENERALES
+========================================================= */
+
+function obtenerContenidoDetalle() {
+    return document.getElementById("contenidoDetalle");
+}
+
+function agruparPor(lista, obtenerClave) {
+    const mapa = new Map();
+
+    (lista || []).forEach(elemento => {
+        const clave = obtenerClave(elemento) || "Sin grupo";
+        if (!mapa.has(clave)) mapa.set(clave, []);
+        mapa.get(clave).push(elemento);
+    });
+
+    return mapa;
+}
+
+function nombreGrupoVisible(grupo) {
+    const texto = String(grupo || "").trim();
+    if (!texto) return "Sin grupo";
+    if (/^grupo/i.test(texto) || /^regrupo/i.test(texto)) return texto;
+    return `Grupo ${texto}`;
+}
+
+function ordenarNombreGrupo(a, b) {
+    return String(a).localeCompare(String(b), "es", {
+        numeric: true,
+        sensitivity: "base"
+    });
+}
+
+function mismoEquipoPorIDsONombre(a, b) {
+    const idsValidas = a.id_jug1 && a.id_jug2 && b.id_jug1 && b.id_jug2;
+    if (idsValidas) {
+        return a.id_jug1 === b.id_jug1 && a.id_jug2 === b.id_jug2;
+    }
+    return normalizar(a.equipo) === normalizar(b.equipo);
+}
+
+function tituloFase(fase) {
+    const f = normalizar(fase).toLowerCase();
+    if (f.includes("octavo")) return "🔵 Octavos de final";
+    if (f.includes("cuarto")) return "🟠 Cuartos de final";
+    if (f.includes("semi")) return "🟣 Semifinales";
+    if (f.includes("final")) return "🟡 Gran Final";
+    return `🟠 ${fase}`;
+}
+
+function tituloFaseSinIcono(fase) {
+    const f = normalizar(fase).toLowerCase();
+    if (f.includes("octavo")) return "Octavos de final";
+    if (f.includes("cuarto")) return "Cuartos de final";
+    if (f.includes("semi")) return "Semifinales";
+    if (f.includes("final")) return "Gran Final";
+    return fase || "Eliminatorias";
+}
+
+function claseBarraFase(fase) {
+    const f = normalizar(fase).toLowerCase();
+    if (f.includes("semi")) return "barraSemis";
+    if (f.includes("final")) return "barraFinal";
+    return "barraCuartos";
+}
+
+function formatoDiff(valor) {
+    const n = numero(valor);
+    return n > 0 ? `+${n}` : String(n);
+}
+
+function numero(valor) {
+    const n = Number(valor);
+    return Number.isFinite(n) ? n : 0;
+}
+
+function normalizar(texto) {
+    return String(texto || "").trim().toUpperCase();
+}
+
+function esSi(valor) {
+    return ["SI", "SÍ", "TRUE", "1"].includes(normalizar(valor));
+}
+
+function textoSiNoPendiente(valor) {
+
+    const texto = normalizar(valor);
+
+    if (
+        valor === true ||
+        ["SI", "SÍ", "TRUE", "1"].includes(texto)
+    ) {
+        return "Sí";
+    }
+
+    if (
+        valor === false ||
+        ["NO", "FALSE", "0"].includes(texto)
+    ) {
+        return "No";
+    }
+
+    /*
+       Incluye:
+       "-"
+       null
+       undefined
+       vacío
+       "Pendiente"
+    */
+
+    return "Pendiente de confirmar";
+}
+
+
+function escaparHTML(valor) {
+    return String(valor ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function escaparAtributo(valor) {
+    return escaparHTML(valor);
+}
+
+function setHTML(id, html) {
+    const elemento = document.getElementById(id);
+    if (elemento) elemento.innerHTML = html;
+}
+
+function setText(id, texto) {
+    const elemento = document.getElementById(id);
+    if (elemento) elemento.textContent = texto;
+}
+
+function pintarTarjetaVacia(titulo, texto) {
+    return `
+        <section class="tarjetaVacia">
+            <h3>${escaparHTML(titulo)}</h3>
+            <p>${escaparHTML(texto)}</p>
+        </section>
+    `;
+}
+
+function pintarVacioInline(texto) {
+    return `<div class="equipoPodio"><span>⏳ ${escaparHTML(texto)}</span></div>`;
+}
+
+function pintarErrorCarga() {
+    setText("estadoCabecera", "🔴 Error de carga");
+    setText("textoProgreso", "No se pudo leer el estado del torneo");
+    setHTML(
+        "podio",
+        pintarVacioInline("Comprueba la conexión y vuelve a abrir la página")
+    );
+}

@@ -1,0 +1,150 @@
+name: Sincronizar partidos y sets con Supabase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/estado_torneo.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-supabase-partidos
+  cancel-in-progress: false
+
+jobs:
+  sync-partidos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v5
+
+      - name: Preparar sincronización
+        id: preparar
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "ready=false" >> "$GITHUB_OUTPUT"
+          test -f docs/estado_torneo.json
+          jq -e '.configuracion | type == "object"' docs/estado_torneo.json > /dev/null
+
+          if ! jq -e '.configuracion.codigo_campeonato | type == "string" and length > 0' docs/estado_torneo.json > /dev/null 2>&1; then
+            echo "estado_torneo.json todavía no contiene codigo_campeonato. Es la subida preliminar de Excel; se omite esta ejecución sin marcar error."
+            exit 0
+          fi
+
+          echo "Campeonato: $(jq -r '.configuracion.codigo_campeonato' docs/estado_torneo.json)"
+          echo "Estado: $(jq -r '.configuracion.estado_torneo // ""' docs/estado_torneo.json)"
+          echo "Clasificaciones Grupos: $(jq '.grupos.clasificaciones // [] | length' docs/estado_torneo.json)"
+          echo "Clasificaciones ReGrupos: $(jq '.regrupos.clasificaciones // [] | length' docs/estado_torneo.json)"
+          echo "Partidos Liguilla: $(jq '.partidos // [] | length' docs/estado_torneo.json)"
+          echo "Partidos Grupos: $(jq '.grupos.partidos // [] | length' docs/estado_torneo.json)"
+          echo "Partidos ReGrupos: $(jq '.regrupos.partidos // [] | length' docs/estado_torneo.json)"
+          echo "Cruces: $(jq '.cruces // [] | length' docs/estado_torneo.json)"
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+
+      - name: Sincronizar clasificaciones con Supabase
+        if: steps.preparar.outputs.ready == 'true'
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload docs/estado_torneo.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_clasificaciones_body.json
+
+          # Fases y grupos se sincronizan en otra Action disparada por el
+          # mismo estado_torneo.json. Si coinciden en el tiempo, reintentamos
+          # unos segundos antes de considerar la clasificación fallida.
+          for INTENTO in 1 2 3 4 5; do
+            HTTP_CODE=$(curl --silent --show-error \
+              --output /tmp/supabase_clasificaciones_response.json \
+              --write-out '%{http_code}' \
+              --request POST \
+              --header "apikey: ${SUPABASE_SECRET_KEY}" \
+              --header 'Content-Type: application/json' \
+              --data-binary @/tmp/supabase_clasificaciones_body.json \
+              "${SUPABASE_URL%/}/rest/v1/rpc/sync_clasificaciones_excel")
+
+            if [[ "${HTTP_CODE}" -ge 200 && "${HTTP_CODE}" -lt 300 ]] \
+               && jq -e '.ok == true' /tmp/supabase_clasificaciones_response.json > /dev/null 2>&1; then
+              echo "HTTP ${HTTP_CODE}"
+              cat /tmp/supabase_clasificaciones_response.json
+              echo
+              echo "Clasificaciones Grupos procesadas: $(jq -r '.clasificaciones_grupos // 0' /tmp/supabase_clasificaciones_response.json)"
+              echo "Clasificaciones ReGrupos procesadas: $(jq -r '.clasificaciones_regrupos // 0' /tmp/supabase_clasificaciones_response.json)"
+              echo "Clasificaciones sincronizadas correctamente."
+              break
+            fi
+
+            echo "Intento ${INTENTO}/5: HTTP ${HTTP_CODE}"
+            cat /tmp/supabase_clasificaciones_response.json || true
+            echo
+
+            if [[ "${INTENTO}" -eq 5 ]]; then
+              echo "La sincronización de clasificaciones ha fallado tras 5 intentos."
+              exit 1
+            fi
+
+            sleep 3
+          done
+
+      - name: Sincronizar partidos y sets con Supabase
+        if: steps.preparar.outputs.ready == 'true'
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_SECRET_KEY:-}" ]; then
+            echo "Faltan SUPABASE_URL o SUPABASE_SECRET_KEY en GitHub Secrets."
+            exit 1
+          fi
+
+          jq -n \
+            --slurpfile payload docs/estado_torneo.json \
+            '{p_payload: $payload[0]}' \
+            > /tmp/supabase_body.json
+
+          HTTP_CODE=$(curl --silent --show-error \
+            --output /tmp/supabase_response.json \
+            --write-out '%{http_code}' \
+            --request POST \
+            --header "apikey: ${SUPABASE_SECRET_KEY}" \
+            --header 'Content-Type: application/json' \
+            --data-binary @/tmp/supabase_body.json \
+            "${SUPABASE_URL%/}/rest/v1/rpc/sync_partidos_sets_excel")
+
+          echo "HTTP ${HTTP_CODE}"
+          cat /tmp/supabase_response.json
+          echo
+
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "La sincronización de partidos y sets con Supabase ha fallado."
+            exit 1
+          fi
+
+          jq -e '.ok == true' /tmp/supabase_response.json > /dev/null
+
+          echo "Partidos recibidos: $(jq -r '.partidos_recibidos // 0' /tmp/supabase_response.json)"
+          echo "Partidos procesados: $(jq -r '.partidos_procesados // 0' /tmp/supabase_response.json)"
+          echo "Sets procesados: $(jq -r '.sets_procesados // 0' /tmp/supabase_response.json)"
+          echo "Participantes procesados: $(jq -r '.participantes_procesados // 0' /tmp/supabase_response.json)"
+          echo "Arrastrados procesados: $(jq -r '.arrastrados_procesados // 0' /tmp/supabase_response.json)"
+          echo "Partidos y sets sincronizados correctamente."
