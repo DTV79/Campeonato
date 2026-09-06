@@ -129,10 +129,10 @@ if (
 ========================================================= */
 
 async function cargarConfiguracionDesdeSupabase(datosJSON) {
-    const codigo = String(
-        datosJSON?.configuracion?.codigo_campeonato ||
-        CODIGO_CAMPEONATO_ACTIVO
+    const codigoRespaldo = String(
+        datosJSON?.configuracion?.codigo_campeonato || CODIGO_CAMPEONATO_ACTIVO
     ).trim();
+    const codigo = await obtenerCodigoCampeonatoActivo(codigoRespaldo);
 
     if (!codigo) return datosJSON;
 
@@ -169,11 +169,22 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
             throw new Error("Respuesta de configuración no válida");
         }
 
-        return {
+        const cambiaEdicion = codigo !== codigoRespaldo;
+        const base = cambiaEdicion ? {
             ...datosJSON,
+            clasificacion: [],
+            partidos: [],
+            cruces: [],
+            grupos: { ...(datosJSON.grupos || {}), clasificaciones: [], partidos: [] },
+            regrupos: { ...(datosJSON.regrupos || {}), clasificaciones: [], partidos: [] }
+        } : datosJSON;
+
+        return {
+            ...base,
             configuracion: {
-                ...(datosJSON.configuracion || {}),
-                ...remoto
+                ...(base.configuracion || {}),
+                ...remoto,
+                codigo_campeonato: codigo
             },
             fuente_configuracion: "supabase"
         };
@@ -185,6 +196,29 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
         return datosJSON;
     } finally {
         clearTimeout(temporizador);
+    }
+}
+
+async function obtenerCodigoCampeonatoActivo(codigoRespaldo) {
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_campeonato_activo`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+        if (!respuesta.ok) throw new Error(`Supabase HTTP ${respuesta.status}`);
+        const activo = await respuesta.json();
+        return String(activo?.codigo_campeonato || codigoRespaldo).trim();
+    } catch (error) {
+        console.warn("No se pudo obtener el campeonato activo; se usa el respaldo.", error);
+        return codigoRespaldo;
     }
 }
 
