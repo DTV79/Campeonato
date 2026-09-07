@@ -108,6 +108,18 @@ async function iniciarApp() {
         datos = await cargarConfiguracionDesdeSupabase(datos);
         datos = await cargarCompeticionDesdeSupabase(datos);
 
+        /*
+           Avisamos a los módulos complementarios cuando ya se ha
+           resuelto el estado definitivo del campeonato. De este modo,
+           finalizado.js no toma una decisión usando todavía el valor
+           provisional de estado_torneo.json mientras Supabase termina
+           de responder.
+        */
+        window.__sprintPadelDatosListos = true;
+        window.dispatchEvent(
+            new CustomEvent("sprintpadel:datos-listos")
+        );
+
 /*
    Antes de preparar ninguna pantalla, comprobamos
    si la web está en mantenimiento y si este navegador
@@ -5577,7 +5589,11 @@ function obtenerEstadoCompeticion() {
 
 function obtenerEstadoCruces() {
     const cruces = datos.cruces || [];
-    const finalizado = cruces.length > 0 && cruces.every(partidoFinalizado);
+    const estadoMarcadoFinalizado = obtenerEstadoTorneo().includes("FINALIZ");
+    const finalizado =
+        estadoMarcadoFinalizado &&
+        cruces.length > 0 &&
+        cruces.every(partidoFinalizado);
 
     if (finalizado) {
         const final = cruces.find(partido => normalizar(partido.fase) === "FINAL");
@@ -5632,7 +5648,12 @@ function obtenerConfiguracion() {
 
 function obtenerEstadoTorneo() {
     const config = obtenerConfiguracion();
-    const valor = config.estado_torneo || config.estado || "En juego";
+    /*
+       Supabase y el panel de administración utilizan actualmente
+       "estado". "estado_torneo" se conserva como respaldo para los
+       JSON antiguos exportados desde Excel.
+    */
+    const valor = config.estado || config.estado_torneo || "En juego";
 
     return normalizar(valor)
         .replaceAll("_", " ")
