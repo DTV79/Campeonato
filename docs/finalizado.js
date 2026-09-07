@@ -12,10 +12,19 @@
     const CLAVE_CONFETI = "sprintPadelConfetiFinal";
     let funcionesEnvuelta = false;
 
+    window.addEventListener(
+        "sprintpadel:datos-listos",
+        instalarPortadaFinalizada
+    );
+
     esperarDatos();
 
     function esperarDatos(intentos = 0) {
-        if (typeof datos !== "undefined" && datos) {
+        if (
+            window.__sprintPadelDatosListos &&
+            typeof datos !== "undefined" &&
+            datos
+        ) {
             instalarPortadaFinalizada();
             return;
         }
@@ -39,8 +48,8 @@
     function esCampeonatoFinalizado() {
         const config = datos?.configuracion || {};
         const estado =
-            config.estado_torneo ||
             config.estado ||
+            config.estado_torneo ||
             datos?.estado_torneo ||
             "";
 
@@ -740,8 +749,8 @@
     function esFinalizado() {
         const config = datos?.configuracion || {};
         const estado =
-            config.estado_torneo ||
             config.estado ||
+            config.estado_torneo ||
             datos?.estado_torneo ||
             "";
 
