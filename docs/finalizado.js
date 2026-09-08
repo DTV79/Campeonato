@@ -491,7 +491,10 @@
             tarjetaCruces.removeAttribute("aria-disabled");
         }
 
-        const hayPalas = Array.isArray(datos?.palas_playa) && datos.palas_playa.length > 0;
+        const hayPalas = Array.isArray(datos?.palas_playa) &&
+            datos.palas_playa.some(ronda =>
+                Array.isArray(ronda?.partidos) && ronda.partidos.length > 0
+            );
 
         if (tarjetaPalas && hayPalas) {
             configurarTarjeta(
@@ -1180,8 +1183,13 @@
     function obtenerUltimoEquipoPalas() {
         const config = datos?.configuracion || {};
         const valorCopa = config.hay_copa_palas_playa;
+        const hayPartidos = Array.isArray(datos?.palas_playa) &&
+            datos.palas_playa.some(ronda =>
+                Array.isArray(ronda?.partidos) && ronda.partidos.length > 0
+            );
         const hayCopa = valorCopa === true ||
-            normalizarV2(valorCopa) === "SI";
+            normalizarV2(valorCopa) === "SI" ||
+            hayPartidos;
 
         if (!hayCopa || !Array.isArray(datos?.palas_playa)) return "";
 
