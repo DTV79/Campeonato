@@ -4269,7 +4269,7 @@ function pintarContenidoCruces() {
         );
     }
 
-    const fases = [...new Set(cruces.map(partido => partido.fase))];
+    const fases = obtenerFasesEliminatoriasOrdenadas(cruces);
     const faseActual = obtenerFaseActualCruces(cruces);
 
     return `
@@ -4303,7 +4303,7 @@ function pintarContenidoCruces() {
 }
 
 function obtenerFaseActualCruces(cruces) {
-    const fases = [...new Set(cruces.map(partido => partido.fase))];
+    const fases = obtenerFasesEliminatoriasOrdenadas(cruces);
 
     for (const fase of fases) {
         if (cruces.filter(partido => partido.fase === fase).some(partidoPendiente)) {
@@ -4312,6 +4312,31 @@ function obtenerFaseActualCruces(cruces) {
     }
 
     return fases[fases.length - 1] || "";
+}
+
+function obtenerFasesEliminatoriasOrdenadas(cruces) {
+    const orden = {
+        "DIECISEISAVOS": 10,
+        "OCTAVOS": 20,
+        "CUARTOS": 30,
+        "CUARTOS DE FINAL": 30,
+        "SEMIFINAL": 40,
+        "SEMIFINALES": 40,
+        "FINAL": 50,
+        "GRAN FINAL": 50
+    };
+
+    return [...new Set(
+        (Array.isArray(cruces) ? cruces : [])
+            .map(partido => partido?.fase)
+            .filter(Boolean)
+    )].sort((faseA, faseB) => {
+        const posicionA = orden[normalizar(faseA)] ?? 999;
+        const posicionB = orden[normalizar(faseB)] ?? 999;
+
+        return posicionA - posicionB ||
+            String(faseA).localeCompare(String(faseB), "es");
+    });
 }
 
 /* =========================================================
