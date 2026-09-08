@@ -184,11 +184,8 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
         const cambiaEdicion = codigo !== codigoRespaldo;
         const gestionAdmin =
             remoto.configuracion_gestionada_admin === true;
-        const edicionEnCurso = !normalizar(
-            remoto.estado || remoto.estado_torneo || ""
-        ).includes("FINALIZ");
         const competicionSupabaseAutoritativa =
-            cambiaEdicion || (gestionAdmin && edicionEnCurso);
+            cambiaEdicion || gestionAdmin;
 
         const base = competicionSupabaseAutoritativa ? {
             ...datosJSON,
@@ -197,12 +194,20 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
             partidos: [],
             cruces: [],
             palas_playa: [],
+            campeon: "",
+            campeones: "",
+            ganador_torneo: "",
+            foto_campeon: "",
+            foto_campeones: "",
             grupos: { ...(datosJSON.grupos || {}), clasificaciones: [], partidos: [] },
             regrupos: { ...(datosJSON.regrupos || {}), clasificaciones: [], partidos: [] }
         } : datosJSON;
 
         return {
             ...base,
+            ultima_actualizacion:
+                remoto.configuracion_gestionada_admin_at ||
+                base.ultima_actualizacion,
             configuracion: {
                 ...(base.configuracion || {}),
                 ...remoto,
@@ -342,9 +347,7 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         );
 
         if (
-            datosJSON?.configuracion?.configuracion_gestionada_admin === true &&
-            !obtenerEstadoTorneoDesdeConfiguracion(datosJSON.configuracion)
-                .includes("FINALIZ")
+            datosJSON?.configuracion?.configuracion_gestionada_admin === true
         ) {
             combinado.equipos = construirEquiposDesdeCompeticion(combinado);
         }
@@ -364,14 +367,6 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
     } finally {
         clearTimeout(temporizador);
     }
-}
-
-function obtenerEstadoTorneoDesdeConfiguracion(config = {}) {
-    return normalizar(
-        config.estado || config.estado_torneo || ""
-    )
-        .replaceAll("_", " ")
-        .replace(/\s+/g, " ");
 }
 
 function construirEquiposDesdeCompeticion(origen) {
@@ -2209,7 +2204,15 @@ async function prepararFotosPortada() {
             await cargarDatosFotos();
 
         const fotos =
-            obtenerFotosVisibles(origen);
+            obtenerFotosVisibles(origen)
+                .filter(fotoPerteneceCampeonatoActual);
+
+        if (!fotos.length) {
+            tarjeta.classList.add("oculto");
+            delete tarjeta.dataset.seccion;
+            ajustarUltimaTarjetaDashboard();
+            return;
+        }
 
         if (resumen) {
             resumen.textContent =
@@ -2291,6 +2294,29 @@ function obtenerFotosVisibles(origen = datosFotos) {
                 foto?.categoria
             ) !== "campeones"
         );
+}
+
+function fotoPerteneceCampeonatoActual(foto) {
+    const config = obtenerConfiguracion();
+    const codigoActual = normalizar(
+        config.codigo_campeonato || ""
+    );
+    const codigoFoto = normalizar(
+        foto?.codigo_campeonato || ""
+    );
+
+    if (codigoActual && codigoFoto) {
+        return codigoActual === codigoFoto;
+    }
+
+    const idActual = normalizar(
+        config.id_campeonato || config.nombre_campeonato || ""
+    );
+    const idFoto = normalizar(
+        foto?.id_campeonato || foto?.nombre_campeonato || ""
+    );
+
+    return Boolean(idActual && idFoto && idActual === idFoto);
 }
 
 function fotoEsDestacada(foto) {
