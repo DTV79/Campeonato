@@ -270,7 +270,7 @@
 
     script.src =
         "nav-pretorneo.js?v=" +
-        encodeURIComponent(version);
+        encodeURIComponent(version) + "-" + Date.now();
 
     document.body.appendChild(script);
 })();
