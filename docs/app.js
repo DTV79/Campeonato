@@ -1827,8 +1827,18 @@ function pintarTarjetaPalas(config) {
 
     const hayCopa =
         config.hay_copa_palas_playa === true ||
-        esSi(config.hay_copa_palas_playa) ||
-        contarPartidosPalas(datos?.palas_playa) > 0;
+        esSi(config.hay_copa_palas_playa);
+
+    /*
+       Este acceso depende siempre del check de Configuración.
+       Si la edición no tiene Copa Palas de Playa, la tarjeta no
+       debe ocupar espacio en la portada aunque existan datos antiguos.
+    */
+    if (!hayCopa) {
+        configurarBloqueoTarjeta(tarjeta, true);
+        tarjeta.classList.add("oculto");
+        return;
+    }
 
     const rondas =
         datos?.palas_playa || [];
@@ -1844,10 +1854,7 @@ function pintarTarjetaPalas(config) {
 
     let resumen;
 
-    if (!hayCopa) {
-        resumen =
-            "No se disputa esta edición";
-    } else if (!hayEquipos) {
+    if (!hayEquipos) {
         resumen =
             "Pendiente de generar";
     } else {
