@@ -195,7 +195,7 @@
         function cargarScript(archivo) {
             return new Promise((resolver, rechazar) => {
                 const script = document.createElement("script");
-                script.src = `${archivo}?v=${version}`;
+                script.src = `${archivo}?v=${version}-${Date.now()}`;
                 script.async = false;
                 script.addEventListener("load", resolver, { once: true });
                 script.addEventListener("error", rechazar, { once: true });
