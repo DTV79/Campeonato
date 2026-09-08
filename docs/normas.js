@@ -4,6 +4,10 @@ const URL_ESTADO_NORMAS =
     "https://dtv79.github.io/Campeonato/estado_torneo.json";
 const URL_REGLAS_NORMAS =
     "https://dtv79.github.io/Campeonato/reglas.json";
+const SUPABASE_URL_NORMAS =
+    "https://imznjbnpecvnoivywnoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY_NORMAS =
+    "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
 
 let datosNormas = null;
 let estadoNormas = null;
@@ -22,7 +26,9 @@ async function iniciarPaginaNormas() {
             cargarJSONNormas(URL_REGLAS_NORMAS)
         ]);
 
-        estadoNormas = estado || {};
+        estadoNormas = await cargarConfiguracionSupabaseNormas(
+            estado || {}
+        );
         datosNormas = reglas || {};
         configNormas = {
             ...(datosNormas.configuracion || {}),
@@ -47,6 +53,72 @@ async function iniciarPaginaNormas() {
     } catch (error) {
         console.error(error);
         pintarErrorNormas();
+    }
+}
+
+async function cargarConfiguracionSupabaseNormas(estadoJSON) {
+    const codigoRespaldo = String(
+        estadoJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    try {
+        const respuestaActivo = await fetch(
+            `${SUPABASE_URL_NORMAS}/rest/v1/rpc/web_campeonato_activo`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_NORMAS,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuestaActivo.ok) {
+            throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
+        }
+
+        const activo = await respuestaActivo.json();
+        const codigo = String(
+            activo?.codigo_campeonato || codigoRespaldo
+        ).trim();
+
+        if (!codigo) return estadoJSON;
+
+        const respuestaConfig = await fetch(
+            `${SUPABASE_URL_NORMAS}/rest/v1/rpc/web_obtener_configuracion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_NORMAS,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ p_codigo: codigo })
+            }
+        );
+
+        if (!respuestaConfig.ok) {
+            throw new Error(`Supabase HTTP ${respuestaConfig.status}`);
+        }
+
+        const remoto = await respuestaConfig.json();
+
+        return {
+            ...estadoJSON,
+            configuracion: {
+                ...(estadoJSON?.configuracion || {}),
+                ...(remoto && typeof remoto === "object" ? remoto : {}),
+                codigo_campeonato: codigo
+            }
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudo cargar la configuración de Normas desde Supabase; se usa el respaldo.",
+            error
+        );
+        return estadoJSON;
     }
 }
 
@@ -688,4 +760,3 @@ function escaparHTML(valor) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
-
