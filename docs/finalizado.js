@@ -506,6 +506,9 @@
             );
             tarjetaPalas.classList.remove("tarjetaBloqueada");
             tarjetaPalas.removeAttribute("aria-disabled");
+        } else if (tarjetaPalas) {
+            tarjetaPalas.classList.add("oculto");
+            delete tarjetaPalas.dataset.seccion;
         }
 
         configurarTarjeta(
@@ -515,6 +518,10 @@
             "Consulta todos los equipos participantes",
             "equipos"
         );
+
+        if (typeof ajustarUltimaTarjetaDashboard === "function") {
+            ajustarUltimaTarjetaDashboard();
+        }
     }
 
     function obtenerTarjetaEquiposFinal() {
@@ -554,6 +561,9 @@
 
     function configurarTarjeta(tarjeta, icono, titulo, resumen, seccion) {
         if (!tarjeta) return;
+
+        tarjeta.classList.remove("oculto", "tarjetaBloqueada");
+        tarjeta.removeAttribute("aria-disabled");
 
         const nodoIcono = tarjeta.querySelector(".iconoAcceso");
         const nodoTitulo = tarjeta.querySelector("h4");
@@ -738,6 +748,7 @@
         sincronizarNavegacionFinal();
         limpiarPantallaMasFinal();
         agregarEquiposPantallaMas();
+        agregarGruposPantallaMas();
 
         const portada = document.getElementById("portadaFinalizada");
         if (!portada) return;
@@ -1269,48 +1280,54 @@
 
     /* =====================================================
        NAVEGACIÓN FINALIZADA
-       Ranking sustituye a Equipos en la barra inferior.
-       Equipos se añade como acceso grande dentro de Más.
+       Inicio · Partidos · Estadísticas · Ranking · Más.
+       Grupos y Equipos quedan disponibles dentro de Más.
     ===================================================== */
 
     function configurarRankingNavegacionFinal() {
-        const config = datos?.configuracion || {};
-        const rankingVisible =
-            config.mostrar_ranking_historico === true ||
-            normalizarV2(
-                config.mostrar_ranking_historico
-            ) === "SI";
+        const botones = [
+            ...document.querySelectorAll(".bottomNav .navBtn")
+        ];
 
-        if (!rankingVisible) return;
+        configurarBotonFinal(botones[0], "🏠", "Inicio", "inicio");
+        configurarBotonFinal(botones[1], "🎾", "Partidos", "partidos");
+        configurarBotonFinal(
+            botones[2],
+            "📊",
+            "Estadísticas",
+            "",
+            "estadisticas.html"
+        );
+        configurarBotonFinal(botones[3], "🏆", "Ranking", "ranking");
+        configurarBotonFinal(botones[4], "☰", "Más", "mas");
 
-        const boton =
-            document.querySelector(
-                '.bottomNav .navBtn[data-pantalla="equipos"]'
-            ) ||
-            document.querySelector(
-                ".bottomNav .navRankingFinal"
-            );
+        botones[3]?.classList.add("navRankingFinal");
+    }
 
+    function configurarBotonFinal(
+        boton,
+        icono,
+        texto,
+        pantalla = "",
+        href = ""
+    ) {
         if (!boton) return;
 
-        boton.classList.add("navRankingFinal");
-        boton.dataset.pantalla = "ranking";
-        boton.setAttribute(
-            "aria-label",
-            "Ranking histórico"
-        );
-        boton.title = "Ranking histórico";
+        boton.classList.remove("oculto", "navRankingFinal");
 
-        const icono = boton.querySelector("span");
-        const texto = boton.querySelector("small");
+        const nodoIcono = boton.querySelector("span");
+        const nodoTexto = boton.querySelector("small");
+        if (nodoIcono) nodoIcono.textContent = icono;
+        if (nodoTexto) nodoTexto.textContent = texto;
 
-        if (icono && icono.textContent !== "🏆") {
-            icono.textContent = "🏆";
-        }
+        if (pantalla) boton.dataset.pantalla = pantalla;
+        else delete boton.dataset.pantalla;
 
-        if (texto && texto.textContent !== "Ranking") {
-            texto.textContent = "Ranking";
-        }
+        if (href) boton.dataset.href = href;
+        else delete boton.dataset.href;
+
+        boton.setAttribute("aria-label", texto);
+        boton.title = texto;
     }
 
     function limpiarPantallaMasFinal() {
@@ -1335,7 +1352,8 @@
 
             if (
                 destino === "RANKING" ||
-                texto.includes("RANKING HISTORICO")
+                texto.includes("RANKING HISTORICO") ||
+                texto.includes("ESTADISTICAS")
             ) {
                 opcion.remove();
                 return;
@@ -1375,6 +1393,39 @@
         boton.innerHTML = `
             <span>👥</span>
             <strong>Equipos</strong>
+        `;
+
+        lista.prepend(boton);
+    }
+
+    function agregarGruposPantallaMas() {
+        if (
+            typeof estadoUI === "undefined" ||
+            estadoUI.pantalla !== "mas"
+        ) {
+            return;
+        }
+
+        const lista = document.querySelector(
+            "#contenidoDetalle .listaOpcionesMas"
+        );
+
+        if (!lista || lista.querySelector("#opcionGruposMasFinal")) {
+            return;
+        }
+
+        const boton = document.createElement("button");
+        boton.id = "opcionGruposMasFinal";
+        boton.className = "opcionMas opcionGruposMasFinal";
+        boton.type = "button";
+        boton.dataset.destinoPantalla = "competicion";
+        boton.dataset.destinoFase =
+            typeof obtenerFaseClasificacionPrincipal === "function"
+                ? obtenerFaseClasificacionPrincipal()
+                : "grupos";
+        boton.innerHTML = `
+            <span>📊</span>
+            <strong>${esModoGruposFinal() ? "Grupos" : "Clasificación"}</strong>
         `;
 
         lista.prepend(boton);
