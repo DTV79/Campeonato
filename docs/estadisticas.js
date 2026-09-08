@@ -1,5 +1,9 @@
 const URL_ESTADO_ESTADISTICAS = "estado_torneo.json";
 const URL_DATOS_ESTADISTICAS = "estadisticas.json";
+const SUPABASE_URL_ESTADISTICAS =
+    "https://imznjbnpecvnoivywnoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS =
+    "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
 const CLAVE_ACCESO_MANTENIMIENTO_ESTADISTICAS =
     "campeonato_acceso_mantenimiento";
 
@@ -203,7 +207,7 @@ async function iniciarPaginaEstadisticas() {
             window.estadoInicialEstadisticas ||
             null;
 
-        const [estado, origenEstadisticas] =
+        const [estadoBase, origenEstadisticas] =
             await Promise.all([
                 estadoInicial || cargarJSONEstadisticas(
                     URL_ESTADO_ESTADISTICAS
@@ -212,6 +216,11 @@ async function iniciarPaginaEstadisticas() {
                     URL_DATOS_ESTADISTICAS
                 )
             ]);
+
+        const estado =
+            await cargarConfiguracionSupabaseEstadisticas(
+                estadoBase || {}
+            );
 
         estadoCampeonato = estado || {};
         estadisticas = origenEstadisticas || {};
@@ -239,6 +248,72 @@ async function iniciarPaginaEstadisticas() {
         document.body.classList.remove(
             "appCargando"
         );
+    }
+}
+
+async function cargarConfiguracionSupabaseEstadisticas(estadoJSON) {
+    const codigoRespaldo = String(
+        estadoJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    try {
+        const respuestaActivo = await fetch(
+            `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_campeonato_activo`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuestaActivo.ok) {
+            throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
+        }
+
+        const activo = await respuestaActivo.json();
+        const codigo = String(
+            activo?.codigo_campeonato || codigoRespaldo
+        ).trim();
+
+        if (!codigo) return estadoJSON;
+
+        const respuestaConfig = await fetch(
+            `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_obtener_configuracion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ p_codigo: codigo })
+            }
+        );
+
+        if (!respuestaConfig.ok) {
+            throw new Error(`Supabase HTTP ${respuestaConfig.status}`);
+        }
+
+        const remoto = await respuestaConfig.json();
+
+        return {
+            ...estadoJSON,
+            configuracion: {
+                ...(estadoJSON?.configuracion || {}),
+                ...(remoto && typeof remoto === "object" ? remoto : {}),
+                codigo_campeonato: codigo
+            }
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudo cargar la configuración de Estadísticas desde Supabase; se usa el respaldo.",
+            error
+        );
+        return estadoJSON;
     }
 }
 
