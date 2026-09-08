@@ -2359,6 +2359,11 @@ function obtenerAnoFoto(valor) {
 
 
 function pintarResumenPortada() {
+    const tarjetaResumen =
+        document.querySelector(".podioCard");
+
+    tarjetaResumen?.classList.remove("oculto");
+
     const fase = obtenerFaseActualCompeticion();
 
     if (fase === "cruces") {
@@ -2377,35 +2382,12 @@ function pintarResumenPortada() {
         const faseIniciada = hayPartidosJugadosEnFase(faseGrupos);
 
         if (!faseIniciada) {
-            setText(
-                "tituloPodio",
-                faseGrupos === "regrupos"
-                    ? "🔁 Equipos de los ReGrupos"
-                    : "👥 Equipos de cada grupo"
-            );
-
-            const htmlEquipos = nombresGrupos.map(grupo => {
-                const filas = obtenerFilasGrupoParaMostrar(faseGrupos, grupo);
-                const nombres = filas.map(fila => escaparHTML(fila.equipo));
-
-                return `
-                    <div class="equipoPodio">
-                        <span>
-                            <strong>${escaparHTML(nombreGrupoVisible(grupo))}</strong><br>
-                            ${nombres.length ? nombres.join("<br>") : "Equipos pendientes"}
-                        </span>
-                    </div>
-                `;
-            }).join("");
-
-            setHTML(
-                "podio",
-                htmlEquipos || pintarVacioInline(
-                    faseGrupos === "regrupos"
-                        ? "ReGrupos pendientes de generar"
-                        : "Equipos pendientes de asignar"
-                )
-            );
+            /*
+               Hasta que se juegue el primer partido no hay un
+               resumen útil que mostrar. Los equipos ya se consultan
+               desde Grupos y Equipos, así que evitamos duplicarlos.
+            */
+            tarjetaResumen?.classList.add("oculto");
             return;
         }
 
