@@ -320,6 +320,17 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             datosJSON.cruces
         );
 
+        combinado.palas_playa = elegirPalasMasCompletas(
+            normalizarPalasSupabase(
+                remoto.palas_playa ||
+                remoto.partidos_palas_playa ||
+                remoto.copa_palas_playa ||
+                remoto.partidos_palas ||
+                remoto.palas
+            ),
+            datosJSON.palas_playa
+        );
+
         combinado.fuente_competicion = detectarFuenteCompeticion(
             combinado,
             datosJSON
@@ -368,6 +379,77 @@ function normalizarListaSupabase(lista, codigoFase) {
     });
 }
 
+function normalizarPalasSupabase(valor) {
+    if (valor && !Array.isArray(valor)) {
+        valor =
+            valor.rondas ||
+            valor.partidos ||
+            valor.palas_playa ||
+            [];
+    }
+
+    if (!Array.isArray(valor) || !valor.length) return [];
+
+    const yaEstaPorRondas = valor.some(
+        elemento => Array.isArray(elemento?.partidos)
+    );
+
+    if (yaEstaPorRondas) {
+        return valor
+            .map((ronda, indice) => ({
+                ...ronda,
+                ronda: ronda.ronda || indice + 1,
+                nombre: ronda.nombre || `Ronda ${ronda.ronda || indice + 1}`,
+                partidos: normalizarListaSupabase(ronda.partidos, "PP")
+            }))
+            .filter(ronda => ronda.partidos.length);
+    }
+
+    const porRondas = new Map();
+
+    valor.forEach((partido, indice) => {
+        const numeroRonda =
+            partido?.ronda ||
+            partido?.numero_ronda ||
+            partido?.jornada ||
+            1;
+
+        const clave = String(numeroRonda);
+
+        if (!porRondas.has(clave)) {
+            porRondas.set(clave, {
+                ronda: numeroRonda,
+                nombre: partido?.nombre_ronda || `Ronda ${numeroRonda}`,
+                partidos: []
+            });
+        }
+
+        porRondas.get(clave).partidos.push(
+            normalizarListaSupabase([partido], "PP")[0] || partido
+        );
+    });
+
+    return [...porRondas.values()];
+}
+
+function contarPartidosPalas(rondas) {
+    return (Array.isArray(rondas) ? rondas : [])
+        .reduce(
+            (total, ronda) =>
+                total + (Array.isArray(ronda?.partidos) ? ronda.partidos.length : 0),
+            0
+        );
+}
+
+function elegirPalasMasCompletas(palasSupabase, palasJSON) {
+    const supabase = Array.isArray(palasSupabase) ? palasSupabase : [];
+    const respaldo = Array.isArray(palasJSON) ? palasJSON : [];
+
+    return contarPartidosPalas(supabase) >= contarPartidosPalas(respaldo)
+        ? supabase
+        : respaldo;
+}
+
 function detectarFuenteCompeticion(combinado, original) {
     const claves = [
         [combinado.clasificacion, original.clasificacion],
@@ -376,7 +458,8 @@ function detectarFuenteCompeticion(combinado, original) {
         [combinado.partidos, original.partidos],
         [combinado?.grupos?.partidos, original?.grupos?.partidos],
         [combinado?.regrupos?.partidos, original?.regrupos?.partidos],
-        [combinado.cruces, original.cruces]
+        [combinado.cruces, original.cruces],
+        [combinado.palas_playa, original.palas_playa]
     ];
 
     return claves.some(([actual, anterior]) =>
@@ -1744,7 +1827,8 @@ function pintarTarjetaPalas(config) {
 
     const hayCopa =
         config.hay_copa_palas_playa === true ||
-        esSi(config.hay_copa_palas_playa);
+        esSi(config.hay_copa_palas_playa) ||
+        contarPartidosPalas(datos?.palas_playa) > 0;
 
     const rondas =
         datos?.palas_playa || [];
