@@ -36,6 +36,8 @@ async function iniciarNavegacionGeneral() {
 
         if (esWebPreviaNav(config)) {
             configurarNavegacionPrevia(config);
+        } else if (esWebFinalizadaNav(config)) {
+            configurarNavegacionFinalizada();
         } else {
             configurarNavegacionEnJuego(config);
         }
@@ -175,6 +177,18 @@ function configurarNavegacionEnJuego(config) {
     );
 
     botones[4]?.classList.add("navActivo");
+}
+
+function configurarNavegacionFinalizada() {
+    const botones = obtenerBotonesNav();
+
+    configurarEnlaceNav(botones[0], "🏠", "Inicio", "index.html", true, "inicio");
+    configurarEnlaceNav(botones[1], "🎾", "Partidos", "index.html?pantalla=partidos");
+    configurarEnlaceNav(botones[2], "📊", "Estadísticas", "estadisticas.html", true, "estadisticas");
+    configurarEnlaceNav(botones[3], "🏆", "Ranking", "index.html?pantalla=ranking");
+    configurarEnlaceNav(botones[4], "☰", "Más", "index.html?pantalla=mas", true, "mas");
+
+    activarPaginaActual();
 }
 
 
@@ -327,6 +341,12 @@ function esWebPreviaNav(config) {
         estado === "PRETORNEO" ||
         estado.includes("INSCRIP")
     );
+}
+
+function esWebFinalizadaNav(config) {
+    return normalizarNav(
+        config.estado || config.estado_torneo || ""
+    ).includes("FINALIZ");
 }
 
 
