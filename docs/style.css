@@ -3132,6 +3132,11 @@ body.modoPretorneo{
     display:none !important;
 }
 
+/* Si queda una cantidad impar, el último acceso completa la fila. */
+.listaOpcionesMas .opcionMas:last-child:nth-child(odd){
+    grid-column:1 / -1;
+}
+
 @media(max-width:380px){
     .listaOpcionesMas{
         gap:9px;
