@@ -399,6 +399,25 @@ function configurarNavegacionEstadisticas() {
         return;
     }
 
+    if (obtenerEstadoTorneoEstadisticas().includes("FINALIZ")) {
+        configurarBotonNavegacionEstadisticas(
+            botones[0], "🏠", "Inicio", "index.html"
+        );
+        configurarBotonNavegacionEstadisticas(
+            botones[1], "🎾", "Partidos", "index.html?pantalla=partidos"
+        );
+        configurarBotonNavegacionEstadisticas(
+            botones[2], "📊", "Estadísticas", "estadisticas.html", false, true
+        );
+        configurarBotonNavegacionEstadisticas(
+            botones[3], "🏆", "Ranking", "index.html?pantalla=ranking"
+        );
+        configurarBotonNavegacionEstadisticas(
+            botones[4], "☰", "Más", "index.html?pantalla=mas"
+        );
+        return;
+    }
+
     configurarBotonNavegacionEstadisticas(
         botones[0],
         "🏠",
@@ -496,8 +515,8 @@ function obtenerEstadoTorneoEstadisticas() {
         estadoCampeonato?.configuracion || {};
 
     const valor =
-        config.estado_torneo ||
         config.estado ||
+        config.estado_torneo ||
         "En juego";
 
     return normalizarEstadisticas(valor)
