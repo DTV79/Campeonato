@@ -2112,8 +2112,14 @@ async function prepararFotosPortada() {
 
     if (!tarjeta) return;
 
+    /*
+       La galería se ofrece desde «Más» durante el campeonato.
+       La tarjeta destacada de la portada queda reservada para
+       cuando el torneo ya está finalizado.
+    */
     const visible =
-        esSi(config.mostrar_fotos);
+        esSi(config.mostrar_fotos) &&
+        obtenerEstadoTorneo().includes("FINALIZ");
 
     tarjeta.classList.toggle(
         "oculto",
