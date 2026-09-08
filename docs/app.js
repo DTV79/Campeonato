@@ -182,11 +182,21 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
         }
 
         const cambiaEdicion = codigo !== codigoRespaldo;
-        const base = cambiaEdicion ? {
+        const gestionAdmin =
+            remoto.configuracion_gestionada_admin === true;
+        const edicionEnCurso = !normalizar(
+            remoto.estado || remoto.estado_torneo || ""
+        ).includes("FINALIZ");
+        const competicionSupabaseAutoritativa =
+            cambiaEdicion || (gestionAdmin && edicionEnCurso);
+
+        const base = competicionSupabaseAutoritativa ? {
             ...datosJSON,
+            equipos: [],
             clasificacion: [],
             partidos: [],
             cruces: [],
+            palas_playa: [],
             grupos: { ...(datosJSON.grupos || {}), clasificaciones: [], partidos: [] },
             regrupos: { ...(datosJSON.regrupos || {}), clasificaciones: [], partidos: [] }
         } : datosJSON;
@@ -331,6 +341,14 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             datosJSON.palas_playa
         );
 
+        if (
+            datosJSON?.configuracion?.configuracion_gestionada_admin === true &&
+            !obtenerEstadoTorneoDesdeConfiguracion(datosJSON.configuracion)
+                .includes("FINALIZ")
+        ) {
+            combinado.equipos = construirEquiposDesdeCompeticion(combinado);
+        }
+
         combinado.fuente_competicion = detectarFuenteCompeticion(
             combinado,
             datosJSON
@@ -346,6 +364,40 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
     } finally {
         clearTimeout(temporizador);
     }
+}
+
+function obtenerEstadoTorneoDesdeConfiguracion(config = {}) {
+    return normalizar(
+        config.estado || config.estado_torneo || ""
+    )
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ");
+}
+
+function construirEquiposDesdeCompeticion(origen) {
+    const filas = [
+        ...(origen.clasificacion || []),
+        ...(origen?.grupos?.clasificaciones || []),
+        ...(origen?.regrupos?.clasificaciones || [])
+    ];
+    const unicos = new Map();
+
+    filas.forEach(fila => {
+        const nombre = String(fila?.equipo || "").trim();
+        const clave = normalizar(nombre);
+        if (!clave || unicos.has(clave)) return;
+
+        unicos.set(clave, {
+            orden: unicos.size + 1,
+            equipo: nombre,
+            id_jug1: fila.id_jug1 || "",
+            id_jug2: fila.id_jug2 || "",
+            grupo: fila.grupo || "",
+            fase: fila.fase || ""
+        });
+    });
+
+    return [...unicos.values()];
 }
 
 function elegirListaMasCompleta(listaSupabase, listaJSON) {
@@ -1637,13 +1689,21 @@ function pintarTarjetasDashboard() {
         const grupos =
             obtenerNombresGrupos(faseClasificacion);
 
-        setHTML(
-            "resumenCompeticion",
-            `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
-            `${grupos.length} ` +
-            `${grupos.length === 1 ? "grupo" : "grupos"} · ` +
-            `${equipos.length} equipos`
-        );
+        if (!equipos.length) {
+            setHTML(
+                "resumenCompeticion",
+                `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
+                "Equipos pendientes de asignar"
+            );
+        } else {
+            setHTML(
+                "resumenCompeticion",
+                `${escaparHTML(nombreFase(faseClasificacion))}<br>` +
+                `${grupos.length} ` +
+                `${grupos.length === 1 ? "grupo" : "grupos"} · ` +
+                `${equipos.length} equipos`
+            );
+        }
     } else {
         const lider =
             datos.clasificacion?.[0]?.equipo ||
