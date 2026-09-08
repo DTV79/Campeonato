@@ -1425,7 +1425,7 @@
                 : "grupos";
         boton.innerHTML = `
             <span>📊</span>
-            <strong>${esModoGruposFinal() ? "Grupos" : "Clasificación"}</strong>
+            <strong>Grupos</strong>
         `;
 
         lista.prepend(boton);
@@ -1440,7 +1440,11 @@
             "#opcionEquiposMasFinal"
         );
 
-        if (!ranking && !equipos) return;
+        const grupos = evento.target.closest(
+            "#opcionGruposMasFinal"
+        );
+
+        if (!ranking && !equipos && !grupos) return;
 
         window.setTimeout(
             sincronizarNavegacionFinal,
@@ -1462,7 +1466,10 @@
             return;
         }
 
-        if (pantalla === "equipos") {
+        if (
+            pantalla === "equipos" ||
+            pantalla === "competicion"
+        ) {
             activarBotonNavegacionFinal(
                 document.querySelector(
                     '.bottomNav .navBtn[data-pantalla="mas"]'
