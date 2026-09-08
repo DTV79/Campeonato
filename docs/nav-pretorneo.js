@@ -1,5 +1,9 @@
 const JSON_URL_NAV =
     "https://dtv79.github.io/Campeonato/estado_torneo.json";
+const SUPABASE_URL_NAV =
+    "https://imznjbnpecvnoivywnoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY_NAV =
+    "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
 
 if (document.readyState === "loading") {
     document.addEventListener(
@@ -26,7 +30,8 @@ async function iniciarNavegacionGeneral() {
             );
         }
 
-        const datos = await respuesta.json();
+        let datos = await respuesta.json();
+        datos = await cargarConfiguracionSupabaseNav(datos);
         const config = datos?.configuracion || {};
 
         if (esWebPreviaNav(config)) {
@@ -46,6 +51,72 @@ async function iniciarNavegacionGeneral() {
            de competición.
         */
         configurarNavegacionEnJuego({});
+    }
+}
+
+async function cargarConfiguracionSupabaseNav(datosJSON) {
+    const codigoRespaldo = String(
+        datosJSON?.configuracion?.codigo_campeonato || ""
+    ).trim();
+
+    try {
+        const respuestaActivo = await fetch(
+            `${SUPABASE_URL_NAV}/rest/v1/rpc/web_campeonato_activo`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_NAV,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuestaActivo.ok) {
+            throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
+        }
+
+        const activo = await respuestaActivo.json();
+        const codigo = String(
+            activo?.codigo_campeonato || codigoRespaldo
+        ).trim();
+
+        if (!codigo) return datosJSON;
+
+        const respuestaConfig = await fetch(
+            `${SUPABASE_URL_NAV}/rest/v1/rpc/web_obtener_configuracion`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_NAV,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ p_codigo: codigo })
+            }
+        );
+
+        if (!respuestaConfig.ok) {
+            throw new Error(`Supabase HTTP ${respuestaConfig.status}`);
+        }
+
+        const remoto = await respuestaConfig.json();
+
+        return {
+            ...datosJSON,
+            configuracion: {
+                ...(datosJSON?.configuracion || {}),
+                ...(remoto && typeof remoto === "object" ? remoto : {}),
+                codigo_campeonato: codigo
+            }
+        };
+    } catch (error) {
+        console.warn(
+            "No se pudo cargar la configuración de navegación desde Supabase; se usa el respaldo.",
+            error
+        );
+        return datosJSON;
     }
 }
 
@@ -247,8 +318,8 @@ function activarPaginaActual() {
 
 function esWebPreviaNav(config) {
     const estado = normalizarNav(
-        config.estado_torneo ||
         config.estado ||
+        config.estado_torneo ||
         ""
     );
 
