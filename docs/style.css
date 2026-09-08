@@ -3093,6 +3093,56 @@ body.modoPretorneo{
     grid-column: 1 / -1;
 }
 
+/* Pantalla Más uniforme en todos los estados del campeonato */
+.listaOpcionesMas{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.listaOpcionesMas .opcionMas{
+    position:relative;
+    display:flex;
+    min-width:0;
+    min-height:112px;
+    padding:17px 15px;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:space-between;
+    border:1px solid #e2e8f0;
+    border-radius:20px;
+    background:linear-gradient(145deg,#fff,#f8fafc);
+    color:#1e293b;
+    text-align:left;
+    box-shadow:0 7px 19px rgba(15,23,42,.07);
+}
+
+.listaOpcionesMas .opcionMas > span{
+    font-size:28px;
+    line-height:1;
+}
+
+.listaOpcionesMas .opcionMas > strong{
+    padding-right:0;
+    font-size:13px;
+    line-height:1.25;
+}
+
+.listaOpcionesMas .opcionMas > b{
+    display:none !important;
+}
+
+@media(max-width:380px){
+    .listaOpcionesMas{
+        gap:9px;
+    }
+
+    .listaOpcionesMas .opcionMas{
+        min-height:104px;
+        padding:14px 12px;
+    }
+}
+
 
 
 /* =========================================================
