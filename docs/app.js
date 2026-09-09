@@ -6116,6 +6116,21 @@ function obtenerURLInscripcion() {
 function esModoGrupos() {
     const config = obtenerConfiguracion();
     const tipoCampeonato = normalizar(config.tipo_campeonato);
+    const estructuraPrimeraFase = normalizar(
+        config.estructura_primera_fase ||
+        config.sistema_primera_fase ||
+        ""
+    );
+
+    // La estructura concreta manda: 2 Grupos o 4 Grupos deben mostrarse
+    // siempre como grupos, aunque exista un valor antiguo en tipo_campeonato.
+    if (estructuraPrimeraFase.includes("GRUPO")) {
+        return true;
+    }
+
+    if (estructuraPrimeraFase.includes("LIGUILLA")) {
+        return false;
+    }
 
     // Si el JSON indica expresamente el tipo de campeonato,
     // ese valor es el que manda.
