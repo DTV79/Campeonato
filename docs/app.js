@@ -4133,6 +4133,7 @@ function pintarCardEquipo(equipo) {
     const ficha = obtenerFichaEquipo(equipo);
     const jugadores = dividirEquipo(equipo.equipo);
     const etiquetas = [];
+    const torneoFinalizado = obtenerEstadoTorneo().includes("FINALIZ");
 
     if (ficha.grupoInicial) etiquetas.push(ficha.grupoInicial);
     if (ficha.regrupo) etiquetas.push(ficha.regrupo);
@@ -4157,10 +4158,12 @@ function pintarCardEquipo(equipo) {
                 </div>
             ` : ""}
 
-            <div class="datosFila">
-                🎾 Próximo partido: <strong>${escaparHTML(ficha.proximo?.rival || "Sin partido pendiente")}</strong>
-                ${ficha.proximo?.detalle ? `<br>${escaparHTML(ficha.proximo.detalle)}` : ""}
-            </div>
+            ${!torneoFinalizado ? `
+        <div class="datosFila">
+        🎾 Próximo partido: <strong>${escaparHTML(ficha.proximo?.rival || "Sin partido pendiente")}</strong>
+        ${ficha.proximo?.detalle ? `<br>${escaparHTML(ficha.proximo.detalle)}` : ""}
+    </div>
+` : ""}
         </article>
     `;
 }
