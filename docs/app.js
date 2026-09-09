@@ -4133,7 +4133,8 @@ function pintarCardEquipo(equipo) {
     const ficha = obtenerFichaEquipo(equipo);
     const jugadores = dividirEquipo(equipo.equipo);
     const etiquetas = [];
-    const torneoFinalizado = obtenerEstadoTorneo().includes("FINALIZ");
+    const torneoFinalizado = obtenerEstadoTorneo().includes("FINALIZ") || competicionFinalizadaPorResultados();
+    const faseDeGruposActiva = !(datos?.cruces || []).length && !(datos?.palas_playa || []).length;
 
     if (ficha.grupoInicial) etiquetas.push(ficha.grupoInicial);
     if (ficha.regrupo) etiquetas.push(ficha.regrupo);
@@ -4142,7 +4143,7 @@ function pintarCardEquipo(equipo) {
     } else if (ficha.clasificacion?.pj > 0) {
         etiquetas.push(`${ficha.clasificacion.pj} PJ`);
     }
-    if (!torneoFinalizado && ficha.clasificacion?.pj > 0) {
+    if (!torneoFinalizado && faseDeGruposActiva && ficha.clasificacion?.pj > 0) {
         etiquetas.push(`${ficha.clasificacion.puntos_totales} pts`);
     }
     if (ficha.situacion) etiquetas.push(ficha.situacion);
@@ -4278,9 +4279,11 @@ function obtenerSituacionEquipo(nombreEquipo) {
     const buscar = (lista, ronda) => lista.find(partido => esRonda(partido, ronda));
     const finalPalas = buscar(palas, "final");
     const semifinalPalas = buscar(palas, "semifinal");
-    const final = buscar(cruces, "final");
-    const semifinal = buscar(cruces, "semifinal");
-    const cuartos = buscar(cruces, "cuartos");
+    // En el cuadro principal usamos exclusivamente el campo `fase`.
+    // `es_final` no identifica de forma fiable la gran final en estos datos.
+    const final = cruces.find(partido => normalizar(partido.fase) === "FINAL");
+    const semifinal = cruces.find(partido => ["SEMIFINAL", "SEMIFINALES"].includes(normalizar(partido.fase)));
+    const cuartos = cruces.find(partido => ["CUARTOS", "CUARTOS DE FINAL"].includes(normalizar(partido.fase)));
 
     if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "pierde") return "🥄 Farolillo rojo";
     if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "gana") return "🛟 Salvado en la final de Palas";
@@ -4298,6 +4301,17 @@ function obtenerSituacionEquipo(nombreEquipo) {
     if (cuartos && !partidoFinalizado(cuartos)) return "⚔️ En cuartos de final";
     if (resultadoEquipoEnPartido(cuartos, nombreEquipo) === "pierde") return "🥄 Pasa a Palas de Playa";
     return "";
+}
+
+function competicionFinalizadaPorResultados() {
+    const finalPrincipal = (datos?.cruces || []).find(
+        partido => normalizar(partido.fase) === "FINAL"
+    );
+    const partidosPalas = obtenerPartidosFase("palas");
+    const finalPalas = partidosPalas.find(partido => esRonda(partido, "final"));
+
+    if (!partidoFinalizado(finalPrincipal)) return false;
+    return !partidosPalas.length || partidoFinalizado(finalPalas);
 }
 
 function obtenerProximoPartidoEquipo(
