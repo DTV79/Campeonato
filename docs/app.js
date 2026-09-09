@@ -4286,9 +4286,9 @@ function obtenerSituacionEquipo(nombreEquipo) {
     const cuartos = cruces.find(partido => ["CUARTOS", "CUARTOS DE FINAL"].includes(normalizar(partido.fase)));
 
     if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "pierde") return "🥄 Farolillo rojo";
-    if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "gana") return "🛟 Salvado en la final de Palas";
+    if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "gana") return "⭕ Salvado en la final de Palas";
     if (finalPalas && !partidoFinalizado(finalPalas)) return "🥄 Final de Palas";
-    if (resultadoEquipoEnPartido(semifinalPalas, nombreEquipo) === "gana") return "🛟 Salvado en Palas";
+    if (resultadoEquipoEnPartido(semifinalPalas, nombreEquipo) === "gana") return "⭕ Salvado en Palas";
     if (resultadoEquipoEnPartido(semifinalPalas, nombreEquipo) === "pierde") return "🥄 Pasa a la final de Palas";
     if (semifinalPalas && !partidoFinalizado(semifinalPalas)) return "🥄 Semifinales de Palas";
     if (resultadoEquipoEnPartido(final, nombreEquipo) === "gana") return "🏆 Campeón";
