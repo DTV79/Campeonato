@@ -228,6 +228,7 @@
 
             try {
                 await cargarScript("app.js");
+                await cargarScript("configuracion-pendiente.js");
                 await cargarScript("isp.js");
                 await cargarScript("finalizado.js");
             } catch (error) {
