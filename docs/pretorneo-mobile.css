@@ -1,0 +1,14 @@
+/* Ajuste móvil de las tarjetas de información del pretorneo.
+   Evita que los textos cortos queden pegados a la parte inferior
+   cuando otra tarjeta de la misma fila tiene más líneas. */
+
+@media (max-width: 600px) {
+    .modoPretorneo .listaOpcionesMas .datoPretorneo {
+        justify-content: flex-start;
+        gap: 14px;
+    }
+
+    .modoPretorneo .listaOpcionesMas .datoPretorneo > strong {
+        margin-top: 0;
+    }
+}
