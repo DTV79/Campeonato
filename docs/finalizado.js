@@ -1214,7 +1214,19 @@
             }
         });
 
-        const ultimo = partidos.at(-1);
+        const finales = partidos.filter(partido => {
+    const codigoRonda = normalizarV2(partido?.codigo_ronda);
+    const ronda = normalizarV2(partido?.ronda);
+    const fase = normalizarV2(partido?.fase);
+    const id = normalizarV2(partido?.id_partido);
+
+    return codigoRonda === "FIN" ||
+        ronda === "FINAL" ||
+        fase === "FINAL" ||
+        id.includes("-PP-FIN-");
+});
+
+const ultimo = finales.at(-1) || partidos.at(-1);
         if (!ultimo) return "";
 
         const perdedorExplicito = textoV2(
