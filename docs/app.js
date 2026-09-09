@@ -4137,10 +4137,15 @@ function pintarCardEquipo(equipo) {
 
     if (ficha.grupoInicial) etiquetas.push(ficha.grupoInicial);
     if (ficha.regrupo) etiquetas.push(ficha.regrupo);
-    if (ficha.clasificacion?.pj > 0) {
+    if (ficha.partidosJugados > 0) {
+        etiquetas.push(`${ficha.partidosJugados} partidos jugados`);
+    } else if (ficha.clasificacion?.pj > 0) {
         etiquetas.push(`${ficha.clasificacion.pj} PJ`);
+    }
+    if (!torneoFinalizado && ficha.clasificacion?.pj > 0) {
         etiquetas.push(`${ficha.clasificacion.puntos_totales} pts`);
     }
+    if (ficha.situacion) etiquetas.push(ficha.situacion);
 
     return `
         <article class="cardEquipo">
@@ -4204,8 +4209,95 @@ function obtenerFichaEquipo(equipo) {
         grupoInicial,
         regrupo: regrupo ? nombreGrupoVisible(regrupo) : "",
         clasificacion,
+        partidosJugados: obtenerPartidosJugadosEquipo(equipo.equipo).length,
+        situacion: obtenerSituacionEquipo(equipo.equipo),
         proximo: obtenerProximoPartidoEquipo(equipo.equipo, obtenerFaseActualCompeticion())
     };
+}
+
+function partidoIncluyeEquipo(partido, nombreEquipo) {
+    const buscado = normalizar(nombreEquipo);
+    return [
+        partido?.local,
+        partido?.visitante,
+        partido?.equipo1,
+        partido?.equipo2,
+        partido?.equipo_a,
+        partido?.equipo_b
+    ].some(nombre => normalizar(nombre) === buscado);
+}
+
+function obtenerPartidosJugadosEquipo(nombreEquipo) {
+    const unicos = new Map();
+
+    ["liguilla", "grupos", "regrupos", "cruces", "palas"].forEach(fase => {
+        obtenerPartidosFase(fase)
+            .filter(partido => partidoFinalizado(partido) && partidoIncluyeEquipo(partido, nombreEquipo))
+            .forEach((partido, indice) => {
+                const clave = partido.id_partido || partido.codigo_partido || partido.id ||
+                    `${fase}|${partido.fase || ""}|${partido.ronda || ""}|${partido.local || partido.equipo1 || ""}|${partido.visitante || partido.equipo2 || ""}|${indice}`;
+                unicos.set(String(clave), partido);
+            });
+    });
+
+    return [...unicos.values()];
+}
+
+function textoRondaPartido(partido) {
+    return normalizar([
+        partido?.fase,
+        partido?.nombre_fase,
+        partido?.codigo_fase,
+        partido?.ronda,
+        partido?.nombre_ronda,
+        partido?.codigo_ronda,
+        partido?.id_partido,
+        partido?.codigo_partido
+    ].filter(Boolean).join(" "));
+}
+
+function esRonda(partido, tipo) {
+    const texto = textoRondaPartido(partido);
+    if (tipo === "final") {
+        return partido?.es_final === true ||
+            (/(^|[^A-Z])FIN(AL)?([^A-Z]|$)|GRAN FINAL/.test(texto) && !texto.includes("SEMIFINAL"));
+    }
+    if (tipo === "semifinal") return texto.includes("SEM") || texto.includes("SEMIFINAL");
+    if (tipo === "cuartos") return texto.includes("CUA") || texto.includes("CUARTOS");
+    return false;
+}
+
+function resultadoEquipoEnPartido(partido, nombreEquipo) {
+    if (!partido || !partidoFinalizado(partido) || !partidoIncluyeEquipo(partido, nombreEquipo)) return "";
+    return normalizar(partido.ganador) === normalizar(nombreEquipo) ? "gana" : "pierde";
+}
+
+function obtenerSituacionEquipo(nombreEquipo) {
+    const cruces = obtenerPartidosFase("cruces").filter(partido => partidoIncluyeEquipo(partido, nombreEquipo));
+    const palas = obtenerPartidosFase("palas").filter(partido => partidoIncluyeEquipo(partido, nombreEquipo));
+    const buscar = (lista, ronda) => lista.find(partido => esRonda(partido, ronda));
+    const finalPalas = buscar(palas, "final");
+    const semifinalPalas = buscar(palas, "semifinal");
+    const final = buscar(cruces, "final");
+    const semifinal = buscar(cruces, "semifinal");
+    const cuartos = buscar(cruces, "cuartos");
+
+    if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "pierde") return "🥄 Farolillo rojo";
+    if (resultadoEquipoEnPartido(finalPalas, nombreEquipo) === "gana") return "🛟 Salvado en la final de Palas";
+    if (finalPalas && !partidoFinalizado(finalPalas)) return "🥄 Final de Palas";
+    if (resultadoEquipoEnPartido(semifinalPalas, nombreEquipo) === "gana") return "🛟 Salvado en Palas";
+    if (resultadoEquipoEnPartido(semifinalPalas, nombreEquipo) === "pierde") return "🥄 Pasa a la final de Palas";
+    if (semifinalPalas && !partidoFinalizado(semifinalPalas)) return "🥄 Semifinales de Palas";
+    if (resultadoEquipoEnPartido(final, nombreEquipo) === "gana") return "🏆 Campeón";
+    if (resultadoEquipoEnPartido(final, nombreEquipo) === "pierde") return "🥈 Subcampeón";
+    if (final && !partidoFinalizado(final)) return "🏆 Finalista";
+    if (resultadoEquipoEnPartido(semifinal, nombreEquipo) === "pierde") return "⚔️ Semifinalista";
+    if (resultadoEquipoEnPartido(semifinal, nombreEquipo) === "gana") return "✅ Clasificado a la final";
+    if (semifinal && !partidoFinalizado(semifinal)) return "⚔️ En semifinales";
+    if (resultadoEquipoEnPartido(cuartos, nombreEquipo) === "gana") return "✅ Clasificado a semifinales";
+    if (cuartos && !partidoFinalizado(cuartos)) return "⚔️ En cuartos de final";
+    if (resultadoEquipoEnPartido(cuartos, nombreEquipo) === "pierde") return "🥄 Pasa a Palas de Playa";
+    return "";
 }
 
 function obtenerProximoPartidoEquipo(
@@ -4428,7 +4520,7 @@ function obtenerFasesEliminatoriasOrdenadas(cruces) {
 ========================================================= */
 
 function pintarContenidoPalas() {
-    const rondas = datos.palas_playa || [];
+    const rondas = ordenarRondasPalas(datos.palas_playa || []);
 
     if (!rondas.length) {
         return pintarTarjetaVacia(
@@ -4450,7 +4542,7 @@ function pintarContenidoPalas() {
                 const partidos = ronda.partidos || [];
                 const jugados = partidos.filter(partidoFinalizado).length;
                 const pendientes = partidos.length - jugados;
-                const abierta = Number(ronda.ronda) === Number(rondaActual);
+                const abierta = ronda === rondaActual;
 
                 return `
                     <section class="bloqueJornada">
@@ -4475,9 +4567,27 @@ function pintarContenidoPalas() {
     `;
 }
 
+function ordenarRondasPalas(rondas) {
+    const peso = ronda => {
+        const texto = normalizar([
+            ronda?.nombre,
+            ronda?.nombre_ronda,
+            ronda?.codigo_ronda
+        ].filter(Boolean).join(" "));
+
+        if (texto.includes("SEM")) return 10;
+        if (texto.includes("FIN")) return 20;
+        return 100 + numero(ronda?.ronda);
+    };
+
+    return [...(rondas || [])].sort((a, b) =>
+        peso(a) - peso(b) || numero(a?.ronda) - numero(b?.ronda)
+    );
+}
+
 function obtenerRondaActualPalas(rondas) {
     const pendiente = rondas.find(ronda => (ronda.partidos || []).some(partidoPendiente));
-    return pendiente?.ronda || rondas[rondas.length - 1]?.ronda || 1;
+    return pendiente || rondas[rondas.length - 1] || null;
 }
 
 function pintarCardPalas(partido) {
