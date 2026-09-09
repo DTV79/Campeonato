@@ -8,6 +8,7 @@
     <link id="cssPrincipal" rel="stylesheet" href="style.css">
     <link id="cssFinalizado" rel="stylesheet" href="finalizado.css">
     <link id="cssISP" rel="stylesheet" href="isp.css">
+    <link id="cssPretorneoMobile" rel="stylesheet" href="pretorneo-mobile.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +51,8 @@
                 const hojas = [
                     ["cssPrincipal", "style.css"],
                     ["cssFinalizado", "finalizado.css"],
-                    ["cssISP", "isp.css"]
+                    ["cssISP", "isp.css"],
+                    ["cssPretorneoMobile", "pretorneo-mobile.css"]
                 ];
 
                 hojas.forEach(([id, archivo]) => {
@@ -90,85 +92,34 @@
     </header>
 
     <section class="gridDashboard">
-        <div
-            class="cardAcceso cardClasificacion"
-            id="tarjetaCompeticion"
-            data-seccion="competicion"
-        >
+        <div class="cardAcceso cardClasificacion" id="tarjetaCompeticion" data-seccion="competicion">
             <div class="iconoAcceso">📊</div>
-            <div>
-                <h4 id="tituloTarjetaCompeticion">Competición</h4>
-                <p id="resumenCompeticion">Cargando...</p>
-            </div>
+            <div><h4 id="tituloTarjetaCompeticion">Competición</h4><p id="resumenCompeticion">Cargando...</p></div>
             <span class="flecha">→</span>
         </div>
-
-        <div
-            class="cardAcceso cardPartidos"
-            id="tarjetaPartidos"
-            data-seccion="partidos"
-        >
+        <div class="cardAcceso cardPartidos" id="tarjetaPartidos" data-seccion="partidos">
             <div class="iconoAcceso">🎾</div>
-            <div>
-                <h4>Partidos</h4>
-                <p id="resumenPartidos">Cargando...</p>
-            </div>
+            <div><h4>Partidos</h4><p id="resumenPartidos">Cargando...</p></div>
             <span class="flecha">→</span>
         </div>
-
-        <div
-            class="cardAcceso cardPalas"
-            id="tarjetaEquipos"
-            data-seccion="equipos"
-        >
+        <div class="cardAcceso cardPalas" id="tarjetaEquipos" data-seccion="equipos">
             <div class="iconoAcceso">👥</div>
-            <div>
-                <h4>Equipos</h4>
-                <p id="resumenEquipos">Cargando...</p>
-            </div>
+            <div><h4>Equipos</h4><p id="resumenEquipos">Cargando...</p></div>
             <span class="flecha">→</span>
         </div>
-
-        <div
-            class="cardAcceso cardCruces"
-            id="tarjetaEspecial"
-            data-seccion="especial"
-        >
+        <div class="cardAcceso cardCruces" id="tarjetaEspecial" data-seccion="especial">
             <div class="iconoAcceso" id="iconoTarjetaEspecial">⚔️</div>
-            <div>
-                <h4 id="tituloTarjetaEspecial">Siguiente fase</h4>
-                <p id="resumenEspecial">Pendiente de iniciar</p>
-            </div>
+            <div><h4 id="tituloTarjetaEspecial">Siguiente fase</h4><p id="resumenEspecial">Pendiente de iniciar</p></div>
             <span class="flecha">→</span>
         </div>
-
-        <div
-            class="cardAcceso cardRanking oculto"
-            id="tarjetaRanking"
-            data-seccion="ranking"
-        >
+        <div class="cardAcceso cardRanking oculto" id="tarjetaRanking" data-seccion="ranking">
             <div class="iconoAcceso">🏆</div>
-            <div>
-                <h4>Ranking histórico</h4>
-                <p id="resumenRanking">
-                    Clasificación individual de jugadores
-                </p>
-            </div>
+            <div><h4>Ranking histórico</h4><p id="resumenRanking">Clasificación individual de jugadores</p></div>
             <span class="flecha">→</span>
         </div>
-
-        <div
-            class="cardAcceso cardFotos oculto"
-            id="tarjetaFotos"
-            data-seccion="fotos"
-        >
+        <div class="cardAcceso cardFotos oculto" id="tarjetaFotos" data-seccion="fotos">
             <div class="iconoAcceso">📸</div>
-            <div>
-                <h4>Fotos</h4>
-                <p id="resumenFotos">
-                    Los mejores momentos del campeonato
-                </p>
-            </div>
+            <div><h4>Fotos</h4><p id="resumenFotos">Los mejores momentos del campeonato</p></div>
             <span class="flecha">→</span>
         </div>
     </section>
@@ -178,43 +129,21 @@
         <div id="podio">Cargando...</div>
     </section>
 
-    <section id="vistaDetalle" class="vistaDetalle oculto">
-        <div id="contenidoDetalle"></div>
-    </section>
+    <section id="vistaDetalle" class="vistaDetalle oculto"><div id="contenidoDetalle"></div></section>
 </div>
 
 <nav class="bottomNav">
-    <button class="navBtn navActivo" data-pantalla="inicio" type="button">
-        <span>🏠</span>
-        <small>Inicio</small>
-    </button>
-
-    <button class="navBtn" data-pantalla="competicion" type="button">
-        <span>📊</span>
-        <small>Competición</small>
-    </button>
-
-    <button class="navBtn" data-pantalla="partidos" type="button">
-        <span>🎾</span>
-        <small>Partidos</small>
-    </button>
-
-    <button class="navBtn" data-pantalla="equipos" type="button">
-        <span>👥</span>
-        <small>Equipos</small>
-    </button>
-
-    <button class="navBtn" data-pantalla="mas" type="button">
-        <span>☰</span>
-        <small>Más</small>
-    </button>
+    <button class="navBtn navActivo" data-pantalla="inicio" type="button"><span>🏠</span><small>Inicio</small></button>
+    <button class="navBtn" data-pantalla="competicion" type="button"><span>📊</span><small>Competición</small></button>
+    <button class="navBtn" data-pantalla="partidos" type="button"><span>🎾</span><small>Partidos</small></button>
+    <button class="navBtn" data-pantalla="equipos" type="button"><span>👥</span><small>Equipos</small></button>
+    <button class="navBtn" data-pantalla="mas" type="button"><span>☰</span><small>Más</small></button>
 </nav>
 
 <script>
     (
         async function cargarAplicacionVersionada() {
             const version = await window.versionWebPromise;
-
             function cargarScript(archivo) {
                 return new Promise((resolver, rechazar) => {
                     const script = document.createElement("script");
@@ -225,7 +154,6 @@
                     document.body.appendChild(script);
                 });
             }
-
             try {
                 await cargarScript("app.js");
                 await cargarScript("configuracion-pendiente.js");
