@@ -4629,7 +4629,7 @@ function pintarCardPalas(partido) {
                 <div class="infoPalas">
                     ${partido.es_final === true
                         ? `🥄 Farolillo rojo: <strong>${escaparHTML(sigue)}</strong>`
-                        : `🛟 Se salva: <strong>${escaparHTML(salvado)}</strong>`}
+                        : `⭕ Se salva: <strong>${escaparHTML(salvado)}</strong>`}
                 </div>
             ` : ""}
         </article>
