@@ -3842,6 +3842,22 @@ body.modoMantenimiento{
     gap:11px;
 }
 
+.gridRecordsGeneralesEstadisticas{
+    margin-bottom:30px;
+}
+
+.gridRecordsPartidosEstadisticas{
+    padding-top:24px;
+    border-top:1px solid #dbe3ef;
+}
+
+@media (min-width:701px){
+    .gridRecordsGeneralesEstadisticas >
+    .recordGeneralEstadisticas:last-child:nth-child(odd){
+        grid-column:1 / -1;
+    }
+}
+
 .recordPartidoEstadisticas,
 .recordGeneralEstadisticas,
 .gridRecordsSimplesEstadisticas article{
