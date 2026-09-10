@@ -207,15 +207,11 @@ async function iniciarPaginaEstadisticas() {
             window.estadoInicialEstadisticas ||
             null;
 
-        const [estadoBase, origenEstadisticas] =
-            await Promise.all([
-                estadoInicial || cargarJSONEstadisticas(
-                    URL_ESTADO_ESTADISTICAS
-                ),
-                cargarJSONEstadisticas(
-                    URL_DATOS_ESTADISTICAS
-                )
-            ]);
+        const estadoBase =
+            estadoInicial ||
+            await cargarJSONEstadisticas(
+                URL_ESTADO_ESTADISTICAS
+            );
 
         const estado =
             await cargarConfiguracionSupabaseEstadisticas(
@@ -223,9 +219,8 @@ async function iniciarPaginaEstadisticas() {
             );
 
         estadoCampeonato = estado || {};
-        estadisticas = origenEstadisticas || {};
         estadisticas = await completarEdicionesDesdeSupabase(
-            estadisticas,
+            null,
             estadoCampeonato
         );
 
@@ -270,6 +265,16 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
         }
 
         const remoto = await respuestaHistoricos.json();
+
+        const respuestaEdiciones = await fetch(
+            `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_estadisticas_campeonatos`,
+            { method: "POST", cache: "no-store", headers: cabeceras, body: "{}" }
+        );
+        if (!respuestaEdiciones.ok) {
+            throw new Error(`Supabase HTTP ${respuestaEdiciones.status}`);
+        }
+        const edicionesRemotas = await respuestaEdiciones.json();
+
         const respuestaISP = await fetch(
             `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_isp_publico`,
             { method: "POST", cache: "no-store", headers: cabeceras, body: "{}" }
@@ -278,19 +283,21 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             ? await respuestaISP.json()
             : { historial: [] };
         const filas = remoto?.ranking_historico?.historial_ediciones || [];
-        const existentes = [...(origen?.campeonatos || [])];
-        const codigos = new Set(existentes.map(item => String(item.codigo_campeonato || "")));
+        const existentes = [];
         const agrupadas = new Map();
 
         filas.forEach(fila => {
             const codigo = String(fila.id_campeonato || "");
-            if (!codigo || codigos.has(codigo)) return;
+            if (!codigo) return;
             if (!agrupadas.has(codigo)) agrupadas.set(codigo, []);
             agrupadas.get(codigo).push(fila);
         });
 
         agrupadas.forEach((jugadores, codigo) => {
             const config = estado?.configuracion || {};
+            const infoEdicion = (edicionesRemotas || []).find(
+                item => String(item.codigo_campeonato || "") === codigo
+            ) || {};
             const equiposMap = new Map();
             jugadores.forEach(jugador => {
                 const nombre = String(jugador.equipo || "");
@@ -324,11 +331,11 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
                     ? String(config.id_campeonato || config.nombre_campeonato || codigo)
                     : codigo,
                 codigo_campeonato: codigo,
-                anio: Number(jugadores[0]?.anio || 0),
-                fecha: configActual ? String(config.fecha_campeonato || "") : "",
-                nombre: configActual ? String(config.nombre_campeonato || codigo) : codigo,
-                tipo: configActual ? String(config.tipo_campeonato || "") : "",
-                estructura: configActual ? String(config.estructura_primera_fase || "") : "",
+                anio: Number(infoEdicion.anio || jugadores[0]?.anio || 0),
+                fecha: String(infoEdicion.fecha_inicio || (configActual ? config.fecha_campeonato : "") || ""),
+                nombre: String(infoEdicion.nombre || (configActual ? config.nombre_campeonato : "") || codigo),
+                tipo: String(infoEdicion.tipo_campeonato || (configActual ? config.tipo_campeonato : "") || ""),
+                estructura: String(infoEdicion.estructura_primera_fase || (configActual ? config.estructura_primera_fase : "") || ""),
                 campeon: equipos.find(e => normalizarEstadisticas(e.resultado_final) === "CAMPEON")?.equipo || "",
                 subcampeon: equipos.find(e => normalizarEstadisticas(e.resultado_final) === "SUBCAMPEON")?.equipo || "",
                 resumen: {}, equipos, por_fase: [], por_jornada: [], partidos: [],
@@ -337,20 +344,12 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             });
         });
 
-        const codigoActual = String(estado?.configuracion?.codigo_campeonato || "");
-        const actual = existentes.find(item => String(item.codigo_campeonato) === codigoActual);
-        if (actual) {
-            const respuestaCompeticion = await fetch(
-                `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_competicion`,
-                {
-                    method: "POST", cache: "no-store", headers: cabeceras,
-                    body: JSON.stringify({ p_codigo: codigoActual })
-                }
-            );
-            if (!respuestaCompeticion.ok) {
-                throw new Error(`Supabase HTTP ${respuestaCompeticion.status}`);
-            }
-            const competicion = await respuestaCompeticion.json();
+        existentes.forEach(actual => {
+            const codigoActual = String(actual.codigo_campeonato || "");
+            const infoEdicion = (edicionesRemotas || []).find(
+                item => String(item.codigo_campeonato || "") === codigoActual
+            ) || {};
+            const competicion = infoEdicion.competicion || {};
             const fuentes = [
                 ["Grupos", competicion.partidos_grupos],
                 ["Liga", competicion.partidos_liguilla],
@@ -491,7 +490,7 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
                 mas_largos: [...conDuracion].sort((a,b) => b.duracion_min-a.duracion_min).slice(0,1),
                 mas_cortos: [...conDuracion].sort((a,b) => a.duracion_min-b.duracion_min).slice(0,1)
             };
-        }
+        });
 
         const campeonatos = existentes.sort((a,b) => Number(b.anio||0)-Number(a.anio||0));
         const resumenes = campeonatos.map(c => c.resumen || {});
@@ -533,7 +532,14 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
         );
     } catch (error) {
         console.warn("Estadísticas: se utilizará el JSON de respaldo.", error);
-        return origen || {};
+        try {
+            return await cargarJSONEstadisticas(
+                URL_DATOS_ESTADISTICAS
+            );
+        } catch (errorJSON) {
+            console.error("No se pudo cargar tampoco el respaldo estadístico.", errorJSON);
+            return origen || {};
+        }
     }
 }
 
