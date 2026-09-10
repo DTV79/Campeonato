@@ -2137,18 +2137,38 @@ async function cargarDatosRankingHistorico() {
     if (datosRanking) return datosRanking;
 
     if (!promesaRanking) {
-        promesaRanking = fetch(
-            `${JSON_RANKING_URL}?v=${Date.now()}`,
-            { cache: "no-store" }
-        )
+        promesaRanking = fetch("https://imznjbnpecvnoivywnoy.supabase.co/rest/v1/rpc/web_historicos", {
+            method: "POST",
+            cache: "no-store",
+            headers: {
+                apikey: "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2",
+                "Content-Type": "application/json"
+            },
+            body: "{}"
+        })
             .then(respuesta => {
                 if (!respuesta.ok) {
-                    throw new Error(
-                        `No se pudo cargar el ranking (${respuesta.status})`
-                    );
+                    throw new Error(`Supabase HTTP ${respuesta.status}`);
                 }
-
                 return respuesta.json();
+            })
+            .then(origen => origen?.ranking_historico || origen)
+            .catch(errorSupabase => {
+                console.warn(
+                    "Ranking: se utilizará el JSON de respaldo.",
+                    errorSupabase
+                );
+                return fetch(
+                    `${JSON_RANKING_URL}?v=${Date.now()}`,
+                    { cache: "no-store" }
+                ).then(respuesta => {
+                    if (!respuesta.ok) {
+                        throw new Error(
+                            `No se pudo cargar el ranking (${respuesta.status})`
+                        );
+                    }
+                    return respuesta.json();
+                });
             })
             .then(ranking => {
                 datosRanking = ranking;
