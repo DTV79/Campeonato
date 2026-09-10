@@ -294,14 +294,16 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             const equiposMap = new Map();
             jugadores.forEach(jugador => {
                 const nombre = String(jugador.equipo || "");
-                if (!nombre || equiposMap.has(nombre)) return;
+                const clavePareja = claveEquipoEstadisticas(nombre);
+                if (!nombre || equiposMap.has(clavePareja)) return;
                 const pareja = jugadores.find(otro =>
-                    otro.id_jugador === jugador.id_pareja && otro.equipo === nombre
+                    otro.id_jugador === jugador.id_pareja ||
+                    otro.id_jugador === jugador.id_companero
                 );
-                equiposMap.set(nombre, {
+                equiposMap.set(clavePareja, {
                     equipo: nombre,
                     id_jugador1: jugador.id_jugador,
-                    id_jugador2: pareja?.id_jugador || jugador.id_pareja || "",
+                    id_jugador2: pareja?.id_jugador || jugador.id_pareja || jugador.id_companero || "",
                     pj: Number(jugador.pj || 0), pg: Number(jugador.pg || 0),
                     pp: Number(jugador.pp || 0),
                     sets_favor: Number(jugador.sets_ganados || 0),
@@ -404,8 +406,14 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             partidos
                 .filter(partido => partido.fase !== "Palas de Playa")
                 .forEach(partido => {
-                    const local = actual.equipos.find(e => e.equipo === partido.equipo1);
-                    const visitante = actual.equipos.find(e => e.equipo === partido.equipo2);
+                    const claveLocal = claveEquipoEstadisticas(partido.equipo1);
+                    const claveVisitante = claveEquipoEstadisticas(partido.equipo2);
+                    const local = actual.equipos.find(
+                        e => claveEquipoEstadisticas(e.equipo) === claveLocal
+                    );
+                    const visitante = actual.equipos.find(
+                        e => claveEquipoEstadisticas(e.equipo) === claveVisitante
+                    );
                     if (local) {
                         local.puntos_favor += partido.puntos_equipo1;
                         local.puntos_contra += partido.puntos_equipo2;
@@ -670,10 +678,16 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
             e.media_puntos_favor = Number(e.puntos_favor || 0) / sets;
             e.media_puntos_contra = Number(e.puntos_contra || 0) / sets;
         });
+        const conMarcadoresValidos = equipos.filter(e =>
+            Number(e.pj || 0) >= 3 &&
+            Number(e.sets_jugados || 0) > 0 &&
+            Number(e.puntos_favor || 0) > 0 &&
+            Number(e.puntos_contra || 0) > 0
+        );
         return {
             mas_victorias: maximos(equipos, "pg"),
-            mejor_ataque: maximos(equipos, "media_puntos_favor"),
-            mejor_defensa: maximos(equipos, "media_puntos_contra", true)
+            mejor_ataque: maximos(conMarcadoresValidos, "media_puntos_favor"),
+            mejor_defensa: maximos(conMarcadoresValidos, "media_puntos_contra", true)
         };
     };
     const recordsParejas = parejas => ({
@@ -3546,6 +3560,7 @@ function pintarRivalidadesEstadisticas(
 function pintarRecordsEstadisticas(ambito) {
     const records = ambito?.records || {};
     const tarjetas = [];
+    const esHistoricoGlobal = !ambito?.codigo_campeonato;
 
     if (records.equipos) {
         agregarRecordsEquiposEstadisticas(
@@ -3556,20 +3571,26 @@ function pintarRecordsEstadisticas(ambito) {
 
     agregarRecordsJugadoresEstadisticas(
         tarjetas,
-        records.jugadores || {}
+        records.jugadores || {},
+        esHistoricoGlobal
     );
 
-    agregarRecordsParejasEstadisticas(
-        tarjetas,
-        records.parejas_y_rivalidades || {}
-    );
+    if (esHistoricoGlobal) {
+        agregarRecordsParejasEstadisticas(
+            tarjetas,
+            records.parejas_y_rivalidades || {}
+        );
+    }
 
     return `
         <section class="cabeceraPanelEstadisticas">
             <div>
-                <small>LO MEJOR DEL HISTÓRICO</small>
+                <small>${esHistoricoGlobal ? "LO MEJOR DEL HISTÓRICO" : "LO MEJOR DE LA EDICIÓN"}</small>
                 <h1>Récords y curiosidades</h1>
-                <p>Las marcas más destacadas de cada edición.</p>
+                <p>${esHistoricoGlobal
+                    ? "Las marcas más destacadas de todos los campeonatos."
+                    : "Una selección de marcas relevantes, sin duplicar estadísticas equivalentes."
+                }</p>
             </div>
             <span>⭐</span>
         </section>
@@ -3611,7 +3632,7 @@ function agregarRecordsEquiposEstadisticas(
         item => item.equipo,
         item => `${formatearDecimalEstadisticas(
             item.media_puntos_favor
-        )} puntos por partido`
+        )} puntos por set`
     );
 
     agregarTarjetaListaRecordEstadisticas(
@@ -3622,13 +3643,14 @@ function agregarRecordsEquiposEstadisticas(
         item => item.equipo,
         item => `${formatearDecimalEstadisticas(
             item.media_puntos_contra
-        )} recibidos por partido`
+        )} recibidos por set`
     );
 }
 
 function agregarRecordsJugadoresEstadisticas(
     tarjetas,
-    records
+    records,
+    esHistoricoGlobal = false
 ) {
     agregarTarjetaListaRecordEstadisticas(
         tarjetas,
@@ -3659,23 +3681,25 @@ function agregarRecordsJugadoresEstadisticas(
         )} seguidas`
     );
 
-    agregarTarjetaListaRecordEstadisticas(
-        tarjetas,
-        "🏆",
-        "Más títulos",
-        records.mas_titulos,
-        item => item.jugador,
-        item => `${numeroEstadisticas(item.titulos)} títulos`
-    );
+    if (esHistoricoGlobal) {
+        agregarTarjetaListaRecordEstadisticas(
+            tarjetas,
+            "🏆",
+            "Más títulos",
+            records.mas_titulos,
+            item => item.jugador,
+            item => `${numeroEstadisticas(item.titulos)} títulos`
+        );
 
-    agregarTarjetaListaRecordEstadisticas(
-        tarjetas,
-        "🥈",
-        "Más finales",
-        records.mas_finales,
-        item => item.jugador,
-        item => `${numeroEstadisticas(item.finales)} finales`
-    );
+        agregarTarjetaListaRecordEstadisticas(
+            tarjetas,
+            "🥈",
+            "Más finales disputadas",
+            records.mas_finales,
+            item => item.jugador,
+            item => `${numeroEstadisticas(item.finales)} finales`
+        );
+    }
 
     const porcentaje =
         records.mejor_porcentaje_victorias || {};
@@ -3774,6 +3798,16 @@ function agregarTarjetaListaRecordEstadisticas(
         return;
     }
 
+    const claves = new Set();
+    const listaDepurada = lista.filter(item => {
+        const clave = claveEquipoEstadisticas(obtenerNombre(item));
+        if (!clave || claves.has(clave)) return false;
+        claves.add(clave);
+        return true;
+    });
+    const visibles = listaDepurada.slice(0, 4);
+    const restantes = listaDepurada.length - visibles.length;
+
     tarjetas.push(`
         <article class="recordGeneralEstadisticas">
             <div class="iconoRecordGeneralEstadisticas">
@@ -3781,7 +3815,7 @@ function agregarTarjetaListaRecordEstadisticas(
             </div>
             <small>${escaparHTMLEstadisticas(titulo)}</small>
             <div class="ganadoresRecordEstadisticas">
-                ${lista.slice(0, 8).map(item => `
+                ${visibles.map(item => `
                     <div>
                         <strong>${escaparHTMLEstadisticas(
                             obtenerNombre(item)
@@ -3792,6 +3826,10 @@ function agregarTarjetaListaRecordEstadisticas(
                     </div>
                 `).join("")}
             </div>
+            ${restantes > 0
+                ? `<p>Empate con ${numeroEstadisticas(restantes)} más.</p>`
+                : ""
+            }
             ${nota
                 ? `<p>${escaparHTMLEstadisticas(nota)}</p>`
                 : ""
@@ -4167,6 +4205,15 @@ function normalizarEstadisticas(valor) {
         .toLocaleUpperCase("es")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
+}
+
+function claveEquipoEstadisticas(valor) {
+    return String(valor || "")
+        .split("/")
+        .map(nombre => normalizarEstadisticas(nombre))
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, "es"))
+        .join("|");
 }
 
 function unirListaEstadisticas(lista) {
