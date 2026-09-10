@@ -3448,10 +3448,13 @@ function pintarParejasEstadisticas(ambito) {
             </div>
         </section>
 
-        ${pintarRivalidadesEstadisticas(
-            rivalidades,
-            enfrentamientos
-        )}
+        ${ambito?.codigo_campeonato
+            ? ""
+            : pintarRivalidadesEstadisticas(
+                rivalidades,
+                enfrentamientos
+            )
+        }
     `;
 }
 
