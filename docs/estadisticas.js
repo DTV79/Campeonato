@@ -511,11 +511,275 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             parejas: campeonatos.flatMap(c=>c.equipos||[])
         };
 
-        return { ...(origen || {}), generado: new Date().toISOString(), global, campeonatos };
+        return finalizarEstadisticasDinamicas(
+            { ...(origen || {}), generado: new Date().toISOString(), global, campeonatos },
+            remoto
+        );
     } catch (error) {
         console.warn("Estadísticas: se utilizará el JSON de respaldo.", error);
         return origen || {};
     }
+}
+
+function finalizarEstadisticasDinamicas(datosCompletos, remoto) {
+    const ordenFases = {
+        "Grupos": 1,
+        "ReGrupos": 2,
+        "Cuartos": 3,
+        "Semifinales": 4,
+        "Final": 5,
+        "Palas de Playa": 6
+    };
+    const canonizarFase = valor => {
+        const fase = normalizarEstadisticas(valor);
+        if (fase.includes("PALA")) return "Palas de Playa";
+        if (fase.includes("REGR")) return "ReGrupos";
+        if (fase.includes("CUART")) return "Cuartos";
+        if (fase.includes("SEMI")) return "Semifinales";
+        if (fase === "FINAL" || fase.includes("GRAN FINAL")) return "Final";
+        if (fase.includes("GRUPO") || fase.includes("LIGA")) return "Grupos";
+        return String(valor || "");
+    };
+    const ordenarFases = lista => [...lista].sort(
+        (a, b) =>
+            (ordenFases[a.fase] || 99) - (ordenFases[b.fase] || 99)
+    );
+    const maximos = (lista, campo, menor = false) => {
+        if (!lista.length) return [];
+        const valores = lista
+            .map(item => Number(item[campo]))
+            .filter(Number.isFinite);
+        if (!valores.length) return [];
+        const valor = menor ? Math.min(...valores) : Math.max(...valores);
+        return lista.filter(item => Number(item[campo]) === valor);
+    };
+    const registrosPista = partidos => {
+        const mapa = new Map();
+        partidos.filter(p => p.pista !== null && p.pista !== undefined && p.pista !== "")
+            .forEach(p => {
+                const clave = String(p.pista);
+                if (!mapa.has(clave)) {
+                    mapa.set(clave, {
+                        pista: p.pista, partidos: 0, sets: 0, puntos: 0,
+                        duracion_total_min: 0, partidos_con_duracion: 0,
+                        partido_mas_largo_min: null, partido_mas_corto_min: null
+                    });
+                }
+                const x = mapa.get(clave);
+                x.partidos++;
+                x.sets += Number(p.sets_jugados || 0);
+                x.puntos += Number(p.total_puntos || 0);
+                const duracion = Number(p.duracion_min || 0);
+                if (duracion > 0) {
+                    x.duracion_total_min += duracion;
+                    x.partidos_con_duracion++;
+                    x.partido_mas_largo_min = x.partido_mas_largo_min === null
+                        ? duracion : Math.max(x.partido_mas_largo_min, duracion);
+                    x.partido_mas_corto_min = x.partido_mas_corto_min === null
+                        ? duracion : Math.min(x.partido_mas_corto_min, duracion);
+                }
+            });
+        return [...mapa.values()].map(x => ({
+            ...x,
+            duracion_total_min: x.partidos_con_duracion ? x.duracion_total_min : null,
+            duracion_media_min: x.partidos_con_duracion
+                ? x.duracion_total_min / x.partidos_con_duracion : null
+        })).sort((a,b) => Number(a.pista)-Number(b.pista));
+    };
+    const convertirParejas = equipos => equipos.map(e => ({
+        ids_jugadores: [e.id_jugador1, e.id_jugador2],
+        jugadores: String(e.equipo || "").split(" / "),
+        pareja: e.equipo,
+        pj: Number(e.pj || 0), pg: Number(e.pg || 0), pp: Number(e.pp || 0),
+        sets_favor: Number(e.sets_favor || 0),
+        sets_contra: Number(e.sets_contra || 0),
+        sets_jugados: Number(e.sets_jugados || 0),
+        puntos_favor: Number(e.puntos_favor || 0),
+        puntos_contra: Number(e.puntos_contra || 0),
+        diferencia_sets: Number(e.diferencia_sets || 0),
+        diferencia_puntos: Number(e.diferencia_puntos || 0),
+        porcentaje_victorias: Number(e.porcentaje_victorias || 0)
+    }));
+    const agruparFases = partidos => {
+        const mapa = new Map();
+        partidos.forEach(p => {
+            p.fase = canonizarFase(p.fase);
+            if (!ordenFases[p.fase]) return;
+            if (!mapa.has(p.fase)) {
+                mapa.set(p.fase, {
+                    fase: p.fase, partidos: 0, sets: 0, puntos: 0,
+                    duracion_total_min: 0, partidos_con_duracion: 0
+                });
+            }
+            const x = mapa.get(p.fase);
+            x.partidos++;
+            x.sets += Number(p.sets_jugados || 0);
+            x.puntos += Number(p.total_puntos || 0);
+            if (Number(p.duracion_min) > 0) {
+                x.duracion_total_min += Number(p.duracion_min);
+                x.partidos_con_duracion++;
+            }
+        });
+        return ordenarFases([...mapa.values()].map(x => ({
+            ...x,
+            duracion_total_min: x.partidos_con_duracion ? x.duracion_total_min : null,
+            duracion_media_min: x.partidos_con_duracion
+                ? x.duracion_total_min / x.partidos_con_duracion : null
+        })));
+    };
+    const recordsPartidos = partidos => {
+        const conDuracion = partidos.filter(p => Number(p.duracion_min) > 0);
+        return {
+            mas_igualados: maximos(partidos, "margen_medio_set", true).slice(0, 4),
+            mayor_diferencia: maximos(partidos, "diferencia_puntos").slice(0, 4),
+            mas_puntos: maximos(partidos, "total_puntos").slice(0, 4),
+            menos_puntos: maximos(partidos, "total_puntos", true).slice(0, 4),
+            mas_largos: maximos(conDuracion, "duracion_min").slice(0, 4),
+            mas_cortos: maximos(conDuracion, "duracion_min", true).slice(0, 4)
+        };
+    };
+    const recordsPistas = pistas => ({
+        mas_utilizada: maximos(pistas, "partidos"),
+        mas_rapida: {
+            minimo_partidos_con_duracion: 1,
+            pistas: maximos(
+                pistas.filter(p => Number(p.partidos_con_duracion) > 0),
+                "duracion_media_min",
+                true
+            )
+        },
+        mas_lenta: {
+            minimo_partidos_con_duracion: 1,
+            pistas: maximos(
+                pistas.filter(p => Number(p.partidos_con_duracion) > 0),
+                "duracion_media_min"
+            )
+        }
+    });
+    const recordsEquipos = equipos => {
+        equipos.forEach(e => {
+            const sets = Math.max(1, Number(e.sets_jugados || 0));
+            e.media_puntos_favor = Number(e.puntos_favor || 0) / sets;
+            e.media_puntos_contra = Number(e.puntos_contra || 0) / sets;
+        });
+        return {
+            mas_victorias: maximos(equipos, "pg"),
+            mejor_ataque: maximos(equipos, "media_puntos_favor"),
+            mejor_defensa: maximos(equipos, "media_puntos_contra", true)
+        };
+    };
+    const recordsParejas = parejas => ({
+        mas_partidos_juntos: maximos(parejas, "pj"),
+        mas_victorias: maximos(parejas, "pg"),
+        mejor_porcentaje_victorias: {
+            minimo_partidos: 3,
+            parejas: maximos(
+                parejas.filter(p => Number(p.pj) >= 3),
+                "porcentaje_victorias"
+            )
+        },
+        rivalidad_jugadores_mas_repetida: [],
+        enfrentamiento_equipos_mas_repetido: []
+    });
+    const filasHistoricas = remoto?.ranking_historico?.historial_ediciones || [];
+    const construirRecordsJugadores = (filas, global = false) => {
+        const agrupados = new Map();
+        filas.forEach(f => {
+            const id = String(f.id_jugador || "");
+            if (!id) return;
+            if (!agrupados.has(id)) {
+                agrupados.set(id, {
+                    id_jugador: id, jugador: f.jugador,
+                    pj: 0, pg: 0, pp: 0, sets_favor: 0, sets_contra: 0,
+                    titulos: 0, finales: 0, mejor_racha_victorias: 0
+                });
+            }
+            const x = agrupados.get(id);
+            x.pj += Number(f.pj || 0);
+            x.pg += Number(f.pg || 0);
+            x.pp += Number(f.pp || 0);
+            x.sets_favor += Number(f.sets_ganados || 0);
+            x.sets_contra += Number(f.sets_perdidos || 0);
+            const resultado = normalizarEstadisticas(f.resultado_final);
+            if (resultado === "CAMPEON") x.titulos++;
+            if (resultado === "CAMPEON" || resultado === "SUBCAMPEON") x.finales++;
+        });
+        const lista = [...agrupados.values()].map(x => ({
+            ...x,
+            sets_jugados: x.sets_favor + x.sets_contra,
+            porcentaje_victorias: x.pj ? x.pg / x.pj : 0,
+            diferencia_sets: x.sets_favor - x.sets_contra,
+            mejor_racha_victorias: x.pg
+        }));
+        return {
+            mas_partidos: maximos(lista, "pj"),
+            mas_victorias: maximos(lista, "pg"),
+            mayor_racha_victorias: maximos(lista, "mejor_racha_victorias"),
+            mas_titulos: maximos(lista, "titulos"),
+            mas_finales: maximos(lista, "finales"),
+            mejor_porcentaje_victorias: {
+                minimo_partidos: global ? 5 : 3,
+                jugadores: maximos(
+                    lista.filter(j => j.pj >= (global ? 5 : 3)),
+                    "porcentaje_victorias"
+                )
+            }
+        };
+    };
+
+    datosCompletos.campeonatos.forEach(campeonato => {
+        campeonato.partidos = [...(campeonato.partidos || [])]
+            .map(p => ({ ...p, fase: canonizarFase(p.fase) }))
+            .filter(p => ordenFases[p.fase])
+            .sort((a,b) =>
+                ordenFases[a.fase]-ordenFases[b.fase] ||
+                Number(a.jornada||0)-Number(b.jornada||0) ||
+                Number(a.orden||0)-Number(b.orden||0)
+            );
+        campeonato.por_fase = agruparFases(campeonato.partidos);
+        campeonato.pistas = registrosPista(campeonato.partidos);
+        campeonato.parejas = convertirParejas(campeonato.equipos || []);
+        const filasEdicion = filasHistoricas.filter(
+            f => String(f.id_campeonato) === String(campeonato.codigo_campeonato)
+        );
+        campeonato.records = {
+            equipos: recordsEquipos(campeonato.equipos || []),
+            partidos: recordsPartidos(campeonato.partidos),
+            jugadores: construirRecordsJugadores(filasEdicion),
+            parejas_y_rivalidades: recordsParejas(campeonato.parejas),
+            pistas: recordsPistas(campeonato.pistas)
+        };
+    });
+
+    const partidosGlobales = datosCompletos.campeonatos.flatMap(c => c.partidos || []);
+    const parejasMapa = new Map();
+    datosCompletos.campeonatos.flatMap(c => c.parejas || []).forEach(p => {
+        const clave = [...(p.ids_jugadores || [])].sort().join("|") || p.pareja;
+        if (!parejasMapa.has(clave)) {
+            parejasMapa.set(clave, { ...p });
+        } else {
+            const x = parejasMapa.get(clave);
+            ["pj","pg","pp","sets_favor","sets_contra","sets_jugados","puntos_favor","puntos_contra"]
+                .forEach(k => x[k] = Number(x[k]||0) + Number(p[k]||0));
+            x.diferencia_sets = x.sets_favor - x.sets_contra;
+            x.diferencia_puntos = x.puntos_favor - x.puntos_contra;
+            x.porcentaje_victorias = x.pj ? x.pg / x.pj : 0;
+        }
+    });
+    const parejasGlobales = [...parejasMapa.values()];
+    const pistasGlobales = registrosPista(partidosGlobales);
+    datosCompletos.global.partidos = partidosGlobales;
+    datosCompletos.global.por_fase = agruparFases(partidosGlobales);
+    datosCompletos.global.pistas = pistasGlobales;
+    datosCompletos.global.parejas = parejasGlobales;
+    datosCompletos.global.records = {
+        equipos: recordsEquipos(parejasGlobales.map(p => ({ ...p, equipo: p.pareja }))),
+        partidos: recordsPartidos(partidosGlobales),
+        jugadores: construirRecordsJugadores(filasHistoricas, true),
+        parejas_y_rivalidades: recordsParejas(parejasGlobales),
+        pistas: recordsPistas(pistasGlobales)
+    };
+    return datosCompletos;
 }
 
 async function cargarConfiguracionSupabaseEstadisticas(estadoJSON) {
