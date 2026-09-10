@@ -388,6 +388,48 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
                 });
             });
             actual.partidos = partidos;
+            actual.equipos.forEach(equipo => {
+                equipo.puntos_favor = 0;
+                equipo.puntos_contra = 0;
+                equipo.partidos_con_duracion = 0;
+                equipo.duracion_total_min = 0;
+            });
+            partidos
+                .filter(partido => partido.fase !== "Palas de Playa")
+                .forEach(partido => {
+                    const local = actual.equipos.find(e => e.equipo === partido.equipo1);
+                    const visitante = actual.equipos.find(e => e.equipo === partido.equipo2);
+                    if (local) {
+                        local.puntos_favor += partido.puntos_equipo1;
+                        local.puntos_contra += partido.puntos_equipo2;
+                    }
+                    if (visitante) {
+                        visitante.puntos_favor += partido.puntos_equipo2;
+                        visitante.puntos_contra += partido.puntos_equipo1;
+                    }
+                    if (Number(partido.duracion_min) > 0) {
+                        [local, visitante].filter(Boolean).forEach(equipo => {
+                            equipo.partidos_con_duracion++;
+                            equipo.duracion_total_min += Number(partido.duracion_min);
+                        });
+                    }
+                });
+            actual.equipos.forEach(equipo => {
+                equipo.diferencia_puntos =
+                    equipo.puntos_favor - equipo.puntos_contra;
+                equipo.media_puntos_favor = equipo.sets_jugados
+                    ? equipo.puntos_favor / equipo.sets_jugados
+                    : 0;
+                equipo.media_puntos_contra = equipo.sets_jugados
+                    ? equipo.puntos_contra / equipo.sets_jugados
+                    : 0;
+                equipo.duracion_total_min = equipo.partidos_con_duracion
+                    ? equipo.duracion_total_min
+                    : null;
+                equipo.duracion_media_min = equipo.partidos_con_duracion
+                    ? equipo.duracion_total_min / equipo.partidos_con_duracion
+                    : null;
+            });
             const fases = new Map();
             partidos.forEach(p => {
                 if (!fases.has(p.fase)) fases.set(p.fase, { fase: p.fase, partidos: 0, sets: 0, puntos: 0, duracion_total_min: 0, partidos_con_duracion: 0 });
