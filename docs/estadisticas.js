@@ -3230,7 +3230,7 @@ function pintarPistasEstadisticas(ambito) {
             <div>
                 <small>PISTAS Y TIEMPOS</small>
                 <h1>Estadísticas de pistas</h1>
-                <p>La rapidez se calcula mediante la duración media por partido.</p>
+                <p>Partidos a tie-break: uso de las pistas y tiempos medios de juego.</p>
             </div>
             <span>🏟️</span>
         </section>
@@ -3238,24 +3238,19 @@ function pintarPistasEstadisticas(ambito) {
         <section class="gridMetricasEstadisticas">
             ${pintarMetricaEstadisticas(
                 "🎾",
-                "Con pista",
+                "Partidos registrados",
                 resumen.partidos_con_pista
             )}
             ${pintarMetricaEstadisticas(
-                "⏱️",
-                "Con duración",
-                resumen.partidos_con_duracion
-            )}
-            ${pintarMetricaEstadisticas(
                 "⌛",
-                "Duración total",
+                "Tiempo total de juego",
                 formatearDuracionEstadisticas(
                     resumen.duracion_total_min
                 )
             )}
             ${pintarMetricaEstadisticas(
                 "📊",
-                "Media por partido",
+                "Duración media",
                 formatearDuracionEstadisticas(
                     resumen.duracion_media_min
                 )
@@ -3323,7 +3318,7 @@ function pintarRecordsPistasEstadisticas(records) {
     (records.mas_utilizada || []).forEach(pista => {
         items.push([
             "🔥",
-            "Más utilizada",
+            "Pista con más partidos",
             `Pista ${pista.pista}`,
             `${numeroEstadisticas(pista.partidos)} partidos`
         ]);
@@ -3332,7 +3327,7 @@ function pintarRecordsPistasEstadisticas(records) {
     (records.mas_rapida?.pistas || []).forEach(pista => {
         items.push([
             "⚡",
-            "Más rápida",
+            "Partidos más cortos de media",
             `Pista ${pista.pista}`,
             formatearDuracionEstadisticas(
                 pista.duracion_media_min
@@ -3343,7 +3338,7 @@ function pintarRecordsPistasEstadisticas(records) {
     (records.mas_lenta?.pistas || []).forEach(pista => {
         items.push([
             "🐢",
-            "Más lenta",
+            "Partidos más largos de media",
             `Pista ${pista.pista}`,
             formatearDuracionEstadisticas(
                 pista.duracion_media_min
