@@ -33,7 +33,11 @@ async function iniciarPaginaNormas() {
         };
 
         elementosNormas = Array.isArray(datosNormas.elementos)
-            ? [...datosNormas.elementos]
+            ? datosNormas.elementos.filter(
+                elemento =>
+                    elemento.visible !== false &&
+                    elemento.mostrar !== false
+            )
             : [];
 
         elementosNormas.sort((a, b) =>
