@@ -224,6 +224,10 @@ async function iniciarPaginaEstadisticas() {
 
         estadoCampeonato = estado || {};
         estadisticas = origenEstadisticas || {};
+        estadisticas = await completarEdicionesDesdeSupabase(
+            estadisticas,
+            estadoCampeonato
+        );
 
         if (
             modoMantenimientoEstadisticasActivo() &&
@@ -248,6 +252,167 @@ async function iniciarPaginaEstadisticas() {
         document.body.classList.remove(
             "appCargando"
         );
+    }
+}
+
+async function completarEdicionesDesdeSupabase(origen, estado) {
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_historicos`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const remoto = await respuesta.json();
+        const filas =
+            remoto?.ranking_historico?.historial_ediciones || [];
+        const existentes = [...(origen?.campeonatos || [])];
+        const codigos = new Set(
+            existentes.map(item => String(item.codigo_campeonato || ""))
+        );
+        const agrupadas = new Map();
+
+        filas.forEach(fila => {
+            const codigo = String(fila.id_campeonato || "");
+            if (!codigo || codigos.has(codigo)) return;
+            if (!agrupadas.has(codigo)) agrupadas.set(codigo, []);
+            agrupadas.get(codigo).push(fila);
+        });
+
+        agrupadas.forEach((jugadores, codigo) => {
+            const config = estado?.configuracion || {};
+            const equiposMap = new Map();
+
+            jugadores.forEach(jugador => {
+                const nombreEquipo = String(jugador.equipo || "");
+                if (!nombreEquipo || equiposMap.has(nombreEquipo)) return;
+                const pareja = jugadores.find(
+                    otro =>
+                        otro.id_jugador === jugador.id_pareja &&
+                        otro.equipo === nombreEquipo
+                );
+                equiposMap.set(nombreEquipo, {
+                    equipo: nombreEquipo,
+                    id_jugador1: jugador.id_jugador,
+                    id_jugador2: pareja?.id_jugador || jugador.id_pareja || "",
+                    pj: Number(jugador.pj || 0),
+                    pg: Number(jugador.pg || 0),
+                    pp: Number(jugador.pp || 0),
+                    sets_favor: Number(jugador.sets_ganados || 0),
+                    sets_contra: Number(jugador.sets_perdidos || 0),
+                    sets_jugados:
+                        Number(jugador.sets_ganados || 0) +
+                        Number(jugador.sets_perdidos || 0),
+                    puntos_favor: 0,
+                    puntos_contra: 0,
+                    diferencia_sets:
+                        Number(jugador.sets_ganados || 0) -
+                        Number(jugador.sets_perdidos || 0),
+                    diferencia_puntos: 0,
+                    porcentaje_victorias:
+                        Number(jugador.porcentaje_victorias || 0),
+                    posicion_final: jugador.posicion_final,
+                    resultado_final: jugador.resultado_final
+                });
+            });
+
+            const equipos = [...equiposMap.values()];
+            const campeon = equipos.find(
+                equipo => normalizarEstadisticas(equipo.resultado_final) === "CAMPEON"
+            )?.equipo || "";
+            const subcampeon = equipos.find(
+                equipo => normalizarEstadisticas(equipo.resultado_final) === "SUBCAMPEON"
+            )?.equipo || "";
+            const anio = Number(jugadores[0]?.anio || 0);
+            const esActual =
+                codigo === String(config.codigo_campeonato || "");
+
+            existentes.push({
+                id_campeonato:
+                    esActual
+                        ? String(config.id_campeonato || config.nombre_campeonato || codigo)
+                        : codigo,
+                codigo_campeonato: codigo,
+                anio,
+                fecha: esActual ? String(config.fecha_campeonato || "") : "",
+                nombre:
+                    esActual
+                        ? String(config.nombre_campeonato || codigo)
+                        : codigo,
+                tipo: esActual ? String(config.tipo_campeonato || "") : "",
+                estructura: esActual
+                    ? String(config.estructura_primera_fase || "")
+                    : "",
+                campeon,
+                subcampeon,
+                resumen: {
+                    partidos_jugados:
+                        Math.max(0, ...jugadores.map(j => Number(j.pj || 0))),
+                    partidos_competicion_principal:
+                        Math.max(0, ...jugadores.map(j => Number(j.pj || 0))),
+                    partidos_palas_playa: 0,
+                    sets_jugados:
+                        Math.round(
+                            jugadores.reduce(
+                                (total, j) =>
+                                    total +
+                                    Number(j.sets_ganados || 0) +
+                                    Number(j.sets_perdidos || 0),
+                                0
+                            ) / 4
+                        ),
+                    puntos_disputados: 0,
+                    partidos_con_pista: 0,
+                    partidos_con_duracion: 0,
+                    duracion_total_min: null,
+                    duracion_media_min: null,
+                    datos_pistas_disponibles: false,
+                    datos_duracion_disponibles: false,
+                    equipos_participantes: equipos.length,
+                    jugadores_participantes: jugadores.length
+                },
+                equipos,
+                por_fase: [],
+                por_jornada: [],
+                partidos: [],
+                pistas: [],
+                parejas: [],
+                rivalidades_jugadores: [],
+                enfrentamientos_equipos: [],
+                records: {
+                    equipos: {},
+                    partidos: {},
+                    jugadores: {},
+                    parejas_y_rivalidades: {},
+                    pistas: {}
+                }
+            });
+        });
+
+        return {
+            ...(origen || {}),
+            generado: new Date().toISOString(),
+            campeonatos: existentes.sort(
+                (a, b) => Number(b.anio || 0) - Number(a.anio || 0)
+            )
+        };
+    } catch (error) {
+        console.warn(
+            "Estadísticas: se utilizarán las ediciones del JSON de respaldo.",
+            error
+        );
+        return origen || {};
     }
 }
 
