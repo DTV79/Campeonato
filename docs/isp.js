@@ -149,20 +149,38 @@
         if (datosISP) return datosISP;
 
         if (!promesaISP) {
-            promesaISP = fetch(
-                `${JSON_ISP_URL}?v=${Date.now()}`,
-                {
-                    cache: "no-store"
-                }
-            )
+            promesaISP = fetch("https://imznjbnpecvnoivywnoy.supabase.co/rest/v1/rpc/web_historicos", {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2",
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            })
                 .then(respuesta => {
                     if (!respuesta.ok) {
-                        throw new Error(
-                            `No se pudo cargar ISP (${respuesta.status})`
-                        );
+                        throw new Error(`Supabase HTTP ${respuesta.status}`);
                     }
-
                     return respuesta.json();
+                })
+                .then(origen => origen?.isp || origen)
+                .catch(errorSupabase => {
+                    console.warn(
+                        "ISP: se utilizará el JSON de respaldo.",
+                        errorSupabase
+                    );
+                    return fetch(
+                        `${JSON_ISP_URL}?v=${Date.now()}`,
+                        { cache: "no-store" }
+                    ).then(respuesta => {
+                        if (!respuesta.ok) {
+                            throw new Error(
+                                `No se pudo cargar ISP (${respuesta.status})`
+                            );
+                        }
+                        return respuesta.json();
+                    });
                 })
                 .then(origen => {
                     datosISP = origen;
