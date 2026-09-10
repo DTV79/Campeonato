@@ -8,6 +8,7 @@ const SUPABASE_URL_NORMAS =
     "https://imznjbnpecvnoivywnoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY_NORMAS =
     "sb_publishable_E7p63Qia-9VAem_L1PBxnw_tcH-E7m2";
+const CODIGO_CAMPEONATO_NORMAS_RESPALDO = "CAMP-2026-01";
 
 let datosNormas = null;
 let estadoNormas = null;
@@ -21,14 +22,10 @@ async function iniciarPaginaNormas() {
     prepararBotonesNormas();
 
     try {
-        const [estado, reglas] = await Promise.all([
-            cargarJSONNormas(URL_ESTADO_NORMAS),
-            cargarJSONNormas(URL_REGLAS_NORMAS)
-        ]);
+        const { estado, reglas } =
+            await cargarDatosNormas();
 
-        estadoNormas = await cargarConfiguracionSupabaseNormas(
-            estado || {}
-        );
+        estadoNormas = estado || {};
         datosNormas = reglas || {};
         configNormas = {
             ...(datosNormas.configuracion || {}),
@@ -56,69 +53,91 @@ async function iniciarPaginaNormas() {
     }
 }
 
-async function cargarConfiguracionSupabaseNormas(estadoJSON) {
-    const codigoRespaldo = String(
-        estadoJSON?.configuracion?.codigo_campeonato || ""
-    ).trim();
-
+async function cargarDatosNormas() {
     try {
-        const respuestaActivo = await fetch(
-            `${SUPABASE_URL_NORMAS}/rest/v1/rpc/web_campeonato_activo`,
-            {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                    apikey: SUPABASE_PUBLISHABLE_KEY_NORMAS,
-                    "Content-Type": "application/json"
-                },
-                body: "{}"
-            }
-        );
+        const codigo = await llamarRPCNormas(
+            "web_campeonato_activo",
+            {}
+        ).then(resultado => textoSeguro(
+            resultado?.codigo_campeonato ||
+            CODIGO_CAMPEONATO_NORMAS_RESPALDO
+        ));
 
-        if (!respuestaActivo.ok) {
-            throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
+        const [configuracion, reglas] = await Promise.all([
+            llamarRPCNormas(
+                "web_obtener_configuracion",
+                { p_codigo: codigo }
+            ),
+            llamarRPCNormas(
+                "web_normas",
+                { p_codigo: codigo }
+            )
+        ]);
+
+        if (
+            !reglas ||
+            !Array.isArray(reglas.elementos) ||
+            !reglas.elementos.length
+        ) {
+            throw new Error(
+                "Supabase no devolvió un reglamento publicado"
+            );
         }
-
-        const activo = await respuestaActivo.json();
-        const codigo = String(
-            activo?.codigo_campeonato || codigoRespaldo
-        ).trim();
-
-        if (!codigo) return estadoJSON;
-
-        const respuestaConfig = await fetch(
-            `${SUPABASE_URL_NORMAS}/rest/v1/rpc/web_obtener_configuracion`,
-            {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                    apikey: SUPABASE_PUBLISHABLE_KEY_NORMAS,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ p_codigo: codigo })
-            }
-        );
-
-        if (!respuestaConfig.ok) {
-            throw new Error(`Supabase HTTP ${respuestaConfig.status}`);
-        }
-
-        const remoto = await respuestaConfig.json();
 
         return {
-            ...estadoJSON,
-            configuracion: {
-                ...(estadoJSON?.configuracion || {}),
-                ...(remoto && typeof remoto === "object" ? remoto : {}),
-                codigo_campeonato: codigo
-            }
+            estado: {
+                configuracion: configuracion || {},
+                estado_torneo:
+                    configuracion?.estado_torneo || ""
+            },
+            reglas
         };
     } catch (error) {
         console.warn(
-            "No se pudo cargar la configuración de Normas desde Supabase; se usa el respaldo.",
+            "Normas de Supabase no disponibles; se usan los JSON de respaldo.",
             error
         );
-        return estadoJSON;
+
+        const [estado, reglas] = await Promise.all([
+            cargarJSONNormas(URL_ESTADO_NORMAS),
+            cargarJSONNormas(URL_REGLAS_NORMAS)
+        ]);
+
+        return { estado, reglas };
+    }
+}
+
+async function llamarRPCNormas(nombre, parametros) {
+    const controlador = new AbortController();
+    const temporizador = setTimeout(
+        () => controlador.abort(),
+        5000
+    );
+
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL_NORMAS}/rest/v1/rpc/${nombre}`,
+            {
+                method: "POST",
+                cache: "no-store",
+                signal: controlador.signal,
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY_NORMAS,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(parametros || {})
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(
+                `Supabase ${nombre}: HTTP ${respuesta.status}`
+            );
+        }
+
+        return respuesta.json();
+    } finally {
+        clearTimeout(temporizador);
     }
 }
 
@@ -693,8 +712,8 @@ function pintarErrorNormas() {
     if (resumen) {
         resumen.innerHTML = `
             <div class="errorNormas">
-                No se pudo cargar reglas.json.
-                Actualiza la web desde Excel y vuelve a intentarlo.
+                No se pudo cargar el reglamento publicado.
+                Actualiza la página o consulta con la organización.
             </div>
         `;
     }
