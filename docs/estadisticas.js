@@ -665,12 +665,14 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
     const recordsPartidos = partidos => {
         const conDuracion = partidos.filter(p => Number(p.duracion_min) > 0);
         return {
-            mas_igualados: maximos(partidos, "margen_medio_set", true).slice(0, 4),
-            mayor_diferencia: maximos(partidos, "diferencia_puntos").slice(0, 4),
-            mas_puntos: maximos(partidos, "total_puntos").slice(0, 4),
-            menos_puntos: maximos(partidos, "total_puntos", true).slice(0, 4),
-            mas_largos: maximos(conDuracion, "duracion_min").slice(0, 4),
-            mas_cortos: maximos(conDuracion, "duracion_min", true).slice(0, 4)
+            // Se muestran todos los empates. Limitar a cuatro ocultaba
+            // ediciones anteriores cuando dos campeonatos repetían resultados.
+            mas_igualados: maximos(partidos, "margen_medio_set", true),
+            mayor_diferencia: maximos(partidos, "diferencia_puntos"),
+            mas_puntos: maximos(partidos, "total_puntos"),
+            menos_puntos: maximos(partidos, "total_puntos", true),
+            mas_largos: maximos(conDuracion, "duracion_min"),
+            mas_cortos: maximos(conDuracion, "duracion_min", true)
         };
     };
     const recordsPistas = pistas => ({
