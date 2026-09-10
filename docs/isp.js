@@ -295,6 +295,10 @@
                 >ℹ️</button>
             </div>
 
+            <p class="notaPalasNoComputa">
+                ℹ️ Palas de Playa no computa en el Ranking Histórico ni en el ISP.
+            </p>
+
             <section class="resumenISP">
                 <div>
                     <span>Líder</span>
