@@ -556,6 +556,25 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
         if (fase.includes("GRUPO") || fase.includes("LIGA")) return "Grupos";
         return String(valor || "");
     };
+    const canonizarFasePartido = partido => {
+        const faseDirecta = canonizarFase(partido?.fase);
+        if (ordenFases[faseDirecta]) return faseDirecta;
+
+        const faseOriginal = normalizarEstadisticas(partido?.fase);
+        if (
+            faseOriginal.includes("CRUCE") ||
+            faseOriginal.includes("ELIMIN") ||
+            faseOriginal.includes("MATA")
+        ) {
+            return canonizarFase(
+                partido?.grupo_ronda ||
+                partido?.ronda ||
+                partido?.codigo_ronda
+            );
+        }
+
+        return faseDirecta;
+    };
     const ordenarFases = lista => [...lista].sort(
         (a, b) =>
             (ordenFases[a.fase] || 99) - (ordenFases[b.fase] || 99)
@@ -767,7 +786,7 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
 
     datosCompletos.campeonatos.forEach(campeonato => {
         campeonato.partidos = [...(campeonato.partidos || [])]
-            .map(p => ({ ...p, fase: canonizarFase(p.fase) }))
+            .map(p => ({ ...p, fase: canonizarFasePartido(p) }))
             .filter(p => ordenFases[p.fase])
             .sort((a,b) =>
                 ordenFases[a.fase]-ordenFases[b.fase] ||
@@ -806,9 +825,32 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
     });
     const parejasGlobales = [...parejasMapa.values()];
     const pistasGlobales = registrosPista(partidosGlobales);
+    const partidosGlobalesConPista = partidosGlobales.filter(
+        p => p.pista !== null && p.pista !== undefined && p.pista !== ""
+    );
+    const partidosGlobalesConDuracion = partidosGlobales.filter(
+        p => Number(p.duracion_min) > 0
+    );
+    const duracionGlobalMin = partidosGlobalesConDuracion.reduce(
+        (total, p) => total + Number(p.duracion_min || 0),
+        0
+    );
+
     datosCompletos.global.partidos = partidosGlobales;
     datosCompletos.global.por_fase = agruparFases(partidosGlobales);
     datosCompletos.global.pistas = pistasGlobales;
+    datosCompletos.global.resumen = {
+        ...(datosCompletos.global.resumen || {}),
+        partidos_jugados: partidosGlobales.length,
+        partidos_con_pista: partidosGlobalesConPista.length,
+        partidos_con_duracion: partidosGlobalesConDuracion.length,
+        duracion_total_min: partidosGlobalesConDuracion.length ? duracionGlobalMin : null,
+        duracion_media_min: partidosGlobalesConDuracion.length
+            ? duracionGlobalMin / partidosGlobalesConDuracion.length
+            : null,
+        datos_pistas_disponibles: partidosGlobalesConPista.length > 0,
+        datos_duracion_disponibles: partidosGlobalesConDuracion.length > 0
+    };
     datosCompletos.global.parejas = parejasGlobales;
     datosCompletos.global.records = {
         equipos: recordsEquipos(parejasGlobales.map(p => ({ ...p, equipo: p.pareja }))),
@@ -1698,7 +1740,7 @@ function pintarFasesEstadisticas(fases) {
                             <strong>${escaparHTMLEstadisticas(
                                 fase.fase || "Fase"
                             )}</strong>
-                            <b>${partidos} partidos</b>
+                            <b>${partidos} ${partidos === 1 ? "partido" : "partidos"}</b>
                         </div>
                         <div class="barraEstadisticas">
                             <span style="width:${porcentaje}%"></span>
@@ -2935,7 +2977,7 @@ function pintarPartidosEstadisticas(ambito) {
             <span>🎾</span>
         </section>
 
-        ${pintarRecordsPartidosEstadisticas(records)}
+        ${pintarRecordsPartidosEstadisticas(records, esGlobal)}
 
         ${!esGlobal
             ? pintarPartidosAgrupadosPorFaseEstadisticas(ambito)
@@ -2944,7 +2986,7 @@ function pintarPartidosEstadisticas(ambito) {
     `;
 }
 
-function pintarRecordsPartidosEstadisticas(records) {
+function pintarRecordsPartidosEstadisticas(records, mostrarEdicion = false) {
     const tarjetas = [
         [
             "🤏",
@@ -3019,7 +3061,8 @@ function pintarRecordsPartidosEstadisticas(records) {
                     icono,
                     titulo,
                     lista,
-                    obtenerValor
+                    obtenerValor,
+                    mostrarEdicion
                 )
             ).join("")}
         </div>
@@ -3030,7 +3073,8 @@ function pintarRecordPartidoEstadisticas(
     icono,
     titulo,
     partidos,
-    obtenerValor
+    obtenerValor,
+    mostrarEdicion = false
 ) {
     return `
         <article class="recordPartidoEstadisticas">
@@ -3055,8 +3099,12 @@ function pintarRecordPartidoEstadisticas(
                                 obtenerValor(partido),
                                 detallePartidoEstadisticas(partido),
                                 obtenerPistaYDuracionPartidoEstadisticas(
-                                    partido
-                                )
+                                    partido,
+                                    !["Partido más largo", "Partido más corto"].includes(titulo)
+                                ),
+                                mostrarEdicion
+                                    ? obtenerEdicionPartidoEstadisticas(partido)
+                                    : ""
                             ]
                                 .filter(Boolean)
                                 .join(" · ")
@@ -3150,7 +3198,8 @@ function pintarPartidoEstadisticas(partido) {
 }
 
 function obtenerPistaYDuracionPartidoEstadisticas(
-    partido
+    partido,
+    incluirDuracion = true
 ) {
     const datos = [];
 
@@ -3167,6 +3216,7 @@ function obtenerPistaYDuracionPartidoEstadisticas(
     );
 
     if (
+        incluirDuracion &&
         Number.isFinite(duracion) &&
         duracion > 0
     ) {
@@ -3178,6 +3228,14 @@ function obtenerPistaYDuracionPartidoEstadisticas(
     }
 
     return datos.join(" · ");
+}
+
+function obtenerEdicionPartidoEstadisticas(partido) {
+    const anio = Number(partido?.anio);
+    if (Number.isFinite(anio) && anio > 0) return `Edición ${anio}`;
+
+    const codigo = String(partido?.codigo_campeonato || "").trim();
+    return codigo ? `Edición ${codigo}` : "";
 }
 
 function formatearNumeroDecimalEstadisticas(valor) {
@@ -3213,7 +3271,7 @@ function pintarPistasEstadisticas(ambito) {
                 <div>
                     <small>PISTAS Y TIEMPOS</small>
                     <h1>Estadísticas de pistas</h1>
-                    <p>Uso, carga acumulada y velocidad media.</p>
+                    <p>Uso de pistas y tiempos de partidos jugados a tie-break.</p>
                 </div>
                 <span>🏟️</span>
             </section>
@@ -3225,12 +3283,23 @@ function pintarPistasEstadisticas(ambito) {
         `;
     }
 
+    const partidosConPista = numeroEstadisticas(
+        resumen.partidos_con_pista
+    );
+    const partidosTotales = numeroEstadisticas(
+        resumen.partidos_jugados
+    );
+    const coberturaPistas =
+        partidosTotales > partidosConPista
+            ? `${partidosConPista} de ${partidosTotales}`
+            : partidosConPista;
+
     return `
         <section class="cabeceraPanelEstadisticas">
             <div>
                 <small>PISTAS Y TIEMPOS</small>
                 <h1>Estadísticas de pistas</h1>
-                <p>Partidos a tie-break: uso de las pistas y tiempos medios de juego.</p>
+                <p>Partidos a tie-break: uso de las pistas y duración real registrada. Las medias se calculan solo con los partidos que disponen de ese dato.</p>
             </div>
             <span>🏟️</span>
         </section>
@@ -3238,8 +3307,10 @@ function pintarPistasEstadisticas(ambito) {
         <section class="gridMetricasEstadisticas">
             ${pintarMetricaEstadisticas(
                 "🎾",
-                "Partidos registrados",
-                resumen.partidos_con_pista
+                partidosTotales > partidosConPista
+                    ? "Partidos con datos"
+                    : "Partidos registrados",
+                coberturaPistas
             )}
             ${pintarMetricaEstadisticas(
                 "⌛",
@@ -3604,7 +3675,8 @@ function pintarRecordsEstadisticas(ambito) {
         </div>
 
         ${pintarRecordsPartidosEstadisticas(
-            records.partidos || {}
+            records.partidos || {},
+            esHistoricoGlobal
         )}
     `;
 }
