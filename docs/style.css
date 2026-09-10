@@ -4945,3 +4945,13 @@ body.modalEtiquetasEquiposEstadisticasAbierto{
         font-size:15px;
     }
 }
+
+
+/* Aviso deportivo discreto compartido por Ranking e ISP */
+.notaPalasNoComputa {
+    margin: -0.25rem 0 0.9rem;
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    text-align: center;
+}
