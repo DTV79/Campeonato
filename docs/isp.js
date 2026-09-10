@@ -149,7 +149,7 @@
         if (datosISP) return datosISP;
 
         if (!promesaISP) {
-            promesaISP = fetch("https://imznjbnpecvnoivywnoy.supabase.co/rest/v1/rpc/web_historicos", {
+            promesaISP = fetch("https://imznjbnpecvnoivywnoy.supabase.co/rest/v1/rpc/web_isp_publico", {
                 method: "POST",
                 cache: "no-store",
                 headers: {
@@ -164,8 +164,7 @@
                     }
                     return respuesta.json();
                 })
-                .then(origen => origen?.isp || origen)
-                .catch(errorSupabase => {
+                                 .catch(errorSupabase => {
                     console.warn(
                         "ISP: se utilizará el JSON de respaldo.",
                         errorSupabase
