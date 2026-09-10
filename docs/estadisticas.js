@@ -257,30 +257,22 @@ async function iniciarPaginaEstadisticas() {
 
 async function completarEdicionesDesdeSupabase(origen, estado) {
     try {
-        const respuesta = await fetch(
+        const cabeceras = {
+            apikey: SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS,
+            "Content-Type": "application/json"
+        };
+        const respuestaHistoricos = await fetch(
             `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_historicos`,
-            {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                    apikey: SUPABASE_PUBLISHABLE_KEY_ESTADISTICAS,
-                    "Content-Type": "application/json"
-                },
-                body: "{}"
-            }
+            { method: "POST", cache: "no-store", headers: cabeceras, body: "{}" }
         );
-
-        if (!respuesta.ok) {
-            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        if (!respuestaHistoricos.ok) {
+            throw new Error(`Supabase HTTP ${respuestaHistoricos.status}`);
         }
 
-        const remoto = await respuesta.json();
-        const filas =
-            remoto?.ranking_historico?.historial_ediciones || [];
+        const remoto = await respuestaHistoricos.json();
+        const filas = remoto?.ranking_historico?.historial_ediciones || [];
         const existentes = [...(origen?.campeonatos || [])];
-        const codigos = new Set(
-            existentes.map(item => String(item.codigo_campeonato || ""))
-        );
+        const codigos = new Set(existentes.map(item => String(item.codigo_campeonato || "")));
         const agrupadas = new Map();
 
         filas.forEach(fila => {
@@ -293,125 +285,193 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
         agrupadas.forEach((jugadores, codigo) => {
             const config = estado?.configuracion || {};
             const equiposMap = new Map();
-
             jugadores.forEach(jugador => {
-                const nombreEquipo = String(jugador.equipo || "");
-                if (!nombreEquipo || equiposMap.has(nombreEquipo)) return;
-                const pareja = jugadores.find(
-                    otro =>
-                        otro.id_jugador === jugador.id_pareja &&
-                        otro.equipo === nombreEquipo
+                const nombre = String(jugador.equipo || "");
+                if (!nombre || equiposMap.has(nombre)) return;
+                const pareja = jugadores.find(otro =>
+                    otro.id_jugador === jugador.id_pareja && otro.equipo === nombre
                 );
-                equiposMap.set(nombreEquipo, {
-                    equipo: nombreEquipo,
+                equiposMap.set(nombre, {
+                    equipo: nombre,
                     id_jugador1: jugador.id_jugador,
                     id_jugador2: pareja?.id_jugador || jugador.id_pareja || "",
-                    pj: Number(jugador.pj || 0),
-                    pg: Number(jugador.pg || 0),
+                    pj: Number(jugador.pj || 0), pg: Number(jugador.pg || 0),
                     pp: Number(jugador.pp || 0),
                     sets_favor: Number(jugador.sets_ganados || 0),
                     sets_contra: Number(jugador.sets_perdidos || 0),
-                    sets_jugados:
-                        Number(jugador.sets_ganados || 0) +
-                        Number(jugador.sets_perdidos || 0),
-                    puntos_favor: 0,
-                    puntos_contra: 0,
-                    diferencia_sets:
-                        Number(jugador.sets_ganados || 0) -
-                        Number(jugador.sets_perdidos || 0),
+                    sets_jugados: Number(jugador.sets_ganados || 0) + Number(jugador.sets_perdidos || 0),
+                    puntos_favor: 0, puntos_contra: 0,
+                    diferencia_sets: Number(jugador.sets_ganados || 0) - Number(jugador.sets_perdidos || 0),
                     diferencia_puntos: 0,
-                    porcentaje_victorias:
-                        Number(jugador.porcentaje_victorias || 0),
+                    porcentaje_victorias: Number(jugador.porcentaje_victorias || 0),
                     posicion_final: jugador.posicion_final,
                     resultado_final: jugador.resultado_final
                 });
             });
-
             const equipos = [...equiposMap.values()];
-            const campeon = equipos.find(
-                equipo => normalizarEstadisticas(equipo.resultado_final) === "CAMPEON"
-            )?.equipo || "";
-            const subcampeon = equipos.find(
-                equipo => normalizarEstadisticas(equipo.resultado_final) === "SUBCAMPEON"
-            )?.equipo || "";
-            const anio = Number(jugadores[0]?.anio || 0);
-            const esActual =
-                codigo === String(config.codigo_campeonato || "");
-
+            const configActual = codigo === String(config.codigo_campeonato || "");
             existentes.push({
-                id_campeonato:
-                    esActual
-                        ? String(config.id_campeonato || config.nombre_campeonato || codigo)
-                        : codigo,
+                id_campeonato: configActual
+                    ? String(config.id_campeonato || config.nombre_campeonato || codigo)
+                    : codigo,
                 codigo_campeonato: codigo,
-                anio,
-                fecha: esActual ? String(config.fecha_campeonato || "") : "",
-                nombre:
-                    esActual
-                        ? String(config.nombre_campeonato || codigo)
-                        : codigo,
-                tipo: esActual ? String(config.tipo_campeonato || "") : "",
-                estructura: esActual
-                    ? String(config.estructura_primera_fase || "")
-                    : "",
-                campeon,
-                subcampeon,
-                resumen: {
-                    partidos_jugados:
-                        Math.max(0, ...jugadores.map(j => Number(j.pj || 0))),
-                    partidos_competicion_principal:
-                        Math.max(0, ...jugadores.map(j => Number(j.pj || 0))),
-                    partidos_palas_playa: 0,
-                    sets_jugados:
-                        Math.round(
-                            jugadores.reduce(
-                                (total, j) =>
-                                    total +
-                                    Number(j.sets_ganados || 0) +
-                                    Number(j.sets_perdidos || 0),
-                                0
-                            ) / 4
-                        ),
-                    puntos_disputados: 0,
-                    partidos_con_pista: 0,
-                    partidos_con_duracion: 0,
-                    duracion_total_min: null,
-                    duracion_media_min: null,
-                    datos_pistas_disponibles: false,
-                    datos_duracion_disponibles: false,
-                    equipos_participantes: equipos.length,
-                    jugadores_participantes: jugadores.length
-                },
-                equipos,
-                por_fase: [],
-                por_jornada: [],
-                partidos: [],
-                pistas: [],
-                parejas: [],
-                rivalidades_jugadores: [],
-                enfrentamientos_equipos: [],
-                records: {
-                    equipos: {},
-                    partidos: {},
-                    jugadores: {},
-                    parejas_y_rivalidades: {},
-                    pistas: {}
-                }
+                anio: Number(jugadores[0]?.anio || 0),
+                fecha: configActual ? String(config.fecha_campeonato || "") : "",
+                nombre: configActual ? String(config.nombre_campeonato || codigo) : codigo,
+                tipo: configActual ? String(config.tipo_campeonato || "") : "",
+                estructura: configActual ? String(config.estructura_primera_fase || "") : "",
+                campeon: equipos.find(e => normalizarEstadisticas(e.resultado_final) === "CAMPEON")?.equipo || "",
+                subcampeon: equipos.find(e => normalizarEstadisticas(e.resultado_final) === "SUBCAMPEON")?.equipo || "",
+                resumen: {}, equipos, por_fase: [], por_jornada: [], partidos: [],
+                pistas: [], parejas: [], rivalidades_jugadores: [], enfrentamientos_equipos: [],
+                records: { equipos: {}, partidos: {}, jugadores: {}, parejas_y_rivalidades: {}, pistas: {} }
             });
         });
 
-        return {
-            ...(origen || {}),
-            generado: new Date().toISOString(),
-            campeonatos: existentes.sort(
-                (a, b) => Number(b.anio || 0) - Number(a.anio || 0)
-            )
+        const codigoActual = String(estado?.configuracion?.codigo_campeonato || "");
+        const actual = existentes.find(item => String(item.codigo_campeonato) === codigoActual);
+        if (actual) {
+            const respuestaCompeticion = await fetch(
+                `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_competicion`,
+                {
+                    method: "POST", cache: "no-store", headers: cabeceras,
+                    body: JSON.stringify({ p_codigo: codigoActual })
+                }
+            );
+            if (!respuestaCompeticion.ok) {
+                throw new Error(`Supabase HTTP ${respuestaCompeticion.status}`);
+            }
+            const competicion = await respuestaCompeticion.json();
+            const fuentes = [
+                ["Grupos", competicion.partidos_grupos],
+                ["Liga", competicion.partidos_liguilla],
+                ["ReGrupos", competicion.partidos_regrupos],
+                ["Cruces", competicion.cruces],
+                ["Palas de Playa", competicion.palas_playa]
+            ];
+            const partidos = [];
+            fuentes.forEach(([faseBase, lista]) => {
+                (lista || []).forEach(p => {
+                    if (normalizarEstadisticas(p.estado) !== "JUGADO") return;
+                    const sets = (p.resultado || []).map(valor => {
+                        const partes = String(valor).split("-").map(Number);
+                        return { a: partes[0] || 0, b: partes[1] || 0 };
+                    });
+                    const s1 = sets.filter(s => s.a > s.b).length;
+                    const s2 = sets.filter(s => s.b > s.a).length;
+                    const pf1 = sets.reduce((t, s) => t + s.a, 0);
+                    const pf2 = sets.reduce((t, s) => t + s.b, 0);
+                    partidos.push({
+                        id_campeonato: actual.id_campeonato,
+                        codigo_campeonato: codigoActual,
+                        anio: actual.anio,
+                        id_partido: p.id_partido,
+                        fase: faseBase === "Cruces" ? String(p.ronda || p.fase || "Cruces") : faseBase,
+                        grupo_ronda: p.grupo || p.ronda || "",
+                        jornada: Number(p.jornada || 0), orden: Number(p.orden || 0),
+                        equipo1: p.local, equipo2: p.visitante,
+                        resultado: (p.resultado || []).join(" / "),
+                        ganador: s1 > s2 ? p.local : p.visitante,
+                        sets_equipo1: s1, sets_equipo2: s2,
+                        puntos_equipo1: pf1, puntos_equipo2: pf2,
+                        diferencia_puntos: Math.abs(pf1 - pf2),
+                        total_puntos: pf1 + pf2, sets_jugados: sets.length,
+                        margen_total_sets: sets.reduce((t, s) => t + Math.abs(s.a - s.b), 0),
+                        margen_medio_set: sets.length
+                            ? sets.reduce((t, s) => t + Math.abs(s.a - s.b), 0) / sets.length
+                            : 0,
+                        margen_max_set: sets.length ? Math.max(...sets.map(s => Math.abs(s.a - s.b))) : 0,
+                        margen_min_set: sets.length ? Math.min(...sets.map(s => Math.abs(s.a - s.b))) : 0,
+                        sets_perdedor: Math.min(s1, s2),
+                        pista: p.pista ?? null, duracion_min: p.duracion_min ?? null
+                    });
+                });
+            });
+            actual.partidos = partidos;
+            const fases = new Map();
+            partidos.forEach(p => {
+                if (!fases.has(p.fase)) fases.set(p.fase, { fase: p.fase, partidos: 0, sets: 0, puntos: 0, duracion_total_min: 0, partidos_con_duracion: 0 });
+                const x = fases.get(p.fase);
+                x.partidos++; x.sets += p.sets_jugados; x.puntos += p.total_puntos;
+                if (Number(p.duracion_min) > 0) {
+                    x.duracion_total_min += Number(p.duracion_min);
+                    x.partidos_con_duracion++;
+                }
+            });
+            actual.por_fase = [...fases.values()].map(x => ({
+                ...x,
+                duracion_total_min: x.partidos_con_duracion ? x.duracion_total_min : null,
+                duracion_media_min: x.partidos_con_duracion ? x.duracion_total_min / x.partidos_con_duracion : null
+            }));
+            const jornadas = new Map();
+            partidos.forEach(p => {
+                const clave = `${p.fase}|${p.grupo_ronda}|${p.jornada}`;
+                if (!jornadas.has(clave)) jornadas.set(clave, { fase: p.fase, grupo_ronda: p.grupo_ronda, jornada: p.jornada, partidos: 0 });
+                jornadas.get(clave).partidos++;
+            });
+            actual.por_jornada = [...jornadas.values()];
+            const conDuracion = partidos.filter(p => Number(p.duracion_min) > 0);
+            actual.resumen = {
+                partidos_jugados: partidos.length,
+                partidos_competicion_principal: partidos.filter(p => p.fase !== "Palas de Playa").length,
+                partidos_palas_playa: partidos.filter(p => p.fase === "Palas de Playa").length,
+                sets_jugados: partidos.reduce((t, p) => t + p.sets_jugados, 0),
+                puntos_disputados: partidos.reduce((t, p) => t + p.total_puntos, 0),
+                partidos_con_pista: partidos.filter(p => p.pista !== null).length,
+                partidos_con_duracion: conDuracion.length,
+                duracion_total_min: conDuracion.length ? conDuracion.reduce((t,p) => t + Number(p.duracion_min),0) : null,
+                duracion_media_min: conDuracion.length ? conDuracion.reduce((t,p) => t + Number(p.duracion_min),0) / conDuracion.length : null,
+                datos_pistas_disponibles: partidos.some(p => p.pista !== null),
+                datos_duracion_disponibles: conDuracion.length > 0,
+                equipos_participantes: actual.equipos.length,
+                jugadores_participantes: actual.equipos.length * 2
+            };
+            actual.records.partidos = {
+                mas_igualados: [...partidos].sort((a,b) => a.margen_medio_set-b.margen_medio_set).slice(0,1),
+                mayor_diferencia: [...partidos].sort((a,b) => b.diferencia_puntos-a.diferencia_puntos).slice(0,1),
+                mas_puntos: [...partidos].sort((a,b) => b.total_puntos-a.total_puntos).slice(0,1),
+                menos_puntos: [...partidos].sort((a,b) => a.total_puntos-b.total_puntos).slice(0,1),
+                mas_largos: [...conDuracion].sort((a,b) => b.duracion_min-a.duracion_min).slice(0,1),
+                mas_cortos: [...conDuracion].sort((a,b) => a.duracion_min-b.duracion_min).slice(0,1)
+            };
+        }
+
+        const campeonatos = existentes.sort((a,b) => Number(b.anio||0)-Number(a.anio||0));
+        const resumenes = campeonatos.map(c => c.resumen || {});
+        const fasesGlobal = new Map();
+        campeonatos.flatMap(c => c.por_fase || []).forEach(f => {
+            if (!fasesGlobal.has(f.fase)) fasesGlobal.set(f.fase, { fase:f.fase, partidos:0, sets:0, puntos:0, duracion_total_min:0, partidos_con_duracion:0 });
+            const x=fasesGlobal.get(f.fase);
+            x.partidos+=Number(f.partidos||0); x.sets+=Number(f.sets||0); x.puntos+=Number(f.puntos||0);
+            x.duracion_total_min+=Number(f.duracion_total_min||0); x.partidos_con_duracion+=Number(f.partidos_con_duracion||0);
+        });
+        const globalAnterior = origen?.global || {};
+        const global = {
+            ...globalAnterior,
+            resumen: {
+                ...(globalAnterior.resumen || {}),
+                partidos_jugados: resumenes.reduce((t,r)=>t+Number(r.partidos_jugados||0),0),
+                partidos_competicion_principal: resumenes.reduce((t,r)=>t+Number(r.partidos_competicion_principal||0),0),
+                partidos_palas_playa: resumenes.reduce((t,r)=>t+Number(r.partidos_palas_playa||0),0),
+                sets_jugados: resumenes.reduce((t,r)=>t+Number(r.sets_jugados||0),0),
+                puntos_disputados: resumenes.reduce((t,r)=>t+Number(r.puntos_disputados||0),0),
+                campeonatos_finalizados: campeonatos.length,
+                jugadores_distintos: remoto?.ranking_historico?.resumen?.numero_jugadores || 0,
+                parejas_distintas: new Set(campeonatos.flatMap(c => (c.equipos||[]).map(e=>e.equipo))).size,
+                primer_anio: Math.min(...campeonatos.map(c=>Number(c.anio||9999))),
+                ultimo_anio: Math.max(...campeonatos.map(c=>Number(c.anio||0)))
+            },
+            por_fase: [...fasesGlobal.values()].map(x=>({
+                ...x,
+                duracion_total_min:x.partidos_con_duracion?x.duracion_total_min:null,
+                duracion_media_min:x.partidos_con_duracion?x.duracion_total_min/x.partidos_con_duracion:null
+            })),
+            parejas: campeonatos.flatMap(c=>c.equipos||[])
         };
+
+        return { ...(origen || {}), generado: new Date().toISOString(), global, campeonatos };
     } catch (error) {
-        console.warn(
-            "Estadísticas: se utilizarán las ediciones del JSON de respaldo.",
-            error
-        );
+        console.warn("Estadísticas: se utilizará el JSON de respaldo.", error);
         return origen || {};
     }
 }
