@@ -381,14 +381,14 @@ function pintarContenidoSeccion(elementos) {
                     textoSeguro(elementos[indice].tipo)
                 )
             ) {
-                lista.push(elementos[indice].texto);
+                lista.push(elementos[indice]);
                 indice += 1;
             }
 
             html += `
                 <ul>
-                    ${lista.map(texto =>
-                        `<li>${escaparHTML(texto)}</li>`
+                    ${lista.map(item =>
+                        `<li>${iconoElementoHTML(item)}<span>${escaparHTML(item.texto)}</span></li>`
                     ).join("")}
                 </ul>
             `;
@@ -402,14 +402,14 @@ function pintarContenidoSeccion(elementos) {
                 indice < elementos.length &&
                 textoSeguro(elementos[indice].tipo) === "Paso"
             ) {
-                lista.push(elementos[indice].texto);
+                lista.push(elementos[indice]);
                 indice += 1;
             }
 
             html += `
                 <ol>
-                    ${lista.map(texto =>
-                        `<li>${escaparHTML(texto)}</li>`
+                    ${lista.map(item =>
+                        `<li>${iconoElementoHTML(item)}<span>${escaparHTML(item.texto)}</span></li>`
                     ).join("")}
                 </ol>
             `;
@@ -423,15 +423,15 @@ function pintarContenidoSeccion(elementos) {
                 indice < elementos.length &&
                 textoSeguro(elementos[indice].tipo) === "Criterio"
             ) {
-                lista.push(elementos[indice].texto);
+                lista.push(elementos[indice]);
                 indice += 1;
             }
 
             html += `
                 <div class="bloqueCriteriosNorma">
                     <ol class="listaCriteriosNorma">
-                        ${lista.map(texto =>
-                            `<li>${escaparHTML(texto)}</li>`
+                        ${lista.map(item =>
+                            `<li>${iconoElementoHTML(item)}<span>${escaparHTML(item.texto)}</span></li>`
                         ).join("")}
                     </ol>
                 </div>
@@ -488,36 +488,41 @@ function pintarContenidoSeccion(elementos) {
 function pintarElementoIndividual(elemento) {
     const tipo = textoSeguro(elemento.tipo);
     const texto = escaparHTML(elemento.texto);
+    const icono = iconoElementoHTML(elemento);
+    const claseIcono = icono ? " elementoNormaConIcono" : "";
 
     switch (tipo) {
         case "Párrafo":
         case "Descripción":
-            return `<p>${texto}</p>`;
+            return `<p class="${claseIcono.trim()}">${icono}<span>${texto}</span></p>`;
 
         case "Destacado":
         case "Mensaje":
-            return `<div class="destacadoNorma">${texto}</div>`;
+            return `<div class="destacadoNorma${claseIcono}">${icono}<span>${texto}</span></div>`;
 
         case "Nota":
-            return `<div class="notaNorma">${texto}</div>`;
+            return `<div class="notaNorma${claseIcono}">${icono}<span>${texto}</span></div>`;
 
         case "Ejemplo":
             return `
-                <div class="ejemploNorma">
+                <div class="ejemploNorma${claseIcono}">
+                    ${icono}
+                    <div>
                     <strong>Ejemplo</strong>
                     <p>${texto}</p>
+                    </div>
                 </div>
             `;
 
         case "Nombre opción":
             return `
-                <div class="etiquetaOpcionalNorma">
-                    ${texto}
+                <div class="etiquetaOpcionalNorma${claseIcono}">
+                    ${icono}<span>${texto}</span>
                 </div>
             `;
 
         case "Valor dinámico":
-            return `<p><strong>${texto}</strong></p>`;
+            return `<p class="${claseIcono.trim()}">${icono}<strong>${texto}</strong></p>`;
 
         case "Texto alternativo":
         case "Mensaje técnico":
@@ -527,6 +532,14 @@ function pintarElementoIndividual(elemento) {
         default:
             return texto ? `<p>${texto}</p>` : "";
     }
+}
+
+function iconoElementoHTML(elemento) {
+    const icono = textoSeguro(elemento?.icono);
+
+    return icono
+        ? `<span class="iconoContenidoNorma" aria-hidden="true">${escaparHTML(icono)}</span>`
+        : "";
 }
 
 function pintarTablaPuntuacion(cabeceras) {

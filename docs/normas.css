@@ -262,6 +262,22 @@
     font-weight:900;
 }
 
+.elementoNormaConIcono{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+}
+
+.iconoContenidoNorma{
+    flex:0 0 auto;
+    font-size:17px;
+    line-height:1.45;
+}
+
+.contenidoNorma li .iconoContenidoNorma{
+    margin-right:7px;
+}
+
 .destacadoNorma{
     margin:14px 0;
     padding:14px;
