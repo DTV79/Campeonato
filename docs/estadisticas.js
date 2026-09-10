@@ -270,6 +270,13 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
         }
 
         const remoto = await respuestaHistoricos.json();
+        const respuestaISP = await fetch(
+            `${SUPABASE_URL_ESTADISTICAS}/rest/v1/rpc/web_isp_publico`,
+            { method: "POST", cache: "no-store", headers: cabeceras, body: "{}" }
+        );
+        const remotoISP = respuestaISP.ok
+            ? await respuestaISP.json()
+            : { historial: [] };
         const filas = remoto?.ranking_historico?.historial_ediciones || [];
         const existentes = [...(origen?.campeonatos || [])];
         const codigos = new Set(existentes.map(item => String(item.codigo_campeonato || "")));
@@ -513,7 +520,8 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
 
         return finalizarEstadisticasDinamicas(
             { ...(origen || {}), generado: new Date().toISOString(), global, campeonatos },
-            remoto
+            remoto,
+            remotoISP
         );
     } catch (error) {
         console.warn("Estadísticas: se utilizará el JSON de respaldo.", error);
@@ -521,7 +529,7 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
     }
 }
 
-function finalizarEstadisticasDinamicas(datosCompletos, remoto) {
+function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
     const ordenFases = {
         "Grupos": 1,
         "ReGrupos": 2,
@@ -704,12 +712,28 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto) {
             if (resultado === "CAMPEON") x.titulos++;
             if (resultado === "CAMPEON" || resultado === "SUBCAMPEON") x.finales++;
         });
+        const codigos = new Set(filas.map(f => String(f.id_campeonato || "")));
+        const rachas = new Map();
+        const actual = new Map();
+        [...(remotoISP?.historial || [])]
+            .filter(m => global || codigos.has(String(m.codigo_campeonato || "")))
+            .sort((a,b) =>
+                Number(a.secuencia_partido || 0) - Number(b.secuencia_partido || 0)
+            )
+            .forEach(m => {
+                const id = String(m.id_jugador || "");
+                const seguida = normalizarEstadisticas(m.resultado) === "VICTORIA"
+                    ? Number(actual.get(id) || 0) + 1
+                    : 0;
+                actual.set(id, seguida);
+                rachas.set(id, Math.max(Number(rachas.get(id) || 0), seguida));
+            });
         const lista = [...agrupados.values()].map(x => ({
             ...x,
             sets_jugados: x.sets_favor + x.sets_contra,
             porcentaje_victorias: x.pj ? x.pg / x.pj : 0,
             diferencia_sets: x.sets_favor - x.sets_contra,
-            mejor_racha_victorias: x.pg
+            mejor_racha_victorias: Number(rachas.get(x.id_jugador) || 0)
         }));
         return {
             mas_partidos: maximos(lista, "pj"),
