@@ -2152,36 +2152,7 @@ async function cargarDatosRankingHistorico() {
                 }
                 return respuesta.json();
             })
-            .then(async origen => {
-                const ranking = origen?.ranking_historico || origen;
-                try {
-                    const respuestaBaremo = await fetch(
-                        SUPABASE_URL + "/rest/v1/rpc/web_baremo_ranking",
-                        {
-                            method: "POST",
-                            cache: "no-store",
-                            headers: {
-                                apikey: SUPABASE_PUBLISHABLE_KEY,
-                                "Content-Type": "application/json"
-                            },
-                            body: "{}"
-                        }
-                    );
-                    if (!respuestaBaremo.ok) {
-                        throw new Error(`Supabase HTTP ${respuestaBaremo.status}`);
-                    }
-                    return {
-                        ...ranking,
-                        baremo: await respuestaBaremo.json()
-                    };
-                } catch (errorBaremo) {
-                    console.warn(
-                        "No se pudo cargar el baremo del ranking.",
-                        errorBaremo
-                    );
-                    return ranking;
-                }
-            })
+            .then(origen => origen?.ranking_historico || origen)
             .catch(errorSupabase => {
                 console.warn(
                     "Ranking: se utilizará el JSON de respaldo.",
