@@ -4810,7 +4810,7 @@ function mostrarInfoRanking() {
             <p>
                 Los puntos de cada jugador se calculan de forma individual y se
                 acumulan edición tras edición. Los valores que aparecen aquí se
-                leen automáticamente de la hoja <strong>Configuración</strong>.
+                leen automáticamente del baremo guardado en <strong>Supabase</strong>.
             </p>
 
             <div class="baremoRankingInfo">
