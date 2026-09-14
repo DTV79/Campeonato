@@ -4908,13 +4908,13 @@ function obtenerPosicionCompartidaRanking(jugador) {
     const ranking = datosRanking?.ranking || [];
     const puntosJugador = numero(jugador.puntos);
 
-    const primeraCoincidencia = ranking.findIndex(
-        item => numero(item.puntos) === puntosJugador
+    const puntuacionesSuperiores = new Set(
+        ranking
+            .map(item => numero(item.puntos))
+            .filter(puntos => puntos > puntosJugador)
     );
 
-    return primeraCoincidencia >= 0
-        ? primeraCoincidencia + 1
-        : numero(jugador.posicion);
+    return puntuacionesSuperiores.size + 1;
 }
 
 function pintarFilaRankingJugador(jugador) {
