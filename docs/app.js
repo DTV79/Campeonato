@@ -274,24 +274,41 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             },
             body: JSON.stringify({ p_codigo: codigo })
         };
-        const [respuesta, respuestaDescansos, respuestaConfiguracion] = await Promise.all([
+        const [
+            respuesta,
+            respuestaDescansos,
+            respuestaConfiguracion,
+            respuestaMovimientos
+        ] = await Promise.all([
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud)
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion`, opcionesSolicitud)
         ]);
 
-        if (!respuesta.ok || !respuestaDescansos.ok || !respuestaConfiguracion.ok) {
+        if (
+            !respuesta.ok ||
+            !respuestaDescansos.ok ||
+            !respuestaConfiguracion.ok ||
+            !respuestaMovimientos.ok
+        ) {
             const estado = !respuesta.ok
                 ? respuesta.status
                 : !respuestaDescansos.ok
                     ? respuestaDescansos.status
-                    : respuestaConfiguracion.status;
+                    : !respuestaConfiguracion.ok
+                        ? respuestaConfiguracion.status
+                        : respuestaMovimientos.status;
             throw new Error(`Supabase HTTP ${estado}`);
         }
 
         const remoto = await respuesta.json();
         const descansosRemotos = await respuestaDescansos.json();
         const configuracionRemota = await respuestaConfiguracion.json();
+        const respuestaMovimientosRemotos = await respuestaMovimientos.json();
+        const movimientosRemotos = Array.isArray(respuestaMovimientosRemotos)
+            ? respuestaMovimientosRemotos
+            : respuestaMovimientosRemotos?.web_movimientos_clasificacion || [];
 
         if (!remoto || typeof remoto !== "object") {
             throw new Error("Respuesta de Supabase no valida");
@@ -320,6 +337,29 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             normalizarListaSupabase(remoto.clasificacion_liguilla, "GR"),
             datosJSON.clasificacion
         );
+
+        const movimientosPorEquipo = new Map(
+            movimientosRemotos.map(fila => [
+                normalizar(fila?.equipo),
+                fila
+            ])
+        );
+
+        combinado.clasificacion = combinado.clasificacion.map(fila => {
+            const movimiento = movimientosPorEquipo.get(
+                normalizar(fila?.equipo)
+            );
+
+            if (!movimiento) return fila;
+
+            return {
+                ...fila,
+                movimiento: movimiento.movimiento,
+                jornada_movimiento: movimiento.jornada,
+                posicion_jornada: movimiento.posicion_jornada,
+                posicion_anterior: movimiento.posicion_anterior
+            };
+        });
 
         combinado.grupos.clasificaciones = elegirListaMasCompleta(
             normalizarListaSupabase(remoto.clasificaciones_grupos, "GR"),
@@ -6483,9 +6523,15 @@ function mostrarCoeficiente() {
 }
 
 function obtenerMovimiento(equipo) {
-    const actual = numero(equipo.posicion_actual);
-    const anterior = numero(equipo.posicion_anterior || actual);
-    const diferencia = anterior - actual;
+    const tieneMovimientoCerrado =
+        equipo.movimiento !== null &&
+        equipo.movimiento !== undefined &&
+        equipo.movimiento !== "";
+
+    const diferencia = tieneMovimientoCerrado
+        ? numero(equipo.movimiento)
+        : numero(equipo.posicion_anterior || equipo.posicion_actual) -
+          numero(equipo.posicion_actual);
 
     if (diferencia > 0) return { texto: `▲ ${diferencia}`, clase: "sube" };
     if (diferencia < 0) return { texto: `▼ ${Math.abs(diferencia)}`, clase: "baja" };
