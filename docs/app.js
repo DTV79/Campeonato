@@ -274,17 +274,24 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             },
             body: JSON.stringify({ p_codigo: codigo })
         };
-        const [respuesta, respuestaDescansos] = await Promise.all([
+        const [respuesta, respuestaDescansos, respuestaConfiguracion] = await Promise.all([
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud)
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud)
         ]);
 
-        if (!respuesta.ok || !respuestaDescansos.ok) {
-            throw new Error(`Supabase HTTP ${!respuesta.ok ? respuesta.status : respuestaDescansos.status}`);
+        if (!respuesta.ok || !respuestaDescansos.ok || !respuestaConfiguracion.ok) {
+            const estado = !respuesta.ok
+                ? respuesta.status
+                : !respuestaDescansos.ok
+                    ? respuestaDescansos.status
+                    : respuestaConfiguracion.status;
+            throw new Error(`Supabase HTTP ${estado}`);
         }
 
         const remoto = await respuesta.json();
         const descansosRemotos = await respuestaDescansos.json();
+        const configuracionRemota = await respuestaConfiguracion.json();
 
         if (!remoto || typeof remoto !== "object") {
             throw new Error("Respuesta de Supabase no valida");
@@ -299,6 +306,15 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
                 ...(datosJSON.regrupos || {})
             }
         };
+
+        combinado.configuracion = {
+            ...(datosJSON.configuracion || {}),
+            ...(configuracionRemota || {})
+        };
+        combinado.modo_orden = normalizarModoOrden(
+            configuracionRemota?.ordenar_clasificacion ||
+            datosJSON.modo_orden
+        );
 
         combinado.clasificacion = elegirListaMasCompleta(
             normalizarListaSupabase(remoto.clasificacion_liguilla, "GR"),
@@ -6454,8 +6470,16 @@ function ordenarClasificacionGrupo(filas) {
     );
 }
 
+function normalizarModoOrden(modo) {
+    const valor = String(modo || "").trim().toUpperCase();
+    if (valor === "A" || valor === "OPCIÓN A" || valor === "OPCION A") return "Opción A";
+    if (valor === "B" || valor === "OPCIÓN B" || valor === "OPCION B") return "Opción B";
+    if (valor === "C" || valor === "OPCIÓN C" || valor === "OPCION C") return "Opción C";
+    return "";
+}
+
 function mostrarCoeficiente() {
-    return !esModoGrupos() && datos.modo_orden === "Opción C";
+    return !esModoGrupos() && normalizarModoOrden(datos.modo_orden) === "Opción C";
 }
 
 function obtenerMovimiento(equipo) {
@@ -6505,10 +6529,11 @@ function obtenerEtiquetaGrupo(equipo, fase, totalEquipos) {
 }
 
 function textoModoOrden(modo) {
-    if (modo === "Opción A") return "Rendimiento proporcional";
-    if (modo === "Opción B") return "Constancia y participación";
-    if (modo === "Opción C") return "Eficacia real";
-    return modo || "Sistema no definido";
+    const normalizado = normalizarModoOrden(modo);
+    if (normalizado === "Opción A") return "A · Puntos y rendimiento proporcional";
+    if (normalizado === "Opción B") return "B · Puntos y mayor participación";
+    if (normalizado === "Opción C") return "C · Eficacia real por partido";
+    return "Sistema no definido";
 }
 
 /* =========================================================
@@ -6540,6 +6565,7 @@ function cerrarInfoOrden() {
 }
 
 function obtenerInfoOrden(modo) {
+    modo = normalizarModoOrden(modo);
     if (modo === "Opción A") {
         return {
             titulo: "Opción A · Rendimiento proporcional",
