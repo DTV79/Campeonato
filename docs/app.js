@@ -264,27 +264,27 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
     );
 
     try {
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/rpc/web_competicion`,
-            {
-                method: "POST",
-                cache: "no-store",
-                signal: controlador.signal,
-                headers: {
-                    apikey: SUPABASE_PUBLISHABLE_KEY,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    p_codigo: codigo
-                })
-            }
-        );
+        const opcionesSolicitud = {
+            method: "POST",
+            cache: "no-store",
+            signal: controlador.signal,
+            headers: {
+                apikey: SUPABASE_PUBLISHABLE_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ p_codigo: codigo })
+        };
+        const [respuesta, respuestaDescansos] = await Promise.all([
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud)
+        ]);
 
-        if (!respuesta.ok) {
-            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        if (!respuesta.ok || !respuestaDescansos.ok) {
+            throw new Error(`Supabase HTTP ${!respuesta.ok ? respuesta.status : respuestaDescansos.status}`);
         }
 
         const remoto = await respuesta.json();
+        const descansosRemotos = await respuestaDescansos.json();
 
         if (!remoto || typeof remoto !== "object") {
             throw new Error("Respuesta de Supabase no valida");
@@ -316,7 +316,10 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         );
 
         combinado.partidos = elegirListaMasCompleta(
-            normalizarListaSupabase(remoto.partidos_liguilla, "GR"),
+            [
+                ...normalizarListaSupabase(remoto.partidos_liguilla, "GR"),
+                ...normalizarListaSupabase(descansosRemotos, "GR")
+            ],
             datosJSON.partidos
         );
 
