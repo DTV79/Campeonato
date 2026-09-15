@@ -278,19 +278,22 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             respuesta,
             respuestaDescansos,
             respuestaConfiguracion,
-            respuestaMovimientos
+            respuestaMovimientos,
+            respuestaDescansosPalas
         ] = await Promise.all([
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion`, opcionesSolicitud)
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_palas`, opcionesSolicitud)
         ]);
 
         if (
             !respuesta.ok ||
             !respuestaDescansos.ok ||
             !respuestaConfiguracion.ok ||
-            !respuestaMovimientos.ok
+            !respuestaMovimientos.ok ||
+            !respuestaDescansosPalas.ok
         ) {
             const estado = !respuesta.ok
                 ? respuesta.status
@@ -298,7 +301,9 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
                     ? respuestaDescansos.status
                     : !respuestaConfiguracion.ok
                         ? respuestaConfiguracion.status
-                        : respuestaMovimientos.status;
+                        : !respuestaMovimientos.ok
+                            ? respuestaMovimientos.status
+                            : respuestaDescansosPalas.status;
             throw new Error(`Supabase HTTP ${estado}`);
         }
 
@@ -306,6 +311,7 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         const descansosRemotos = await respuestaDescansos.json();
         const configuracionRemota = await respuestaConfiguracion.json();
         const respuestaMovimientosRemotos = await respuestaMovimientos.json();
+        const descansosPalasRemotos = await respuestaDescansosPalas.json();
         const movimientosRemotos = Array.isArray(respuestaMovimientosRemotos)
             ? respuestaMovimientosRemotos
             : respuestaMovimientosRemotos?.web_movimientos_clasificacion || [];
@@ -393,6 +399,10 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             normalizarListaSupabase(remoto.cruces, "MM"),
             datosJSON.cruces
         );
+
+        combinado.descansos_palas = Array.isArray(descansosPalasRemotos)
+            ? descansosPalasRemotos
+            : [];
 
         combinado.palas_playa = elegirPalasMasCompletas(
             normalizarPalasSupabase(
@@ -1891,7 +1901,7 @@ function pintarTarjetaEliminatorias(config) {
         datos?.cruces || [];
 
     const hayEquipos =
-        hayEquiposRealesEnPartidos(cruces);
+        cruces.length > 0;
 
     let resumen;
 
@@ -1964,7 +1974,7 @@ function pintarTarjetaPalas(config) {
 
     const hayEquipos =
         hayCopa &&
-        hayEquiposRealesEnPartidos(partidos);
+        partidos.length > 0;
 
     let resumen;
 
@@ -2634,9 +2644,23 @@ function pintarResumenCrucesPortada() {
 }
 
 function pintarResumenPalasPortada() {
+    const descansos = Array.isArray(datos?.descansos_palas)
+        ? datos.descansos_palas
+        : [];
+
+    const tarjetasDescanso = descansos.map(descanso => `
+        <div class="equipoPodio">
+            <span>
+                💤 <strong>${escaparHTML(descanso.equipo || "Equipo")}</strong><br>
+                <small>Descansa y pasa directamente</small>
+            </span>
+        </div>
+    `).join("");
+
     setText("tituloPodio", "🏖️ Copa Palas Playa");
     setHTML(
         "podio",
+        tarjetasDescanso +
         `<div class="equipoPodio"><span>🥄 El que pierde continúa jugando</span></div>`
     );
 }
