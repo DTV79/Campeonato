@@ -1,28 +1,30 @@
 /* Adaptación pública de W.O. y retiradas.
    Se carga justo después de app.js para conservar compatibilidad con el JSON histórico. */
 (function activarResolucionesPublicas() {
+    /* IMPORTANTE: app.js ya empezó a cargar los datos antes de que este archivo se ejecute.
+       Por eso normalizamos tanto en normalizarListaSupabase como justo antes de pintar la tarjeta. */
+    function normalizarResultadoResolucion(partido) {
+        if (!partido || !Array.isArray(partido.resultado)) return partido;
+
+        const detallado = partido.resultado.filter(
+            set => set && typeof set === "object" && !Array.isArray(set)
+        );
+        if (!detallado.length) return partido;
+
+        partido.resultado_detalle = detallado;
+        partido.resultado = partido.resultado.map(set =>
+            set && typeof set === "object"
+                ? String(set.marcador || "")
+                : set
+        );
+        return partido;
+    }
+
     if (typeof normalizarListaSupabase === "function") {
         const normalizarListaBase = normalizarListaSupabase;
         normalizarListaSupabase = function (lista, codigoFase) {
-            return normalizarListaBase(lista, codigoFase).map(partido => {
-                if (!partido || !Array.isArray(partido.resultado)) return partido;
-
-                const resultadoDetallado = partido.resultado.filter(
-                    set => set && typeof set === "object" && !Array.isArray(set)
-                );
-
-                if (!resultadoDetallado.length) return partido;
-
-                return {
-                    ...partido,
-                    resultado_detalle: resultadoDetallado,
-                    resultado: partido.resultado.map(set =>
-                        set && typeof set === "object"
-                            ? String(set.marcador || "")
-                            : set
-                    )
-                };
-            });
+            return normalizarListaBase(lista, codigoFase)
+                .map(normalizarResultadoResolucion);
         };
     }
 
@@ -91,6 +93,7 @@
         if (typeof original !== "function") return;
 
         window[nombreFuncion] = function (partido) {
+            normalizarResultadoResolucion(partido);
             const html = original.apply(this, arguments);
             const aviso = avisoResolucion(partido);
             if (!aviso || typeof html !== "string") return html;
@@ -102,7 +105,6 @@
         };
     }
 
-    /* Las declaraciones function de app.js son propiedades globales en este script clásico. */
     envolverTarjeta("pintarCardPartido");
     envolverTarjeta("pintarCardPalas");
 
@@ -122,13 +124,8 @@
             border-color: rgba(239, 68, 68, .30);
         }
         .avisoResolucionPublica strong,
-        .avisoResolucionPublica small {
-            display: block;
-        }
-        .avisoResolucionPublica small {
-            margin-top: 3px;
-            opacity: .78;
-        }
+        .avisoResolucionPublica small { display: block; }
+        .avisoResolucionPublica small { margin-top: 3px; opacity: .78; }
     `;
     document.head.appendChild(estilo);
 })();
