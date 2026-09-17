@@ -3478,18 +3478,31 @@ function pintarSelectorFases(
         </div>
     `;
 }
+
+function pintarCriterioClasificacion() {
+    return `
+        <div class="modoOrden">
+            <div>
+                <span>🏆 Criterio aplicado</span>
+                <strong>${escaparHTML(textoModoOrden(datos.modo_orden))}</strong>
+            </div>
+            <button
+                class="btnInfoOrden"
+                id="btnInfoOrden"
+                type="button"
+                aria-label="Ver cómo se ordena la clasificación"
+                title="Información del criterio de clasificación"
+            >i</button>
+        </div>
+    `;
+}
+
 function pintarClasificacionLiguilla() {
     const mostrarCoef = mostrarCoeficiente();
     const clasificacion = datos.clasificacion || [];
 
     return `
-        <div class="modoOrden">
-            <div>
-                <span>🏆 Sistema de clasificación</span>
-                <strong>${escaparHTML(textoModoOrden(datos.modo_orden))}</strong>
-            </div>
-            <button class="btnInfoOrden" id="btnInfoOrden" type="button">ℹ️</button>
-        </div>
+        ${pintarCriterioClasificacion()}
 
         <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
             📋 Ver clasificación completa
@@ -3572,6 +3585,8 @@ function pintarClasificacionesPorGrupos(fase) {
                 <p>${filas.length} equipos en ${escaparHTML(nombreGrupoVisible(seleccionado))}</p>
             </div>
         </div>
+
+        ${pintarCriterioClasificacion()}
 
         ${pintarSelectorGrupos(nombresGrupos, seleccionado, "competicion", fase, false)}
 
@@ -3707,6 +3722,7 @@ function pintarTablaCompletaLiguilla() {
 
     return `
         <h2>📋 Clasificación completa</h2>
+        ${pintarCriterioClasificacion()}
         <div class="tablaScroll">
             <table class="tablaClasificacion">
                 <thead>
@@ -3758,6 +3774,7 @@ function pintarTablaCompletaGrupo(fase) {
 
     return `
         <h2>📋 ${escaparHTML(nombreGrupoVisible(grupo))}</h2>
+        ${pintarCriterioClasificacion()}
         <div class="tablaScroll">
             <table class="tablaClasificacion">
                 <thead>
@@ -6612,6 +6629,9 @@ function textoModoOrden(modo) {
 
 function mostrarInfoOrden() {
     const info = obtenerInfoOrden(datos.modo_orden);
+    const aplicacion = esModoGrupos()
+        ? "Se aplica por separado dentro de cada Grupo y, si están activos, también dentro de cada ReGrupo."
+        : "Se aplica a la clasificación general de la Liguilla.";
     const overlay = document.createElement("div");
 
     overlay.className = "overlayInfo";
@@ -6620,6 +6640,7 @@ function mostrarInfoOrden() {
         <div class="globoInfo">
             <button id="cerrarInfoOrden" class="cerrarInfo" type="button">×</button>
             <h3>${escaparHTML(info.titulo)}</h3>
+            <p><strong>Aplicación actual:</strong> ${escaparHTML(aplicacion)}</p>
             <p>${info.descripcion}</p>
             <div class="ejemploInfo">${info.ejemplo}</div>
             <h4>Orden de criterios</h4>
