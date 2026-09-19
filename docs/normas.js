@@ -14,7 +14,9 @@ let datosNormas = null;
 let estadoNormas = null;
 let configNormas = {};
 let elementosNormas = [];
+let elementosNormasTodos = [];
 let elementosPorId = new Map();
+let elementosPorIdTodos = new Map();
 
 iniciarPaginaNormas();
 
@@ -32,13 +34,19 @@ async function iniciarPaginaNormas() {
             ...(estadoNormas.configuracion || {})
         };
 
-        elementosNormas = Array.isArray(datosNormas.elementos)
-            ? datosNormas.elementos.filter(
-                elemento =>
-                    elemento.visible !== false &&
-                    elemento.mostrar !== false
-            )
+        elementosNormasTodos = Array.isArray(datosNormas.elementos)
+            ? [...datosNormas.elementos]
             : [];
+
+        elementosPorIdTodos = new Map(
+            elementosNormasTodos.map(elemento => [elemento.id, elemento])
+        );
+
+        elementosNormas = elementosNormasTodos.filter(
+            elemento =>
+                elemento.visible !== false &&
+                elemento.mostrar !== false
+        );
 
         elementosNormas.sort((a, b) =>
             numeroSeguro(a.orden_seccion) - numeroSeguro(b.orden_seccion) ||
@@ -218,25 +226,37 @@ function pintarResumenEdicion() {
     const elementosResumen = elementosNormas.filter(
         elemento => elemento.seccion === "Resumen superior"
     );
+    const elementosResumenTodos = elementosNormasTodos.filter(
+        elemento => elemento.seccion === "Resumen superior"
+    );
     const chips = elementosNormas.filter(
         elemento => elemento.seccion === "Chips resumen"
     );
 
-    const etiqueta =
-        elementosResumen.find(e => e.tipo === "Etiqueta")?.texto ||
-        "FORMATO DE ESTA EDICIÓN";
+    const etiquetaVisible =
+        elementosResumen.find(e => e.tipo === "Etiqueta");
+    const etiquetaDefinida =
+        elementosResumenTodos.find(e => e.tipo === "Etiqueta");
+    const etiqueta = etiquetaVisible?.texto ||
+        (etiquetaDefinida ? "" : "FORMATO DE ESTA EDICIÓN");
 
-    const titulo =
-        elementosResumen.find(e =>
-            ["Título", "Título dinámico"].includes(e.tipo)
-        )?.texto ||
-        obtenerTituloFormato();
+    const tituloVisible = elementosResumen.find(e =>
+        ["Título", "Título dinámico"].includes(e.tipo)
+    );
+    const tituloDefinido = elementosResumenTodos.find(e =>
+        ["Título", "Título dinámico"].includes(e.tipo)
+    );
+    const titulo = tituloVisible?.texto ||
+        (tituloDefinido ? "" : obtenerTituloFormato());
 
-    const descripcion =
-        elementosResumen.find(e =>
-            ["Descripción", "Párrafo"].includes(e.tipo)
-        )?.texto ||
-        obtenerDescripcionFormato();
+    const descripcionVisible = elementosResumen.find(e =>
+        ["Descripción", "Párrafo"].includes(e.tipo)
+    );
+    const descripcionDefinida = elementosResumenTodos.find(e =>
+        ["Descripción", "Párrafo"].includes(e.tipo)
+    );
+    const descripcion = descripcionVisible?.texto ||
+        (descripcionDefinida ? "" : obtenerDescripcionFormato());
 
     const estado = textoSeguro(
         configNormas.estado_torneo ||
@@ -315,15 +335,23 @@ function pintarSeccionNorma(seccion, indice) {
     const subtituloElemento = seccion.elementos.find(e =>
         ["Subtítulo", "Subtítulo dinámico"].includes(e.tipo)
     );
+    const elementosSeccionTodos = elementosNormasTodos.filter(
+        elemento => elemento.seccion === seccion.nombre
+    );
+    const tituloDefinido = elementosSeccionTodos.find(e =>
+        ["Título", "Título dinámico"].includes(e.tipo)
+    );
+    const subtituloDefinido = elementosSeccionTodos.find(e =>
+        ["Subtítulo", "Subtítulo dinámico"].includes(e.tipo)
+    );
 
     const titulo =
         tituloElemento?.texto ||
-        seccion.nombre ||
-        "Reglas";
+        (tituloDefinido ? "" : (seccion.nombre || "Reglas"));
 
     const subtitulo =
         subtituloElemento?.texto ||
-        "Información del campeonato";
+        (subtituloDefinido ? "" : "Información del campeonato");
 
     const icono =
         tituloElemento?.icono ||
