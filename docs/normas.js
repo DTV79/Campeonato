@@ -267,8 +267,8 @@ function pintarResumenEdicion() {
     contenedor.innerHTML = `
         <div class="cabeceraResumenNormas">
             <div>
-                <span>${escaparHTML(etiqueta)}</span>
-                <h2>${escaparHTML(titulo)}</h2>
+                ${etiqueta ? `<span>${escaparHTML(etiqueta)}</span>` : ""}
+                ${titulo ? `<h2>${escaparHTML(titulo)}</h2>` : ""}
             </div>
 
             <div class="estadoResumenNormas">
@@ -276,9 +276,7 @@ function pintarResumenEdicion() {
             </div>
         </div>
 
-        <p class="descripcionResumenNormas">
-            ${escaparHTML(descripcion)}
-        </p>
+        ${descripcion ? `<p class="descripcionResumenNormas">${escaparHTML(descripcion)}</p>` : ""}
 
         <div class="chipsNormas">
             ${chips.map(chip => `
@@ -378,8 +376,8 @@ function pintarSeccionNorma(seccion, indice) {
                 </span>
 
                 <span class="tituloBloqueNorma">
-                    <strong>${escaparHTML(titulo)}</strong>
-                    <small>${escaparHTML(subtitulo)}</small>
+                    ${titulo ? `<strong>${escaparHTML(titulo)}</strong>` : ""}
+                    ${subtitulo ? `<small>${escaparHTML(subtitulo)}</small>` : ""}
                 </span>
 
                 <span class="flechaBloqueNorma" aria-hidden="true">›</span>
