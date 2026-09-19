@@ -2240,8 +2240,8 @@ async function cargarDatosRankingHistorico() {
                 });
             })
             .then(ranking => {
-                datosRanking = ranking;
-                return ranking;
+                datosRanking = corregirMeritosRankingHistorico(ranking);
+                return datosRanking;
             })
             .catch(error => {
                 promesaRanking = null;
@@ -2250,6 +2250,61 @@ async function cargarDatosRankingHistorico() {
     }
 
     return promesaRanking;
+}
+
+function corregirMeritosRankingHistorico(origen) {
+    if (!origen || !Array.isArray(origen.ranking)) return origen;
+
+    const historial = Array.isArray(origen.historial_ediciones)
+        ? origen.historial_ediciones
+        : [];
+
+    if (!historial.length) return origen;
+
+    const meritosPorJugador = new Map();
+
+    historial.forEach(edicion => {
+        const idJugador = String(edicion?.id_jugador || "").trim();
+        if (!idJugador) return;
+
+        const resultado = normalizar(edicion?.resultado_final)
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+
+        const meritos = meritosPorJugador.get(idJugador) || {
+            titulos: 0,
+            finales: 0,
+            semifinales: 0,
+            cuartos: 0,
+            octavos: 0
+        };
+
+        if (resultado === "CAMPEON") {
+            meritos.titulos += 1;
+            meritos.finales += 1;
+        } else if (resultado === "SUBCAMPEON") {
+            meritos.finales += 1;
+        } else if (resultado === "SEMIFINALISTA") {
+            meritos.semifinales += 1;
+        } else if (resultado === "CUARTOS") {
+            meritos.cuartos += 1;
+        } else if (resultado === "OCTAVOS") {
+            meritos.octavos += 1;
+        }
+
+        meritosPorJugador.set(idJugador, meritos);
+    });
+
+    return {
+        ...origen,
+        ranking: origen.ranking.map(jugador => {
+            const meritos = meritosPorJugador.get(
+                String(jugador?.id_jugador || "").trim()
+            );
+
+            return meritos ? { ...jugador, ...meritos } : jugador;
+        })
+    };
 }
 
 /* =========================================================
