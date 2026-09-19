@@ -644,6 +644,63 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
         diferencia_puntos: Number(e.diferencia_puntos || 0),
         porcentaje_victorias: Number(e.porcentaje_victorias || 0)
     }));
+    const construirRivalidades = partidos => {
+        const rivalidadesJugadores = new Map();
+        const enfrentamientosEquipos = new Map();
+
+        const jugadoresEquipo = equipo => String(equipo || "")
+            .split("/")
+            .map(nombre => nombre.trim())
+            .filter(Boolean);
+
+        (partidos || []).forEach(partido => {
+            const equipo1 = String(partido?.equipo1 || "").trim();
+            const equipo2 = String(partido?.equipo2 || "").trim();
+            if (!equipo1 || !equipo2) return;
+
+            const equiposOrdenados = [
+                { clave: claveEquipoEstadisticas(equipo1), nombre: equipo1 },
+                { clave: claveEquipoEstadisticas(equipo2), nombre: equipo2 }
+            ].sort((a, b) => a.clave.localeCompare(b.clave, "es"));
+
+            const claveEnfrentamiento = equiposOrdenados
+                .map(equipo => equipo.clave)
+                .join("|");
+            const enfrentamiento = enfrentamientosEquipos.get(
+                claveEnfrentamiento
+            ) || {
+                enfrentamiento: equiposOrdenados
+                    .map(equipo => equipo.nombre)
+                    .join(" vs "),
+                enfrentamientos: 0
+            };
+            enfrentamiento.enfrentamientos += 1;
+            enfrentamientosEquipos.set(claveEnfrentamiento, enfrentamiento);
+
+            jugadoresEquipo(equipo1).forEach(jugador1 => {
+                jugadoresEquipo(equipo2).forEach(jugador2 => {
+                    const jugadoresOrdenados = [jugador1, jugador2]
+                        .sort((a, b) => a.localeCompare(b, "es"));
+                    const claveRivalidad = jugadoresOrdenados
+                        .map(nombre => normalizarEstadisticas(nombre))
+                        .join("|");
+                    const rivalidad = rivalidadesJugadores.get(
+                        claveRivalidad
+                    ) || {
+                        rivalidad: jugadoresOrdenados.join(" vs "),
+                        enfrentamientos: 0
+                    };
+                    rivalidad.enfrentamientos += 1;
+                    rivalidadesJugadores.set(claveRivalidad, rivalidad);
+                });
+            });
+        });
+
+        return {
+            rivalidades_jugadores: [...rivalidadesJugadores.values()],
+            enfrentamientos_equipos: [...enfrentamientosEquipos.values()]
+        };
+    };
     const agruparFases = partidos => {
         const mapa = new Map();
         partidos.forEach(p => {
@@ -807,6 +864,10 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
         campeonato.por_fase = agruparFases(campeonato.partidos);
         campeonato.pistas = registrosPista(campeonato.partidos);
         campeonato.parejas = convertirParejas(campeonato.equipos || []);
+        Object.assign(
+            campeonato,
+            construirRivalidades(campeonato.partidos)
+        );
         const filasEdicion = filasHistoricas.filter(
             f => String(f.id_campeonato) === String(campeonato.codigo_campeonato)
         );
@@ -863,6 +924,10 @@ function finalizarEstadisticasDinamicas(datosCompletos, remoto, remotoISP) {
         datos_duracion_disponibles: partidosGlobalesConDuracion.length > 0
     };
     datosCompletos.global.parejas = parejasGlobales;
+    Object.assign(
+        datosCompletos.global,
+        construirRivalidades(partidosGlobales)
+    );
     datosCompletos.global.records = {
         equipos: recordsEquipos(parejasGlobales.map(p => ({ ...p, equipo: p.pareja }))),
         partidos: recordsPartidos(partidosGlobales),
