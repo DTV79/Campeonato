@@ -361,8 +361,11 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             fuentes.forEach(([faseBase, lista]) => {
                 (lista || []).forEach(p => {
                     if (normalizarEstadisticas(p.estado) !== "JUGADO") return;
-                    const sets = (p.resultado || []).map(valor => {
-                        const partes = String(valor).split("-").map(Number);
+                    const marcadores = (p.resultado || [])
+                        .map(obtenerMarcadorSetEstadisticas)
+                        .filter(Boolean);
+                    const sets = marcadores.map(valor => {
+                        const partes = valor.split("-").map(Number);
                         return { a: partes[0] || 0, b: partes[1] || 0 };
                     });
                     const s1 = sets.filter(s => s.a > s.b).length;
@@ -378,7 +381,7 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
                         grupo_ronda: p.grupo || p.ronda || "",
                         jornada: Number(p.jornada || 0), orden: Number(p.orden || 0),
                         equipo1: p.local, equipo2: p.visitante,
-                        resultado: (p.resultado || []).join(" / "),
+                        resultado: marcadores.join(" / "),
                         ganador: s1 > s2 ? p.local : p.visitante,
                         sets_equipo1: s1, sets_equipo2: s2,
                         puntos_equipo1: pf1, puntos_equipo2: pf2,
@@ -4276,6 +4279,42 @@ function numeroEstadisticas(valor) {
     const numero = Number(valor);
     return Number.isFinite(numero) ? numero : 0;
 }
+
+function obtenerMarcadorSetEstadisticas(valor) {
+    if (valor === null || valor === undefined) return "";
+
+    if (typeof valor !== "object") {
+        return String(valor).trim();
+    }
+
+    const marcadorDirecto =
+        valor.marcador ??
+        valor.resultado ??
+        valor.puntuacion;
+
+    if (marcadorDirecto !== null && marcadorDirecto !== undefined) {
+        return String(marcadorDirecto).trim();
+    }
+
+    const puntos1 =
+        valor.puntos1 ??
+        valor.puntos_equipo1 ??
+        valor.a;
+    const puntos2 =
+        valor.puntos2 ??
+        valor.puntos_equipo2 ??
+        valor.b;
+
+    if (
+        Number.isFinite(Number(puntos1)) &&
+        Number.isFinite(Number(puntos2))
+    ) {
+        return `${Number(puntos1)}-${Number(puntos2)}`;
+    }
+
+    return "";
+}
+
 
 function normalizarEstadisticas(valor) {
     return String(valor || "")
