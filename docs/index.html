@@ -39,9 +39,9 @@
 
                     version = Date.now();
                 } catch (error) {
-                    console.error(
-                        "No se pudo leer Versión WEB. " +
-                        "Se utilizará una versión temporal.",
+                    console.warn(
+                        "estado_torneo.json no disponible para versionado; " +
+                        "la aplicación continuará y usará una versión temporal.",
                         error
                     );
                 }
