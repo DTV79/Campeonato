@@ -3525,8 +3525,8 @@ function pintarDatoPistaEstadisticas(titulo, valor) {
 function pintarParejasEstadisticas(ambito) {
     const parejas = [...(ambito?.parejas || [])]
         .sort((a, b) =>
-            numeroEstadisticas(b.porcentaje_victorias) -
-                numeroEstadisticas(a.porcentaje_victorias) ||
+            cocienteEtiquetasEquipoEstadisticas(b.pg, b.pj) -
+                cocienteEtiquetasEquipoEstadisticas(a.pg, a.pj) ||
             numeroEstadisticas(b.pj) -
                 numeroEstadisticas(a.pj) ||
             numeroEstadisticas(b.diferencia_sets) -
