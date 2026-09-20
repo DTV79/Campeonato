@@ -91,21 +91,33 @@ function gestionarMensajeInscripciones(
 
 async function iniciarApp() {
     try {
-        const respuesta = await fetch(
-            `${JSON_URL}?v=${Date.now()}`,
-            {
-                cache: "no-store"
-            }
-        );
+        /*
+           CAMP-2026-01: Supabase es la fuente maestra.
+           El JSON se conserva únicamente como respaldo si Supabase falla.
+        */
+        let respaldoJSON = {};
 
-        if (!respuesta.ok) {
-            throw new Error(
-                `No se pudo cargar el JSON (${respuesta.status})`
+        try {
+            const respuesta = await fetch(
+                `${JSON_URL}?v=${Date.now()}`,
+                { cache: "no-store" }
+            );
+
+            if (respuesta.ok) {
+                respaldoJSON = await respuesta.json();
+            } else {
+                console.warn(
+                    `estado_torneo.json no disponible (${respuesta.status}); se continúa con Supabase.`
+                );
+            }
+        } catch (errorJSON) {
+            console.warn(
+                "estado_torneo.json no disponible; se continúa con Supabase.",
+                errorJSON
             );
         }
 
-        datos = await respuesta.json();
-        datos = await cargarConfiguracionDesdeSupabase(datos);
+        datos = await cargarConfiguracionDesdeSupabase(respaldoJSON);
         datos = await cargarCompeticionDesdeSupabase(datos);
 
         /*
@@ -468,15 +480,22 @@ function elegirListaMasCompleta(listaSupabase, listaJSON) {
     const supabase = Array.isArray(listaSupabase)
         ? listaSupabase
         : [];
+
+    /*
+       Supabase es autoritativo para el campeonato administrado.
+       Una lista vacía también es un dato válido (por ejemplo tras anular,
+       borrar o regenerar una fase), por lo que nunca debe recuperarse
+       contenido antiguo del JSON solo porque tenga más filas.
+    */
+    if (datos?.configuracion?.configuracion_gestionada_admin === true) {
+        return supabase;
+    }
+
     const respaldo = Array.isArray(listaJSON)
         ? listaJSON
         : [];
 
-    if (supabase.length < respaldo.length) {
-        return respaldo;
-    }
-
-    return supabase;
+    return supabase.length ? supabase : respaldo;
 }
 
 function normalizarListaSupabase(lista, codigoFase) {
@@ -559,11 +578,13 @@ function contarPartidosPalas(rondas) {
 
 function elegirPalasMasCompletas(palasSupabase, palasJSON) {
     const supabase = Array.isArray(palasSupabase) ? palasSupabase : [];
-    const respaldo = Array.isArray(palasJSON) ? palasJSON : [];
 
-    return contarPartidosPalas(supabase) >= contarPartidosPalas(respaldo)
-        ? supabase
-        : respaldo;
+    if (datos?.configuracion?.configuracion_gestionada_admin === true) {
+        return supabase;
+    }
+
+    const respaldo = Array.isArray(palasJSON) ? palasJSON : [];
+    return supabase.length ? supabase : respaldo;
 }
 
 function detectarFuenteCompeticion(combinado, original) {
