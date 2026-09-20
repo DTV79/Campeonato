@@ -3525,10 +3525,12 @@ function pintarDatoPistaEstadisticas(titulo, valor) {
 function pintarParejasEstadisticas(ambito) {
     const parejas = [...(ambito?.parejas || [])]
         .sort((a, b) =>
+            numeroEstadisticas(b.porcentaje_victorias) -
+                numeroEstadisticas(a.porcentaje_victorias) ||
             numeroEstadisticas(b.pj) -
                 numeroEstadisticas(a.pj) ||
-            numeroEstadisticas(b.pg) -
-                numeroEstadisticas(a.pg) ||
+            numeroEstadisticas(b.diferencia_sets) -
+                numeroEstadisticas(a.diferencia_sets) ||
             String(a.pareja || "")
                 .localeCompare(
                     String(b.pareja || ""),
@@ -3789,7 +3791,9 @@ function agregarRecordsEquiposEstadisticas(
         item => item.equipo,
         item => `${formatearDecimalEstadisticas(
             item.media_puntos_contra
-        )} recibidos por set`
+        )} recibidos por set · ${numeroEstadisticas(
+            item.pj
+        )} partidos`
     );
 }
 
