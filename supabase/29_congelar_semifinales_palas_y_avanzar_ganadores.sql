@@ -1,5 +1,6 @@
 -- Impide que admin_actualizar_cuadro vuelva a emparejar una ronda de
--- Palas de Playa ya creada y hace avanzar a los ganadores a la final.
+-- Palas de Playa ya creada. En esta copa inversa los ganadores se salvan
+-- y son los perdedores quienes avanzan hasta la final.
 
 CREATE OR REPLACE FUNCTION public.admin_actualizar_cuadro_especial(p_codigo text)
  RETURNS jsonb
@@ -58,8 +59,8 @@ begin
     if public.insertar_partido_cuadro(p_codigo,'MM','FIN',1,v_g_s1,v_g_s2) then v_creados:=v_creados+1; end if;
 
     if v_hay_palas then
-        v_g_ps1 := public.equipo_resultado_cuadro(p_codigo || '-PP-SEM-P01', false);
-        v_g_ps2 := public.equipo_resultado_cuadro(p_codigo || '-PP-SEM-P02', false);
+        v_g_ps1 := public.equipo_resultado_cuadro(p_codigo || '-PP-SEM-P01', true);
+        v_g_ps2 := public.equipo_resultado_cuadro(p_codigo || '-PP-SEM-P02', true);
         if public.insertar_partido_cuadro(p_codigo,'PP','FIN',1,v_g_ps1,v_g_ps2) then v_creados:=v_creados+1; end if;
     end if;
 
