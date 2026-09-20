@@ -5541,10 +5541,42 @@ function pintarEdicionJugadorRanking(edicion) {
 
 function obtenerMovimientoRanking(jugador) {
     const actual = numero(jugador.posicion);
-    const anterior = numero(jugador.posicion_anterior);
+    let anterior = numero(jugador.posicion_anterior);
 
+    /*
+       Algunas ediciones históricas antiguas no guardaron posicion_anterior.
+       En ese caso la reconstruimos con el acumulado de la edición previa.
+       NUEVO se reserva exclusivamente para quien no participó antes.
+    */
     if (!anterior) {
-        return { texto: "NUEVO", clase: "movRankingNuevo" };
+        const historial = datosRanking?.historial_ediciones || [];
+        const ultimaEdicion = numero(datosRanking?.resumen?.ultima_edicion);
+        const anteriores = historial.filter(
+            fila => numero(fila?.anio) < ultimaEdicion
+        );
+        const anioAnterior = Math.max(
+            0,
+            ...anteriores.map(fila => numero(fila?.anio))
+        );
+        const rankingAnterior = anteriores
+            .filter(fila => numero(fila?.anio) === anioAnterior)
+            .sort((a, b) =>
+                numero(b?.puntos_acumulados) - numero(a?.puntos_acumulados) ||
+                String(a?.id_jugador || "").localeCompare(
+                    String(b?.id_jugador || ""),
+                    "es"
+                )
+            );
+        const indiceAnterior = rankingAnterior.findIndex(
+            fila => String(fila?.id_jugador || "") ===
+                String(jugador?.id_jugador || "")
+        );
+
+        if (indiceAnterior >= 0) {
+            anterior = indiceAnterior + 1;
+        } else {
+            return { texto: "NUEVO", clase: "movRankingNuevo" };
+        }
     }
 
     const diferencia = anterior - actual;
