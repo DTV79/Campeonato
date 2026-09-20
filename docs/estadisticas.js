@@ -207,11 +207,24 @@ async function iniciarPaginaEstadisticas() {
             window.estadoInicialEstadisticas ||
             null;
 
-        const estadoBase =
-            estadoInicial ||
-            await cargarJSONEstadisticas(
-                URL_ESTADO_ESTADISTICAS
-            );
+        let estadoBase = estadoInicial || {};
+
+        /*
+           Supabase es la fuente maestra. estado_torneo.json queda como
+           respaldo opcional y nunca debe impedir abrir Estadísticas.
+        */
+        if (!estadoInicial) {
+            try {
+                estadoBase = await cargarJSONEstadisticas(
+                    URL_ESTADO_ESTADISTICAS
+                );
+            } catch (errorJSON) {
+                console.warn(
+                    "Estado JSON no disponible; Estadísticas continúa con Supabase.",
+                    errorJSON
+                );
+            }
+        }
 
         const estado =
             await cargarConfiguracionSupabaseEstadisticas(
