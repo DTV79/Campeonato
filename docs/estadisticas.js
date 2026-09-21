@@ -313,13 +313,28 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
             ) || {};
             const equiposMap = new Map();
             jugadores.forEach(jugador => {
-                const nombre = String(jugador.equipo || "");
-                const clavePareja = claveEquipoEstadisticas(nombre);
-                if (!nombre || equiposMap.has(clavePareja)) return;
                 const pareja = jugadores.find(otro =>
                     otro.id_jugador === jugador.id_pareja ||
                     otro.id_jugador === jugador.id_companero
                 );
+                const aliasJugador = String(jugador.jugador || "").trim();
+                const aliasPareja = String(
+                    pareja?.jugador || jugador.pareja || ""
+                ).trim();
+                const nombre = aliasJugador && aliasPareja
+                    ? `${aliasJugador} / ${aliasPareja}`
+                    : String(jugador.equipo || "").trim();
+                const idsPareja = [
+                    String(jugador.id_jugador || ""),
+                    String(
+                        pareja?.id_jugador || jugador.id_pareja ||
+                        jugador.id_companero || ""
+                    )
+                ].filter(Boolean).sort();
+                const clavePareja = idsPareja.length === 2
+                    ? idsPareja.join("|")
+                    : claveEquipoEstadisticas(nombre);
+                if (!nombre || equiposMap.has(clavePareja)) return;
                 equiposMap.set(clavePareja, {
                     equipo: nombre,
                     id_jugador1: jugador.id_jugador,
