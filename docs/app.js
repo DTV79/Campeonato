@@ -4655,6 +4655,38 @@ function obtenerProximoPartidoEquipo(
    ELIMINATORIAS
 ========================================================= */
 
+function esRondaAccesoASemifinales(fase, cruces = datos?.cruces || []) {
+    const esCuartos = ["CUARTOS", "CUARTOS DE FINAL"].includes(
+        normalizar(fase)
+    );
+
+    if (!esCuartos) return false;
+
+    const formatoEspecial =
+        normalizar(
+            obtenerConfiguracion()
+                .formato_acceso_eliminatorias
+        ) ===
+        "CAMPEONES DE REGRUPO DIRECTOS A SEMIFINALES";
+
+    if (!formatoEspecial) return false;
+
+    const partidosDeCuartos = (Array.isArray(cruces) ? cruces : [])
+        .filter(partido =>
+            ["CUARTOS", "CUARTOS DE FINAL"].includes(
+                normalizar(partido?.fase)
+            )
+        );
+
+    return partidosDeCuartos.length === 2;
+}
+
+function nombreFaseEliminatoriaVisible(fase, cruces = datos?.cruces || []) {
+    return esRondaAccesoASemifinales(fase, cruces)
+        ? "Ronda de acceso a semifinales"
+        : fase;
+}
+
 function pintarContenidoCruces() {
     const cruces = datos.cruces || [];
 
@@ -4683,7 +4715,7 @@ function pintarContenidoCruces() {
                                 <span class="chipJornada">
                                     ${pendientes === 0 ? "✅ Finalizada" : "🟢 En juego"}
                                 </span>
-                                <h3>${escaparHTML(fase)}</h3>
+                                <h3>${escaparHTML(nombreFaseEliminatoriaVisible(fase, cruces))}</h3>
                                 <p>${jugados}/${partidosFase.length} partidos</p>
                             </div>
                             <span class="flechaJornada">${abierta ? "▼" : "▶"}</span>
@@ -6923,6 +6955,9 @@ function mismoEquipoPorIDsONombre(a, b) {
 }
 
 function tituloFase(fase) {
+    if (esRondaAccesoASemifinales(fase)) {
+        return "🟠 Ronda de acceso a semifinales";
+    }
     const f = normalizar(fase).toLowerCase();
     if (f.includes("octavo")) return "🔵 Octavos de final";
     if (f.includes("cuarto")) return "🟠 Cuartos de final";
@@ -6932,6 +6967,9 @@ function tituloFase(fase) {
 }
 
 function tituloFaseSinIcono(fase) {
+    if (esRondaAccesoASemifinales(fase)) {
+        return "Ronda de acceso a semifinales";
+    }
     const f = normalizar(fase).toLowerCase();
     if (f.includes("octavo")) return "Octavos de final";
     if (f.includes("cuarto")) return "Cuartos de final";
