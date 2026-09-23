@@ -3648,6 +3648,10 @@ function pintarClasificacionesPorGrupos(fase) {
 
     const filas = obtenerFilasGrupoParaMostrar(fase, seleccionado);
     const grupoIniciado = hayPartidosJugadosEnGrupo(fase, seleccionado);
+    const hayPuntosArrastrados = fase === "regrupos" && filas.some(
+        fila => numero(fila.puntos_totales ?? fila.puntos) > 0
+    );
+    const mostrarClasificacion = grupoIniciado || hayPuntosArrastrados;
 
     const titulo = fase === "regrupos"
         ? "Segunda fase · ReGrupos"
@@ -3666,10 +3670,16 @@ function pintarClasificacionesPorGrupos(fase) {
 
         ${pintarSelectorGrupos(nombresGrupos, seleccionado, "competicion", fase, false)}
 
-        ${grupoIniciado ? `
+        ${mostrarClasificacion ? `
             <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
                 📋 Ver tabla completa de ${escaparHTML(nombreGrupoVisible(seleccionado))}
             </button>
+            ${!grupoIniciado && hayPuntosArrastrados ? `
+                <section class="resumenPartidos separacionSuperior">
+                    <div class="estadoResumen">↪️ Clasificación inicial</div>
+                    <p>Los puntos mostrados proceden de los partidos arrastrados de la fase de Grupos. Los partidos, victorias, sets y juegos de este ReGrupo comienzan en cero.</p>
+                </section>
+            ` : ""}
         ` : `
             <section class="resumenPartidos separacionSuperior">
                 <div class="estadoResumen">👥 Equipos asignados</div>
@@ -3679,7 +3689,7 @@ function pintarClasificacionesPorGrupos(fase) {
 
         <div class="listaClasificacion separacionSuperior">
             ${filas.length
-                ? (grupoIniciado
+                ? (mostrarClasificacion
                     ? ordenarClasificacionGrupo(filas)
                         .map(fila => pintarFilaClasificacionGrupo(fila, fase, filas.length))
                         .join("")
@@ -6701,6 +6711,9 @@ function obtenerEtiquetaLiguilla(equipo) {
 
 function obtenerEtiquetaGrupo(equipo, fase, totalEquipos) {
     if (!hayPartidosJugadosEnGrupo(fase, equipo.grupo)) {
+        if (fase === "regrupos") {
+            return `↪️ ${numero(equipo.puntos_totales ?? equipo.puntos)} pts arrastrados`;
+        }
         return "👥 Equipo asignado";
     }
 
