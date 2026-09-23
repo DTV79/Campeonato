@@ -222,7 +222,16 @@
 
         if (Array.isArray(resultado)) {
             return resultado
-                .map(textoFinal)
+                .map(set => {
+                    if (set && typeof set === "object" && !Array.isArray(set)) {
+                        return textoFinal(
+                            set.marcador ||
+                            set.resultado ||
+                            ""
+                        );
+                    }
+                    return textoFinal(set);
+                })
                 .filter(Boolean)
                 .join(" · ");
         }
@@ -960,6 +969,29 @@
                         local: numeroV2(resultado[0]),
                         visitante: numeroV2(resultado[1])
                     };
+                }
+
+                if (resultado && typeof resultado === "object") {
+                    const local =
+                        resultado.local ??
+                        resultado.juegos_equipo_1 ??
+                        resultado.puntos_1;
+                    const visitante =
+                        resultado.visitante ??
+                        resultado.juegos_equipo_2 ??
+                        resultado.puntos_2;
+
+                    if (local !== undefined && visitante !== undefined) {
+                        return {
+                            local: numeroV2(local),
+                            visitante: numeroV2(visitante)
+                        };
+                    }
+
+                    resultado =
+                        resultado.marcador ??
+                        resultado.resultado ??
+                        "";
                 }
 
                 const coincidencia = textoV2(resultado).match(
