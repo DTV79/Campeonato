@@ -1019,7 +1019,7 @@
         const local = nombreLocalV2(resumen.final) || "Finalista";
         const visitante = nombreVisitanteV2(resumen.final) || "Finalista";
         const sets = obtenerSetsPartido(resumen.final);
-        const numeroSets = Math.max(sets.length, 1);
+        const numeroSets = 3;
 
         tarjeta.dataset.v2 = "1";
         tarjeta.classList.add("marcadorGranFinalV2");
@@ -1036,10 +1036,10 @@
 
             <div class="cabeceraSetsFinal">
                 <span>EQUIPO</span>
-                ${sets.length
-                    ? sets.map((_, indice) => `<span>SET ${indice + 1}</span>`).join("")
-                    : "<span>RESULTADO</span>"
-                }
+                ${Array.from(
+                    { length: numeroSets },
+                    (_, indice) => `<span>SET ${indice + 1}</span>`
+                ).join("")}
             </div>
 
             ${pintarFilaMarcadorV2(
@@ -1059,20 +1059,24 @@
     }
 
     function pintarFilaMarcadorV2(equipo, sets, lado, esCampeon) {
-        const valores = sets.length
-            ? sets.map(set => {
-                const valor = set[lado];
-                const rival = lado === "local"
-                    ? set.visitante
-                    : set.local;
+        const valores = Array.from({ length: 3 }, (_, indice) => {
+            const set = sets[indice];
 
-                return `
-                    <span class="puntoSetFinal ${valor > rival ? "setGanadoFinal" : ""}">
-                        ${valor}
-                    </span>
-                `;
-            }).join("")
-            : "<span class=\"puntoSetFinal\">—</span>";
+            if (!set) {
+                return '<span class="puntoSetFinal">—</span>';
+            }
+
+            const valor = set[lado];
+            const rival = lado === "local"
+                ? set.visitante
+                : set.local;
+
+            return `
+                <span class="puntoSetFinal ${valor > rival ? "setGanadoFinal" : ""}">
+                    ${valor}
+                </span>
+            `;
+        }).join("");
 
         return `
             <div class="filaMarcadorFinal ${esCampeon ? "filaCampeonaFinal" : "filaSubcampeonaFinal"}">
