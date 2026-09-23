@@ -658,12 +658,15 @@ pintarInicio();
             pantallaSolicitada ===
             "ranking"
         ) {
-            if (
+            const rankingVisible =
                 esSi(
                     obtenerConfiguracion()
                         .mostrar_ranking_historico
-                )
-            ) {
+                ) ||
+                obtenerEstadoTorneo()
+                    .includes("FINALIZ");
+
+            if (rankingVisible) {
                 abrirPantalla(
                     "ranking"
                 );
