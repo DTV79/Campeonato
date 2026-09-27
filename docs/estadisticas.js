@@ -378,14 +378,22 @@ async function completarEdicionesDesdeSupabase(origen, estado) {
                 item => String(item.codigo_campeonato || "") === codigoActual
             ) || {};
             const competicion = infoEdicion.competicion || {};
-            // Palas de Playa no computa en estadísticas deportivas ni en
-            // rivalidades/enfrentamientos. Se excluye también aquí para que
-            // el global y cada edición usen exactamente el mismo universo.
+            // Palas de Playa sí cuenta en el resumen de partidos y por fase;
+            // sus resultados se excluyen de las métricas deportivas de equipos.
+            const rondasPalas = competicion.palas_playa ||
+                infoEdicion.palas_playa ||
+                (codigoActual === String(estado?.configuracion?.codigo_campeonato || "")
+                    ? estado?.palas_playa : []) || [];
+            const partidosPalas = Array.isArray(rondasPalas)
+                ? rondasPalas.flatMap(ronda =>
+                    Array.isArray(ronda?.partidos) ? ronda.partidos : [ronda]
+                ) : [];
             const fuentes = [
                 ["Grupos", competicion.partidos_grupos],
                 ["Liga", competicion.partidos_liguilla],
                 ["ReGrupos", competicion.partidos_regrupos],
-                ["Cruces", competicion.cruces]
+                ["Cruces", competicion.cruces],
+                ["Palas de Playa", partidosPalas]
             ];
             const partidos = [];
             fuentes.forEach(([faseBase, lista]) => {
