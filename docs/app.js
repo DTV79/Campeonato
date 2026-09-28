@@ -292,14 +292,16 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             respuestaConfiguracion,
             respuestaMovimientos,
             respuestaDescansosPalas,
-            respuestaDescansosChampions
+            respuestaDescansosChampions,
+            respuestaMovimientosChampions
         ] = await Promise.all([
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_palas`, opcionesSolicitud),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_champions`, opcionesSolicitud)
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_champions`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion_champions`, opcionesSolicitud)
         ]);
 
         if (
@@ -308,7 +310,8 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             !respuestaConfiguracion.ok ||
             !respuestaMovimientos.ok ||
             !respuestaDescansosPalas.ok ||
-            !respuestaDescansosChampions.ok
+            !respuestaDescansosChampions.ok ||
+            !respuestaMovimientosChampions.ok
         ) {
             const estado = !respuesta.ok
                 ? respuesta.status
@@ -320,7 +323,9 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
                             ? respuestaMovimientos.status
                             : !respuestaDescansosPalas.ok
                                 ? respuestaDescansosPalas.status
-                                : respuestaDescansosChampions.status;
+                                : !respuestaDescansosChampions.ok
+                                    ? respuestaDescansosChampions.status
+                                    : respuestaMovimientosChampions.status;
             throw new Error(`Supabase HTTP ${estado}`);
         }
 
@@ -330,6 +335,7 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         const respuestaMovimientosRemotos = await respuestaMovimientos.json();
         const descansosPalasRemotos = await respuestaDescansosPalas.json();
         const descansosChampionsRemotos = await respuestaDescansosChampions.json();
+        const movimientosChampionsRemotos = await respuestaMovimientosChampions.json();
         const movimientosRemotos = Array.isArray(respuestaMovimientosRemotos)
             ? respuestaMovimientosRemotos
             : respuestaMovimientosRemotos?.web_movimientos_clasificacion || [];
@@ -357,8 +363,15 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             datosJSON.modo_orden
         );
 
+        const movimientosChampionsPorEquipo = new Map(
+            movimientosChampionsRemotos.map(fila => [normalizar(fila?.equipo), fila])
+        );
+        const clasificacionChampions = normalizarListaSupabase(remoto.clasificacion_champions, "CH").map(fila => {
+            const movimiento = movimientosChampionsPorEquipo.get(normalizar(fila?.equipo));
+            return movimiento ? { ...fila, movimiento: movimiento.movimiento, jornada_movimiento: movimiento.jornada, posicion_jornada: movimiento.posicion_jornada, posicion_anterior: movimiento.posicion_anterior } : fila;
+        });
         combinado.champions = {
-            clasificacion: normalizarListaSupabase(remoto.clasificacion_champions, "CH"),
+            clasificacion: clasificacionChampions,
             partidos: [
                 ...normalizarListaSupabase(remoto.partidos_champions, "CH"),
                 ...normalizarListaSupabase(descansosChampionsRemotos, "CH")
@@ -3621,7 +3634,7 @@ function pintarFilaClasificacionChampions(equipo) {
         <article class="filaClasificacion" data-desplegable="true">
             <div class="lineaEquipo">
                 <div class="equipoFila">${medalla} ${escaparHTML(fila.equipo)}</div>
-                <div class="movimientoFila igual">${fila.puntos_totales} pts</div>
+                ${(() => { const mov = obtenerMovimiento(equipo); return `<div class="${mov.clase} movimientoFila">${mov.texto}</div>`; })()}
             </div>
             <div class="datosFila">
                 🎾 ${fila.pj} PJ · ✅ ${fila.pg} PG · ❌ ${fila.pp} PP
@@ -3878,14 +3891,18 @@ function pintarTablaCompletaChampions() {
             <table class="tablaClasificacion">
                 <thead>
                     <tr>
-                        <th>POS</th><th>EQUIPO</th><th>PTOS</th><th>PJ</th>
+                        <th>MOV</th><th>POS</th><th>EQUIPO</th><th>PTOS</th><th>PJ</th>
                         <th>PG</th><th>PP</th><th>SF</th><th>SC</th>
                         <th>SD</th><th>JF</th><th>JC</th><th>JD</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${filas.map(fila => `
+                    ${filas.map(fila => {
+                        const original = (datos?.champions?.clasificacion || []).find(x => normalizar(x.equipo) === normalizar(fila.equipo)) || fila;
+                        const mov = obtenerMovimiento(original);
+                        return `
                         <tr>
+                            <td><span class="${mov.clase} movTabla">${mov.texto}</span></td>
                             <td><strong>${fila.posicion_actual}</strong></td>
                             <td class="equipoTabla">${escaparHTML(fila.equipo)}</td>
                             <td>${fila.puntos_totales}</td>
@@ -3895,7 +3912,7 @@ function pintarTablaCompletaChampions() {
                             <td>${fila.puntos_ganados}</td><td>${fila.puntos_perdidos}</td>
                             <td>${formatoDiff(fila.puntos_diff)}</td>
                         </tr>
-                    `).join("")}
+                    `; }).join("")}
                 </tbody>
             </table>
         </div>
