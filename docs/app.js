@@ -291,13 +291,15 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             respuestaDescansos,
             respuestaConfiguracion,
             respuestaMovimientos,
-            respuestaDescansosPalas
+            respuestaDescansosPalas,
+            respuestaDescansosChampions
         ] = await Promise.all([
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_competicion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_obtener_configuracion`, opcionesSolicitud),
             fetch(`${SUPABASE_URL}/rest/v1/rpc/web_movimientos_clasificacion`, opcionesSolicitud),
-            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_palas`, opcionesSolicitud)
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_palas`, opcionesSolicitud),
+            fetch(`${SUPABASE_URL}/rest/v1/rpc/web_descansos_champions`, opcionesSolicitud)
         ]);
 
         if (
@@ -305,7 +307,8 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             !respuestaDescansos.ok ||
             !respuestaConfiguracion.ok ||
             !respuestaMovimientos.ok ||
-            !respuestaDescansosPalas.ok
+            !respuestaDescansosPalas.ok ||
+            !respuestaDescansosChampions.ok
         ) {
             const estado = !respuesta.ok
                 ? respuesta.status
@@ -315,7 +318,9 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
                         ? respuestaConfiguracion.status
                         : !respuestaMovimientos.ok
                             ? respuestaMovimientos.status
-                            : respuestaDescansosPalas.status;
+                            : !respuestaDescansosPalas.ok
+                                ? respuestaDescansosPalas.status
+                                : respuestaDescansosChampions.status;
             throw new Error(`Supabase HTTP ${estado}`);
         }
 
@@ -324,6 +329,7 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         const configuracionRemota = await respuestaConfiguracion.json();
         const respuestaMovimientosRemotos = await respuestaMovimientos.json();
         const descansosPalasRemotos = await respuestaDescansosPalas.json();
+        const descansosChampionsRemotos = await respuestaDescansosChampions.json();
         const movimientosRemotos = Array.isArray(respuestaMovimientosRemotos)
             ? respuestaMovimientosRemotos
             : respuestaMovimientosRemotos?.web_movimientos_clasificacion || [];
@@ -350,6 +356,14 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
             configuracionRemota?.ordenar_clasificacion ||
             datosJSON.modo_orden
         );
+
+        combinado.champions = {
+            clasificacion: normalizarListaSupabase(remoto.clasificacion_champions, "CH"),
+            partidos: [
+                ...normalizarListaSupabase(remoto.partidos_champions, "CH"),
+                ...normalizarListaSupabase(descansosChampionsRemotos, "CH")
+            ]
+        };
 
         combinado.clasificacion = elegirListaMasCompleta(
             normalizarListaSupabase(remoto.clasificacion_liguilla, "GR"),
@@ -3450,6 +3464,7 @@ function pintarPantallaCompeticion() {
         obtenerFasesCompeticionDisponibles()
             .filter(fase =>
                 [
+                    "champions",
                     "liguilla",
                     "grupos",
                     "regrupos"
@@ -3483,6 +3498,8 @@ function pintarPantallaCompeticion() {
         titulo = "⚔️ Eliminatorias";
     } else if (fase === "palas") {
         titulo = "🏖️ Palas de playa";
+    } else if (fase === "champions") {
+        titulo = "🏆 Clasificación Champions";
     } else if (fase === "regrupos") {
         titulo = "🔁 ReGrupos";
     } else if (fase === "grupos") {
@@ -3506,7 +3523,9 @@ function pintarPantallaCompeticion() {
         );
     }
 
-    if (fase === "liguilla") {
+    if (fase === "champions") {
+        html += pintarClasificacionChampions();
+    } else if (fase === "liguilla") {
         html += pintarClasificacionLiguilla();
     } else if (
         fase === "grupos" ||
@@ -3574,6 +3593,14 @@ function pintarCriterioClasificacion() {
             >i</button>
         </div>
     `;
+}
+
+function pintarClasificacionChampions() {
+    const anterior = datos.clasificacion;
+    datos.clasificacion = datos?.champions?.clasificacion || [];
+    const html = pintarClasificacionLiguilla();
+    datos.clasificacion = anterior;
+    return html;
 }
 
 function pintarClasificacionLiguilla() {
@@ -3916,7 +3943,9 @@ function pintarPantallaPartidos() {
         ${pintarSelectorFases(fases, fase, "partidos")}
     `;
 
-    if (fase === "liguilla") {
+    if (fase === "champions") {
+        html += pintarJornadasFase("champions", "todos");
+    } else if (fase === "liguilla") {
         html += pintarJornadasFase("liguilla", "todos");
     } else if (fase === "grupos" || fase === "regrupos") {
         const grupos = obtenerNombresGrupos(fase);
@@ -6514,6 +6543,11 @@ function obtenerURLInscripcion() {
     ).trim();
 }
 
+function esModoChampions() {
+    const config = obtenerConfiguracion();
+    return normalizar(config.estructura_primera_fase || config.tipo_campeonato || "").includes("CHAMPIONS");
+}
+
 function esModoGrupos() {
     const config = obtenerConfiguracion();
     const tipoCampeonato = normalizar(config.tipo_campeonato);
@@ -6554,7 +6588,9 @@ function obtenerFasesCompeticionDisponibles() {
     const fases = [];
     const config = obtenerConfiguracion();
 
-    if (esModoGrupos()) {
+    if (esModoChampions()) {
+        fases.push({ clave: "champions", nombre: "Champions", icono: "🏆" });
+    } else if (esModoGrupos()) {
         fases.push({ clave: "grupos", nombre: "Grupos", icono: "📊" });
 
         if (config.hay_regrupos) {
@@ -6583,6 +6619,13 @@ function obtenerFasesPartidosDisponibles() {
 
 function obtenerFaseActualCompeticion() {
     const cruces = datos?.cruces || [];
+
+    if (esModoChampions()) {
+        const partidosChampions = quitarDescansos(obtenerPartidosFase("champions"));
+        if (partidosChampions.some(partidoPendiente)) return "champions";
+        if (cruces.length) return "cruces";
+        return "champions";
+    }
 
     if (esModoGrupos()) {
         const partidosGrupos = quitarDescansos(obtenerPartidosFase("grupos"));
@@ -6628,11 +6671,13 @@ function obtenerFaseActualPartidos() {
     const faseCompeticion = obtenerFaseActualCompeticion();
     if (obtenerPartidosFase(faseCompeticion).length) return faseCompeticion;
 
+    if (esModoChampions()) return "champions";
     if (esModoGrupos()) return "grupos";
     return "liguilla";
 }
 
 function obtenerClasificacionFase(fase) {
+    if (fase === "champions") return datos?.champions?.clasificacion || [];
     if (fase === "liguilla") return datos?.clasificacion || [];
     if (fase === "grupos") return datos?.grupos?.clasificaciones || [];
     if (fase === "regrupos") return datos?.regrupos?.clasificaciones || [];
@@ -6640,6 +6685,7 @@ function obtenerClasificacionFase(fase) {
 }
 
 function obtenerPartidosFase(fase) {
+    if (fase === "champions") return datos?.champions?.partidos || [];
     if (fase === "liguilla") return datos?.partidos || [];
     if (fase === "grupos") return datos?.grupos?.partidos || [];
     if (fase === "regrupos") return datos?.regrupos?.partidos || [];
@@ -6664,6 +6710,7 @@ function obtenerNombresGrupos(fase) {
 
 function nombreFase(fase) {
     const nombres = {
+        champions: "Champions",
         liguilla: "Liguilla",
         grupos: "Grupos",
         regrupos: "ReGrupos",
