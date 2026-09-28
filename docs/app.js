@@ -335,7 +335,10 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
         const respuestaMovimientosRemotos = await respuestaMovimientos.json();
         const descansosPalasRemotos = await respuestaDescansosPalas.json();
         const descansosChampionsRemotos = await respuestaDescansosChampions.json();
-        const movimientosChampionsRemotos = await respuestaMovimientosChampions.json();
+        const respuestaMovimientosChampionsRemotos = await respuestaMovimientosChampions.json();
+        const movimientosChampionsRemotos = Array.isArray(respuestaMovimientosChampionsRemotos)
+            ? respuestaMovimientosChampionsRemotos
+            : respuestaMovimientosChampionsRemotos?.web_movimientos_clasificacion_champions || [];
         const movimientosRemotos = Array.isArray(respuestaMovimientosRemotos)
             ? respuestaMovimientosRemotos
             : respuestaMovimientosRemotos?.web_movimientos_clasificacion || [];
