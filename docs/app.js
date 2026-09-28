@@ -6924,9 +6924,11 @@ function textoModoOrden(modo) {
 
 function mostrarInfoOrden() {
     const info = obtenerInfoOrden(datos.modo_orden);
-    const aplicacion = esModoGrupos()
-        ? "Se aplica por separado dentro de cada Grupo y, si están activos, también dentro de cada ReGrupo."
-        : "Se aplica a la clasificación general de la Liguilla.";
+    const aplicacion = esModoChampions()
+        ? "Se aplica a la clasificación general de Champions."
+        : esModoGrupos()
+            ? "Se aplica por separado dentro de cada Grupo y, si están activos, también dentro de cada ReGrupo."
+            : "Se aplica a la clasificación general de la Liguilla.";
     const overlay = document.createElement("div");
 
     overlay.className = "overlayInfo";
