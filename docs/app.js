@@ -1602,6 +1602,7 @@ function setTextClase(clase, texto) {
 }
 
 function obtenerFaseClasificacionPrincipal() {
+    if (esModoChampions()) return "champions";
     if (!esModoGrupos()) return "liguilla";
     return hayRegruposGenerados() ? "regrupos" : "grupos";
 }
