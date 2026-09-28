@@ -3597,11 +3597,38 @@ function pintarCriterioClasificacion() {
 }
 
 function pintarClasificacionChampions() {
-    const anterior = datos.clasificacion;
-    datos.clasificacion = datos?.champions?.clasificacion || [];
-    const html = pintarClasificacionLiguilla();
-    datos.clasificacion = anterior;
-    return html;
+    const clasificacion = datos?.champions?.clasificacion || [];
+
+    return `
+        ${pintarCriterioClasificacion()}
+
+        <button class="btnVistaCompleta" id="btnVistaCompleta" type="button">
+            📋 Ver clasificación completa
+        </button>
+
+        <div class="listaClasificacion separacionSuperior">
+            ${clasificacion.map(equipo => pintarFilaClasificacionChampions(equipo)).join("")}
+        </div>
+    `;
+}
+
+function pintarFilaClasificacionChampions(equipo) {
+    const fila = normalizarClasificacion(equipo);
+    const posicion = numero(fila.posicion_actual);
+    const medalla = posicion === 1 ? "🥇" : posicion === 2 ? "🥈" : posicion === 3 ? "🥉" : `${posicion}.`;
+
+    return `
+        <article class="filaClasificacion" data-desplegable="true">
+            <div class="lineaEquipo">
+                <div class="equipoFila">${medalla} ${escaparHTML(fila.equipo)}</div>
+                <div class="movimientoFila igual">${fila.puntos_totales} pts</div>
+            </div>
+            <div class="datosFila">
+                🎾 ${fila.pj} PJ · ✅ ${fila.pg} PG · ❌ ${fila.pp} PP
+            </div>
+            ${pintarDetalleEstadisticas(fila, false)}
+        </article>
+    `;
 }
 
 function pintarClasificacionLiguilla() {
@@ -3824,6 +3851,11 @@ function pintarClasificacionCompletaActual() {
 
     const fase = estadoUI.faseCompeticion;
 
+    if (fase === "champions") {
+        contenido.innerHTML = pintarTablaCompletaChampions();
+        return;
+    }
+
     if (fase === "liguilla") {
         contenido.innerHTML = pintarTablaCompletaLiguilla();
         return;
@@ -3832,6 +3864,45 @@ function pintarClasificacionCompletaActual() {
     if (fase === "grupos" || fase === "regrupos") {
         contenido.innerHTML = pintarTablaCompletaGrupo(fase);
     }
+}
+
+function pintarTablaCompletaChampions() {
+    const filas = (datos?.champions?.clasificacion || [])
+        .map(normalizarClasificacion)
+        .sort((a, b) => numero(a.posicion_actual) - numero(b.posicion_actual));
+
+    return `
+        <h2>🏆 Clasificación Champions completa</h2>
+        ${pintarCriterioClasificacion()}
+        <div class="tablaScroll">
+            <table class="tablaClasificacion">
+                <thead>
+                    <tr>
+                        <th>POS</th><th>EQUIPO</th><th>PTOS</th><th>PJ</th>
+                        <th>PG</th><th>PP</th><th>SF</th><th>SC</th>
+                        <th>SD</th><th>JF</th><th>JC</th><th>JD</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filas.map(fila => `
+                        <tr>
+                            <td><strong>${fila.posicion_actual}</strong></td>
+                            <td class="equipoTabla">${escaparHTML(fila.equipo)}</td>
+                            <td>${fila.puntos_totales}</td>
+                            <td>${fila.pj}</td><td>${fila.pg}</td><td>${fila.pp}</td>
+                            <td>${fila.sets_ganados}</td><td>${fila.sets_perdidos}</td>
+                            <td>${formatoDiff(fila.sets_diff)}</td>
+                            <td>${fila.puntos_ganados}</td><td>${fila.puntos_perdidos}</td>
+                            <td>${formatoDiff(fila.puntos_diff)}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            </table>
+        </div>
+        <button class="btnVistaCompleta" id="btnVistaResumida" type="button">
+            ← Volver a vista resumida
+        </button>
+    `;
 }
 
 function pintarTablaCompletaLiguilla() {
