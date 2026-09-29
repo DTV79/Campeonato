@@ -1284,11 +1284,17 @@ function abrirPantalla(pantalla, fase = "") {
     }
 
     ocultarInicio();
+
+    if (pantalla === "ranking") {
+        configurarNavegacionGlobalPublica();
+    }
+
     activarNav(
-    ["ranking", "fotos"].includes(pantalla)
-        ? "mas"
-        : pantalla
-);
+        pantalla === "fotos"
+            ? "mas"
+            : pantalla
+    );
+
     estadoUI.pantalla = pantalla;
 
         let faseURL = fase;
@@ -3277,6 +3283,52 @@ function configurarNavegacionCompeticion() {
         "👥",
         "Equipos",
         "equipos"
+    );
+
+    configurarBotonNav(
+        botones[4],
+        "☰",
+        "Más",
+        "mas"
+    );
+}
+
+function configurarNavegacionGlobalPublica() {
+    const botones = [
+        ...document.querySelectorAll(
+            ".bottomNav .navBtn"
+        )
+    ];
+
+    configurarBotonNav(
+        botones[0],
+        "🏠",
+        "Inicio",
+        "",
+        "index.html?portal=1"
+    );
+
+    configurarBotonNav(
+        botones[1],
+        "🎾",
+        "Campeonato",
+        "",
+        "index.html"
+    );
+
+    configurarBotonNav(
+        botones[2],
+        "📊",
+        "Estadísticas",
+        "",
+        "estadisticas.html"
+    );
+
+    configurarBotonNav(
+        botones[3],
+        "🏆",
+        "Ranking",
+        "ranking"
     );
 
     configurarBotonNav(
