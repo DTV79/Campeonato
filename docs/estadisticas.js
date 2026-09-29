@@ -1058,131 +1058,43 @@ function configurarNavegacionEstadisticas() {
         document.getElementById("navEstadisticas5")
     ];
 
-    const config =
-        estadoCampeonato?.configuracion || {};
-
-    botones.forEach(boton => {
-        if (!boton) return;
-
-        boton.classList.remove(
-            "oculto",
-            "navActivo"
-        );
-
-        boton.removeAttribute(
-            "aria-current"
-        );
-    });
-
-    if (esWebPreviaEstadisticas()) {
-        configurarBotonNavegacionEstadisticas(
-            botones[0],
-            "🏠",
-            "Inicio",
-            "index.html"
-        );
-
-        configurarBotonNavegacionEstadisticas(
-            botones[1],
-            "📖",
-            "Historia",
-            "historia.html",
-            !esSiEstadisticas(
-                config.mostrar_historia
-            )
-        );
-
-        configurarBotonNavegacionEstadisticas(
-            botones[2],
-            "📜",
-            "Normas",
-            "normas.html",
-            !esSiEstadisticas(
-                config.mostrar_normativa
-            )
-        );
-
-        configurarBotonNavegacionEstadisticas(
-            botones[3],
-            "🏆",
-            "Campeones",
-            "campeones.html",
-            !esSiEstadisticas(
-                config.mostrar_campeones
-            )
-        );
-
-        configurarBotonNavegacionEstadisticas(
-            botones[4],
-            "☰",
-            "Más",
-            "index.html?pantalla=mas",
-            false,
-            true
-        );
-
-        return;
-    }
-
-    if (obtenerEstadoTorneoEstadisticas().includes("FINALIZ")) {
-        configurarBotonNavegacionEstadisticas(
-            botones[0], "🏠", "Inicio", "index.html"
-        );
-        configurarBotonNavegacionEstadisticas(
-            botones[1], "🎾", "Partidos", "index.html?pantalla=partidos"
-        );
-        configurarBotonNavegacionEstadisticas(
-            botones[2], "📊", "Estadísticas", "estadisticas.html", false, true
-        );
-        configurarBotonNavegacionEstadisticas(
-            botones[3], "🏆", "Ranking", "index.html?pantalla=ranking"
-        );
-        configurarBotonNavegacionEstadisticas(
-            botones[4], "☰", "Más", "index.html?pantalla=mas"
-        );
-        return;
-    }
-
     configurarBotonNavegacionEstadisticas(
         botones[0],
         "🏠",
         "Inicio",
-        "index.html"
+        "index.html?portal=1"
     );
 
     configurarBotonNavegacionEstadisticas(
         botones[1],
-        "📊",
-        esModoGruposEstadisticas()
-            ? "Grupos"
-            : "Clasificación",
-        "index.html?pantalla=competicion"
+        "🎾",
+        "Campeonato",
+        "index.html"
     );
 
     configurarBotonNavegacionEstadisticas(
         botones[2],
-        "🎾",
-        "Partidos",
-        "index.html?pantalla=partidos"
+        "📊",
+        "Estadísticas",
+        "estadisticas.html",
+        false,
+        true
     );
 
     configurarBotonNavegacionEstadisticas(
         botones[3],
-        "👥",
-        "Equipos",
-        "index.html?pantalla=equipos"
+        "🏆",
+        "Ranking",
+        "index.html?pantalla=ranking"
     );
 
     configurarBotonNavegacionEstadisticas(
         botones[4],
         "☰",
         "Más",
-        "index.html?pantalla=mas",
-        false,
-        true
+        "index.html?pantalla=mas"
     );
 }
-
 
 function configurarBotonNavegacionEstadisticas(
     boton,
