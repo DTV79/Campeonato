@@ -659,6 +659,17 @@ const faseSolicitada =
 */
 pintarInicio();
 
+        const portalSolicitado = [
+            "1", "si", "sí", "true"
+        ].includes(
+            String(parametros.get("portal") || "").trim().toLowerCase()
+        );
+
+        if (portalSolicitado) {
+            pintarPortalGeneral();
+            return;
+        }
+
         if (
             pantallaSolicitada ===
             "inicio"
@@ -1049,6 +1060,37 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+
+    const entrarCampeonatoPortal = evento.target.closest("#portalEntrarCampeonato");
+    if (entrarCampeonatoPortal) {
+        document.body.classList.remove("modoPortal");
+        document.getElementById("portalSprintPadel")?.classList.add("oculto");
+        mostrarInicio();
+        return;
+    }
+
+    const volverPortadaActual = evento.target.closest("#portalVolverActual");
+    if (volverPortadaActual) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("portal");
+        window.location.href = url.pathname + url.search + url.hash;
+        return;
+    }
+
+    const accesoPortalPantalla = evento.target.closest("[data-portal-pantalla]");
+    if (accesoPortalPantalla) {
+        document.body.classList.remove("modoPortal");
+        document.getElementById("portalSprintPadel")?.classList.add("oculto");
+        abrirPantalla(accesoPortalPantalla.dataset.portalPantalla || "inicio");
+        return;
+    }
+
+    const accesoPortalHref = evento.target.closest("[data-portal-href]");
+    if (accesoPortalHref) {
+        const href = accesoPortalHref.dataset.portalHref;
+        if (href) window.location.href = href;
+        return;
+    }
 
     const albumFotos =
         evento.target.closest(
@@ -1717,6 +1759,55 @@ function pintarFilaEquipoGrupoSinClasificacion(fila) {
             <div class="datosFila">${escaparHTML(nombreGrupoVisible(fila.grupo))}</div>
         </article>
     `;
+}
+
+/* =========================================================
+   PORTAL GENERAL SPRINT PÁDEL · VISTA PREVIA
+========================================================= */
+
+function nombreFormatoPublico(config = {}) {
+    const tipo = String(
+        config.tipo_campeonato ||
+        config.estructura_primera_fase ||
+        ""
+    ).trim();
+
+    if (/champions/i.test(tipo)) return "Champions";
+    if (/grupo/i.test(tipo)) return "Grupos";
+    if (/liguilla/i.test(tipo)) return "Liguilla";
+    if (/team/i.test(tipo)) return "Teams";
+    return tipo || "Campeonato";
+}
+
+function pintarPortalGeneral() {
+    const config = obtenerConfiguracion();
+    const nombre = String(
+        config.nombre_campeonato ||
+        "Campeonato Sprint Pádel"
+    ).trim();
+    const formato = nombreFormatoPublico(config);
+    const estado = String(
+        config.estado ||
+        config.estado_torneo ||
+        datos?.estado ||
+        ""
+    ).trim();
+
+    setText("portalNombreCampeonato", nombre);
+    setText("portalFormatoCampeonato", formato);
+
+    const resumen = [
+        formato ? `Formato: ${formato}` : "",
+        estado ? `Estado: ${estado}` : ""
+    ].filter(Boolean).join(" · ");
+
+    setText(
+        "portalResumenCampeonato",
+        resumen || "Consulta clasificación, partidos y fases de la edición actual."
+    );
+
+    document.body.classList.add("modoPortal");
+    document.getElementById("portalSprintPadel")?.classList.remove("oculto");
 }
 
 /* =========================================================
