@@ -483,6 +483,7 @@ async function cargarCompeticionDesdeSupabase(datosJSON) {
 function construirEquiposDesdeCompeticion(origen) {
     const filas = [
         ...(origen.clasificacion || []),
+        ...(origen?.champions?.clasificacion || []),
         ...(origen?.grupos?.clasificaciones || []),
         ...(origen?.regrupos?.clasificaciones || [])
     ];
@@ -1063,8 +1064,7 @@ function gestionarClickGlobal(evento) {
 
     const entrarCampeonatoPortal = evento.target.closest("#portalEntrarCampeonato");
     if (entrarCampeonatoPortal) {
-        document.body.classList.remove("modoPortal");
-        document.getElementById("portalSprintPadel")?.classList.add("oculto");
+        salirModoPortal();
         mostrarInicio();
         return;
     }
@@ -1079,8 +1079,7 @@ function gestionarClickGlobal(evento) {
 
     const accesoPortalPantalla = evento.target.closest("[data-portal-pantalla]");
     if (accesoPortalPantalla) {
-        document.body.classList.remove("modoPortal");
-        document.getElementById("portalSprintPadel")?.classList.add("oculto");
+        salirModoPortal();
         abrirPantalla(accesoPortalPantalla.dataset.portalPantalla || "inicio");
         return;
     }
@@ -1779,32 +1778,128 @@ function nombreFormatoPublico(config = {}) {
     return tipo || "Campeonato";
 }
 
+function salirModoPortal() {
+    document.body.classList.remove("modoPortal");
+    document.getElementById("portalSprintPadel")?.classList.add("oculto");
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("portal");
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.pathname + url.search + url.hash
+    );
+}
+
+function obtenerPartidosPortal() {
+    const fases = esModoChampions()
+        ? [
+            obtenerPartidosFase("champions"),
+            obtenerPartidosFase("cruces"),
+            obtenerPartidosFase("palas")
+        ]
+        : esModoGrupos()
+            ? [
+                obtenerPartidosFase("grupos"),
+                obtenerPartidosFase("regrupos"),
+                obtenerPartidosFase("cruces"),
+                obtenerPartidosFase("palas")
+            ]
+            : [
+                obtenerPartidosFase("liguilla"),
+                obtenerPartidosFase("cruces"),
+                obtenerPartidosFase("palas")
+            ];
+
+    const unicos = new Map();
+
+    fases.flat().forEach(partido => {
+        if (!partido || partidoEsDescanso(partido)) return;
+
+        const clave = String(
+            partido.id_partido ||
+            partido.id ||
+            [
+                partido.fase,
+                partido.jornada,
+                partido.orden,
+                partido.local,
+                partido.visitante
+            ].join("|")
+        );
+
+        if (!unicos.has(clave)) {
+            unicos.set(clave, partido);
+        }
+    });
+
+    return [...unicos.values()];
+}
+
+function obtenerSituacionPortal() {
+    const estadoTorneo = obtenerEstadoTorneo();
+
+    if (estadoTorneo.includes("FINALIZ")) {
+        return "Finalizado";
+    }
+
+    if (esEstadoInscripciones()) {
+        return "Inscripciones";
+    }
+
+    if (esEstadoPretorneo()) {
+        return "Próximamente";
+    }
+
+    return nombreFase(obtenerFaseActualCompeticion());
+}
+
 function pintarPortalGeneral() {
     const config = obtenerConfiguracion();
+
     const nombre = String(
         config.nombre_campeonato ||
         "Campeonato Sprint Pádel"
     ).trim();
+
     const formato = nombreFormatoPublico(config);
-    const estado = String(
-        config.estado ||
-        config.estado_torneo ||
-        datos?.estado ||
-        ""
-    ).trim();
+    const estado = obtenerEstadoTorneo();
+    const partidos = obtenerPartidosPortal();
+    const jugados = partidos.filter(partidoFinalizado).length;
+    const equipos = Array.isArray(datos?.equipos)
+        ? datos.equipos.length
+        : 0;
+    const situacion = obtenerSituacionPortal();
 
     setText("portalNombreCampeonato", nombre);
     setText("portalFormatoCampeonato", formato);
+    setText("portalEquiposCampeonato", equipos || "—");
+    setText("portalPartidosCampeonato", partidos.length || "—");
+    setText("portalJugadosCampeonato", partidos.length ? `${jugados}/${partidos.length}` : "—");
+    setText("portalSituacionCampeonato", situacion || "—");
 
-    const resumen = [
-        formato ? `Formato: ${formato}` : "",
-        estado ? `Estado: ${estado}` : ""
-    ].filter(Boolean).join(" · ");
+    const resumen = estado.includes("FINALIZ")
+        ? "La edición está finalizada. Consulta resultados, clasificación, eliminatorias y estadísticas."
+        : esWebPrevia()
+            ? "Consulta la información de la próxima edición y el estado de las inscripciones."
+            : "Sigue la edición actual: clasificación, jornadas, eliminatorias y Palas de Playa cuando corresponda.";
 
-    setText(
-        "portalResumenCampeonato",
-        resumen || "Consulta clasificación, partidos y fases de la edición actual."
-    );
+    setText("portalResumenCampeonato", resumen);
+
+    const meta = [
+        formatearFechaCampeonato(),
+        obtenerLugarCampeonato()
+    ].filter(Boolean);
+
+    const metaElemento =
+        document.getElementById("portalMetaCampeonato");
+
+    if (metaElemento) {
+        metaElemento.innerHTML = meta.map((valor, indice) => `
+            <span>${indice === 0 ? "📅" : "📍"} ${escaparHTML(valor)}</span>
+        `).join("");
+    }
 
     document.body.classList.add("modoPortal");
     document.getElementById("portalSprintPadel")?.classList.remove("oculto");
