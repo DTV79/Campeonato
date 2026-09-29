@@ -68,6 +68,43 @@
     </script>
 </head>
 <body class="appCargando">
+<section id="portalSprintPadel" class="portalSprintPadel oculto" aria-label="Inicio Sprint Pádel">
+    <div class="portalMarca">
+        <span class="portalEyebrow">SPRINT PÁDEL</span>
+        <h1>Todo el pádel, en un mismo sitio</h1>
+        <p>Campeonatos, ranking, estadísticas e historia.</p>
+    </div>
+
+    <div class="portalCampeonatoActual" id="portalCampeonatoActual">
+        <div class="portalCampeonatoCabecera">
+            <div>
+                <span class="portalEtiqueta">CAMPEONATO ACTUAL</span>
+                <h2 id="portalNombreCampeonato">Cargando campeonato…</h2>
+            </div>
+            <span class="portalFormato" id="portalFormatoCampeonato">—</span>
+        </div>
+        <p id="portalResumenCampeonato">Preparando la información de la edición actual.</p>
+        <button type="button" class="portalBotonPrincipal" id="portalEntrarCampeonato">Entrar al campeonato →</button>
+    </div>
+
+    <div class="portalAccesos">
+        <button type="button" class="portalAcceso" data-portal-href="estadisticas.html">
+            <span>📊</span><strong>Estadísticas</strong><small>Rendimiento, récords y comparativas</small>
+        </button>
+        <button type="button" class="portalAcceso" data-portal-pantalla="ranking">
+            <span>🏆</span><strong>Ranking</strong><small>Ranking histórico e ISP</small>
+        </button>
+        <button type="button" class="portalAcceso" data-portal-href="campeones.html">
+            <span>👑</span><strong>Campeones</strong><small>Palmarés de Sprint Pádel</small>
+        </button>
+        <button type="button" class="portalAcceso" data-portal-href="historia.html">
+            <span>📚</span><strong>Historia</strong><small>Ediciones y evolución del campeonato</small>
+        </button>
+    </div>
+
+    <p class="portalNota">Vista previa de la nueva portada · <button type="button" id="portalVolverActual">Ver portada actual</button></p>
+</section>
+
 <div class="contenedor">
     <header class="cabecera">
         <div class="tituloSuperior"></div>
