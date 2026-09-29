@@ -1285,7 +1285,14 @@ function abrirPantalla(pantalla, fase = "") {
 
     ocultarInicio();
 
-    if (pantalla === "ranking") {
+    const parametrosNavegacion =
+        new URLSearchParams(window.location.search);
+
+    const navegacionGlobal =
+        pantalla === "ranking" ||
+        parametrosNavegacion.get("nav") === "global";
+
+    if (navegacionGlobal) {
         configurarNavegacionGlobalPublica();
     }
 
@@ -1331,7 +1338,11 @@ function abrirPantalla(pantalla, fase = "") {
         estadoUI.albumFotos = "";
         pintarPantallaFotos();
         } else if (pantalla === "mas") {
-            pintarPantallaMas();
+            if (navegacionGlobal) {
+                pintarPantallaMasGlobal();
+            } else {
+                pintarPantallaMas();
+            }
         } else {
             mostrarInicio();
         }
@@ -1352,7 +1363,11 @@ function abrirPantalla(pantalla, fase = "") {
         estadoUI.albumFotos = "";
         pintarPantallaFotos();
     } else if (pantalla === "mas") {
-        pintarPantallaMas();
+        if (navegacionGlobal) {
+            pintarPantallaMasGlobal();
+        } else {
+            pintarPantallaMas();
+        }
     }
 }
 
@@ -3246,7 +3261,8 @@ function configurarNavegacionPretorneo() {
         botones[4],
         "☰",
         "Más",
-        "mas"
+        "",
+        "index.html?pantalla=mas&nav=global"
     );
 }
 
@@ -6467,6 +6483,57 @@ function formatearFechaFoto(fechaISO) {
 /* =========================================================
    PANTALLA MÁS
 ========================================================= */
+
+function pintarPantallaMasGlobal() {
+    const contenido = obtenerContenidoDetalle();
+    if (!contenido) return;
+
+    const config = obtenerConfiguracion();
+    const opciones = [];
+
+    if (esSi(config.mostrar_historia)) {
+        opciones.push({
+            icono: "📖",
+            texto: "Historia",
+            href: "historia.html"
+        });
+    }
+
+    if (esSi(config.mostrar_campeones)) {
+        opciones.push({
+            icono: "👑",
+            texto: "Campeones",
+            href: "campeones.html"
+        });
+    }
+
+    if (esSi(config.mostrar_normativa)) {
+        opciones.push({
+            icono: "📜",
+            texto: "Normas",
+            href: "normas.html"
+        });
+    }
+
+    if (esSi(config.mostrar_fotos)) {
+        opciones.push({
+            icono: "📷",
+            texto: "Fotos",
+            pantalla: "fotos"
+        });
+    }
+
+    contenido.innerHTML = `
+        <h2>☰ Más</h2>
+        ${opciones.length
+            ? pintarListaOpcionesMas(opciones)
+            : pintarTarjetaVacia(
+                "Sin más secciones",
+                "No hay contenido adicional habilitado."
+            )
+        }
+    `;
+}
 
 function pintarPantallaMas() {
     const contenido = obtenerContenidoDetalle();
