@@ -1092,7 +1092,7 @@ function configurarNavegacionEstadisticas() {
         botones[4],
         "☰",
         "Más",
-        "index.html?pantalla=mas"
+        "index.html?pantalla=mas&nav=global"
     );
 }
 
