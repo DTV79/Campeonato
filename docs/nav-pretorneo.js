@@ -166,7 +166,7 @@ function configurarNavegacionGlobal() {
         botones[4],
         "☰",
         "Más",
-        "index.html?pantalla=mas",
+        "index.html?pantalla=mas&nav=global",
         true,
         "mas"
     );
