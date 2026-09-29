@@ -3351,7 +3351,8 @@ function configurarNavegacionGlobalPublica() {
         botones[4],
         "☰",
         "Más",
-        "mas"
+        "",
+        "index.html?pantalla=mas&nav=global"
     );
 }
 
