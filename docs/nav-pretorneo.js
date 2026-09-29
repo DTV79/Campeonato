@@ -123,112 +123,43 @@ async function cargarConfiguracionSupabaseNav(datosJSON) {
 }
 
 
-function configurarNavegacionEnJuego(config) {
-    const botones = obtenerBotonesNav();
-
-    const modoGrupos =
-        normalizarNav(config.tipo_campeonato) ===
-        "GRUPOS";
-
-    configurarEnlaceNav(
-        botones[0],
-        "🏠",
-        "Inicio",
-        "index.html"
-    );
-
-    configurarEnlaceNav(
-        botones[1],
-        "📊",
-        modoGrupos
-            ? "Grupos"
-            : "Clasificación",
-        "index.html?pantalla=competicion"
-    );
-
-    configurarEnlaceNav(
-        botones[2],
-        "🎾",
-        "Partidos",
-        "index.html?pantalla=partidos"
-    );
-
-    configurarEnlaceNav(
-        botones[3],
-        "👥",
-        "Equipos",
-        "index.html?pantalla=equipos"
-    );
-
-    configurarEnlaceNav(
-        botones[4],
-        "☰",
-        "Más",
-        "index.html?pantalla=mas"
-    );
-
-    /*
-       Historia, Normativa, Campeones, etc.
-       pertenecen al apartado Más.
-    */
-    botones.forEach(
-        boton =>
-            boton.classList.remove("navActivo")
-    );
-
-    botones[4]?.classList.add("navActivo");
-}
-
-function configurarNavegacionFinalizada() {
-    const botones = obtenerBotonesNav();
-
-    configurarEnlaceNav(botones[0], "🏠", "Inicio", "index.html", true, "inicio");
-    configurarEnlaceNav(botones[1], "🎾", "Partidos", "index.html?pantalla=partidos");
-    configurarEnlaceNav(botones[2], "📊", "Estadísticas", "estadisticas.html", true, "estadisticas");
-    configurarEnlaceNav(botones[3], "🏆", "Ranking", "index.html?pantalla=ranking");
-    configurarEnlaceNav(botones[4], "☰", "Más", "index.html?pantalla=mas", true, "mas");
-
-    activarPaginaActual();
-}
-
-
-function configurarNavegacionPrevia(config) {
+function configurarNavegacionGlobal() {
     const botones = obtenerBotonesNav();
 
     configurarEnlaceNav(
         botones[0],
         "🏠",
         "Inicio",
-        "index.html",
+        "index.html?portal=1",
         true,
         "inicio"
     );
 
     configurarEnlaceNav(
         botones[1],
-        "📖",
-        "Historia",
-        "historia.html",
-        esSiNav(config.mostrar_historia),
-        "historia"
+        "🎾",
+        "Campeonato",
+        "index.html",
+        true,
+        "campeonato"
     );
 
     configurarEnlaceNav(
         botones[2],
-        "📜",
-        "Normas",
-        "normas.html",
-        esSiNav(config.mostrar_normativa),
-        "normativa"
+        "📊",
+        "Estadísticas",
+        "estadisticas.html",
+        true,
+        "estadisticas"
     );
 
     configurarEnlaceNav(
         botones[3],
         "🏆",
-        "Campeones",
-        "campeones.html",
-        esSiNav(config.mostrar_campeones),
-        "campeones"
+        "Ranking",
+        "index.html?pantalla=ranking",
+        true,
+        "ranking"
     );
 
     configurarEnlaceNav(
@@ -243,6 +174,17 @@ function configurarNavegacionPrevia(config) {
     activarPaginaActual();
 }
 
+function configurarNavegacionEnJuego() {
+    configurarNavegacionGlobal();
+}
+
+function configurarNavegacionFinalizada() {
+    configurarNavegacionGlobal();
+}
+
+function configurarNavegacionPrevia() {
+    configurarNavegacionGlobal();
+}
 
 function configurarEnlaceNav(
     boton,
@@ -306,12 +248,12 @@ function activarPaginaActual() {
 
     const mapa = {
         "index.html": "inicio",
-        "historia.html": "historia",
-        "normas.html": "normativa",
-        "campeones.html": "campeones",
+        "historia.html": "mas",
+        "normas.html": "mas",
+        "campeones.html": "mas",
         "fotos.html": "mas",
-        "ranking.html": "mas",
-        "estadisticas.html": "mas"
+        "ranking.html": "ranking",
+        "estadisticas.html": "estadisticas"
     };
 
     const actual =
