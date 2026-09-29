@@ -5106,6 +5106,51 @@ body.modoPortal .portalSprintPadel{
     font-size:14px;
     line-height:1.5;
 }
+
+.portalDatosCampeonato{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:16px 0 14px;
+}
+
+.portalDatosCampeonato>div{
+    min-width:0;
+    padding:12px 10px;
+    border-radius:14px;
+    background:#f8fafc;
+    text-align:center;
+}
+
+.portalDatosCampeonato small{
+    display:block;
+    margin-bottom:4px;
+    color:#94a3b8;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+
+.portalDatosCampeonato strong{
+    display:block;
+    overflow:hidden;
+    color:#0f172a;
+    font-size:14px;
+    font-weight:900;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.portalMetaCampeonato{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 14px;
+    margin:0 0 18px;
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+}
 .portalBotonPrincipal{
     width:100%;
     padding:14px 18px;
@@ -5156,5 +5201,10 @@ body.modoPortal .portalSprintPadel{
 @media(max-width:560px){
     .portalMarca h1{font-size:30px}
     .portalCampeonatoCabecera{flex-direction:column}
+    .portalDatosCampeonato{grid-template-columns:1fr 1fr}
     .portalAccesos{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:380px){
+    .portalAccesos{grid-template-columns:1fr}
 }
