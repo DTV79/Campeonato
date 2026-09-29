@@ -3261,8 +3261,7 @@ function configurarNavegacionPretorneo() {
         botones[4],
         "☰",
         "Más",
-        "",
-        "index.html?pantalla=mas&nav=global"
+        "mas"
     );
 }
 
