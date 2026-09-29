@@ -5460,7 +5460,19 @@ function pintarDetalleJugadorRanking(idJugador) {
 
     const historial = (datosRanking.historial_ediciones || [])
         .filter(fila => String(fila.id_jugador) === String(idJugador))
-        .sort((a, b) => numero(b.anio) - numero(a.anio));
+        .sort((a, b) => {
+            const fechaA = Date.parse(a?.fecha_campeonato || "") || 0;
+            const fechaB = Date.parse(b?.fecha_campeonato || "") || 0;
+
+            return fechaB - fechaA ||
+                numero(b.anio) - numero(a.anio) ||
+                String(b.codigo_campeonato || b.id_campeonato || "")
+                    .localeCompare(
+                        String(a.codigo_campeonato || a.id_campeonato || ""),
+                        "es",
+                        { numeric: true }
+                    );
+        });
 
     const mejorEdicion = historial.length > 1
     ? [...historial].sort(
@@ -5510,9 +5522,8 @@ function pintarDetalleJugadorRanking(idJugador) {
             <article class="edicionJugadorRanking">
                 <div class="cabeceraEdicionRanking">
                     <div>
-                        <span>${numero(mejorEdicion.anio)}</span>
-
-                        <strong>
+                        ${pintarIdentidadEdicionRanking(mejorEdicion, "mejor")}
+                        <strong class="resultadoEdicionRanking">
                             ${escaparHTML(
                                 mejorEdicion.resultado_final ||
                                 "Participación"
@@ -5585,6 +5596,47 @@ ${historial.length > 1 && parejasHistoricas.length
     `;
 }
 
+function obtenerIdentidadEdicionRanking(edicion = {}) {
+    const codigo = String(
+        edicion.codigo_campeonato ||
+        edicion.id_campeonato ||
+        ""
+    ).trim();
+
+    const anio = String(
+        edicion.anio ||
+        (edicion.fecha_campeonato
+            ? new Date(edicion.fecha_campeonato).getFullYear()
+            : "")
+    ).trim();
+
+    const nombre = String(
+        edicion.nombre_campeonato ||
+        codigo ||
+        (anio ? `Edición ${anio}` : "Campeonato Sprint Pádel")
+    ).trim();
+
+    const meta = [anio, codigo]
+        .filter(Boolean)
+        .join(" · ");
+
+    return { nombre, meta, codigo, anio };
+}
+
+function pintarIdentidadEdicionRanking(edicion, clase = "") {
+    const identidad = obtenerIdentidadEdicionRanking(edicion);
+
+    return `
+        <div class="identidadEdicionRanking ${escaparAtributo(clase)}">
+            <strong>${escaparHTML(identidad.nombre)}</strong>
+            ${identidad.meta
+                ? `<small>${escaparHTML(identidad.meta)}</small>`
+                : ""
+            }
+        </div>
+    `;
+}
+
 function pintarMetricaRanking(icono, titulo, valor) {
     return `
         <article>
@@ -5616,7 +5668,8 @@ function obtenerParejasHistoricasJugador(historial) {
                 titulos: 0,
                 finales: 0,
                 puntos: 0,
-                anios: []
+                anios: [],
+                campeonatos: []
             });
         }
 
@@ -5631,6 +5684,14 @@ function obtenerParejasHistoricasJugador(historial) {
         if (edicion.anio) {
             pareja.anios.push(numero(edicion.anio));
         }
+
+        const identidadEdicion = obtenerIdentidadEdicionRanking(edicion);
+        pareja.campeonatos.push({
+            codigo: identidadEdicion.codigo,
+            nombre: identidadEdicion.nombre,
+            meta: identidadEdicion.meta,
+            fecha: edicion.fecha_campeonato || ""
+        });
 
         const resultado = String(
             edicion.resultado_final || ""
@@ -5665,7 +5726,26 @@ function obtenerParejasHistoricasJugador(historial) {
                     : 0,
 
             anios: [...new Set(pareja.anios)]
-                .sort((a, b) => b - a)
+                .sort((a, b) => b - a),
+
+            campeonatos: [...pareja.campeonatos]
+                .sort((a, b) =>
+                    (Date.parse(b.fecha || "") || 0) -
+                    (Date.parse(a.fecha || "") || 0) ||
+                    String(b.codigo || "").localeCompare(
+                        String(a.codigo || ""),
+                        "es",
+                        { numeric: true }
+                    )
+                )
+                .filter((campeonato, indice, lista) => {
+                    const clave = campeonato.codigo ||
+                        `${campeonato.nombre}|${campeonato.meta}`;
+
+                    return lista.findIndex(item =>
+                        (item.codigo || `${item.nombre}|${item.meta}`) === clave
+                    ) === indice;
+                })
         }))
         .sort((a, b) =>
             numero(b.titulos) - numero(a.titulos) ||
@@ -5747,15 +5827,24 @@ function pintarParejaHistoricaJugador(pareja) {
                 : ""
             }
 
+            <div class="campeonatosParejaHistorica">
+                <small>CAMPEONATOS JUNTOS</small>
+                ${(pareja.campeonatos || []).map(campeonato => `
+                    <div>
+                        <strong>${escaparHTML(campeonato.nombre)}</strong>
+                        ${campeonato.meta
+                            ? `<span>${escaparHTML(campeonato.meta)}</span>`
+                            : ""
+                        }
+                    </div>
+                `).join("")}
+            </div>
+
             <div class="pieParejaHistorica">
                 <span>
                     ${formatearPuntosRanking(pareja.puntos)}
                     puntos conseguidos juntos
                 </span>
-
-                <small>
-                    ${pareja.anios.join(" · ")}
-                </small>
             </div>
         </article>
     `;
@@ -5768,8 +5857,8 @@ function pintarEdicionJugadorRanking(edicion) {
         <article class="edicionJugadorRanking">
             <div class="cabeceraEdicionRanking">
                 <div>
-                    <span>${escaparHTML(edicion.anio || "—")}</span>
-                    <strong>${resultado}</strong>
+                    ${pintarIdentidadEdicionRanking(edicion)}
+                    <strong class="resultadoEdicionRanking">${resultado}</strong>
                 </div>
                 <b>+${formatearPuntosRanking(edicion.puntos_edicion)} pts</b>
             </div>
