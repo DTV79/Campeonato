@@ -1,1 +1,32 @@
 body.modoRankingGlobal{background:#071019!important;color:#eef6ff}body.modoRankingGlobal #portalSprintPadel{display:none!important}body.modoRankingGlobal>.contenedor{max-width:780px;margin:0 auto;padding-top:42px;padding-bottom:90px}body.modoRankingGlobal .cabecera,body.modoRankingGlobal .gridDashboard,body.modoRankingGlobal .podioCard{display:none!important}body.modoRankingGlobal #vistaDetalle{display:block!important}body.modoRankingGlobal #contenidoDetalle{background:transparent!important;color:#eef6ff}body.modoRankingGlobal .selectorRankingModo,body.modoRankingGlobal .resumenRankingHistorico,body.modoRankingGlobal .bloqueRanking,body.modoRankingGlobal .cabeceraJugadorRanking,body.modoRankingGlobal .metricasJugadorRanking article,body.modoRankingGlobal .resumenISP,body.modoRankingGlobal .bloqueISP{background:#0c1924!important;border-color:#20384b!important;color:#eef6ff!important}body.modoRankingGlobal .filaRankingHistorico,body.modoRankingGlobal .podioRankingJugador,body.modoRankingGlobal .edicionJugadorRanking,body.modoRankingGlobal .recordRanking,body.modoRankingGlobal .filaJugadorISP,body.modoRankingGlobal .podioJugadorISP{background:#101f2c!important;border-color:#294158!important;color:#eef6ff!important}body.modoRankingGlobal .datosJugadorRanking small,body.modoRankingGlobal .cabeceraBloqueRanking p,body.modoRankingGlobal .cabeceraJugadorRanking p,body.modoRankingGlobal .metricasJugadorRanking small,body.modoRankingGlobal .filaJugadorISP small{color:#8fa3b6!important}body.modoRankingGlobal .bottomNav{background:#09141eee!important;border-top-color:#203141!important}body.modoRankingGlobal .bottomNav .navBtn{color:#8297a9!important}body.modoRankingGlobal .bottomNav .navActivo{color:#60a5fa!important}@media(min-width:800px){body.modoRankingGlobal>.contenedor{max-width:780px}}
+/* Contraste del Ranking global: mantener toda la funcionalidad, adaptar solo la piel */
+body.modoRankingGlobal #contenidoDetalle h2,
+body.modoRankingGlobal #contenidoDetalle h3,
+body.modoRankingGlobal #contenidoDetalle h4,
+body.modoRankingGlobal .bloqueRanking>h3,
+body.modoRankingGlobal .cabeceraBloqueRanking h3,
+body.modoRankingGlobal .posicionRankingHistorico,
+body.modoRankingGlobal .datosJugadorRanking strong,
+body.modoRankingGlobal .recordRanking strong,
+body.modoRankingGlobal .podioRankingJugador strong{color:#f4f8fc!important}
+body.modoRankingGlobal .datosJugadorRanking small,
+body.modoRankingGlobal .derechaRanking>small,
+body.modoRankingGlobal .podioRankingJugador small,
+body.modoRankingGlobal .recordRanking small,
+body.modoRankingGlobal .cabeceraBloqueRanking p{color:#9fb2c3!important}
+body.modoRankingGlobal .derechaRanking>strong,
+body.modoRankingGlobal .podioRankingJugador b,
+body.modoRankingGlobal .recordRanking b{color:#7db4ff!important}
+body.modoRankingGlobal .filaRankingHistorico{background:#0e1c29!important;border:1px solid #22394c!important;box-shadow:none!important}
+body.modoRankingGlobal .filaRankingHistorico:hover{background:#132536!important;border-color:#365a76!important}
+body.modoRankingGlobal .podioRankingJugador{background:#0e1c29!important;box-shadow:none!important}
+body.modoRankingGlobal .podioRankingJugador.primero{background:linear-gradient(180deg,#252313,#101d28)!important;border-color:#8b7622!important}
+body.modoRankingGlobal .podioRankingJugador.segundo{background:linear-gradient(180deg,#1d252d,#101d28)!important;border-color:#607487!important}
+body.modoRankingGlobal .podioRankingJugador.tercero{background:linear-gradient(180deg,#282018,#101d28)!important;border-color:#8a5b32!important}
+body.modoRankingGlobal .bloqueRanking{background:transparent!important;border:0!important}
+body.modoRankingGlobal .recordRanking{background:#0e1c29!important;border:1px solid #22394c!important}
+body.modoRankingGlobal .movRankingNuevo{color:#a78bfa!important}
+body.modoRankingGlobal .btnVolverRanking{background:#132536!important;color:#93c5fd!important}
+body.modoRankingGlobal .notaPalasNoComputa{color:#e7c66d!important;background:#221e13!important;border:1px solid #493f20!important;border-radius:10px;padding:10px 12px}
+body.modoRankingGlobal .cabeceraTituloRanking h2{color:#f4f8fc!important}
+body.modoRankingGlobal .cabeceraTituloRanking .btnInfoOrden{background:#132536!important;color:#dbeafe!important;border:1px solid #29445c!important}
