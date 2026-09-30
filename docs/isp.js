@@ -493,8 +493,10 @@
                         <span class="datoPJ">${numeroISP(jugador.pj)} PJ</span>
                         <span class="separadorISP">·</span>
                         <span class="datoPG">${numeroISP(jugador.pg)} PG</span>
-                        ${estado
-                            ? `<span class="separadorISP">·</span><span class="estadoISP" title="Estado del índice según el número de partidos computados">${escaparISP(estado)}</span>`
+                        <span class="separadorISP">·</span>
+                        <span class="datoPP">${numeroISP(Math.max(0, Number(jugador.pj || 0) - Number(jugador.pg || 0)))} PP</span>
+                        ${estado && estado.toLowerCase().includes("provisional")
+                            ? `<span class="separadorISP">·</span><span class="estadoISP estadoProvisionalISP">Provisional</span>`
                             : ""}
                     </small>
                 </span>
