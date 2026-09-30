@@ -660,14 +660,10 @@ const faseSolicitada =
 */
 pintarInicio();
 
-        const portalSolicitado = [
-            "1", "si", "sí", "true"
-        ].includes(
-            String(parametros.get("portal") || "").trim().toLowerCase()
-        );
-
-        if (portalSolicitado) {
-            pintarPortalGeneral();
+        const portalSolicitado = parametros.get("portal");
+        const entrarDirectoCampeonato = ["0","no","false","campeonato"].includes(String(portalSolicitado||"").trim().toLowerCase());
+        if (!entrarDirectoCampeonato && pantallaSolicitada === "inicio") {
+            await pintarPortalGeneral();
             return;
         }
 
@@ -1061,6 +1057,11 @@ function inicializarEstadoUI() {
 ========================================================= */
 
 function gestionarClickGlobal(evento) {
+
+    const inicioPortal=evento.target.closest("[data-portal-inicio]");
+    if(inicioPortal){window.scrollTo({top:0,behavior:"smooth"});return;}
+    const scrollPortal=evento.target.closest("[data-portal-scroll]");
+    if(scrollPortal){document.getElementById(scrollPortal.dataset.portalScroll)?.scrollIntoView({behavior:"smooth"});return;}
 
     const entrarCampeonatoPortal = evento.target.closest("#portalEntrarCampeonato");
     if (entrarCampeonatoPortal) {
@@ -1876,7 +1877,7 @@ function obtenerSituacionPortal() {
     return nombreFase(obtenerFaseActualCompeticion());
 }
 
-function pintarPortalGeneral() {
+async function pintarPortalGeneral() {
     const config = obtenerConfiguracion();
 
     const nombre = String(
@@ -1922,6 +1923,25 @@ function pintarPortalGeneral() {
         `).join("");
     }
 
+    try {
+        const respuestaTeams = await fetch(SUPABASE_URL + "/rest/v1/rpc/web_teams_portal", {method:"POST",cache:"no-store",headers:{apikey:SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json"},body:"{}"});
+        if (respuestaTeams.ok) {
+            const team = await respuestaTeams.json();
+            const card = document.getElementById("portalTeamsActual");
+            if (team && team.id) {
+                setText("portalTeamsNombre", team.nombre || "Teams");
+                setText("portalTeamsEstado", String(team.estado||"").replaceAll("_"," "));
+                const equiposT = team.equipos || [], a=equiposT.find(e=>e.lado==="A"), b=equiposT.find(e=>e.lado==="B"), vict=team.victorias||{};
+                const ma=a?Number(vict[a.id]||0):0, mb=b?Number(vict[b.id]||0):0;
+                const marcador=document.getElementById("portalTeamsMarcador");
+                if(marcador) marcador.innerHTML=(a?'<span class="dot" style="background:'+escaparHTML(a.color||"#64748b")+'"></span>'+escaparHTML(a.nombre):"Equipo A")+' <strong>'+ma+' – '+mb+'</strong> '+(b?escaparHTML(b.nombre)+'<span class="dot" style="background:'+escaparHTML(b.color||"#64748b")+'"></span>':"Equipo B");
+                setText("portalTeamsResumen", (team.jugados||0)+" de "+(team.numero_partidos||0)+" partidos jugados");
+                card?.classList.remove("sinTeams");
+            } else {
+                setText("portalTeamsNombre","Próximo Teams");setText("portalTeamsEstado","sin competición activa");setText("portalTeamsMarcador","—");setText("portalTeamsResumen","Cuando haya un Teams activo aparecerá aquí.");card?.classList.add("sinTeams");
+            }
+        }
+    } catch(error){ console.warn("No se pudo cargar el resumen de Teams",error); }
     document.body.classList.add("modoPortal");
     document.getElementById("portalSprintPadel")?.classList.remove("oculto");
 }
