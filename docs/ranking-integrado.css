@@ -30,3 +30,53 @@ body.modoRankingGlobal .btnVolverRanking{background:#132536!important;color:#93c
 body.modoRankingGlobal .notaPalasNoComputa{color:#e7c66d!important;background:#221e13!important;border:1px solid #493f20!important;border-radius:10px;padding:10px 12px}
 body.modoRankingGlobal .cabeceraTituloRanking h2{color:#f4f8fc!important}
 body.modoRankingGlobal .cabeceraTituloRanking .btnInfoOrden{background:#132536!important;color:#dbeafe!important;border:1px solid #29445c!important}
+
+/* Auditoria de contraste: todos los componentes heredados del ranking */
+body.modoRankingGlobal #contenidoDetalle{--txt:#f8fbff;--muted:#b2c1cf;--soft:#91a6b9;--accent:#79b7ff;--panel:#0e1d2a;--panel2:#132433;--line:#294154}
+body.modoRankingGlobal #contenidoDetalle,
+body.modoRankingGlobal #contenidoDetalle p,
+body.modoRankingGlobal #contenidoDetalle span{color:var(--txt)}
+body.modoRankingGlobal .cabeceraTituloRanking h2,
+body.modoRankingGlobal .bloqueRanking>h3,
+body.modoRankingGlobal .cabeceraBloqueRanking h3,
+body.modoRankingGlobal .cabeceraTituloISP h2,
+body.modoRankingGlobal .cabeceraBloqueISP h3{color:var(--txt)!important}
+body.modoRankingGlobal .resumenRankingHistorico div,
+body.modoRankingGlobal .resumenISP>div{background:var(--panel)!important;border:1px solid var(--line)!important}
+body.modoRankingGlobal .resumenRankingHistorico span,
+body.modoRankingGlobal .resumenISP span{color:var(--muted)!important}
+body.modoRankingGlobal .resumenRankingHistorico strong,
+body.modoRankingGlobal .resumenISP strong{color:var(--accent)!important}
+body.modoRankingGlobal .posicionRankingHistorico{color:#dbeafe!important}
+body.modoRankingGlobal .datosJugadorRanking strong{color:#fff!important}
+body.modoRankingGlobal .datosJugadorRanking small{color:#b7c6d3!important}
+body.modoRankingGlobal .derechaRanking>small{color:#9fb2c3!important}
+body.modoRankingGlobal .cabeceraBloqueRanking p,
+body.modoRankingGlobal .cabeceraBloqueISP p{color:#a9bac8!important}
+body.modoRankingGlobal .identidadEdicionRanking strong,
+body.modoRankingGlobal .resultadoEdicionRanking,
+body.modoRankingGlobal .parejaEdicionRanking strong,
+body.modoRankingGlobal .desglosePuntosRanking strong{color:#f8fbff!important}
+body.modoRankingGlobal .identidadEdicionRanking small,
+body.modoRankingGlobal .parejaEdicionRanking small,
+body.modoRankingGlobal .desglosePuntosRanking span{color:#aebdca!important}
+body.modoRankingGlobal .parejaEdicionRanking{background:var(--panel2)!important}
+body.modoRankingGlobal .datosEdicionRanking span{background:#172b3d!important;color:#d8eaff!important}
+body.modoRankingGlobal .cabeceraEdicionRanking>b{background:#173657!important;color:#9dccff!important}
+body.modoRankingGlobal .desglosePuntosRanking{border-top-color:var(--line)!important}
+body.modoRankingGlobal .metricasJugadorRanking article strong{color:#fff!important}
+body.modoRankingGlobal .metricasJugadorRanking article small{color:#aebdca!important}
+body.modoRankingGlobal .listaParejasHistoricas article,
+body.modoRankingGlobal .parejaHistoricaRanking{background:var(--panel)!important;border-color:var(--line)!important;color:var(--txt)!important}
+body.modoRankingGlobal .listaParejasHistoricas strong,
+body.modoRankingGlobal .parejaHistoricaRanking strong{color:#fff!important}
+body.modoRankingGlobal .listaParejasHistoricas small,
+body.modoRankingGlobal .parejaHistoricaRanking small{color:#aebdca!important}
+body.modoRankingGlobal .filaJugadorISP strong,
+body.modoRankingGlobal .podioJugadorISP strong{color:#fff!important}
+body.modoRankingGlobal .filaJugadorISP small,
+body.modoRankingGlobal .podioJugadorISP small{color:#aebdca!important}
+body.modoRankingGlobal .puestoISP{color:#dbeafe!important}
+body.modoRankingGlobal .valorISP,
+body.modoRankingGlobal .filaJugadorISP b,
+body.modoRankingGlobal .podioJugadorISP b{color:#79b7ff!important}
