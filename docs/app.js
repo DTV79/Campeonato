@@ -654,6 +654,9 @@ const faseSolicitada =
     parametros.get("fase") ||
     "";
 
+const rankingGlobalSolicitado = pantallaSolicitada === "ranking" && ["1","si","true"].includes(String(parametros.get("global")||"").toLowerCase());
+document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
+
 /*
    Se prepara primero la portada, pero continúa
    oculta mediante la clase appCargando.
