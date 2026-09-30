@@ -146,3 +146,20 @@ body.modoRankingGlobal .globoInfoRanking .bloquePuntosRankingInfo,
 body.modoRankingGlobal .globoInfoRanking .resumenPuntosRankingInfo{background:#f0fdfa!important;color:#334155!important}
 body.modoRankingGlobal .globoInfoRanking .bloquePuntosRankingInfo *,
 body.modoRankingGlobal .globoInfoRanking .resumenPuntosRankingInfo *{color:#334155!important}
+
+/* Modal Ranking claro: anular colores heredados del modo oscuro en TODOS sus descendientes */
+body.modoRankingGlobal .globoInfoRanking,
+body.modoRankingGlobal .globoInfoRanking *{color:#334155!important}
+body.modoRankingGlobal .globoInfoRanking h2{color:#0f172a!important}
+body.modoRankingGlobal .globoInfoRanking h3,
+body.modoRankingGlobal .globoInfoRanking b,
+body.modoRankingGlobal .globoInfoRanking strong{color:#0f172a!important}
+body.modoRankingGlobal .globoInfoRanking p,
+body.modoRankingGlobal .globoInfoRanking small,
+body.modoRankingGlobal .globoInfoRanking span{color:#475569!important}
+body.modoRankingGlobal .globoInfoRanking .baremoRankingInfo strong{color:#0f766e!important}
+body.modoRankingGlobal .globoInfoRanking .formulaRankingInfo strong{color:#0f766e!important}
+body.modoRankingGlobal .globoInfoRanking .notaRankingInfo,
+body.modoRankingGlobal .globoInfoRanking .notaRankingInfo *{color:#065f46!important}
+body.modoRankingGlobal .globoInfoRanking .cerrarGlobo,
+body.modoRankingGlobal .globoInfoRanking button[aria-label="Cerrar"]{color:#0f172a!important}
