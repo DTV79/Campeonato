@@ -125,52 +125,11 @@ async function cargarConfiguracionSupabaseNav(datosJSON) {
 
 function configurarNavegacionGlobal() {
     const botones = obtenerBotonesNav();
-
-    configurarEnlaceNav(
-        botones[0],
-        "🏠",
-        "Inicio",
-        "index.html?portal=1",
-        true,
-        "inicio"
-    );
-
-    configurarEnlaceNav(
-        botones[1],
-        "🎾",
-        "Campeonato",
-        "index.html",
-        true,
-        "campeonato"
-    );
-
-    configurarEnlaceNav(
-        botones[2],
-        "📊",
-        "Estadísticas",
-        "estadisticas.html",
-        true,
-        "estadisticas"
-    );
-
-    configurarEnlaceNav(
-        botones[3],
-        "🏆",
-        "Ranking",
-        "index.html?pantalla=ranking",
-        true,
-        "ranking"
-    );
-
-    configurarEnlaceNav(
-        botones[4],
-        "☰",
-        "Más",
-        "index.html?pantalla=mas&nav=global",
-        true,
-        "mas"
-    );
-
+    configurarEnlaceNav(botones[0],"🏠","Inicio","index.html",true,"inicio");
+    configurarEnlaceNav(botones[1],"🏆","Competiciones","index.html#portalCompeticiones",true,"competiciones");
+    configurarEnlaceNav(botones[2],"📊","Estadísticas","estadisticas.html",true,"estadisticas");
+    configurarEnlaceNav(botones[3],"🏅","Ranking","index.html?pantalla=ranking",true,"ranking");
+    configurarEnlaceNav(botones[4],"🔐","Mi Zona","mi-zona.html",true,"mizone");
     activarPaginaActual();
 }
 
@@ -248,10 +207,10 @@ function activarPaginaActual() {
 
     const mapa = {
         "index.html": "inicio",
-        "historia.html": "mas",
-        "normas.html": "mas",
-        "campeones.html": "mas",
-        "fotos.html": "mas",
+        "historia.html": "inicio",
+        "normas.html": "competiciones",
+        "campeones.html": "inicio",
+        "mi-zona.html": "mizone",
         "ranking.html": "ranking",
         "estadisticas.html": "estadisticas"
     };
