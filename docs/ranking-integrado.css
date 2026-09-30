@@ -127,3 +127,22 @@ body.modoRankingGlobal .formulaRankingInfo>div{background:#17283a!important;bord
 body.modoRankingGlobal .formulaRankingInfo strong{color:#9dccff!important}
 body.modoRankingGlobal .formulaRankingInfo span{color:#c0ced9!important}
 body.modoRankingGlobal .notaRankingInfo{background:#282114!important;color:#f0ce73!important;border:1px solid #55451f!important}
+
+/* Info Ranking: conservar la gama clara verde/azulada del modal ISP */
+body.modoRankingGlobal .globoInfoRanking{background:#ffffff!important;border:1px solid #dbe4ea!important;color:#0f172a!important;box-shadow:0 24px 70px rgba(0,0,0,.45)!important}
+body.modoRankingGlobal .globoInfoRanking h2,
+body.modoRankingGlobal .globoInfoRanking h3{color:#0f172a!important}
+body.modoRankingGlobal .globoInfoRanking p{color:#475569!important}
+body.modoRankingGlobal .globoInfoRanking .cerrarGlobo,
+body.modoRankingGlobal .globoInfoRanking button[aria-label="Cerrar"]{background:#f1f5f9!important;color:#0f172a!important}
+body.modoRankingGlobal .baremoRankingInfo>div{background:#f8fafc!important;border:0!important}
+body.modoRankingGlobal .baremoRankingInfo span{color:#475569!important}
+body.modoRankingGlobal .baremoRankingInfo strong{color:#0f766e!important}
+body.modoRankingGlobal .formulaRankingInfo>div{background:#f0fdfa!important;border:0!important}
+body.modoRankingGlobal .formulaRankingInfo strong{color:#0f766e!important}
+body.modoRankingGlobal .formulaRankingInfo span{color:#475569!important}
+body.modoRankingGlobal .notaRankingInfo{background:#ecfdf5!important;color:#065f46!important;border:0!important}
+body.modoRankingGlobal .globoInfoRanking .bloquePuntosRankingInfo,
+body.modoRankingGlobal .globoInfoRanking .resumenPuntosRankingInfo{background:#f0fdfa!important;color:#334155!important}
+body.modoRankingGlobal .globoInfoRanking .bloquePuntosRankingInfo *,
+body.modoRankingGlobal .globoInfoRanking .resumenPuntosRankingInfo *{color:#334155!important}
