@@ -80,3 +80,17 @@ body.modoRankingGlobal .puestoISP{color:#dbeafe!important}
 body.modoRankingGlobal .valorISP,
 body.modoRankingGlobal .filaJugadorISP b,
 body.modoRankingGlobal .podioJugadorISP b{color:#79b7ff!important}
+
+/* Correccion de superficies heredadas: evitar panel blanco alrededor del ranking */
+body.modoRankingGlobal #vistaDetalle,
+body.modoRankingGlobal #contenidoDetalle,
+body.modoRankingGlobal #contenidoDetalle>div,
+body.modoRankingGlobal .detalleContenido,
+body.modoRankingGlobal .rankingHistoricoVista,
+body.modoRankingGlobal .rankingHistoricoContenido{background:transparent!important}
+body.modoRankingGlobal #contenidoDetalle{padding:0!important}
+body.modoRankingGlobal .selectorRankingModo{background:#0b1823!important;border:1px solid #294154!important}
+body.modoRankingGlobal .selectorRankingModo button{color:#aebdca!important;background:transparent!important}
+body.modoRankingGlobal .selectorRankingModo button.activo,
+body.modoRankingGlobal .selectorRankingModo .activo{background:#17324a!important;color:#fff!important}
+body.modoRankingGlobal .resumenRankingHistorico div{background:#0e1d2a!important;border:1px solid #294154!important}
