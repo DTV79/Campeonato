@@ -9,6 +9,7 @@
     <link id="cssFinalizado" rel="stylesheet" href="finalizado.css">
     <link id="cssISP" rel="stylesheet" href="isp.css">
     <link id="cssPretorneoMobile" rel="stylesheet" href="pretorneo-mobile.css">
+    <link id="cssPortal" rel="stylesheet" href="portal.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +53,8 @@
                     ["cssPrincipal", "style.css"],
                     ["cssFinalizado", "finalizado.css"],
                     ["cssISP", "isp.css"],
-                    ["cssPretorneoMobile", "pretorneo-mobile.css"]
+                    ["cssPretorneoMobile", "pretorneo-mobile.css"],
+                    ["cssPortal", "portal.css"]
                 ];
 
                 hojas.forEach(([id, archivo]) => {
@@ -69,53 +71,61 @@
 </head>
 <body class="appCargando">
 <section id="portalSprintPadel" class="portalSprintPadel oculto" aria-label="Inicio Sprint Pádel">
-    <div class="portalMarca">
+    <header class="portalTopbar">
+        <button type="button" class="portalLogo" data-portal-inicio><span>🎾</span><b>Sprint Pádel</b></button>
+        <nav class="portalNav">
+            <button data-portal-inicio>Inicio</button>
+            <button data-portal-scroll="portalCompeticiones">Competiciones</button>
+            <button data-portal-pantalla="partidos">Partidos</button>
+            <button data-portal-pantalla="ranking">Ranking</button>
+            <button data-portal-href="estadisticas.html">Estadísticas</button>
+            <button data-portal-href="historia.html">Histórico</button>
+            <button class="portalMiZona" data-portal-href="mi-zona.html">🔐 Mi Zona</button>
+        </nav>
+    </header>
+    <div class="portalHero">
         <span class="portalEyebrow">SPRINT PÁDEL</span>
-        <h1>Sprint Pádel</h1>
-        <p>Campeonatos · Ranking · Estadísticas · Historia</p>
+        <h1>Tu pádel, en un solo lugar</h1>
+        <p>Competiciones, partidos, ranking, estadísticas e historia de Sprint Pádel.</p>
     </div>
-
-    <div class="portalCampeonatoActual" id="portalCampeonatoActual">
-        <div class="portalCampeonatoCabecera">
-            <div>
-                <span class="portalEtiqueta">CAMPEONATO ACTUAL</span>
-                <h2 id="portalNombreCampeonato">Cargando campeonato…</h2>
+    <div class="portalContenido">
+        <section class="portalAhora">
+            <div class="portalSeccionTitulo"><div><span>EN JUEGO</span><h2>Ahora en Sprint Pádel</h2></div><p>Las competiciones activas, separadas y fáciles de seguir.</p></div>
+            <div class="portalActivas">
+                <article class="portalCompeticionCard portalCampeonatoCard">
+                    <div class="portalCardTipo"><span>🏆 CAMPEONATO</span><b id="portalFormatoCampeonato">—</b></div>
+                    <h3 id="portalNombreCampeonato">Cargando campeonato…</h3>
+                    <p id="portalResumenCampeonato">Preparando la edición actual.</p>
+                    <div class="portalDatosCampeonato"><div><small>Equipos</small><strong id="portalEquiposCampeonato">—</strong></div><div><small>Partidos</small><strong id="portalPartidosCampeonato">—</strong></div><div><small>Jugados</small><strong id="portalJugadosCampeonato">—</strong></div><div><small>Situación</small><strong id="portalSituacionCampeonato">—</strong></div></div>
+                    <div class="portalMetaCampeonato" id="portalMetaCampeonato"></div>
+                    <button type="button" class="portalBotonPrincipal" id="portalEntrarCampeonato">Entrar al campeonato →</button>
+                </article>
+                <article class="portalCompeticionCard portalTeamsCard" id="portalTeamsActual">
+                    <div class="portalCardTipo"><span>⚔️ TEAMS</span><b id="portalTeamsEstado">—</b></div>
+                    <h3 id="portalTeamsNombre">Cargando Teams…</h3>
+                    <div class="portalTeamsMarcador" id="portalTeamsMarcador">—</div>
+                    <p id="portalTeamsResumen">Preparando la competición por equipos.</p>
+                    <button type="button" class="portalBotonSecundario" data-portal-href="teams.html">Ver Teams →</button>
+                </article>
             </div>
-            <span class="portalFormato" id="portalFormatoCampeonato">—</span>
-        </div>
-        <p id="portalResumenCampeonato">Preparando la información de la edición actual.</p>
-
-        <div class="portalDatosCampeonato">
-            <div><small>Equipos</small><strong id="portalEquiposCampeonato">—</strong></div>
-            <div><small>Partidos</small><strong id="portalPartidosCampeonato">—</strong></div>
-            <div><small>Jugados</small><strong id="portalJugadosCampeonato">—</strong></div>
-            <div><small>Situación</small><strong id="portalSituacionCampeonato">—</strong></div>
-        </div>
-
-        <div class="portalMetaCampeonato" id="portalMetaCampeonato"></div>
-
-        <button type="button" class="portalBotonPrincipal" id="portalEntrarCampeonato">Entrar al campeonato →</button>
+        </section>
+        <section id="portalCompeticiones" class="portalBloque">
+            <div class="portalSeccionTitulo"><div><span>COMPETICIONES</span><h2>Dos formatos, una misma casa</h2></div></div>
+            <div class="portalDosColumnas">
+                <button class="portalArea grande" id="portalEntrarCampeonato"><i>🏆</i><span><b>Campeonatos</b><small>Ediciones, clasificación, jornadas y eliminatorias</small></span><em>→</em></button>
+                <button class="portalArea grande" data-portal-href="teams.html"><i>⚔️</i><span><b>Teams</b><small>Copa por equipos, enfrentamientos y marcador</small></span><em>→</em></button>
+            </div>
+        </section>
+        <section class="portalBloque">
+            <div class="portalSeccionTitulo"><div><span>SPRINT PÁDEL GLOBAL</span><h2>Más allá de una edición</h2></div><p>Información acumulada de jugadores y competiciones.</p></div>
+            <div class="portalAccesos">
+                <button class="portalArea" data-portal-pantalla="ranking"><i>🏅</i><span><b>Ranking</b><small>Ranking histórico e ISP</small></span><em>→</em></button>
+                <button class="portalArea" data-portal-href="estadisticas.html"><i>📊</i><span><b>Estadísticas</b><small>Rendimiento, récords y comparativas</small></span><em>→</em></button>
+                <button class="portalArea" data-portal-href="historia.html"><i>📚</i><span><b>Histórico</b><small>Ediciones y evolución de Sprint Pádel</small></span><em>→</em></button>
+                <button class="portalArea destacado" data-portal-href="mi-zona.html"><i>🔐</i><span><b>Mi Zona</b><small>Tu equipo, partidos y acciones pendientes</small></span><em>→</em></button>
+            </div>
+        </section>
     </div>
-
-    <div class="portalAccesos">
-        <button type="button" class="portalAcceso" onclick="window.location.href='mi-zona.html'">
-            <span>🔐</span><strong>Mi Zona</strong><small>Tu equipo, partidos y acciones pendientes</small>
-        </button>
-        <button type="button" class="portalAcceso" data-portal-href="estadisticas.html">
-            <span>📊</span><strong>Estadísticas</strong><small>Rendimiento, récords y comparativas</small>
-        </button>
-        <button type="button" class="portalAcceso" data-portal-pantalla="ranking">
-            <span>🏆</span><strong>Ranking</strong><small>Ranking histórico e ISP</small>
-        </button>
-        <button type="button" class="portalAcceso" data-portal-href="campeones.html">
-            <span>👑</span><strong>Campeones</strong><small>Palmarés de Sprint Pádel</small>
-        </button>
-        <button type="button" class="portalAcceso" data-portal-href="historia.html">
-            <span>📚</span><strong>Historia</strong><small>Ediciones y evolución del campeonato</small>
-        </button>
-    </div>
-
-    <p class="portalNota">Vista previa de la nueva portada · <button type="button" id="portalVolverActual">Ver portada actual</button></p>
 </section>
 
 <div class="contenedor">
