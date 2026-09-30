@@ -128,7 +128,7 @@ function configurarNavegacionGlobal() {
     configurarEnlaceNav(botones[0],"🏠","Inicio","index.html",true,"inicio");
     configurarEnlaceNav(botones[1],"🏆","Competiciones","index.html#portalCompeticiones",true,"competiciones");
     configurarEnlaceNav(botones[2],"📊","Estadísticas","estadisticas.html",true,"estadisticas");
-    configurarEnlaceNav(botones[3],"🏅","Ranking","index.html?pantalla=ranking",true,"ranking");
+    configurarEnlaceNav(botones[3],"🏅","Ranking","ranking.html",true,"ranking");
     configurarEnlaceNav(botones[4],"🔐","Mi Zona","mi-zona.html",true,"mizone");
     activarPaginaActual();
 }
