@@ -198,3 +198,13 @@ body.modoRankingGlobal .pieMovimientoISP strong{color:#dce8f1!important}
 body.modoRankingGlobal .ispSube{color:#34d399!important}
 body.modoRankingGlobal .ispBaja{color:#fb7185!important}
 body.modoRankingGlobal .ispIgual{color:#a9bdcb!important}
+
+/* ISP: semántica visual de variación y resumen PJ/PG */
+body.modoRankingGlobal .filaJugadorISP .valorJugadorISP .ispSube{color:#34d399!important}
+body.modoRankingGlobal .filaJugadorISP .valorJugadorISP .ispBaja{color:#fb7185!important}
+body.modoRankingGlobal .filaJugadorISP .valorJugadorISP .ispIgual{color:#a9bdcb!important}
+body.modoRankingGlobal .resumenJugadorISP{display:flex!important;align-items:center!important;gap:5px!important}
+body.modoRankingGlobal .resumenJugadorISP .datoPJ{color:#7dd3fc!important;font-weight:800!important}
+body.modoRankingGlobal .resumenJugadorISP .datoPG{color:#6ee7b7!important;font-weight:800!important}
+body.modoRankingGlobal .resumenJugadorISP .separadorISP{color:#64748b!important}
+body.modoRankingGlobal .resumenJugadorISP .estadoISP{color:#cbd5e1!important;font-weight:700!important}
