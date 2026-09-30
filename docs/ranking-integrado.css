@@ -94,3 +94,19 @@ body.modoRankingGlobal .selectorRankingModo button{color:#aebdca!important;backg
 body.modoRankingGlobal .selectorRankingModo button.activo,
 body.modoRankingGlobal .selectorRankingModo .activo{background:#17324a!important;color:#fff!important}
 body.modoRankingGlobal .resumenRankingHistorico div{background:#0e1d2a!important;border:1px solid #294154!important}
+
+/* Parejas historicas: conversion completa del antiguo tema claro */
+body.modoRankingGlobal .parejaHistoricaJugador{background:#0e1d2a!important;border:1px solid #294154!important;box-shadow:none!important}
+body.modoRankingGlobal .cabeceraParejaHistorica small{color:#8fa6b9!important}
+body.modoRankingGlobal .cabeceraParejaHistorica strong{color:#f8fbff!important}
+body.modoRankingGlobal .cabeceraParejaHistorica>b{background:#17324a!important;color:#dbeafe!important}
+body.modoRankingGlobal .datosParejaHistorica span{background:#142635!important;color:#dce8f2!important;border:1px solid #203b50!important}
+body.modoRankingGlobal .resultadosParejaHistorica span{background:#2a2515!important;color:#f3d36a!important;border:1px solid #55491f!important}
+body.modoRankingGlobal .campeonatosParejaHistorica{border-top-color:#294154!important}
+body.modoRankingGlobal .campeonatosParejaHistorica>small{color:#8fa6b9!important}
+body.modoRankingGlobal .campeonatosParejaHistorica>div{background:#142635!important;border:1px solid #203b50!important}
+body.modoRankingGlobal .campeonatosParejaHistorica strong{color:#f4f8fc!important}
+body.modoRankingGlobal .campeonatosParejaHistorica span{color:#9fb3c4!important}
+body.modoRankingGlobal .pieParejaHistorica{border-top-color:#294154!important}
+body.modoRankingGlobal .pieParejaHistorica span{color:#e7eef5!important}
+body.modoRankingGlobal .pieParejaHistorica small{color:#9fb3c4!important}
