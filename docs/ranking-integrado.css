@@ -211,3 +211,15 @@ body.modoRankingGlobal .resumenJugadorISP .estadoISP{color:#cbd5e1!important;fon
 
 body.modoRankingGlobal .resumenJugadorISP .datoPP{color:#fda4af!important;font-weight:800!important}
 body.modoRankingGlobal .resumenJugadorISP .estadoProvisionalISP{color:#fbbf24!important;font-weight:900!important}
+
+/* ISP: color semantico también en podio y movimientos destacados */
+body.modoRankingGlobal .podioJugadorISP .ispSube,
+body.modoRankingGlobal .podioJugadorISP .variacionISP.ispSube,
+body.modoRankingGlobal .podioJugadorISP small.ispSube{color:#34d399!important}
+body.modoRankingGlobal .podioJugadorISP .ispBaja,
+body.modoRankingGlobal .podioJugadorISP .variacionISP.ispBaja,
+body.modoRankingGlobal .podioJugadorISP small.ispBaja{color:#fb7185!important}
+body.modoRankingGlobal .recordMovimientoISP .ispSube,
+body.modoRankingGlobal .recordsMovimientoISP .ispSube{color:#34d399!important}
+body.modoRankingGlobal .recordMovimientoISP .ispBaja,
+body.modoRankingGlobal .recordsMovimientoISP .ispBaja{color:#fb7185!important}
