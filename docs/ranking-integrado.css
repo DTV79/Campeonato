@@ -163,3 +163,38 @@ body.modoRankingGlobal .globoInfoRanking .notaRankingInfo,
 body.modoRankingGlobal .globoInfoRanking .notaRankingInfo *{color:#065f46!important}
 body.modoRankingGlobal .globoInfoRanking .cerrarGlobo,
 body.modoRankingGlobal .globoInfoRanking button[aria-label="Cerrar"]{color:#0f172a!important}
+
+/* ISP: contraste del puesto y ficha individual completa */
+body.modoRankingGlobal .filaJugadorISP .puestoISP{background:#163447!important;color:#f8fbff!important;border:1px solid #3b6077!important;font-weight:900!important}
+body.modoRankingGlobal .filaJugadorISP .datosJugadorISP strong{color:#f8fbff!important}
+body.modoRankingGlobal .filaJugadorISP .datosJugadorISP small{color:#b4c5d2!important}
+body.modoRankingGlobal .filaJugadorISP .valorJugadorISP strong{color:#f8fbff!important}
+body.modoRankingGlobal .filaJugadorISP .valorJugadorISP small{color:#b4c5d2!important}
+body.modoRankingGlobal .metricaJugadorISP{background:#102331!important;border:1px solid #29485c!important;color:#eef6ff!important}
+body.modoRankingGlobal .metricaJugadorISP span{color:#eef6ff!important}
+body.modoRankingGlobal .metricaJugadorISP small{color:#9fb5c6!important}
+body.modoRankingGlobal .metricaJugadorISP strong{color:#6ee7d2!important}
+body.modoRankingGlobal .graficaISP{background:#f8fafc!important;border:1px solid #d9e2e8!important}
+body.modoRankingGlobal .graficaISP .textoEjeISP{fill:#475569!important}
+body.modoRankingGlobal .graficaISP .lineaGuiaISP{stroke:#cbd5e1!important}
+body.modoRankingGlobal .graficaISP .ejeISP{stroke:#94a3b8!important}
+body.modoRankingGlobal .graficaISP .lineaEvolucionISP{stroke:#0f766e!important}
+body.modoRankingGlobal .graficaISP .puntoEvolucionISP{fill:#fff!important;stroke:#0f766e!important}
+body.modoRankingGlobal .recordsMovimientoISP article,
+body.modoRankingGlobal .recordMovimientoISP{background:#102331!important;border:1px solid #29485c!important;color:#eef6ff!important}
+body.modoRankingGlobal .recordsMovimientoISP small,
+body.modoRankingGlobal .recordMovimientoISP small{color:#9fb5c6!important}
+body.modoRankingGlobal .recordsMovimientoISP strong,
+body.modoRankingGlobal .recordMovimientoISP strong{color:#6ee7d2!important}
+body.modoRankingGlobal .movimientoISP{background:#102331!important;border:1px solid #29485c!important;color:#eef6ff!important}
+body.modoRankingGlobal .cabeceraMovimientoISP small{color:#91a8ba!important}
+body.modoRankingGlobal .cabeceraMovimientoISP strong{color:#f8fbff!important}
+body.modoRankingGlobal .rivalesMovimientoISP span{background:#152a39!important}
+body.modoRankingGlobal .rivalesMovimientoISP small{color:#91a8ba!important}
+body.modoRankingGlobal .rivalesMovimientoISP strong{color:#eef6ff!important}
+body.modoRankingGlobal .pieMovimientoISP{border-top-color:#29485c!important;color:#a9bdcb!important}
+body.modoRankingGlobal .pieMovimientoISP span{color:#a9bdcb!important}
+body.modoRankingGlobal .pieMovimientoISP strong{color:#dce8f1!important}
+body.modoRankingGlobal .ispSube{color:#34d399!important}
+body.modoRankingGlobal .ispBaja{color:#fb7185!important}
+body.modoRankingGlobal .ispIgual{color:#a9bdcb!important}
