@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estadísticas · Sprint Pádel Tui</title>
 
-    <link
-        id="cssPrincipal"
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link id="cssPrincipal" rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="portal.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,7 +61,8 @@
         )();
     </script>
 </head>
-<body class="paginaSecundaria paginaEstadisticas appCargando">
+<body class="paginaSecundaria paginaEstadisticas paginaGlobalSprint appCargando">
+    <header class="globalTopbar"><a href="index.html">🎾 <b>Sprint Pádel</b></a><nav><a href="index.html">Inicio</a><a href="index.html#portalCompeticiones">Competiciones</a><a class="activo" href="estadisticas.html">Estadísticas</a><a href="index.html?pantalla=ranking">Ranking</a><a href="historia.html">Histórico</a><a class="miZona" href="mi-zona.html">🔐 Mi Zona</a></nav></header>
     <div class="contenedor">
         <header class="cabecera cabeceraEstadisticas">
             <div class="cabeceraEstadisticasSuperior">
@@ -73,7 +71,7 @@
                         class="tituloSuperior"
                         id="marcaEstadisticas"
                     >
-                        HISTÓRICO Y RÉCORDS
+                        SPRINT PÁDEL · GLOBAL
                     </div>
 
                     <div
@@ -87,11 +85,11 @@
                         class="subtitulo"
                         id="subtituloEstadisticas"
                     >
-                        Resultados, rendimiento y curiosidades
+                        Rendimiento, récords y comparativas de todas las competiciones
                     </div>
 
                     <div class="etiquetaCabeceraEstadisticas">
-                        Global · Por campeonato
+                        Global · Por competición · Por edición
                     </div>
                 </div>
 
