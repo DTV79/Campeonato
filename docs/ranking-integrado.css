@@ -110,3 +110,20 @@ body.modoRankingGlobal .campeonatosParejaHistorica span{color:#9fb3c4!important}
 body.modoRankingGlobal .pieParejaHistorica{border-top-color:#294154!important}
 body.modoRankingGlobal .pieParejaHistorica span{color:#e7eef5!important}
 body.modoRankingGlobal .pieParejaHistorica small{color:#9fb3c4!important}
+
+/* Modal de informacion del Ranking: tema oscuro completo */
+body.modoRankingGlobal .globoInfoRanking{background:#0e1d2a!important;border:1px solid #355168!important;color:#eef6ff!important;box-shadow:0 24px 70px rgba(0,0,0,.55)!important}
+body.modoRankingGlobal .globoInfoRanking h2,
+body.modoRankingGlobal .globoInfoRanking h3,
+body.modoRankingGlobal .globoInfoRanking strong{color:#f8fbff!important}
+body.modoRankingGlobal .globoInfoRanking p,
+body.modoRankingGlobal .globoInfoRanking span{color:#b8c7d4!important}
+body.modoRankingGlobal .globoInfoRanking .cerrarGlobo,
+body.modoRankingGlobal .globoInfoRanking button[aria-label="Cerrar"]{background:#172b3b!important;color:#f8fbff!important}
+body.modoRankingGlobal .baremoRankingInfo>div{background:#142635!important;border:1px solid #203b50!important}
+body.modoRankingGlobal .baremoRankingInfo span{color:#d8e4ee!important}
+body.modoRankingGlobal .baremoRankingInfo strong{color:#79b7ff!important}
+body.modoRankingGlobal .formulaRankingInfo>div{background:#17283a!important;border:1px solid #294154!important}
+body.modoRankingGlobal .formulaRankingInfo strong{color:#9dccff!important}
+body.modoRankingGlobal .formulaRankingInfo span{color:#c0ced9!important}
+body.modoRankingGlobal .notaRankingInfo{background:#282114!important;color:#f0ce73!important;border:1px solid #55451f!important}
