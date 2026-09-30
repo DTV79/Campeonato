@@ -489,11 +489,12 @@
                         )}
                     </strong>
 
-                    <small>
-                        ${numeroISP(jugador.pj)} PJ ·
-                        ${numeroISP(jugador.pg)} PG
+                    <small class="resumenJugadorISP">
+                        <span class="datoPJ">${numeroISP(jugador.pj)} PJ</span>
+                        <span class="separadorISP">·</span>
+                        <span class="datoPG">${numeroISP(jugador.pg)} PG</span>
                         ${estado
-                            ? ` · ${escaparISP(estado)}`
+                            ? `<span class="separadorISP">·</span><span class="estadoISP" title="Estado del índice según el número de partidos computados">${escaparISP(estado)}</span>`
                             : ""}
                     </small>
                 </span>
