@@ -5,6 +5,8 @@ export const TOKEN_KEY = "sprint-padel-mi-zona-token";
 export const RPC = Object.freeze({
     jugadores: "web_teams_jugadores_acceso",
     login: "web_teams_login",
+    activar: "web_teams_activar_acceso",
+    cambiarPin: "web_teams_cambiar_pin",
     logout: "web_teams_logout",
     zona: "web_teams_mi_zona",
     disponibilidad: "web_teams_cambiar_disponibilidad",
