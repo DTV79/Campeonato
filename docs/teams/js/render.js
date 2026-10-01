@@ -166,8 +166,107 @@ function renderMarcador(detalle) {
             <span style="width:${progreso}%"></span>
         </div>
 
+        ${htmlEstadisticasTeams(detalle, equipoA, equipoB)}
+
         <div class="marcadorPie">${cierre}</div>
     `;
+}
+
+function htmlEstadisticasTeams(detalle, equipoA, equipoB) {
+    const estadA = calcularEstadisticasEquipo(detalle, equipoA, "A");
+    const estadB = calcularEstadisticasEquipo(detalle, equipoB, "B");
+
+    const filas = [
+        ["Partidos ganados", estadA.partidosGanados, estadB.partidosGanados],
+        ["Sets ganados", estadA.setsGanados, estadB.setsGanados],
+        ["Juegos ganados", estadA.juegosGanados, estadB.juegosGanados],
+        ["Puntos Teams", estadA.puntosTeams, estadB.puntosTeams],
+        ["Tie-breaks ganados", estadA.tiebreaksGanados, estadB.tiebreaksGanados],
+        ["Jugadores utilizados", estadA.jugadoresUtilizados, estadB.jugadoresUtilizados]
+    ];
+
+    return `
+        <div class="estadisticasTeams">
+            <div class="estadisticasTeamsTitulo">
+                <span>ESTADÍSTICAS DE LA EDICIÓN</span>
+                <small>Solo cuentan partidos confirmados</small>
+            </div>
+
+            <div class="estadisticasTeamsCabecera">
+                <strong>${escaparHtml(equipoA?.nombre || "Equipo A")}</strong>
+                <span></span>
+                <strong>${escaparHtml(equipoB?.nombre || "Equipo B")}</strong>
+            </div>
+
+            <div class="estadisticasTeamsFilas">
+                ${filas.map(([etiqueta, valorA, valorB]) => `
+                    <div class="estadisticaTeamsFila">
+                        <b>${valorA}</b>
+                        <span>${escaparHtml(etiqueta)}</span>
+                        <b>${valorB}</b>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+}
+
+function calcularEstadisticasEquipo(detalle, equipo, lado) {
+    const partidosConfirmados = (detalle?.partidos || [])
+        .filter(partido => partido?.estado === "finalizado");
+
+    let setsGanados = 0;
+    let juegosGanados = 0;
+    let tiebreaksGanados = 0;
+    const jugadores = new Set();
+
+    for (const partido of partidosConfirmados) {
+        for (const jugador of alineacionPorLado(partido, lado)) {
+            if (jugador?.id_jugador) jugadores.add(jugador.id_jugador);
+        }
+
+        for (const set of partido?.sets || []) {
+            const esA = lado === "A";
+            const puntos = Number(esA ? set?.puntos_a : set?.puntos_b);
+            const puntosRival = Number(esA ? set?.puntos_b : set?.puntos_a);
+            const tie = esA ? set?.tiebreak_a : set?.tiebreak_b;
+            const tieRival = esA ? set?.tiebreak_b : set?.tiebreak_a;
+
+            juegosGanados += Number.isFinite(puntos) ? puntos : 0;
+
+            if (puntos > puntosRival) {
+                setsGanados += 1;
+            } else if (
+                puntos === puntosRival &&
+                Number.isInteger(tie) &&
+                Number.isInteger(tieRival) &&
+                tie > tieRival
+            ) {
+                setsGanados += 1;
+            }
+
+            if (
+                Number.isInteger(tie) &&
+                Number.isInteger(tieRival) &&
+                tie > tieRival
+            ) {
+                tiebreaksGanados += 1;
+            }
+        }
+    }
+
+    const partidosGanados = victoriasEquipo(detalle, equipo?.id);
+    const puntosPorVictoria = Number(detalle?.puntos_por_victoria || 1);
+    const puntosTeams = partidosGanados * puntosPorVictoria;
+
+    return {
+        partidosGanados,
+        setsGanados,
+        juegosGanados,
+        puntosTeams: Number.isInteger(puntosTeams) ? puntosTeams : puntosTeams.toFixed(1),
+        tiebreaksGanados,
+        jugadoresUtilizados: jugadores.size
+    };
 }
 
 function htmlEquipoMarcador(equipo, victorias) {
