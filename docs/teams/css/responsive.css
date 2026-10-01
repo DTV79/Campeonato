@@ -215,6 +215,10 @@
         grid-template-columns: 1fr;
     }
 
+    .convocatoriaEquiposPublicos {
+        grid-template-columns: 1fr;
+    }
+
     .convocatoriaGrupo + .convocatoriaGrupo {
         border-top: 1px solid var(--borde);
         border-left: 0;
