@@ -235,3 +235,15 @@ body.modoRankingGlobal .selectorRankingModo button[aria-selected="true"]:hover{b
 /* Modal informativo ISP: asegurar contraste del encabezado sobre fondo claro */
 body.modoRankingGlobal .globoInfoISP h3{color:#0f172a!important}
 body.modoRankingGlobal .globoInfoISP h3 *{color:#0f172a!important}
+
+/* Selector Histórico / ISP: mismo lenguaje visual azul que Estadísticas */
+body.modoRankingGlobal .selectorRankingModo button.activo,
+body.modoRankingGlobal .selectorRankingModo button[aria-selected="true"]{
+  background:#1665c1!important;
+  border-color:#3183df!important;
+  color:#fff!important;
+}
+body.modoRankingGlobal .selectorRankingModo button.activo:hover,
+body.modoRankingGlobal .selectorRankingModo button[aria-selected="true"]:hover{
+  background:#1d73d1!important;
+}
