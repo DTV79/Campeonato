@@ -12,7 +12,7 @@ import {
     resumenFinalizacion,
     tipoResultado,
     victoriasEquipo
-} from "./model.js";
+} from "./model.js?v=20261001-1910";
 
 const nodos = {
     nombre: document.getElementById("teamsNombre"),
