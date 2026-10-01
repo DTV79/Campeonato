@@ -1059,12 +1059,12 @@ function configurarNavegacionEstadisticas() {
     ];
 
     configurarBotonNavegacionEstadisticas(
-        botones[0], "🏠", "Inicio", "index.html?portal=1"
+        botones[0], "🏠", "Inicio", "index.html"
     );
 
     configurarBotonNavegacionEstadisticas(
         botones[1], "🏆", "Competiciones",
-        "index.html?portal=1#portalCompeticiones"
+        "index.html#portalCompeticiones"
     );
 
     configurarBotonNavegacionEstadisticas(
