@@ -106,3 +106,23 @@ body.paginaEstadisticas.paginaGlobalSprint{
 .paginaEstadisticas .bottomNav{background:#071722!important;border-top-color:#20384a!important}
 .paginaEstadisticas .bottomNav .navBtn{color:#9eb0bd!important}
 .paginaEstadisticas .bottomNav .navBtn.navActivo{color:#a855f7!important}
+
+
+/* Palmarés: asegurar contraste de campeones y subcampeones en tema oscuro */
+.paginaEstadisticas .palmaresEstadisticas article strong{
+  color:#f8fbff!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+
+.paginaEstadisticas .palmaresEstadisticas article:first-child strong{
+  color:#fde68a!important;
+}
+
+.paginaEstadisticas .palmaresEstadisticas article:nth-child(2) strong{
+  color:#dbeafe!important;
+}
+
+.paginaEstadisticas .palmaresEstadisticas article small{
+  color:#f59e0b!important;
+}
