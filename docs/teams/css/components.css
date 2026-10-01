@@ -36,6 +36,88 @@
 }
 
 .marcadorCabecera,
+
+.estadisticasTeams {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(4, 13, 22, 0.3);
+}
+
+.estadisticasTeamsTitulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 10px;
+}
+
+.estadisticasTeamsTitulo span {
+    color: #7dd3fc;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.estadisticasTeamsTitulo small {
+    color: var(--texto-tenue);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.estadisticasTeamsCabecera,
+.estadisticaTeamsFila {
+    display: grid;
+    grid-template-columns: minmax(86px, 1fr) minmax(150px, 1.2fr) minmax(86px, 1fr);
+    align-items: center;
+    text-align: center;
+}
+
+.estadisticasTeamsCabecera {
+    padding: 0 18px 8px;
+}
+
+.estadisticasTeamsCabecera strong {
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.estadisticasTeamsCabecera strong:first-child {
+    text-align: left;
+}
+
+.estadisticasTeamsCabecera strong:last-child {
+    text-align: right;
+}
+
+.estadisticasTeamsFilas {
+    padding: 0 18px 14px;
+}
+
+.estadisticaTeamsFila {
+    min-height: 38px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.estadisticaTeamsFila b {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.estadisticaTeamsFila b:first-child {
+    text-align: left;
+}
+
+.estadisticaTeamsFila b:last-child {
+    text-align: right;
+}
+
+.estadisticaTeamsFila span {
+    color: var(--texto-suave);
+    font-size: 10px;
+    font-weight: 700;
+}
+
 .marcadorPie {
     display: flex;
     align-items: center;
