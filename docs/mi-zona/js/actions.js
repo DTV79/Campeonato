@@ -174,6 +174,31 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
         const tipo = form.dataset.form;
         const partidoId = form.dataset.partidoId;
 
+        if (tipo === "cambiar-pin") {
+            const pinActual = form.elements.pinActual.value;
+            const pinNuevo = form.elements.pinNuevo.value;
+            const pinNuevo2 = form.elements.pinNuevo2.value;
+
+            if (!/^\\d{4,8}$/.test(pinNuevo)) {
+                mensajeFormulario(form, "El nuevo PIN debe tener entre 4 y 8 cifras.", true);
+                return;
+            }
+
+            if (pinNuevo !== pinNuevo2) {
+                mensajeFormulario(form, "Los dos nuevos PIN no coinciden.", true);
+                return;
+            }
+
+            await ejecutar(form, () => api.cambiarPin(
+                token,
+                pinActual,
+                pinNuevo
+            ), async () => {
+                form.reset();
+            });
+            return;
+        }
+
         if (tipo === "alineacion") {
             await ejecutar(form, () => api.guardarAlineacion(
                 token,
