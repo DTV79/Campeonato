@@ -180,7 +180,6 @@ function htmlEstadisticasTeams(detalle, equipoA, equipoB) {
         ["Partidos ganados", estadA.partidosGanados, estadB.partidosGanados],
         ["Sets ganados", estadA.setsGanados, estadB.setsGanados],
         ["Juegos ganados", estadA.juegosGanados, estadB.juegosGanados],
-        ["Puntos Teams", estadA.puntosTeams, estadB.puntosTeams],
         ["Tie-breaks ganados", estadA.tiebreaksGanados, estadB.tiebreaksGanados],
         ["Jugadores utilizados", estadA.jugadoresUtilizados, estadB.jugadoresUtilizados]
     ];
