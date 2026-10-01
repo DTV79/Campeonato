@@ -62,27 +62,35 @@ async function cargarConfiguracionSupabaseNav(datosJSON) {
     ).trim();
 
     try {
-        const respuestaActivo = await fetch(
-            `${SUPABASE_URL_NAV}/rest/v1/rpc/web_campeonato_activo`,
-            {
-                method: "POST",
-                cache: "no-store",
-                headers: {
-                    apikey: SUPABASE_PUBLISHABLE_KEY_NAV,
-                    "Content-Type": "application/json"
-                },
-                body: "{}"
-            }
-        );
-
-        if (!respuestaActivo.ok) {
-            throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
-        }
-
-        const activo = await respuestaActivo.json();
-        const codigo = String(
-            activo?.codigo_campeonato || codigoRespaldo
+        const codigoSolicitado = String(
+            new URLSearchParams(window.location.search).get("campeonato") || ""
         ).trim();
+
+        let codigo = codigoSolicitado;
+
+        if (!codigo) {
+            const respuestaActivo = await fetch(
+                `${SUPABASE_URL_NAV}/rest/v1/rpc/web_campeonato_activo`,
+                {
+                    method: "POST",
+                    cache: "no-store",
+                    headers: {
+                        apikey: SUPABASE_PUBLISHABLE_KEY_NAV,
+                        "Content-Type": "application/json"
+                    },
+                    body: "{}"
+                }
+            );
+
+            if (!respuestaActivo.ok) {
+                throw new Error(`Supabase HTTP ${respuestaActivo.status}`);
+            }
+
+            const activo = await respuestaActivo.json();
+            codigo = String(
+                activo?.codigo_campeonato || codigoRespaldo
+            ).trim();
+        }
 
         if (!codigo) return datosJSON;
 
@@ -144,11 +152,15 @@ function configurarNavegacionGlobal(config = {}) {
 function configurarNavegacionCampeonato(config = {}) {
     const botones = obtenerBotonesNav();
 
-    const idCampeonato = String(
-        config.id_campeonato ||
+    const codigoCampeonato = String(
         config.codigo_campeonato ||
+        config.id_campeonato ||
         ""
     ).trim();
+
+    const sufijoCampeonato = codigoCampeonato
+        ? "&campeonato=" + encodeURIComponent(codigoCampeonato)
+        : "";
 
     const parametrosEstadisticas = new URLSearchParams({
         ambito: "campeonato",
@@ -156,13 +168,34 @@ function configurarNavegacionCampeonato(config = {}) {
         origen: "campeonato"
     });
 
-    if (idCampeonato) {
-        parametrosEstadisticas.set("campeonato", idCampeonato);
+    if (codigoCampeonato) {
+        parametrosEstadisticas.set("campeonato", codigoCampeonato);
     }
 
-    configurarEnlaceNav(botones[0],"🏆","Campeonato","index.html?portal=0",true,"campeonato");
-    configurarEnlaceNav(botones[1],"📊","Competición","index.html?portal=0&pantalla=competicion",true,"competicion");
-    configurarEnlaceNav(botones[2],"🎾","Partidos","index.html?portal=0&pantalla=partidos",true,"partidos");
+    configurarEnlaceNav(
+        botones[0],
+        "🏆",
+        "Campeonato",
+        "index.html?portal=0" + sufijoCampeonato,
+        true,
+        "campeonato"
+    );
+    configurarEnlaceNav(
+        botones[1],
+        "📊",
+        "Competición",
+        "index.html?portal=0&pantalla=competicion" + sufijoCampeonato,
+        true,
+        "competicion"
+    );
+    configurarEnlaceNav(
+        botones[2],
+        "🎾",
+        "Partidos",
+        "index.html?portal=0&pantalla=partidos" + sufijoCampeonato,
+        true,
+        "partidos"
+    );
     configurarEnlaceNav(
         botones[3],
         "📈",
@@ -171,7 +204,14 @@ function configurarNavegacionCampeonato(config = {}) {
         true,
         "estadisticas-campeonato"
     );
-    configurarEnlaceNav(botones[4],"☰","Más","index.html?portal=0&pantalla=mas",true,"mas");
+    configurarEnlaceNav(
+        botones[4],
+        "☰",
+        "Más",
+        "index.html?portal=0&pantalla=mas" + sufijoCampeonato,
+        true,
+        "mas"
+    );
 }
 
 function configurarNavegacionEnJuego(config = {}) {
