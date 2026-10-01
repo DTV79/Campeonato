@@ -769,3 +769,130 @@
     font-size: 10px;
     line-height: 1.45;
 }
+
+.convocatoriasZona {
+    display: grid;
+    gap: 12px;
+}
+
+.convocatoriasZonaTitulo {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.convocatoriasZonaTitulo span {
+    color: var(--azul);
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+.convocatoriasZonaTitulo h2 {
+    margin: 3px 0 0;
+    font-size: 20px;
+}
+
+.convocatoriasZonaTitulo small {
+    color: var(--tenue);
+    font-size: 9px;
+}
+
+.convocatoriaCard {
+    overflow: hidden;
+    padding: 16px;
+    border: 1px solid rgba(96,165,250,.22);
+    border-radius: 16px;
+    background:
+        linear-gradient(145deg, rgba(37,99,235,.09), rgba(9,20,31,.92) 58%);
+    box-shadow: var(--sombra);
+}
+
+.convocatoriaInfo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.convocatoriaAbierta {
+    display: block;
+    color: #86efac;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.convocatoriaInfo h3 {
+    margin: 4px 0 5px;
+    font-size: 18px;
+}
+
+.convocatoriaInfo small {
+    color: var(--tenue);
+    font-size: 9px;
+}
+
+.convocatoriaInfo p {
+    max-width: 245px;
+    margin: 0;
+    color: var(--suave);
+    font-size: 10px;
+    line-height: 1.45;
+    text-align: right;
+}
+
+.convocatoriaInfo p strong {
+    color: var(--texto);
+}
+
+.convocatoriaOpciones {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.convocatoriaOpcion {
+    min-height: 42px;
+    padding: 9px 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    background: rgba(255,255,255,.035);
+    color: #c8d4df;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.convocatoriaOpcion:hover:not(:disabled) {
+    border-color: rgba(96,165,250,.35);
+    background: rgba(96,165,250,.07);
+}
+
+.convocatoriaOpcion.meApunto.activo {
+    border-color: rgba(74,222,128,.36);
+    background: rgba(74,222,128,.11);
+    color: #86efac;
+}
+
+.convocatoriaOpcion.noPuedo.activo {
+    border-color: rgba(248,113,113,.36);
+    background: rgba(248,113,113,.1);
+    color: #fca5a5;
+}
+
+.convocatoriaOpcion.noSe.activo {
+    border-color: rgba(250,204,21,.34);
+    background: rgba(250,204,21,.09);
+    color: #fde68a;
+}
+
+.convocatoriaNota {
+    display: block;
+    margin-top: 10px;
+    color: var(--tenue);
+    font-size: 8px;
+    text-align: center;
+}
