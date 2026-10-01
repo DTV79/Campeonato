@@ -654,20 +654,14 @@ const faseSolicitada =
     parametros.get("fase") ||
     "";
 
-// Ranking e ISP son ahora secciones globales del portal. Cualquier acceso a
-// ?pantalla=ranking usa el diseño global, aunque llegue desde un enlace antiguo.
 const rankingGlobalSolicitado = pantallaSolicitada === "ranking";
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
 
 /*
-   La portada del campeonato solo se prepara para las pantallas
-   pertenecientes al campeonato. El Ranking global no debe pintarla
-   ni siquiera de forma transitoria: así evitamos la carrera entre
-   pintarInicio(), abrirPantalla("ranking") y los ajustes de finalizado.js.
+   Se prepara primero la portada, pero continúa
+   oculta mediante la clase appCargando.
 */
-if (!rankingGlobalSolicitado) {
-    pintarInicio();
-}
+pintarInicio();
 
         const portalSolicitado = parametros.get("portal");
         const entrarDirectoCampeonato = ["0","no","false","campeonato"].includes(String(portalSolicitado||"").trim().toLowerCase());
@@ -1074,7 +1068,6 @@ function gestionarClickGlobal(evento) {
 
     const entrarCampeonatoPortal = evento.target.closest("[data-entrar-campeonato]");
     if (entrarCampeonatoPortal) {
-        // Ruta canónica del campeonato. El portal global se reserva para index.html.
         window.location.href = "index.html?portal=0";
         return;
     }
@@ -3349,7 +3342,7 @@ function configurarNavegacionGlobalPublica() {
         "🏠",
         "Inicio",
         "",
-        "index.html"
+        "index.html?portal=1"
     );
 
     configurarBotonNav(
@@ -3357,7 +3350,7 @@ function configurarNavegacionGlobalPublica() {
         "🏆",
         "Competiciones",
         "",
-        "index.html#portalCompeticiones"
+        "index.html?portal=1#portalCompeticiones"
     );
 
     configurarBotonNav(
