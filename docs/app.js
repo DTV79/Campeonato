@@ -665,10 +665,10 @@ const esRutaCampeonatoPublico =
 
 document.body.classList.toggle("modoCampeonatoPublico", esRutaCampeonatoPublico);
 
-configurarEstadoTopbarGlobal(esRutaCampeonatoPublico, rankingGlobalSolicitado);
-
 const rankingGlobalSolicitado = pantallaSolicitada === "ranking";
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
+
+configurarEstadoTopbarGlobal(esRutaCampeonatoPublico, rankingGlobalSolicitado);
 
 /*
    Se prepara primero la portada, pero continúa
