@@ -505,10 +505,12 @@ function htmlPuntuacionSet(sets, numero, lado) {
 
     return `
         <div class="puntuacionSet${ganador ? " ganadorSet" : ""}">
-            <strong>${puntos}</strong>
-            ${Number.isInteger(tie)
-                ? `<small>TB ${tie}</small>`
-                : "<small>&nbsp;</small>"}
+            <strong>
+                <span>${puntos}</span>
+                ${Number.isInteger(tie)
+                    ? `<sup class="tiebreakSuperindice">${tie}</sup>`
+                    : ""}
+            </strong>
         </div>
     `;
 }
