@@ -34,22 +34,22 @@
         }
     }
 
-    function esContextoCampeonato() {
+    function esContextoCampeonatoFinal() {
         const parametros = new URLSearchParams(window.location.search);
         const pantalla = String(parametros.get("pantalla") || "inicio").toLowerCase();
         const portal = String(parametros.get("portal") || "").toLowerCase();
 
-        // index.html es la portada global. El campeonato tiene ruta explícita ?portal=0.
         if (pantalla === "ranking") return false;
-        if (["1", "si", "true"].includes(portal)) return false;
-        if (["0", "no", "false", "campeonato"].includes(portal)) return true;
 
-        // Pantallas internas históricas del campeonato siguen siendo válidas.
-        return pantalla !== "inicio";
+        if (pantalla === "inicio") {
+            return ["0", "no", "false", "campeonato"].includes(portal);
+        }
+
+        return true;
     }
 
     function instalarPortadaFinalizada() {
-        if (!esContextoCampeonato()) {
+        if (!esContextoCampeonatoFinal()) {
             limpiarModoFinalizado();
             return;
         }
@@ -118,7 +118,7 @@
     }
 
     function aplicarPortadaFinalizada() {
-        if (!esContextoCampeonato() || !esCampeonatoFinalizado()) return;
+        if (!esContextoCampeonatoFinal() || !esCampeonatoFinalizado()) return;
 
         const resumen = obtenerResumenFinal();
 
@@ -771,37 +771,30 @@
     function aplicarAjustes() {
         if (!esFinalizado()) return;
 
-        const parametros = new URLSearchParams(window.location.search);
-        const esRankingGlobal = parametros.get("pantalla") === "ranking";
+        const parametrosRuta = new URLSearchParams(window.location.search);
+        const pantallaRuta = String(parametrosRuta.get("pantalla") || "inicio").toLowerCase();
+        const portalRuta = String(parametrosRuta.get("portal") || "").toLowerCase();
+        const esPortalGlobal =
+            pantallaRuta === "inicio" &&
+            !["0", "no", "false", "campeonato"].includes(portalRuta);
 
-        /*
-           finalizado.js observa cambios de la página y vuelve a ejecutar
-           estos ajustes. En el Ranking global no debe tocar ni la portada
-           ni el contenido del campeonato: solo respetar la navegación global.
-        */
-        if (esRankingGlobal) {
-            configurarRankingNavegacionFinal();
-            return;
-        }
+        if (pantallaRuta === "ranking" || esPortalGlobal) return;
 
-        /*
-           Conservamos el diseño oscuro unificado, pero NO eliminamos la
-           información ampliada del campeonato finalizado. La V2 aporta
-           estadísticas y detalles que forman parte del contenido.
-        */
-        if (typeof configurarNavegacionGlobalPublica === "function") {
-            configurarNavegacionGlobalPublica();
-        }
+        compactarCabecera();
+        configurarRankingNavegacionFinal();
+        sincronizarNavegacionFinal();
+        limpiarPantallaMasFinal();
+        agregarEquiposPantallaMas();
+        agregarGruposPantallaMas();
 
         const portada = document.getElementById("portadaFinalizada");
         if (!portada) return;
 
         const resumen = calcularResumenCompleto();
 
+        renovarGranFinal(portada, resumen);
         renovarCifras(portada, resumen);
         pintarFarolilloPalas(portada, resumen);
-
-        portada.dataset.disenoFinal = "unificado";
     }
 
     function esFinalizado() {
@@ -1368,25 +1361,6 @@ const ultimo = finales.at(-1) || partidos.at(-1);
     ===================================================== */
 
     function configurarRankingNavegacionFinal() {
-        const parametros = new URLSearchParams(window.location.search);
-        const esRankingGlobal = parametros.get("pantalla") === "ranking";
-
-        /*
-           El campeonato finalizado conserva su navegación propia,
-           pero el Ranking global pertenece al portal Sprint Pádel.
-           No debe volver a convertir la barra global en la del campeonato.
-        */
-        if (
-            esRankingGlobal &&
-            typeof configurarNavegacionGlobalPublica === "function"
-        ) {
-            configurarNavegacionGlobalPublica();
-            document
-                .querySelectorAll(".bottomNav .navBtn")
-                [3]?.classList.add("navRankingFinal");
-            return;
-        }
-
         const botones = [
             ...document.querySelectorAll(".bottomNav .navBtn")
         ];
@@ -1400,7 +1374,7 @@ const ultimo = finales.at(-1) || partidos.at(-1);
             "",
             "estadisticas.html"
         );
-        configurarBotonFinal(botones[3], "🏆", "Ranking", "ranking");
+        configurarBotonFinal(botones[3], "🏆", "Ranking", "", "index.html?pantalla=ranking&global=1");
         configurarBotonFinal(botones[4], "☰", "Más", "mas");
 
         botones[3]?.classList.add("navRankingFinal");
