@@ -40,3 +40,48 @@ body.modoPortal{background:#071019!important}.modoPortal>.contenedor,.modoPortal
         display:none;
     }
 }
+
+
+/* =========================================================
+   CABECERA GLOBAL · BLOQUE COMPACTO Y CENTRADO
+========================================================= */
+.globalTopbar{
+    display:grid !important;
+    grid-template-columns:max-content max-content !important;
+    justify-content:center !important;
+    align-items:center !important;
+    column-gap:34px !important;
+    padding-left:16px !important;
+    padding-right:16px !important;
+}
+
+.globalTopbar > a{
+    width:max-content !important;
+    max-width:max-content !important;
+    margin:0 !important;
+    flex:none !important;
+}
+
+.globalTopbar nav{
+    display:flex !important;
+    width:max-content !important;
+    max-width:none !important;
+    margin:0 !important;
+    flex:none !important;
+    justify-content:flex-start !important;
+}
+
+@media(max-width:760px){
+    .globalTopbar{
+        display:flex !important;
+        justify-content:flex-start !important;
+        gap:12px !important;
+        overflow:hidden;
+    }
+
+    .globalTopbar nav{
+        width:auto !important;
+        max-width:calc(100vw - 76px) !important;
+        overflow-x:auto !important;
+    }
+}
