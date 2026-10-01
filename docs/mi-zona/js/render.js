@@ -186,6 +186,7 @@ export function renderLogin(jugadores = [], mensaje = "") {
 export function renderZona(datos) {
     const jugador = datos?.jugador || {};
     const teams = Array.isArray(datos?.teams) ? datos.teams : [];
+    const convocatorias = Array.isArray(datos?.convocatorias) ? datos.convocatorias : [];
 
     app.innerHTML = `
         <section class="zonaHero">
@@ -244,11 +245,95 @@ export function renderZona(datos) {
         </section>
 
         <section class="zonaContenido">
+            ${convocatorias.length ? htmlConvocatorias(convocatorias) : ""}
             ${teams.length
                 ? teams.map(team => htmlTeam(team, jugador)).join("")
-                : '<div class="vacio">No tienes ninguna edición de Teams activa o finalizada.</div>'}
+                : convocatorias.length
+                    ? ""
+                    : '<div class="vacio">No tienes convocatorias ni ediciones de Teams activas.</div>'}
         </section>
     `;
+}
+
+function htmlConvocatorias(convocatorias) {
+    return `
+        <section class="convocatoriasZona">
+            <div class="convocatoriasZonaTitulo">
+                <div>
+                    <span>CONVOCATORIA</span>
+                    <h2>¿Quieres participar?</h2>
+                </div>
+                <small>Responde desde aquí</small>
+            </div>
+
+            ${convocatorias.map(convocatoria => htmlConvocatoria(convocatoria)).join("")}
+        </section>
+    `;
+}
+
+function htmlConvocatoria(convocatoria) {
+    const respuesta = convocatoria?.respuesta || "";
+    const fecha = formatoFechaConvocatoria(convocatoria?.fecha_inicio);
+    const textos = {
+        elegible: "Te has apuntado",
+        no_disponible: "Has indicado que no puedes",
+        pendiente: "Todavía no lo sabes"
+    };
+
+    return `
+        <article class="convocatoriaCard">
+            <div class="convocatoriaInfo">
+                <div>
+                    <span class="convocatoriaAbierta">● Convocatoria abierta</span>
+                    <h3>${esc(convocatoria?.nombre || "Teams")}</h3>
+                    ${fecha ? `<small>📅 ${esc(fecha)}</small>` : ""}
+                </div>
+
+                <p>
+                    ${respuesta
+                        ? `Respuesta actual: <strong>${esc(textos[respuesta] || respuesta)}</strong>`
+                        : "Todavía no has respondido a esta convocatoria."}
+                </p>
+            </div>
+
+            <div class="convocatoriaOpciones">
+                <button
+                    type="button"
+                    class="convocatoriaOpcion meApunto ${respuesta === "elegible" ? "activo" : ""}"
+                    data-action="convocatoria"
+                    data-team-id="${esc(convocatoria.id)}"
+                    data-estado="elegible"
+                >✅ Me apunto</button>
+
+                <button
+                    type="button"
+                    class="convocatoriaOpcion noPuedo ${respuesta === "no_disponible" ? "activo" : ""}"
+                    data-action="convocatoria"
+                    data-team-id="${esc(convocatoria.id)}"
+                    data-estado="no_disponible"
+                >❌ No puedo</button>
+
+                <button
+                    type="button"
+                    class="convocatoriaOpcion noSe ${respuesta === "pendiente" ? "activo" : ""}"
+                    data-action="convocatoria"
+                    data-team-id="${esc(convocatoria.id)}"
+                    data-estado="pendiente"
+                >🤔 Todavía no sé</button>
+            </div>
+
+            ${respuesta
+                ? '<small class="convocatoriaNota">Puedes cambiar tu respuesta mientras la convocatoria siga abierta.</small>'
+                : ""}
+        </article>
+    `;
+}
+
+function formatoFechaConvocatoria(valor) {
+    const texto = String(valor || "").trim();
+    const m = texto.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return texto;
+    return `${m[3]}/${m[2]}/${m[1]}`;
 }
 
 function htmlTeam(team, jugador) {
