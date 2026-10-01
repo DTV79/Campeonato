@@ -103,10 +103,14 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
                     b.disabled = true;
                 });
 
+                const equipoId =
+                    contenedor?.querySelector("[data-convocatoria-equipo]")?.value || null;
+
                 await api.responderConvocatoria(
                     token,
                     boton.dataset.teamId,
-                    boton.dataset.estado
+                    boton.dataset.estado,
+                    equipoId
                 );
                 await recargar();
                 return;
@@ -163,7 +167,7 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
         } catch (error) {
             boton.disabled = false;
             boton.textContent = boton.dataset.textoOriginal || boton.textContent;
-            const contenedor = boton.closest(".accionPanel,.confirmacionResultado,.miembroFila");
+            const contenedor = boton.closest(".accionPanel,.confirmacionResultado,.miembroFila,.convocatoriaCard");
             let aviso = contenedor?.querySelector(".errorAccion");
             if (!aviso && contenedor) {
                 aviso = document.createElement("p");
