@@ -906,14 +906,25 @@ body.modoFinalizado{
     }
 }
 
-/* Portada finalizada unificada con el lenguaje oscuro del portal */
+/* =========================================================
+   INTEGRACIÓN VISUAL CON EL PORTAL
+   Solo cambia la piel exterior. No altera colores, tamaños ni
+   distribución del contenido interno del campeonato.
+========================================================= */
 body.modoFinalizado{
-  background:#06131d!important;
-  color:#eaf2f8;
+    background:#06131d !important;
 }
+
 body.modoFinalizado .bottomNav{
-  background:#071722!important;
-  border-top:1px solid #20384a!important;
+    background:#071722 !important;
+    border-top:1px solid #20384a !important;
 }
-body.modoFinalizado .bottomNav .navBtn{color:#9eb0bd!important}
-body.modoFinalizado .bottomNav .navBtn.navActivo{color:#a855f7!important}
+
+body.modoFinalizado .bottomNav .navBtn{
+    color:#9eb0bd !important;
+}
+
+body.modoFinalizado .bottomNav .navBtn.navActivo,
+body.modoFinalizado .bottomNav .navBtn.navActivo small{
+    color:#60a5fa !important;
+}
