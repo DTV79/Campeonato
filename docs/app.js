@@ -2108,24 +2108,49 @@ function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
         normalizarEstadoPortal(estadoTeams)
     ].filter(Boolean);
 
+    const esFinalizado = estado =>
+        estado.includes("FINALIZ") ||
+        estado.includes("CERRAD");
+
+    const esPreparacion = estado =>
+        estado.includes("PREPAR") ||
+        estado.includes("CONVOC") ||
+        estado.includes("DRAFT") ||
+        estado.includes("PRETORNEO") ||
+        estado.includes("INSCRIP");
+
     const hayEnJuego = estados.some(estado =>
-        !estado.includes("FINALIZ") &&
-        !estado.includes("CERRAD")
+        !esFinalizado(estado) &&
+        !esPreparacion(estado)
     );
 
-    setText(
-        "portalAhoraEtiqueta",
-        hayEnJuego ? "EN JUEGO" : "FINALIZADAS"
-    );
-    setText(
-        "portalAhoraTitulo",
-        hayEnJuego ? "Ahora en Sprint Pádel" : "Últimas competiciones"
-    );
+    const hayPreparacion = estados.some(esPreparacion);
+
+    if (hayEnJuego) {
+        setText("portalAhoraEtiqueta", "EN JUEGO");
+        setText("portalAhoraTitulo", "Ahora en Sprint Pádel");
+        setText(
+            "portalAhoraTexto",
+            "Las competiciones activas, separadas y fáciles de seguir."
+        );
+        return;
+    }
+
+    if (hayPreparacion) {
+        setText("portalAhoraEtiqueta", "EN PREPARACIÓN");
+        setText("portalAhoraTitulo", "Próximamente en Sprint Pádel");
+        setText(
+            "portalAhoraTexto",
+            "Hay competiciones en preparación o con convocatoria abierta."
+        );
+        return;
+    }
+
+    setText("portalAhoraEtiqueta", "FINALIZADAS");
+    setText("portalAhoraTitulo", "Últimas competiciones");
     setText(
         "portalAhoraTexto",
-        hayEnJuego
-            ? "Las competiciones activas, separadas y fáciles de seguir."
-            : "Consulta las últimas competiciones ya finalizadas."
+        "Consulta las últimas competiciones ya finalizadas."
     );
 }
 
@@ -2192,13 +2217,68 @@ async function pintarPortalGeneral() {
             const card = document.getElementById("portalTeamsActual");
             if (team && team.id) {
                 estadoTeamsPortal = String(team.estado || "");
+                const estadoNormalizado = normalizarEstadoPortal(team.estado);
+                const enPreparacion =
+                    estadoNormalizado.includes("PREPAR") ||
+                    estadoNormalizado.includes("CONVOC");
+                const enDraft = estadoNormalizado.includes("DRAFT");
+                const finalizado = estadoNormalizado.includes("FINALIZ");
+
                 setText("portalTeamsNombre", team.nombre || "Teams");
-                setText("portalTeamsEstado", String(team.estado||"").replaceAll("_"," "));
-                const equiposT = team.equipos || [], a=equiposT.find(e=>e.lado==="A"), b=equiposT.find(e=>e.lado==="B"), vict=team.victorias||{};
-                const ma=a?Number(vict[a.id]||0):0, mb=b?Number(vict[b.id]||0):0;
-                const marcador=document.getElementById("portalTeamsMarcador");
-                if(marcador) marcador.innerHTML=(a?'<span class="dot" style="background:'+escaparHTML(a.color||"#64748b")+'"></span>'+escaparHTML(a.nombre):"Equipo A")+' <strong>'+ma+' – '+mb+'</strong> '+(b?escaparHTML(b.nombre)+'<span class="dot" style="background:'+escaparHTML(b.color||"#64748b")+'"></span>':"Equipo B");
-                setText("portalTeamsResumen", (team.jugados||0)+" de "+(team.numero_partidos||0)+" partidos jugados");
+
+                if (enPreparacion) {
+                    setText("portalTeamsEstado", "convocatoria abierta");
+                    setText("portalTeamsMarcador", "Convocatoria abierta");
+                    setText(
+                        "portalTeamsResumen",
+                        (team.apuntados || 0) + " apuntados · " +
+                        (team.respuestas || 0) + " respuestas recibidas"
+                    );
+                } else if (enDraft) {
+                    setText("portalTeamsEstado", "formación de equipos");
+                    setText("portalTeamsMarcador", "Equipos en formación");
+                    setText(
+                        "portalTeamsResumen",
+                        "La competición está preparando sus plantillas."
+                    );
+                } else {
+                    setText(
+                        "portalTeamsEstado",
+                        finalizado ? "finalizado" : "en juego"
+                    );
+
+                    const equiposT = team.equipos || [];
+                    const a = equiposT.find(e => e.lado === "A");
+                    const b = equiposT.find(e => e.lado === "B");
+                    const vict = team.victorias || {};
+                    const ma = a ? Number(vict[a.id] || 0) : 0;
+                    const mb = b ? Number(vict[b.id] || 0) : 0;
+                    const marcador = document.getElementById("portalTeamsMarcador");
+
+                    if (marcador) {
+                        marcador.innerHTML =
+                            (a
+                                ? '<span class="dot" style="background:' +
+                                  escaparHTML(a.color || "#64748b") +
+                                  '"></span>' + escaparHTML(a.nombre)
+                                : "Equipo A") +
+                            ' <strong>' + ma + ' – ' + mb + '</strong> ' +
+                            (b
+                                ? escaparHTML(b.nombre) +
+                                  '<span class="dot" style="background:' +
+                                  escaparHTML(b.color || "#64748b") +
+                                  '"></span>'
+                                : "Equipo B");
+                    }
+
+                    setText(
+                        "portalTeamsResumen",
+                        (team.jugados || 0) + " de " +
+                        (team.numero_partidos || 0) +
+                        " partidos jugados"
+                    );
+                }
+
                 card?.classList.remove("sinTeams");
             } else {
                 setText("portalTeamsNombre","Próximo Teams");setText("portalTeamsEstado","sin competición activa");setText("portalTeamsMarcador","—");setText("portalTeamsResumen","Cuando haya un Teams activo aparecerá aquí.");card?.classList.add("sinTeams");
