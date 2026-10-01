@@ -665,8 +665,7 @@ const esRutaCampeonatoPublico =
 
 document.body.classList.toggle("modoCampeonatoPublico", esRutaCampeonatoPublico);
 
-const volverPortalGlobal = document.getElementById("volverPortalGlobal");
-volverPortalGlobal?.classList.toggle("oculto", !esRutaCampeonatoPublico);
+configurarEstadoTopbarGlobal(esRutaCampeonatoPublico, rankingGlobalSolicitado);
 
 const rankingGlobalSolicitado = pantallaSolicitada === "ranking";
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
@@ -1814,6 +1813,44 @@ function nombreFormatoPublico(config = {}) {
     if (/liguilla/i.test(tipo)) return "Liguilla";
     if (/team/i.test(tipo)) return "Teams";
     return tipo || "Campeonato";
+}
+
+function configurarEstadoTopbarGlobal(esCampeonato, esRanking) {
+    const claveActiva = esRanking
+        ? "ranking"
+        : esCampeonato
+            ? "competiciones"
+            : "inicio";
+
+    document
+        .querySelectorAll("#globalTopbar [data-global-nav]")
+        .forEach(enlace => {
+            enlace.classList.toggle(
+                "activo",
+                enlace.dataset.globalNav === claveActiva
+            );
+        });
+}
+
+function obtenerURLLocalEstadisticas() {
+    const config = obtenerConfiguracion();
+    const idCampeonato = String(
+        config.id_campeonato ||
+        config.codigo_campeonato ||
+        ""
+    ).trim();
+
+    const parametros = new URLSearchParams({
+        ambito: "campeonato",
+        seccion: "resumen",
+        origen: "campeonato"
+    });
+
+    if (idCampeonato) {
+        parametros.set("campeonato", idCampeonato);
+    }
+
+    return `estadisticas.html?${parametros.toString()}`;
 }
 
 function salirModoPortal() {
@@ -3318,7 +3355,7 @@ function configurarNavegacionCompeticion() {
     configurarBotonNav(
         botones[1],
         "📊",
-        esModoGrupos() ? "Grupos" : "Clasificación",
+        "Competición",
         "competicion"
     );
 
@@ -3331,9 +3368,10 @@ function configurarNavegacionCompeticion() {
 
     configurarBotonNav(
         botones[3],
-        "👥",
-        "Equipos",
-        "equipos"
+        "📈",
+        "Estadísticas",
+        "",
+        obtenerURLLocalEstadisticas()
     );
 
     configurarBotonNav(
@@ -3356,7 +3394,7 @@ function configurarNavegacionGlobalPublica() {
         "🏠",
         "Inicio",
         "",
-        "index.html?portal=1"
+        "index.html"
     );
 
     configurarBotonNav(
@@ -3364,22 +3402,23 @@ function configurarNavegacionGlobalPublica() {
         "🏆",
         "Competiciones",
         "",
-        "index.html?portal=1#portalCompeticiones"
+        "index.html#portalCompeticiones"
     );
 
     configurarBotonNav(
         botones[2],
-        "📊",
-        "Estadísticas",
+        "🏅",
+        "Ranking",
         "",
-        "estadisticas.html"
+        "index.html?pantalla=ranking&global=1"
     );
 
     configurarBotonNav(
         botones[3],
-        "🏅",
-        "Ranking",
-        "ranking"
+        "📊",
+        "Estadísticas",
+        "",
+        "estadisticas.html"
     );
 
     configurarBotonNav(
@@ -3709,46 +3748,36 @@ function pintarPantallaInscripciones() {
 
 function pintarPantallaMasPretorneo() {
     const contenido = obtenerContenidoDetalle();
-
     if (!contenido) return;
 
     const config = obtenerConfiguracion();
     const opciones = [];
 
-    if (esSi(config.mostrar_fotos)) {
-    opciones.push({
-        icono: "📷",
-        texto: "Fotos",
-        pantalla: "fotos"
-    });
-}
-
-    if (esSi(config.mostrar_ranking_historico)) {
+    if (esSi(config.mostrar_normativa)) {
         opciones.push({
-            icono: "📈",
-            texto: "Ranking histórico",
-            pantalla: "ranking"
+            icono: "📜",
+            texto: "Normativa",
+            href: "normas.html?origen=campeonato"
         });
     }
 
-    if (esSi(config.mostrar_estadisticas)) {
+    if (esSi(config.mostrar_fotos)) {
         opciones.push({
-            icono: "📊",
-            texto: "Estadísticas",
-            href: "estadisticas.html"
+            icono: "📷",
+            texto: "Fotos",
+            pantalla: "fotos"
         });
     }
 
     contenido.innerHTML = `
-        <h2>☰ Más</h2>
+        <h2>☰ Más del campeonato</h2>
 
-        ${
-            opciones.length
-                ? pintarListaOpcionesMas(opciones)
-                : pintarTarjetaVacia(
-                    "Sin más secciones",
-                    "No hay contenido adicional habilitado."
-                )
+        ${opciones.length
+            ? pintarListaOpcionesMas(opciones)
+            : pintarTarjetaVacia(
+                "Sin más secciones",
+                "No hay contenido adicional habilitado."
+            )
         }
     `;
 }
@@ -6583,6 +6612,12 @@ function pintarPantallaMas() {
     const config = obtenerConfiguracion();
     const opciones = [];
 
+    opciones.push({
+        icono: "👥",
+        texto: "Equipos",
+        pantalla: "equipos"
+    });
+
     if ((datos.cruces || []).length) {
         opciones.push({
             icono: "⚔️",
@@ -6592,10 +6627,6 @@ function pintarPantallaMas() {
         });
     }
 
-    /*
-       Solo aparece cuando la Copa Palas Playa
-       ya ha sido generada.
-    */
     if ((datos.palas_playa || []).length) {
         opciones.push({
             icono: "🏖️",
@@ -6605,56 +6636,24 @@ function pintarPantallaMas() {
         });
     }
 
-    if (esSi(config.mostrar_historia)) {
-        opciones.push({
-            icono: "📖",
-            texto: "Historia",
-            href: "historia.html"
-        });
-    }
-
-    if (esSi(config.mostrar_campeones)) {
-        opciones.push({
-            icono: "🏆",
-            texto: "Campeones",
-            href: "campeones.html"
-        });
-    }
-
     if (esSi(config.mostrar_normativa)) {
         opciones.push({
             icono: "📜",
             texto: "Normativa",
-            href: "normas.html"
+            href: "normas.html?origen=campeonato"
         });
     }
 
     if (esSi(config.mostrar_fotos)) {
-    opciones.push({
-        icono: "📷",
-        texto: "Fotos",
-        pantalla: "fotos"
-    });
-}
-
-    if (esSi(config.mostrar_ranking_historico)) {
         opciones.push({
-            icono: "📈",
-            texto: "Ranking histórico",
-            pantalla: "ranking"
-        });
-    }
-
-    if (esSi(config.mostrar_estadisticas)) {
-        opciones.push({
-            icono: "📊",
-            texto: "Estadísticas",
-            href: "estadisticas.html"
+            icono: "📷",
+            texto: "Fotos",
+            pantalla: "fotos"
         });
     }
 
     contenido.innerHTML = `
-        <h2>☰ Más</h2>
+        <h2>☰ Más del campeonato</h2>
         ${pintarListaOpcionesMas(opciones)}
     `;
 }
