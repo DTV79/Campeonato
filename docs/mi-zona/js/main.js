@@ -45,6 +45,52 @@ async function cargarLogin(mensaje = "") {
                 }
             }
         });
+
+        const formActivar = app.querySelector('[data-form="activar"]');
+        formActivar?.addEventListener("submit", async evento => {
+            evento.preventDefault();
+
+            const boton = formActivar.querySelector('button[type="submit"]');
+            const mensajeNodo = formActivar.querySelector("[data-activar-mensaje]");
+            const pin = formActivar.elements.pin.value;
+            const pin2 = formActivar.elements.pin2.value;
+
+            if (!/^\\d{4,8}$/.test(pin)) {
+                mensajeNodo.textContent = "El PIN debe tener entre 4 y 8 cifras.";
+                mensajeNodo.classList.add("visible", "error");
+                return;
+            }
+
+            if (pin !== pin2) {
+                mensajeNodo.textContent = "Los dos PIN no coinciden.";
+                mensajeNodo.classList.add("visible", "error");
+                return;
+            }
+
+            boton.disabled = true;
+            mensajeNodo.textContent = "Activando tu acceso…";
+            mensajeNodo.classList.add("visible");
+            mensajeNodo.classList.remove("error");
+
+            try {
+                const respuesta = await api.activar(
+                    formActivar.elements.jugador.value,
+                    formActivar.elements.codigo.value,
+                    pin
+                );
+
+                if (!respuesta?.token) {
+                    throw new Error("No se pudo activar el acceso.");
+                }
+
+                guardarToken(respuesta.token);
+                await cargarZona();
+            } catch (error) {
+                boton.disabled = false;
+                mensajeNodo.textContent = error?.message || "No se pudo activar el acceso.";
+                mensajeNodo.classList.add("visible", "error");
+            }
+        });
     } catch (error) {
         renderError(error?.message || "No se pudo cargar el acceso a Mi Zona.");
         enlazarZona({
