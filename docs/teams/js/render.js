@@ -22,6 +22,9 @@ const nodos = {
     error: document.getElementById("teamsError"),
     errorTexto: document.getElementById("teamsErrorTexto"),
     contenido: document.getElementById("teamsContenido"),
+    preparacion: document.getElementById("teamsPreparacion"),
+    caracteristicas: document.getElementById("teamsCaracteristicas"),
+    convocatoria: document.getElementById("teamsConvocatoria"),
     marcador: document.getElementById("teamsMarcador"),
     plantillas: document.getElementById("teamsPlantillas"),
     partidos: document.getElementById("teamsPartidos"),
@@ -112,9 +115,145 @@ export function renderDetalleTeams(detalle) {
     }
 
     aplicarEstadoGeneral(detalle?.estado);
+
+    const estado = String(detalle?.estado || "");
+    const esPreparacion = ["preparacion", "convocatoria", "draft"].includes(estado);
+    const bloquePlantillas = nodos.plantillas?.closest(".teamsBloque");
+    const bloquePartidos = nodos.partidos?.closest(".teamsBloque");
+
+    mostrar(nodos.preparacion, esPreparacion);
+    mostrar(nodos.marcador, !esPreparacion);
+    mostrar(bloquePlantillas, !esPreparacion);
+    mostrar(bloquePartidos, !esPreparacion);
+
+    if (esPreparacion) {
+        renderPreparacion(detalle);
+        return;
+    }
+
     renderMarcador(detalle);
     renderPlantillas(detalle);
     renderPartidos(detalle);
+}
+
+function renderPreparacion(detalle) {
+    renderCaracteristicas(detalle);
+    renderConvocatoriaPublica(detalle);
+}
+
+function renderCaracteristicas(detalle) {
+    if (!nodos.caracteristicas) return;
+
+    const modalidad = {
+        numero_fijo: `${Number(detalle?.numero_partidos || 0)} partidos`,
+        mejor_de: `Mejor de ${Number(detalle?.numero_partidos || 0)} partidos`,
+        mejor_de_jugar_todos: `Mejor de ${Number(detalle?.numero_partidos || 0)} · se juegan todos`,
+        numero_fijo_desempate: `${Number(detalle?.numero_partidos || 0)} partidos + desempate`
+    }[detalle?.modalidad] || `${Number(detalle?.numero_partidos || 0)} partidos`;
+
+    const repeticionJugador = detalle?.repetir_jugadores === "maximo"
+        ? `Máximo ${Number(detalle?.max_partidos_jugador || 0)} partidos por jugador`
+        : detalle?.repetir_jugadores === "no"
+            ? "Sin repetir jugadores"
+            : "Se pueden repetir jugadores";
+
+    const parejas = detalle?.repetir_pareja
+        ? "Se puede repetir pareja"
+        : "No se puede repetir pareja";
+
+    const rotacion = detalle?.todos_antes_repetir
+        ? "Todos deben jugar antes de repetir jugador"
+        : "No es obligatorio rotar a todos antes de repetir";
+
+    const sistemaParejas = {
+        secreto: "Parejas secretas",
+        alterno: "Presentación alterna de parejas",
+        ganador_primero: "El ganador anterior presenta primero"
+    }[detalle?.sistema_eleccion_parejas] || "Sistema de parejas definido por la organización";
+
+    const segundaVe = detalle?.sistema_eleccion_parejas !== "secreto"
+        ? (detalle?.segundo_ve_pareja
+            ? "El segundo equipo ve la pareja rival antes de presentar"
+            : "El segundo equipo no ve la pareja rival")
+        : "";
+
+    const computos = [
+        detalle?.computa_estadisticas ? "estadísticas" : "",
+        detalle?.computa_ranking ? "ranking" : "",
+        detalle?.computa_isp ? "ISP" : ""
+    ].filter(Boolean);
+
+    const items = [
+        ["Formato", modalidad],
+        ["Plantillas", `${Number(detalle?.jugadores_por_equipo || 0)} jugadores por equipo${Number(detalle?.reservas_por_equipo || 0) ? ` + ${Number(detalle.reservas_por_equipo)} reserva(s)` : ""}`],
+        ["Participación", repeticionJugador],
+        ["Parejas", parejas],
+        ["Rotación", rotacion],
+        ["Elección de parejas", sistemaParejas],
+        segundaVe ? ["Presentación", segundaVe] : null,
+        ["Plazo para presentar", `${Number(detalle?.plazo_presentar_horas || 0)} horas`],
+        ["Acordar partido", `${Number(detalle?.plazo_acordar_dias || 0)} días`],
+        ["Jugar partido", `${Number(detalle?.plazo_jugar_dias || 0)} días desde el anterior/acuerdo`],
+        ["Computa para", computos.length ? computos.join(" · ") : "No computa en históricos"]
+    ].filter(Boolean);
+
+    nodos.caracteristicas.innerHTML = items.map(([titulo, valor]) => `
+        <div class="caracteristicaTeam">
+            <small>${escaparHtml(titulo)}</small>
+            <strong>${escaparHtml(valor)}</strong>
+        </div>
+    `).join("");
+}
+
+function renderConvocatoriaPublica(detalle) {
+    if (!nodos.convocatoria) return;
+
+    const personas = Array.isArray(detalle?.convocatoria)
+        ? detalle.convocatoria
+        : [];
+
+    const grupos = [
+        {
+            estado: "elegible",
+            titulo: "Me apunto",
+            icono: "✅",
+            clase: "convocatoriaSi"
+        },
+        {
+            estado: "pendiente",
+            titulo: "En duda",
+            icono: "🤔",
+            clase: "convocatoriaDuda"
+        },
+        {
+            estado: "no_disponible",
+            titulo: "No puedo",
+            icono: "❌",
+            clase: "convocatoriaNo"
+        }
+    ];
+
+    nodos.convocatoria.innerHTML = grupos.map(grupo => {
+        const lista = personas.filter(p => p?.estado === grupo.estado);
+
+        return `
+            <article class="convocatoriaGrupo ${grupo.clase}">
+                <div class="convocatoriaGrupoTitulo">
+                    <span>${grupo.icono}</span>
+                    <div>
+                        <small>${escaparHtml(grupo.titulo)}</small>
+                        <strong>${lista.length}</strong>
+                    </div>
+                </div>
+
+                <div class="convocatoriaNombres">
+                    ${lista.length
+                        ? lista.map(p => `<span>${escaparHtml(p?.nombre || "Jugador")}</span>`).join("")
+                        : '<em>Nadie todavía</em>'}
+                </div>
+            </article>
+        `;
+    }).join("");
 }
 
 function renderMarcador(detalle) {
