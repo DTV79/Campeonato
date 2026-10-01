@@ -905,3 +905,15 @@ body.modoFinalizado{
         font-size:42px;
     }
 }
+
+/* Portada finalizada unificada con el lenguaje oscuro del portal */
+body.modoFinalizado{
+  background:#06131d!important;
+  color:#eaf2f8;
+}
+body.modoFinalizado .bottomNav{
+  background:#071722!important;
+  border-top:1px solid #20384a!important;
+}
+body.modoFinalizado .bottomNav .navBtn{color:#9eb0bd!important}
+body.modoFinalizado .bottomNav .navBtn.navActivo{color:#a855f7!important}
