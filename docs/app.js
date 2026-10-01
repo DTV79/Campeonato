@@ -658,10 +658,14 @@ const rankingGlobalSolicitado = pantallaSolicitada === "ranking" && ["1","si","t
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
 
 /*
-   Se prepara primero la portada, pero continúa
-   oculta mediante la clase appCargando.
+   La portada del campeonato solo se prepara para las pantallas
+   pertenecientes al campeonato. El Ranking global no debe pintarla
+   ni siquiera de forma transitoria: así evitamos la carrera entre
+   pintarInicio(), abrirPantalla("ranking") y los ajustes de finalizado.js.
 */
-pintarInicio();
+if (!rankingGlobalSolicitado) {
+    pintarInicio();
+}
 
         const portalSolicitado = parametros.get("portal");
         const entrarDirectoCampeonato = ["0","no","false","campeonato"].includes(String(portalSolicitado||"").trim().toLowerCase());
