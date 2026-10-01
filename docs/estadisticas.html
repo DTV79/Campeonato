@@ -118,32 +118,13 @@
         </main>
     </div>
 
-    <nav class="bottomNav" id="navegacionEstadisticas">
-        <a class="navBtn" id="navEstadisticas1" href="index.html?portal=1">
-            <span>🏠</span>
-            <small>Inicio</small>
-        </a>
-
-        <a class="navBtn" id="navEstadisticas2" href="index.html?portal=1#portalCompeticiones">
-            <span>🏆</span>
-            <small>Competiciones</small>
-        </a>
-
-        <a class="navBtn navActivo" id="navEstadisticas3" href="estadisticas.html" aria-current="page">
-            <span>📊</span>
-            <small>Estadísticas</small>
-        </a>
-
-        <a class="navBtn" id="navEstadisticas4" href="index.html?pantalla=ranking&global=1">
-            <span>🏆</span>
-            <small>Ranking</small>
-        </a>
-
-        <a class="navBtn" id="navEstadisticas5" href="mi-zona.html">
-            <span>🔐</span>
-            <small>Mi Zona</small>
-        </a>
-    </nav>
+    <nav class="bottomNav" aria-label="Navegación principal">
+    <a class="navBtn" data-nav="inicio" href="index.html"><span>🏠</span><small>Inicio</small></a>
+    <a class="navBtn" data-nav="competiciones" href="index.html#portalCompeticiones"><span>🏆</span><small>Competiciones</small></a>
+    <a class="navBtn" data-nav="estadisticas" href="estadisticas.html"><span>📊</span><small>Estadísticas</small></a>
+    <a class="navBtn" data-nav="ranking" href="index.html?pantalla=ranking&global=1"><span>🏅</span><small>Ranking</small></a>
+    <a class="navBtn" data-nav="mizone" href="mi-zona.html"><span>🔐</span><small>Mi Zona</small></a>
+</nav>
 
     <script>
         (
