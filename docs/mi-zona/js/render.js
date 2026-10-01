@@ -280,6 +280,57 @@ function htmlConvocatoria(convocatoria) {
         pendiente: "Todavía no lo sabes"
     };
 
+    const predeterminado =
+        convocatoria?.metodo_formacion === "predeterminado";
+    const asignacion =
+        convocatoria?.asignacion_predeterminada || "admin";
+    const equipos = Array.isArray(convocatoria?.equipos)
+        ? convocatoria.equipos
+        : [];
+    const equipoActual = convocatoria?.equipo_preasignado || null;
+
+    let bloqueEquipo = "";
+
+    if (predeterminado && asignacion === "admin") {
+        bloqueEquipo = equipoActual
+            ? `
+                <div class="convocatoriaEquipoAsignado">
+                    <small>Tu equipo</small>
+                    <strong>${esc(equipoActual.nombre || "Equipo")}</strong>
+                </div>
+              `
+            : `
+                <div class="convocatoriaEquipoAsignado pendiente">
+                    <small>Tu equipo</small>
+                    <strong>Pendiente de asignación por el administrador</strong>
+                </div>
+              `;
+    }
+
+    if (predeterminado && asignacion === "jugador") {
+        bloqueEquipo = `
+            <label class="convocatoriaElegirEquipo">
+                <span>¿Con qué equipo participas?</span>
+                <select data-convocatoria-equipo>
+                    <option value="">Selecciona tu equipo</option>
+                    ${equipos.map(e => `
+                        <option
+                            value="${esc(e.id)}"
+                            ${equipoActual?.id === e.id ? "selected" : ""}
+                        >
+                            ${esc(e.nombre || ("Equipo " + (e.lado || "")))}
+                        </option>
+                    `).join("")}
+                </select>
+            </label>
+        `;
+    }
+
+    const puedeApuntarse =
+        !predeterminado ||
+        asignacion !== "admin" ||
+        Boolean(equipoActual?.id);
+
     return `
         <article class="convocatoriaCard">
             <div class="convocatoriaInfo">
@@ -296,6 +347,8 @@ function htmlConvocatoria(convocatoria) {
                 </p>
             </div>
 
+            ${bloqueEquipo}
+
             <div class="convocatoriaOpciones">
                 <button
                     type="button"
@@ -303,6 +356,7 @@ function htmlConvocatoria(convocatoria) {
                     data-action="convocatoria"
                     data-team-id="${esc(convocatoria.id)}"
                     data-estado="elegible"
+                    ${puedeApuntarse ? "" : "disabled"}
                 >✅ Me apunto</button>
 
                 <button
@@ -322,9 +376,11 @@ function htmlConvocatoria(convocatoria) {
                 >🤔 Todavía no sé</button>
             </div>
 
-            ${respuesta
-                ? '<small class="convocatoriaNota">Puedes cambiar tu respuesta mientras la convocatoria siga abierta.</small>'
-                : ""}
+            ${!puedeApuntarse
+                ? '<small class="convocatoriaNota aviso">El administrador debe asignarte un equipo antes de que puedas apuntarte.</small>'
+                : respuesta
+                    ? '<small class="convocatoriaNota">Puedes cambiar tu respuesta mientras la convocatoria siga abierta.</small>'
+                    : ""}
         </article>
     `;
 }
