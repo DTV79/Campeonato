@@ -135,30 +135,38 @@
         align-items: flex-start;
     }
 
-    .partidoParejas {
-        grid-template-columns: 1fr;
-        gap: 6px;
+    .marcadorPartidoCabecera,
+    .filaEquipoPartido {
+        grid-template-columns: minmax(0, 1fr) repeat(3, 52px);
     }
 
-    .versus {
-        text-align: center;
+    .marcadorPartidoCabecera .cabeceraPareja {
+        padding-left: 13px;
     }
 
-    .parejaB {
-        text-align: left;
-        border-right: 1px solid rgba(255, 255, 255, 0.09);
-        border-left: 3px solid var(--equipo-color, var(--acento));
+    .infoEquipoPartido {
+        padding: 12px 10px 11px 10px;
     }
 
-    .setsPartido {
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding-bottom: 2px;
-        scrollbar-width: thin;
+    .nombreEquipoPartido {
+        gap: 7px;
     }
 
-    .setCaja {
-        min-width: 88px;
+    .nombreEquipoPartido b {
+        font-size: 11px;
+    }
+
+    .nombresParejaPartido {
+        margin-top: 6px;
+        font-size: 12px;
+    }
+
+    .puntuacionSet strong {
+        font-size: 23px;
+    }
+
+    .puntuacionSet small {
+        font-size: 7px;
     }
 
     .edicionesLista {
@@ -186,5 +194,49 @@
 
     .avisoResultado {
         align-items: flex-start;
+    }
+
+    .marcadorPartidoCabecera,
+    .filaEquipoPartido {
+        grid-template-columns: minmax(0, 1fr) repeat(3, 44px);
+    }
+
+    .marcadorPartidoCabecera span {
+        font-size: 7px;
+        letter-spacing: 0.04em;
+    }
+
+    .marcadorPartidoCabecera .cabeceraPareja {
+        padding-left: 10px;
+    }
+
+    .filaEquipoPartido {
+        min-height: 76px;
+        border-left-width: 3px;
+    }
+
+    .infoEquipoPartido {
+        padding: 10px 8px;
+    }
+
+    .nombreEquipoPartido .puntoEquipo {
+        width: 7px;
+        height: 7px;
+    }
+
+    .nombreEquipoPartido small {
+        display: none;
+    }
+
+    .nombreEquipoPartido b {
+        font-size: 10px;
+    }
+
+    .nombresParejaPartido {
+        font-size: 11px;
+    }
+
+    .puntuacionSet strong {
+        font-size: 21px;
     }
 }
