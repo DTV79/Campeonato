@@ -461,7 +461,7 @@ function htmlFilaEquipoPartido(lado, equipo, jugadores, sets) {
 
                 <strong class="nombresParejaPartido">
                     ${nombres.length
-                        ? nombres.map(escaparHtml).join(' <span class="separadorPareja">+</span> ')
+                        ? nombres.map(escaparHtml).join(' <span class="separadorPareja">/</span> ')
                         : "Pareja pendiente"}
                 </strong>
             </div>
