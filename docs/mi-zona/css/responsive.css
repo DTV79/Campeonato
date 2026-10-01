@@ -190,3 +190,11 @@
         width: calc(100vw - 20px);
     }
 }
+
+
+/* Cabecera superior visible y estable también en móvil */
+@media (max-width: 860px) {
+    .globalTopbar nav {
+        display: flex !important;
+    }
+}
