@@ -1072,8 +1072,8 @@ function gestionarClickGlobal(evento) {
 
     const entrarCampeonatoPortal = evento.target.closest("#portalEntrarCampeonato");
     if (entrarCampeonatoPortal) {
-        salirModoPortal();
-        mostrarInicio();
+        // Ruta canónica del campeonato. El portal global se reserva para index.html.
+        window.location.href = "index.html?portal=0";
         return;
     }
 
@@ -3347,7 +3347,7 @@ function configurarNavegacionGlobalPublica() {
         "🏠",
         "Inicio",
         "",
-        "index.html?portal=1"
+        "index.html"
     );
 
     configurarBotonNav(
@@ -3355,7 +3355,7 @@ function configurarNavegacionGlobalPublica() {
         "🏆",
         "Competiciones",
         "",
-        "index.html?portal=1#portalCompeticiones"
+        "index.html#portalCompeticiones"
     );
 
     configurarBotonNav(
