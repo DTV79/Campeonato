@@ -654,6 +654,20 @@ const faseSolicitada =
     parametros.get("fase") ||
     "";
 
+const portalSolicitadoRuta = String(parametros.get("portal") || "").trim().toLowerCase();
+const pantallasCampeonatoRuta = new Set([
+    "competicion", "partidos", "equipos", "mas", "fotos",
+    "pretorneo_info", "pretorneo_inscripcion"
+]);
+const esRutaCampeonatoPublico =
+    ["0", "no", "false", "campeonato"].includes(portalSolicitadoRuta) ||
+    pantallasCampeonatoRuta.has(String(pantallaSolicitada || "").toLowerCase());
+
+document.body.classList.toggle("modoCampeonatoPublico", esRutaCampeonatoPublico);
+
+const volverPortalGlobal = document.getElementById("volverPortalGlobal");
+volverPortalGlobal?.classList.toggle("oculto", !esRutaCampeonatoPublico);
+
 const rankingGlobalSolicitado = pantallaSolicitada === "ranking";
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
 
@@ -3296,8 +3310,8 @@ function configurarNavegacionCompeticion() {
 
     configurarBotonNav(
         botones[0],
-        "🏠",
-        "Inicio",
+        "🏆",
+        "Campeonato",
         "inicio"
     );
 
