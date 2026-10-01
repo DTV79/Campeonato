@@ -1269,7 +1269,9 @@ function inicializarEstadoVistaEstadisticas() {
     const campeonatoValido = campeonatos.find(
         campeonato =>
             String(campeonato.id_campeonato) ===
-            String(idSolicitado)
+                String(idSolicitado) ||
+            String(campeonato.codigo_campeonato || "") ===
+                String(idSolicitado)
     );
 
     estadoVistaEstadisticas.idCampeonato =
