@@ -769,3 +769,61 @@
 .convocatoriaSi .convocatoriaGrupoTitulo strong { color: #86efac; }
 .convocatoriaDuda .convocatoriaGrupoTitulo strong { color: #fde68a; }
 .convocatoriaNo .convocatoriaGrupoTitulo strong { color: #fca5a5; }
+
+.convocatoriaEquiposPublicos{
+    grid-column:1/-1;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    padding:12px 14px 0;
+}
+
+.convocatoriaEquiposPublicos span{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
+    min-height:40px;
+    padding:9px 10px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+}
+
+.convocatoriaEquiposPublicos i{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+}
+
+.convocatoriaEquiposPublicos b{
+    overflow:hidden;
+    font-size:11px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.convocatoriaEquiposPublicos strong{
+    font-size:16px;
+}
+
+.convocatoriaNombreJugador{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:6px;
+}
+
+.convocatoriaNombreJugador b{
+    overflow:hidden;
+    font-size:11px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.convocatoriaNombreJugador small{
+    color:#7dd3fc;
+    font-size:8px;
+    font-weight:800;
+    text-align:right;
+}
