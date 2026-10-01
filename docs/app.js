@@ -1090,6 +1090,25 @@ function gestionarClickGlobal(evento) {
     const scrollPortal=evento.target.closest("[data-portal-scroll]");
     if(scrollPortal){document.getElementById(scrollPortal.dataset.portalScroll)?.scrollIntoView({behavior:"smooth"});return;}
 
+    const toggleCampeonatos =
+        evento.target.closest("[data-toggle-campeonatos]");
+
+    if (toggleCampeonatos) {
+        const lista = document.getElementById("portalListaCampeonatos");
+        const abierto = !lista?.classList.contains("oculto");
+
+        lista?.classList.toggle("oculto", abierto);
+        toggleCampeonatos.setAttribute(
+            "aria-expanded",
+            abierto ? "false" : "true"
+        );
+        toggleCampeonatos.classList.toggle(
+            "desplegado",
+            !abierto
+        );
+        return;
+    }
+
     const edicionCampeonatoPortal =
         evento.target.closest("[data-campeonato-codigo]");
 
