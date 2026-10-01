@@ -2287,6 +2287,41 @@ async function pintarPortalGeneral() {
     } catch(error){ console.warn("No se pudo cargar el resumen de Teams",error); }
 
     await cargarCampeonatosPublicosPortal();
+
+    const estadoCampeonatoPortal = normalizarEstadoPortal(estado);
+    const estadoTeamsPortalNormalizado = normalizarEstadoPortal(estadoTeamsPortal);
+    const campeonatoFinalizado =
+        estadoCampeonatoPortal.includes("FINALIZ") ||
+        estadoCampeonatoPortal.includes("CERRAD");
+    const teamsFinalizado =
+        estadoTeamsPortalNormalizado.includes("FINALIZ") ||
+        estadoTeamsPortalNormalizado.includes("CERRAD");
+    const hayCampeonatoActual = Boolean(estadoCampeonatoPortal) && !campeonatoFinalizado;
+    const hayTeamsActual = Boolean(estadoTeamsPortalNormalizado) && !teamsFinalizado;
+    const hayCompeticionActual = hayCampeonatoActual || hayTeamsActual;
+
+    const cardCampeonatoPortal =
+        document.querySelector(".portalCampeonatoCard");
+    const cardTeamsPortal =
+        document.getElementById("portalTeamsActual");
+
+    if (hayCompeticionActual) {
+        cardCampeonatoPortal?.classList.toggle(
+            "oculto",
+            !hayCampeonatoActual
+        );
+        cardTeamsPortal?.classList.toggle(
+            "oculto",
+            !hayTeamsActual
+        );
+    } else {
+        cardCampeonatoPortal?.classList.remove("oculto");
+        cardTeamsPortal?.classList.toggle(
+            "oculto",
+            !estadoTeamsPortalNormalizado
+        );
+    }
+
     actualizarEstadoPortalAhora(estado, estadoTeamsPortal);
 
     document.body.classList.add("modoPortal");
