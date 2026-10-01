@@ -15,7 +15,7 @@ import {
     puedePresentar,
     respuestaJugador,
     resultadoVisible
-} from "./model.js?v=20261001-1845";
+} from "./model.js?v=20261001-1945";
 
 const app = document.getElementById("miZonaApp");
 
