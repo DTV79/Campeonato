@@ -39,9 +39,21 @@ export function renderError(mensaje, reintentar = true) {
 }
 
 export function renderLogin(jugadores = [], mensaje = "") {
-    const opciones = jugadores.map(j => `
-        <option value="${esc(j.id)}">${esc(j.nombre)}</option>
+    const opcionesLogin = jugadores.map(j => `
+        <option value="${esc(j.id)}">${esc(j.alias || j.nombre || j.nombre_oficial)}</option>
     `).join("");
+
+    const opcionesAlta = jugadores.map(j => {
+        const alias = j.alias || j.nombre || j.nombre_oficial;
+        const nombre = j.nombre_oficial || "";
+        const texto = nombre && nombre !== alias
+            ? `${alias} — ${nombre}`
+            : alias;
+
+        return `
+            <option value="${esc(j.id)}">${esc(texto)}</option>
+        `;
+    }).join("");
 
     app.innerHTML = `
         <section class="loginCard">
@@ -50,8 +62,8 @@ export function renderLogin(jugadores = [], mensaje = "") {
             <p class="eyebrow">SPRINT PÁDEL</p>
             <h1>Mi Zona</h1>
             <p class="intro">
-                Entra con tu PIN personal o activa tu acceso por primera vez con
-                el código de un solo uso que te facilite el administrador.
+                Entra con tu PIN personal. Si es tu primera vez, solicita el acceso
+                y el administrador te facilitará un código de verificación.
             </p>
 
             <form class="loginForm" data-form="login">
@@ -59,7 +71,7 @@ export function renderLogin(jugadores = [], mensaje = "") {
                     <span>Jugador</span>
                     <select name="jugador" required>
                         <option value="">Selecciona tu nombre</option>
-                        ${opciones}
+                        ${opcionesLogin}
                     </select>
                 </label>
 
@@ -87,25 +99,13 @@ export function renderLogin(jugadores = [], mensaje = "") {
             <details class="altaPanel">
                 <summary>¿Es tu primera vez? Crear mi acceso</summary>
 
-                <form class="loginForm altaForm" data-form="activar">
+                <form class="loginForm altaForm" data-form="solicitar-alta">
                     <label>
                         <span>Jugador</span>
                         <select name="jugador" required>
                             <option value="">Selecciona tu nombre</option>
-                            ${opciones}
+                            ${opcionesAlta}
                         </select>
-                    </label>
-
-                    <label>
-                        <span>Código de alta</span>
-                        <input
-                            name="codigo"
-                            inputmode="numeric"
-                            pattern="[0-9]*"
-                            maxlength="6"
-                            placeholder="6 cifras"
-                            required
-                        >
                     </label>
 
                     <div class="dosCampos">
@@ -121,6 +121,7 @@ export function renderLogin(jugadores = [], mensaje = "") {
                                 required
                             >
                         </label>
+
                         <label>
                             <span>Repite tu PIN</span>
                             <input
@@ -135,18 +136,48 @@ export function renderLogin(jugadores = [], mensaje = "") {
                         </label>
                     </div>
 
-                    <p class="mensajeForm" data-activar-mensaje></p>
-                    <button class="btnPrimario" type="submit">Crear mi acceso</button>
+                    <p class="mensajeForm" data-solicitud-mensaje></p>
+                    <button class="btnPrimario" type="submit">Solicitar acceso</button>
                 </form>
 
+                <div class="altaCodigoPanel oculto" data-alta-codigo-panel>
+                    <div class="altaCodigoEstado">
+                        <span>✓ Solicitud enviada</span>
+                        <strong data-alta-jugador></strong>
+                        <p>
+                            El administrador ya puede ver que estás solicitando el alta.
+                            Cuando te facilite el código, introdúcelo aquí.
+                        </p>
+                    </div>
+
+                    <form class="loginForm altaForm" data-form="completar-alta">
+                        <input type="hidden" name="jugador">
+
+                        <label>
+                            <span>Código de acceso</span>
+                            <input
+                                name="codigo"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                maxlength="6"
+                                placeholder="6 cifras"
+                                autocomplete="one-time-code"
+                                required
+                            >
+                        </label>
+
+                        <p class="mensajeForm" data-codigo-mensaje></p>
+                        <button class="btnPrimario" type="submit">Activar Mi Zona</button>
+                    </form>
+                </div>
+
                 <small class="notaLogin">
-                    El código solo sirve una vez y caduca a las 48 horas.
+                    Tu PIN lo eliges tú. El administrador no puede verlo.
                 </small>
             </details>
 
             <small class="notaLogin">
-                ¿Has olvidado tu PIN? Pide al administrador que restablezca tu acceso
-                y te genere un nuevo código.
+                ¿Has olvidado tu PIN? Pide al administrador que restablezca tu acceso.
             </small>
         </section>
     `;
