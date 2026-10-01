@@ -176,3 +176,36 @@ body.modoPortal{background:#071019!important}.modoPortal>.contenedor,.modoPortal
         grid-template-columns:1fr;
     }
 }
+
+
+/* Campeonatos como desplegable */
+.portalAreaCampeonatos{
+    cursor:pointer;
+}
+
+.portalAreaCampeonatos .portalChevronCampeonatos{
+    transition:transform .2s ease,color .2s ease;
+}
+
+.portalAreaCampeonatos.desplegado{
+    border-color:#3b82f6;
+    background:#102538;
+}
+
+.portalAreaCampeonatos.desplegado .portalChevronCampeonatos{
+    transform:rotate(180deg);
+    color:#60a5fa;
+}
+
+.portalListaCampeonatos.oculto{
+    display:none!important;
+}
+
+.portalListaCampeonatos:not(.oculto){
+    animation:portalDesplegarCampeonatos .18s ease-out;
+}
+
+@keyframes portalDesplegarCampeonatos{
+    from{opacity:0;transform:translateY(-6px)}
+    to{opacity:1;transform:translateY(0)}
+}
