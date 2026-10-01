@@ -896,3 +896,53 @@
     font-size: 8px;
     text-align: center;
 }
+
+.convocatoriaEquipoAsignado,
+.convocatoriaElegirEquipo {
+    margin-top: 12px;
+    padding: 11px 12px;
+    border: 1px solid rgba(96,165,250,.2);
+    border-radius: 11px;
+    background: rgba(37,99,235,.055);
+}
+
+.convocatoriaEquipoAsignado {
+    display: grid;
+    gap: 2px;
+}
+
+.convocatoriaEquipoAsignado small,
+.convocatoriaElegirEquipo > span {
+    color: var(--tenue);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.convocatoriaEquipoAsignado strong {
+    font-size: 13px;
+}
+
+.convocatoriaEquipoAsignado.pendiente {
+    border-color: rgba(250,204,21,.22);
+    background: rgba(250,204,21,.05);
+}
+
+.convocatoriaEquipoAsignado.pendiente strong {
+    color: #fde68a;
+}
+
+.convocatoriaElegirEquipo {
+    display: grid;
+    gap: 7px;
+}
+
+.convocatoriaElegirEquipo select {
+    width: 100%;
+    min-height: 38px;
+}
+
+.convocatoriaNota.aviso {
+    color: #fde68a;
+}
