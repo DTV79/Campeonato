@@ -90,8 +90,7 @@
 }
 
 .marcadorEquipo small,
-.plantillaTitulo small,
-.parejaPartido small {
+.plantillaTitulo small {
     display: block;
     color: var(--texto-tenue);
     font-size: 10px;
@@ -325,40 +324,108 @@
     color: #86efac;
 }
 
-.partidoParejas {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    align-items: center;
-    gap: 14px;
+.marcadorPartidoCompacto {
+    overflow: hidden;
     margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    background: rgba(3, 12, 20, 0.35);
 }
 
-.parejaPartido {
-    position: relative;
-    min-width: 0;
-    padding: 13px 13px 13px 17px;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    border-left: 3px solid var(--equipo-color, var(--acento));
-    border-radius: 12px;
+.marcadorPartidoCabecera,
+.filaEquipoPartido {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(3, 86px);
+    align-items: stretch;
+}
+
+.marcadorPartidoCabecera {
+    min-height: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.025);
 }
 
-.parejaB {
-    border-right: 3px solid var(--equipo-color, var(--acento));
-    border-left: 1px solid rgba(255, 255, 255, 0.09);
-    text-align: right;
+.marcadorPartidoCabecera span {
+    display: grid;
+    place-items: center;
+    padding: 7px 5px;
+    color: var(--texto-tenue);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
 }
 
-.parejaPartido .puntoEquipo {
-    display: none;
+.marcadorPartidoCabecera .cabeceraPareja {
+    justify-content: start;
+    padding-left: 18px;
 }
 
-.parejaPartido strong {
+.filaEquipoPartido {
+    position: relative;
+    min-height: 82px;
+    border-left: 4px solid var(--equipo-color, var(--acento));
+    background: color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 4%,
+        transparent
+    );
+}
+
+.filaEquipoA {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+}
+
+.infoEquipoPartido {
+    min-width: 0;
+    padding: 13px 16px 12px 14px;
+}
+
+.nombreEquipoPartido {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+.nombreEquipoPartido .puntoEquipo {
+    width: 9px;
+    height: 9px;
+    box-shadow: 0 0 0 3px color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 15%,
+        transparent
+    );
+}
+
+.nombreEquipoPartido span:last-child {
+    min-width: 0;
+}
+
+.nombreEquipoPartido small {
+    display: block;
+    color: var(--texto-tenue);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.nombreEquipoPartido b {
+    display: block;
+    overflow: hidden;
+    margin-top: 1px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nombresParejaPartido {
     display: block;
     overflow-wrap: anywhere;
-    margin-top: 5px;
+    margin-top: 7px;
+    color: var(--texto);
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 .separadorPareja {
@@ -366,71 +433,46 @@
     font-weight: 500;
 }
 
-.versus {
-    color: var(--texto-tenue);
-    font-size: 10px;
-    font-weight: 900;
-}
-
-.setsPartido {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 14px;
-}
-
-.setCaja {
-    min-width: 94px;
-    padding: 9px 11px 8px;
-    border: 1px solid rgba(255, 255, 255, 0.11);
-    border-radius: 12px;
-    background: rgba(3, 12, 20, 0.46);
+.puntuacionSet {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    min-width: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.075);
+    background: rgba(0, 0, 0, 0.08);
     text-align: center;
 }
 
-.setCaja small {
-    display: block;
-    color: var(--texto-tenue);
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: 0.09em;
-}
-
-.setCaja strong {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 2px;
-    font-size: 24px;
+.puntuacionSet strong {
+    font-size: 27px;
+    line-height: 1;
     letter-spacing: -0.04em;
 }
 
-.setCaja strong i {
-    color: var(--texto-tenue);
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 500;
-}
-
-.setCaja em {
-    display: block;
-    min-height: 14px;
-    margin-top: 1px;
+.puntuacionSet small {
+    min-height: 12px;
+    margin-top: 3px;
     color: #facc15;
-    font-size: 9px;
-    font-style: normal;
+    font-size: 8px;
     font-weight: 800;
 }
 
-.sinResultado {
-    margin-top: 14px;
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.025);
-    color: var(--texto-tenue);
-    font-size: 11px;
-    text-align: center;
+.puntuacionSet.ganadorSet {
+    background: color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 11%,
+        rgba(0, 0, 0, 0.08)
+    );
+}
+
+.puntuacionSet.ganadorSet strong {
+    color: var(--equipo-color, var(--texto));
+    font-weight: 900;
+}
+
+.puntuacionSet.vacia strong {
+    color: rgba(174, 191, 206, 0.36);
+    font-weight: 500;
 }
 
 .finalizacionPartido {
