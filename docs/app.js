@@ -3286,48 +3286,41 @@ function configurarNavegacionPretorneo() {
 
     configurarBotonNav(
         botones[0],
-        "🏠",
-        "Inicio",
+        "🏆",
+        "Campeonato",
         "inicio"
     );
 
     configurarBotonNav(
         botones[1],
-        "📖",
-        "Historia",
-        "",
-        "historia.html"
-    );
-
-    botones[1]?.classList.toggle(
-        "oculto",
-        !esSi(config.mostrar_historia)
+        "ℹ️",
+        "Información",
+        "pretorneo_info"
     );
 
     configurarBotonNav(
         botones[2],
-        "📜",
-        "Normas",
-        "",
-        "normas.html"
+        "✍️",
+        "Inscripción",
+        "pretorneo_inscripcion"
     );
 
     botones[2]?.classList.toggle(
         "oculto",
-        !esSi(config.mostrar_normativa)
+        !esEstadoInscripciones()
     );
 
     configurarBotonNav(
         botones[3],
-        "🏆",
-        "Campeones",
+        "📜",
+        "Normativa",
         "",
-        "campeones.html"
+        "normas.html?origen=campeonato"
     );
 
     botones[3]?.classList.toggle(
         "oculto",
-        !esSi(config.mostrar_campeones)
+        !esSi(config.mostrar_normativa)
     );
 
     configurarBotonNav(
