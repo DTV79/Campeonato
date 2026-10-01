@@ -3348,10 +3348,10 @@ function configurarNavegacionGlobalPublica() {
 
     configurarBotonNav(
         botones[1],
-        "🎾",
-        "Campeonato",
+        "🏆",
+        "Competiciones",
         "",
-        "index.html"
+        "index.html?portal=1#portalCompeticiones"
     );
 
     configurarBotonNav(
@@ -3364,17 +3364,17 @@ function configurarNavegacionGlobalPublica() {
 
     configurarBotonNav(
         botones[3],
-        "🏆",
+        "🏅",
         "Ranking",
         "ranking"
     );
 
     configurarBotonNav(
         botones[4],
-        "☰",
-        "Más",
+        "🔐",
+        "Mi Zona",
         "",
-        "index.html?pantalla=mas&nav=global"
+        "mi-zona.html"
     );
 }
 
