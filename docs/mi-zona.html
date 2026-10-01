@@ -1,11 +1,48 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mi Zona · Sprint Pádel</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="mi-zona.css"><link rel="stylesheet" href="portal.css?v=20261001-3"></head><body class="paginaGlobalSprint"><header class="globalTopbar">
-    <a href="index.html">🎾 <b>Sprint Pádel</b></a>
-    <nav>
-        <a href="index.html">Inicio</a>
-        <a href="index.html#portalCompeticiones">Competiciones</a>
-        <a href="index.html?pantalla=ranking&global=1">Ranking</a>
-        <a href="estadisticas.html">Estadísticas</a>
-        <a href="historia.html">Historia</a>
-        <a class="miZona activo" href="mi-zona.html">🔐 Mi Zona</a>
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Mi Zona · Sprint Pádel</title>
+    <meta name="theme-color" content="#071019">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="mi-zona/css/base.css">
+    <link rel="stylesheet" href="mi-zona/css/layout.css">
+    <link rel="stylesheet" href="mi-zona/css/components.css">
+    <link rel="stylesheet" href="mi-zona/css/responsive.css">
+</head>
+<body>
+    <header class="globalTopbar">
+        <a class="marcaSprint" href="index.html">🎾 <b>Sprint Pádel</b></a>
+        <nav aria-label="Navegación principal">
+            <a href="index.html">Inicio</a>
+            <a href="index.html#portalCompeticiones">Competiciones</a>
+            <a href="index.html?pantalla=ranking&global=1">Ranking</a>
+            <a href="estadisticas.html">Estadísticas</a>
+            <a href="historia.html">Historia</a>
+            <a class="miZona activo" href="mi-zona.html">🔐 Mi Zona</a>
+        </nav>
+    </header>
+
+    <main id="miZonaApp" class="miZonaPagina">
+        <section class="estadoPagina">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Cargando Mi Zona…</p>
+        </section>
+    </main>
+
+    <nav class="bottomNav" aria-label="Navegación móvil">
+        <a class="navBtn" href="index.html"><span>🏠</span><small>Inicio</small></a>
+        <a class="navBtn" href="teams.html"><span>⚔️</span><small>Teams</small></a>
+        <a class="navBtn" href="index.html?pantalla=ranking&global=1"><span>🏅</span><small>Ranking</small></a>
+        <a class="navBtn" href="estadisticas.html"><span>📊</span><small>Estadíst.</small></a>
+        <a class="navBtn activo" href="mi-zona.html"><span>🔐</span><small>Mi Zona</small></a>
     </nav>
-</header><main id="app"><div class="cargando">Cargando Mi Zona…</div></main><script src="mi-zona.js"></script></body></html>
+
+    <script type="module" src="mi-zona/js/main.js"></script>
+</body>
+</html>
