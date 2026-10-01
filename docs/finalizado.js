@@ -752,6 +752,23 @@
     function aplicarAjustes() {
         if (!esFinalizado()) return;
 
+        const parametros = new URLSearchParams(window.location.search);
+        const esRankingGlobal =
+            parametros.get("pantalla") === "ranking" &&
+            ["1", "si", "true"].includes(
+                String(parametros.get("global") || "").toLowerCase()
+            );
+
+        /*
+           finalizado.js observa cambios de la página y vuelve a ejecutar
+           estos ajustes. En el Ranking global no debe tocar ni la portada
+           ni el contenido del campeonato: solo respetar la navegación global.
+        */
+        if (esRankingGlobal) {
+            configurarRankingNavegacionFinal();
+            return;
+        }
+
         compactarCabecera();
         configurarRankingNavegacionFinal();
         sincronizarNavegacionFinal();
