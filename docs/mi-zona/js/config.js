@@ -11,6 +11,8 @@ export const RPC = Object.freeze({
     cambiarPin: "web_teams_cambiar_pin",
     logout: "web_teams_logout",
     zona: "web_teams_mi_zona",
+    convocatorias: "web_teams_convocatorias",
+    responderConvocatoria: "web_teams_responder_convocatoria",
     disponibilidad: "web_teams_cambiar_disponibilidad",
     alineacion: "web_teams_guardar_alineacion",
     proponerHorario: "web_teams_proponer_horario",
