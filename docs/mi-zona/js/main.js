@@ -178,8 +178,15 @@ async function cargarZona() {
     renderCargando();
 
     try {
-        const datos = await api.zona(token);
-        renderZona(datos || {});
+        const [datos, convocatorias] = await Promise.all([
+            api.zona(token),
+            api.convocatorias(token)
+        ]);
+
+        renderZona({
+            ...(datos || {}),
+            convocatorias: Array.isArray(convocatorias) ? convocatorias : []
+        });
         enlazarZona({
             app,
             recargar: cargarZona,
