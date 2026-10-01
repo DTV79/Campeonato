@@ -6,6 +6,8 @@ export const RPC = Object.freeze({
     jugadores: "web_teams_jugadores_acceso",
     login: "web_teams_login",
     activar: "web_teams_activar_acceso",
+    solicitarAlta: "web_teams_solicitar_alta",
+    completarAlta: "web_teams_completar_alta",
     cambiarPin: "web_teams_cambiar_pin",
     logout: "web_teams_logout",
     zona: "web_teams_mi_zona",
