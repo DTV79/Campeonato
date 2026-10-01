@@ -38,8 +38,9 @@ export function alineacionPorLado(partido, lado) {
 
 export function etiquetaEstadoGeneral(estado) {
     const mapa = {
-        preparacion: "Preparación",
-        convocatoria: "Convocatoria",
+        preparacion: "Convocatoria abierta",
+        convocatoria: "Convocatoria abierta",
+        draft: "Formando equipos",
         formacion: "Formando equipos",
         en_curso: "En juego",
         finalizado: "Finalizado"
