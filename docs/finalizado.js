@@ -1361,23 +1361,34 @@ const ultimo = finales.at(-1) || partidos.at(-1);
     ===================================================== */
 
     function configurarRankingNavegacionFinal() {
+        const parametros = new URLSearchParams(window.location.search);
+        const esRankingGlobal = parametros.get("pantalla") === "ranking";
+
+        if (
+            esRankingGlobal &&
+            typeof configurarNavegacionGlobalPublica === "function"
+        ) {
+            configurarNavegacionGlobalPublica();
+            return;
+        }
+
         const botones = [
             ...document.querySelectorAll(".bottomNav .navBtn")
         ];
 
         configurarBotonFinal(botones[0], "🏆", "Campeonato", "inicio");
-        configurarBotonFinal(botones[1], "🎾", "Partidos", "partidos");
+        configurarBotonFinal(botones[1], "📊", "Competición", "competicion");
+        configurarBotonFinal(botones[2], "🎾", "Partidos", "partidos");
         configurarBotonFinal(
-            botones[2],
-            "📊",
+            botones[3],
+            "📈",
             "Estadísticas",
             "",
-            "estadisticas.html"
+            typeof obtenerURLLocalEstadisticas === "function"
+                ? obtenerURLLocalEstadisticas()
+                : "estadisticas.html?ambito=campeonato&origen=campeonato"
         );
-        configurarBotonFinal(botones[3], "🏆", "Ranking", "", "index.html?pantalla=ranking&global=1");
         configurarBotonFinal(botones[4], "☰", "Más", "mas");
-
-        botones[3]?.classList.add("navRankingFinal");
     }
 
     function configurarBotonFinal(
