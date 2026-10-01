@@ -1,0 +1,108 @@
+
+/* Estadísticas integradas en el portal global Sprint Pádel */
+body.paginaEstadisticas.paginaGlobalSprint{
+  background:#06131d!important;color:#eaf2f8!important;
+}
+.paginaEstadisticas .contenedor{background:transparent!important}
+.paginaEstadisticas .cabeceraEstadisticas{
+  background:linear-gradient(135deg,#0d2030,#123149 60%,#163b55)!important;
+  border:1px solid #28465b!important;box-shadow:none!important
+}
+.paginaEstadisticas .actualizacionEstadisticas{background:#102a3d!important;color:#c7d7e2!important}
+.paginaEstadisticas .controlAmbitoEstadisticas,
+.paginaEstadisticas .cabeceraResumenEstadisticas,
+.paginaEstadisticas .cabeceraPanelEstadisticas,
+.paginaEstadisticas .bloqueEstadisticas,
+.paginaEstadisticas .equipoEstadisticas,
+.paginaEstadisticas .pistaEstadisticas,
+.paginaEstadisticas .listaParejasEstadisticas>article,
+.paginaEstadisticas .recordPartidoEstadisticas,
+.paginaEstadisticas .recordGeneralEstadisticas,
+.paginaEstadisticas .gridRecordsSimplesEstadisticas article,
+.paginaEstadisticas .detalleTodosPartidosEstadisticas,
+.paginaEstadisticas .vacioEstadisticas{
+  background:#0e1f2d!important;border:1px solid #284257!important;box-shadow:none!important;color:#eaf2f8!important
+}
+.paginaEstadisticas .cabeceraResumenEstadisticas,
+.paginaEstadisticas .cabeceraPanelEstadisticas{background:linear-gradient(135deg,#10283a,#132538)!important}
+.paginaEstadisticas .palmaresEstadisticas article,
+.paginaEstadisticas .metricaEstadisticas{
+  background:#102432!important;border:1px solid #29475b!important;box-shadow:none!important
+}
+.paginaEstadisticas .faseEstadisticas,
+.paginaEstadisticas .gridComparativaEstadisticas article,
+.paginaEstadisticas .gridDatosEquipoEstadisticas>div,
+.paginaEstadisticas .gridJornadasEstadisticas article,
+.paginaEstadisticas .listaPartidosEstadisticas article,
+.paginaEstadisticas .gridDatosPistaEstadisticas>div,
+.paginaEstadisticas .datosParejaEstadisticas span,
+.paginaEstadisticas .columnasRivalidadesEstadisticas>article{
+  background:#132b3c!important;border:1px solid #29475b!important
+}
+.paginaEstadisticas .btnAmbitoEstadisticas,
+.paginaEstadisticas .btnPestanaEstadisticas,
+.paginaEstadisticas .selectorCampeonatoEstadisticas select{
+  background:#0e1f2d!important;border-color:#315066!important;color:#c9d8e2!important;box-shadow:none!important
+}
+.paginaEstadisticas .btnAmbitoEstadisticas.activo,
+.paginaEstadisticas .btnPestanaEstadisticas.activo{
+  background:#1665c1!important;border-color:#3183df!important;color:#fff!important
+}
+.paginaEstadisticas .cabeceraControlEstadisticas strong,
+.paginaEstadisticas .cabeceraResumenEstadisticas h1,
+.paginaEstadisticas .cabeceraPanelEstadisticas h1,
+.paginaEstadisticas .tituloBloqueEstadisticas h2,
+.paginaEstadisticas .cabeceraFaseEstadisticas strong,
+.paginaEstadisticas .gridComparativaEstadisticas strong,
+.paginaEstadisticas .cabeceraEquipoEstadisticas strong,
+.paginaEstadisticas .gridDatosEquipoEstadisticas strong,
+.paginaEstadisticas .gridDatosPistaEstadisticas strong,
+.paginaEstadisticas .detalleRecordPartidoEstadisticas strong,
+.paginaEstadisticas .listaPartidosEstadisticas article>strong,
+.paginaEstadisticas .gridJornadasEstadisticas strong,
+.paginaEstadisticas .cabeceraPistaEstadisticas strong,
+.paginaEstadisticas .gridRecordsSimplesEstadisticas strong,
+.paginaEstadisticas .cabeceraParejaEstadisticas strong,
+.paginaEstadisticas .columnasRivalidadesEstadisticas strong,
+.paginaEstadisticas .ganadoresRecordEstadisticas strong,
+.paginaEstadisticas .vacioEstadisticas h2{color:#f5f9fc!important}
+.paginaEstadisticas .cabeceraControlEstadisticas small,
+.paginaEstadisticas .cabeceraResumenEstadisticas small,
+.paginaEstadisticas .cabeceraPanelEstadisticas small,
+.paginaEstadisticas .tituloBloqueEstadisticas small,
+.paginaEstadisticas .cabeceraResumenEstadisticas p,
+.paginaEstadisticas .cabeceraPanelEstadisticas p,
+.paginaEstadisticas .datosFaseEstadisticas,
+.paginaEstadisticas .cabeceraEquipoEstadisticas small,
+.paginaEstadisticas .gridDatosEquipoEstadisticas small,
+.paginaEstadisticas .gridDatosEquipoEstadisticas span,
+.paginaEstadisticas .gridDatosPistaEstadisticas small,
+.paginaEstadisticas .detalleRecordPartidoEstadisticas p,
+.paginaEstadisticas .listaPartidosEstadisticas article>p,
+.paginaEstadisticas .cabeceraPartidoEstadisticas small,
+.paginaEstadisticas .gridJornadasEstadisticas span,
+.paginaEstadisticas .gridJornadasEstadisticas b,
+.paginaEstadisticas .cabeceraPistaEstadisticas small,
+.paginaEstadisticas .gridRecordsSimplesEstadisticas small,
+.paginaEstadisticas .recordGeneralEstadisticas>small,
+.paginaEstadisticas .cabeceraParejaEstadisticas small,
+.paginaEstadisticas .columnasRivalidadesEstadisticas span,
+.paginaEstadisticas .columnasRivalidadesEstadisticas p,
+.paginaEstadisticas .recordGeneralEstadisticas>p{color:#9fb3c2!important}
+.paginaEstadisticas .metricaEstadisticas strong,
+.paginaEstadisticas .cabeceraFaseEstadisticas b,
+.paginaEstadisticas .gridComparativaEstadisticas b,
+.paginaEstadisticas .cabeceraEquipoEstadisticas>b,
+.paginaEstadisticas .cabeceraPistaEstadisticas b,
+.paginaEstadisticas .gridRecordsSimplesEstadisticas b,
+.paginaEstadisticas .cabeceraParejaEstadisticas>b,
+.paginaEstadisticas .ganadoresRecordEstadisticas span{color:#63b3ff!important}
+.paginaEstadisticas .metricaEstadisticas small{color:#9fb3c2!important}
+.paginaEstadisticas .barraEstadisticas{background:#203b4e!important}
+.paginaEstadisticas .gridRecordsPartidosEstadisticas,
+.paginaEstadisticas .detalleRecordPartidoEstadisticas+.detalleRecordPartidoEstadisticas,
+.paginaEstadisticas .columnasRivalidadesEstadisticas article>div,
+.paginaEstadisticas .ganadoresRecordEstadisticas>div{border-color:#29475b!important}
+.paginaEstadisticas .bottomNav{background:#071722!important;border-top-color:#20384a!important}
+.paginaEstadisticas .bottomNav .navBtn{color:#9eb0bd!important}
+.paginaEstadisticas .bottomNav .navBtn.navActivo{color:#a855f7!important}
