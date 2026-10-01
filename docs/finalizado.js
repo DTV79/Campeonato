@@ -1333,6 +1333,29 @@ const ultimo = finales.at(-1) || partidos.at(-1);
     ===================================================== */
 
     function configurarRankingNavegacionFinal() {
+        const parametros = new URLSearchParams(window.location.search);
+        const esRankingGlobal =
+            parametros.get("pantalla") === "ranking" &&
+            ["1", "si", "true"].includes(
+                String(parametros.get("global") || "").toLowerCase()
+            );
+
+        /*
+           El campeonato finalizado conserva su navegación propia,
+           pero el Ranking global pertenece al portal Sprint Pádel.
+           No debe volver a convertir la barra global en la del campeonato.
+        */
+        if (
+            esRankingGlobal &&
+            typeof configurarNavegacionGlobalPublica === "function"
+        ) {
+            configurarNavegacionGlobalPublica();
+            document
+                .querySelectorAll(".bottomNav .navBtn")
+                [3]?.classList.add("navRankingFinal");
+            return;
+        }
+
         const botones = [
             ...document.querySelectorAll(".bottomNav .navBtn")
         ];
