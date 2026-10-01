@@ -34,7 +34,26 @@
         }
     }
 
+    function esContextoCampeonato() {
+        const parametros = new URLSearchParams(window.location.search);
+        const pantalla = String(parametros.get("pantalla") || "inicio").toLowerCase();
+        const portal = String(parametros.get("portal") || "").toLowerCase();
+
+        // index.html es la portada global. El campeonato tiene ruta explícita ?portal=0.
+        if (pantalla === "ranking") return false;
+        if (["1", "si", "true"].includes(portal)) return false;
+        if (["0", "no", "false", "campeonato"].includes(portal)) return true;
+
+        // Pantallas internas históricas del campeonato siguen siendo válidas.
+        return pantalla !== "inicio";
+    }
+
     function instalarPortadaFinalizada() {
+        if (!esContextoCampeonato()) {
+            limpiarModoFinalizado();
+            return;
+        }
+
         if (!esCampeonatoFinalizado()) {
             limpiarModoFinalizado();
             return;
@@ -99,7 +118,7 @@
     }
 
     function aplicarPortadaFinalizada() {
-        if (!esCampeonatoFinalizado()) return;
+        if (!esContextoCampeonato() || !esCampeonatoFinalizado()) return;
 
         const resumen = obtenerResumenFinal();
 
