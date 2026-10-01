@@ -142,3 +142,37 @@
         flex-wrap: wrap;
     }
 }
+
+@media (max-width: 600px) {
+    .zonaHero {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .zonaHeroAcciones {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .seguridadZona .formAccion {
+        right: auto;
+        left: 0;
+    }
+}
+
+@media (max-width: 420px) {
+    .zonaHeroAcciones {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .seguridadZona > summary,
+    .btnSalir {
+        width: 100%;
+        text-align: center;
+    }
+
+    .seguridadZona .formAccion {
+        width: calc(100vw - 20px);
+    }
+}
