@@ -28,7 +28,8 @@ const nodos = {
     marcador: document.getElementById("teamsMarcador"),
     plantillas: document.getElementById("teamsPlantillas"),
     partidos: document.getElementById("teamsPartidos"),
-    ediciones: document.getElementById("teamsEdiciones")
+    ediciones: document.getElementById("teamsEdiciones"),
+    historial: document.querySelector(".teamsHistorial")
 };
 
 function mostrar(nodo, visible) {
@@ -125,6 +126,7 @@ export function renderDetalleTeams(detalle) {
     mostrar(nodos.marcador, !esPreparacion);
     mostrar(bloquePlantillas, !esPreparacion);
     mostrar(bloquePartidos, !esPreparacion);
+    mostrar(nodos.historial, !esPreparacion);
 
     if (esPreparacion) {
         renderPreparacion(detalle);
