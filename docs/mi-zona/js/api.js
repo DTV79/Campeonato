@@ -52,6 +52,13 @@ export const api = {
     }),
     logout: token => rpc(RPC.logout, { p_token: token }),
     zona: token => rpc(RPC.zona, { p_token: token }),
+    convocatorias: token => rpc(RPC.convocatorias, { p_token: token }),
+    responderConvocatoria: (token, teamId, estado) =>
+        rpc(RPC.responderConvocatoria, {
+            p_token: token,
+            p_team_id: teamId,
+            p_estado: estado
+        }),
     disponibilidad: (token, teamId, jugadorId, disponible) =>
         rpc(RPC.disponibilidad, {
             p_token: token,
