@@ -1365,7 +1365,7 @@ const ultimo = finales.at(-1) || partidos.at(-1);
             ...document.querySelectorAll(".bottomNav .navBtn")
         ];
 
-        configurarBotonFinal(botones[0], "🏠", "Inicio", "inicio");
+        configurarBotonFinal(botones[0], "🏆", "Campeonato", "inicio");
         configurarBotonFinal(botones[1], "🎾", "Partidos", "partidos");
         configurarBotonFinal(
             botones[2],
