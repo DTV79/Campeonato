@@ -57,3 +57,25 @@ export async function cargarDetalleTeams(teamId = null) {
 
     return datos;
 }
+
+
+export async function cargarConvocatoriaTeams(teamId = null) {
+    const datos = await rpc(
+        TEAMS_CONFIG.rpcConvocatoria,
+        { p_team_id: teamId || null }
+    );
+
+    if (!datos || typeof datos !== "object") {
+        return {
+            team_id: null,
+            metodo_formacion: null,
+            asignacion_predeterminada: null,
+            personas: []
+        };
+    }
+
+    return {
+        ...datos,
+        personas: Array.isArray(datos.personas) ? datos.personas : []
+    };
+}
