@@ -1,0 +1,144 @@
+@media (max-width: 860px) {
+    .globalTopbar nav { display: none; }
+
+    .miZonaPagina {
+        max-width: 700px;
+        padding: 28px 14px 94px;
+    }
+
+    .bottomNav {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 60;
+        display: grid;
+        grid-template-columns: repeat(5,1fr);
+        min-height: 66px;
+        padding:
+            6px max(6px,env(safe-area-inset-right))
+            calc(6px + env(safe-area-inset-bottom))
+            max(6px,env(safe-area-inset-left));
+        border-top: 1px solid rgba(255,255,255,.09);
+        background: rgba(5,15,25,.94);
+        backdrop-filter: blur(16px);
+    }
+
+    .navBtn {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 2px;
+        min-width: 0;
+        border-radius: 11px;
+        color: var(--tenue);
+    }
+
+    .navBtn span { font-size: 17px; }
+
+    .navBtn small {
+        font-size: 8px;
+        font-weight: 700;
+    }
+
+    .navBtn.activo {
+        background: rgba(56,189,248,.08);
+        color: #7dd3fc;
+    }
+}
+
+@media (max-width: 600px) {
+    .globalTopbar {
+        min-height: 56px;
+        padding: 0 14px;
+    }
+
+    .zonaHero {
+        align-items: flex-start;
+    }
+
+    .zonaHero h1 { font-size: 29px; }
+
+    .dueloEquipos {
+        gap: 8px;
+        padding: 0 14px 14px;
+    }
+
+    .teamCabecera,
+    .bloqueTeam { padding: 16px 14px; }
+
+    .dueloEquipos strong { font-size: 13px; }
+
+    .parejasZona {
+        grid-template-columns: 1fr;
+    }
+
+    .citaProgramada {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dosCampos,
+    .tresCampos {
+        grid-template-columns: 1fr;
+    }
+
+    .propuestaHorario {
+        grid-template-columns: 1fr;
+    }
+
+    .propuestaEstado {
+        text-align: left;
+    }
+
+    .resultadoCabeceraForm,
+    .filaResultadoForm {
+        grid-template-columns: minmax(0,1fr) repeat(3,58px);
+    }
+}
+
+@media (max-width: 420px) {
+    .miZonaPagina {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .loginCard { padding: 22px; }
+
+    .teamCabecera h2 { font-size: 21px; }
+
+    .bloqueTitulo {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .partidoZonaCabecera {
+        display: grid;
+        gap: 8px;
+    }
+
+    .badgeEstado { width: fit-content; }
+
+    .resultadoFila {
+        grid-template-columns: minmax(0,1fr) repeat(3,44px);
+    }
+
+    .resultadoCabeceraForm,
+    .filaResultadoForm {
+        grid-template-columns: minmax(0,1fr) repeat(3,48px);
+    }
+
+    .inputSet {
+        grid-template-columns: 1fr;
+    }
+
+    .inputSet input {
+        min-height: 32px;
+        font-size: 11px;
+    }
+
+    .propuestaEstado > div {
+        flex-wrap: wrap;
+    }
+}
