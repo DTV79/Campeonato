@@ -91,7 +91,7 @@
     </div>
     <div class="portalContenido">
         <section class="portalAhora">
-            <div class="portalSeccionTitulo"><div><span>EN JUEGO</span><h2>Ahora en Sprint Pádel</h2></div><p>Las competiciones activas, separadas y fáciles de seguir.</p></div>
+            <div class="portalSeccionTitulo"><div><span id="portalAhoraEtiqueta">ACTUALIDAD</span><h2 id="portalAhoraTitulo">Competiciones recientes</h2></div><p id="portalAhoraTexto">Campeonatos y Teams, separados y fáciles de consultar.</p></div>
             <div class="portalActivas">
                 <article class="portalCompeticionCard portalCampeonatoCard">
                     <div class="portalCardTipo"><span>🏆 CAMPEONATO</span><b id="portalFormatoCampeonato">—</b></div>
@@ -111,10 +111,20 @@
             </div>
         </section>
         <section id="portalCompeticiones" class="portalBloque">
-            <div class="portalSeccionTitulo"><div><span>COMPETICIONES</span><h2>Dos formatos, una misma casa</h2></div></div>
+            <div class="portalSeccionTitulo">
+                <div><span>COMPETICIONES</span><h2>Elige qué competición quieres consultar</h2></div>
+                <p>Los campeonatos se conservan por edición.</p>
+            </div>
             <div class="portalDosColumnas">
-                <button class="portalArea grande" data-entrar-campeonato><i>🏆</i><span><b>Campeonatos</b><small>Ediciones, clasificación, jornadas y eliminatorias</small></span><em>→</em></button>
+                <article class="portalArea grande portalAreaCampeonatos">
+                    <i>🏆</i>
+                    <span><b>Campeonatos</b><small>Abre directamente una edición concreta</small></span>
+                    <em>↓</em>
+                </article>
                 <button class="portalArea grande" data-portal-href="teams.html"><i>⚔️</i><span><b>Teams</b><small>Copa por equipos, enfrentamientos y marcador</small></span><em>→</em></button>
+            </div>
+            <div id="portalListaCampeonatos" class="portalListaCampeonatos" aria-live="polite">
+                <div class="portalEdicionCargando">Cargando campeonatos…</div>
             </div>
         </section>
         <section class="portalBloque">
