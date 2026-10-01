@@ -97,6 +97,21 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
         }
 
         try {
+            if (accion === "convocatoria") {
+                const contenedor = boton.closest(".convocatoriaCard");
+                contenedor?.querySelectorAll('[data-action="convocatoria"]').forEach(b => {
+                    b.disabled = true;
+                });
+
+                await api.responderConvocatoria(
+                    token,
+                    boton.dataset.teamId,
+                    boton.dataset.estado
+                );
+                await recargar();
+                return;
+            }
+
             if (accion === "disponibilidad") {
                 boton.disabled = true;
                 await api.disponibilidad(
