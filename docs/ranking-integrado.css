@@ -247,3 +247,27 @@ body.modoRankingGlobal .selectorRankingModo button.activo:hover,
 body.modoRankingGlobal .selectorRankingModo button[aria-selected="true"]:hover{
   background:#1d73d1!important;
 }
+
+/* Selector real usado por Ranking: Histórico / ISP */
+body.modoRankingGlobal .selectorRankingTipo{
+  background:#091722!important;
+  border:1px solid #355064!important;
+  padding:5px!important;
+}
+body.modoRankingGlobal .selectorRankingTipo button{
+  background:transparent!important;
+  color:#8fa6b9!important;
+  border:1px solid transparent!important;
+  box-shadow:none!important;
+}
+body.modoRankingGlobal .selectorRankingTipo button.activo,
+body.modoRankingGlobal .selectorRankingTipo button[aria-selected="true"]{
+  background:#1665c1!important;
+  border-color:#3183df!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+body.modoRankingGlobal .selectorRankingTipo button.activo:hover,
+body.modoRankingGlobal .selectorRankingTipo button[aria-selected="true"]:hover{
+  background:#1d73d1!important;
+}
