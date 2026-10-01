@@ -72,19 +72,19 @@
     </script>
 </head>
 <body class="appCargando">
+<header class="globalTopbar" id="globalTopbar">
+    <a href="index.html">🎾 <b>Sprint Pádel</b></a>
+    <nav>
+        <a data-global-nav="inicio" href="index.html">Inicio</a>
+        <a data-global-nav="competiciones" href="index.html#portalCompeticiones">Competiciones</a>
+        <a data-global-nav="ranking" href="index.html?pantalla=ranking&global=1">Ranking</a>
+        <a data-global-nav="estadisticas" href="estadisticas.html">Estadísticas</a>
+        <a data-global-nav="historico" href="historia.html">Histórico</a>
+        <a data-global-nav="mizone" class="miZona" href="mi-zona.html">🔐 Mi Zona</a>
+    </nav>
+</header>
 <section id="portalSprintPadel" class="portalSprintPadel oculto" aria-label="Inicio Sprint Pádel">
-    <header class="portalTopbar">
-        <button type="button" class="portalLogo" data-portal-inicio><span>🎾</span><b>Sprint Pádel</b></button>
-        <nav class="portalNav">
-            <button data-portal-inicio>Inicio</button>
-            <button data-portal-scroll="portalCompeticiones">Competiciones</button>
-            <button data-portal-href="index.html?pantalla=ranking&global=1">Ranking</button>
-            <button data-portal-href="estadisticas.html">Estadísticas</button>
-            <button data-portal-href="historia.html">Histórico</button>
-            <button class="portalMiZona" data-portal-href="mi-zona.html">🔐 Mi Zona</button>
-        </nav>
-    </header>
-    <div class="portalHero">
+<div class="portalHero">
         <span class="portalEyebrow">SPRINT PÁDEL</span>
         <h1>Tu pádel, en un solo lugar</h1>
         <p>Competiciones, partidos, ranking, estadísticas e historia de Sprint Pádel.</p>
@@ -130,9 +130,6 @@
 </section>
 
 <div class="contenedor">
-    <a id="volverPortalGlobal" class="volverPortalGlobal oculto" href="index.html" aria-label="Volver al inicio de Sprint Pádel">
-        <span>←</span> Sprint Pádel
-    </a>
     <header class="cabecera">
         <div class="tituloSuperior"></div>
         <div class="tituloPrincipal"></div>
