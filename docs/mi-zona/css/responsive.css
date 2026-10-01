@@ -95,6 +95,20 @@
     .filaResultadoForm {
         grid-template-columns: minmax(0,1fr) repeat(3,58px);
     }
+
+    .convocatoriaInfo {
+        display: grid;
+        gap: 10px;
+    }
+
+    .convocatoriaInfo p {
+        max-width: none;
+        text-align: left;
+    }
+
+    .convocatoriaOpciones {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 420px) {
