@@ -37,6 +37,14 @@ export const api = {
         p_codigo: codigo,
         p_pin: pin
     }),
+    solicitarAlta: (jugador, pin) => rpc(RPC.solicitarAlta, {
+        p_id_jugador: jugador,
+        p_pin: pin
+    }),
+    completarAlta: (jugador, codigo) => rpc(RPC.completarAlta, {
+        p_id_jugador: jugador,
+        p_codigo: codigo
+    }),
     cambiarPin: (token, pinActual, pinNuevo) => rpc(RPC.cambiarPin, {
         p_token: token,
         p_pin_actual: pinActual,
