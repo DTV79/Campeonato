@@ -193,8 +193,9 @@
         font-size: 23px;
     }
 
-    .puntuacionSet small {
-        font-size: 7px;
+    .puntuacionSet .tiebreakSuperindice {
+        top: -1px;
+        font-size: 10px;
     }
 
     .edicionesLista {
@@ -268,6 +269,11 @@
 
     .puntuacionSet strong {
         font-size: 21px;
+    }
+
+    .puntuacionSet .tiebreakSuperindice {
+        top: -1px;
+        font-size: 9px;
     }
 
     .estadisticasTeamsCabecera,
