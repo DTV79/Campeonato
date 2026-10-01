@@ -153,6 +153,16 @@ function renderCaracteristicas(detalle) {
         numero_fijo_desempate: `${Number(detalle?.numero_partidos || 0)} partidos + desempate`
     }[detalle?.modalidad] || `${Number(detalle?.numero_partidos || 0)} partidos`;
 
+    const formacion = {
+        manual: "Reparto manual después de la convocatoria",
+        draft: "Draft de capitanes",
+        sorteo: "Sorteo",
+        predeterminado:
+            detalle?.asignacion_predeterminada === "jugador"
+                ? "Equipos predeterminados · el jugador elige su equipo"
+                : "Equipos predeterminados · asignación previa del administrador"
+    }[detalle?.metodo_formacion] || "Definida por la organización";
+
     const repeticionJugador = detalle?.repetir_jugadores === "maximo"
         ? `Máximo ${Number(detalle?.max_partidos_jugador || 0)} partidos por jugador`
         : detalle?.repetir_jugadores === "no"
@@ -187,6 +197,7 @@ function renderCaracteristicas(detalle) {
 
     const items = [
         ["Formato", modalidad],
+        ["Formación", formacion],
         ["Plantillas", `${Number(detalle?.jugadores_por_equipo || 0)} jugadores por equipo${Number(detalle?.reservas_por_equipo || 0) ? ` + ${Number(detalle.reservas_por_equipo)} reserva(s)` : ""}`],
         ["Participación", repeticionJugador],
         ["Parejas", parejas],
@@ -214,6 +225,32 @@ function renderConvocatoriaPublica(detalle) {
         ? detalle.convocatoria
         : [];
 
+    const predeterminado =
+        detalle?.metodo_formacion === "predeterminado";
+
+    const equipos = [...(detalle?.equipos || [])]
+        .sort((a,b) => String(a?.lado || "").localeCompare(String(b?.lado || "")));
+
+    const resumenEquipos = predeterminado
+        ? `
+            <div class="convocatoriaEquiposPublicos">
+                ${equipos.map(equipo => {
+                    const apuntados = personas.filter(
+                        p => p?.estado === "elegible" && p?.equipo_id === equipo.id
+                    ).length;
+
+                    return `
+                        <span>
+                            <i style="background:${escaparHtml(colorSeguro(equipo?.color,equipo?.lado || "A"))}"></i>
+                            <b>${escaparHtml(equipo?.nombre || ("Equipo " + (equipo?.lado || "")))}</b>
+                            <strong>${apuntados}</strong>
+                        </span>
+                    `;
+                }).join("")}
+            </div>
+          `
+        : "";
+
     const grupos = [
         {
             estado: "elegible",
@@ -235,27 +272,36 @@ function renderConvocatoriaPublica(detalle) {
         }
     ];
 
-    nodos.convocatoria.innerHTML = grupos.map(grupo => {
-        const lista = personas.filter(p => p?.estado === grupo.estado);
+    nodos.convocatoria.innerHTML =
+        resumenEquipos +
+        grupos.map(grupo => {
+            const lista = personas.filter(p => p?.estado === grupo.estado);
 
-        return `
-            <article class="convocatoriaGrupo ${grupo.clase}">
-                <div class="convocatoriaGrupoTitulo">
-                    <span>${grupo.icono}</span>
-                    <div>
-                        <small>${escaparHtml(grupo.titulo)}</small>
-                        <strong>${lista.length}</strong>
+            return `
+                <article class="convocatoriaGrupo ${grupo.clase}">
+                    <div class="convocatoriaGrupoTitulo">
+                        <span>${grupo.icono}</span>
+                        <div>
+                            <small>${escaparHtml(grupo.titulo)}</small>
+                            <strong>${lista.length}</strong>
+                        </div>
                     </div>
-                </div>
 
-                <div class="convocatoriaNombres">
-                    ${lista.length
-                        ? lista.map(p => `<span>${escaparHtml(p?.nombre || "Jugador")}</span>`).join("")
-                        : '<em>Nadie todavía</em>'}
-                </div>
-            </article>
-        `;
-    }).join("");
+                    <div class="convocatoriaNombres">
+                        ${lista.length
+                            ? lista.map(p => `
+                                <span class="convocatoriaNombreJugador">
+                                    <b>${escaparHtml(p?.nombre || "Jugador")}</b>
+                                    ${predeterminado && p?.equipo_nombre
+                                        ? `<small>${escaparHtml(p.equipo_nombre)}</small>`
+                                        : ""}
+                                </span>
+                              `).join("")
+                            : '<em>Nadie todavía</em>'}
+                    </div>
+                </article>
+            `;
+        }).join("");
 }
 
 function renderMarcador(detalle) {
