@@ -179,7 +179,7 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
             const pinNuevo = form.elements.pinNuevo.value;
             const pinNuevo2 = form.elements.pinNuevo2.value;
 
-            if (!/^\\d{4,8}$/.test(pinNuevo)) {
+            if (!/^[0-9]{4,8}$/.test(pinNuevo)) {
                 mensajeFormulario(form, "El nuevo PIN debe tener entre 4 y 8 cifras.", true);
                 return;
             }
