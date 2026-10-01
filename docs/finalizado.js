@@ -769,21 +769,21 @@
             return;
         }
 
-        compactarCabecera();
-        configurarRankingNavegacionFinal();
-        sincronizarNavegacionFinal();
-        limpiarPantallaMasFinal();
-        agregarEquiposPantallaMas();
-        agregarGruposPantallaMas();
+        /*
+           La portada finalizada ya tiene un diseño completo en la primera
+           versión. Antes V2 volvía a transformar Gran Final y cifras después
+           de pintar la portada, por eso el mismo campeonato podía aparecer
+           con dos diseños distintos según el orden de carga.
+           Dejamos una única representación estable.
+        */
+        if (typeof configurarNavegacionGlobalPublica === "function") {
+            configurarNavegacionGlobalPublica();
+        }
 
         const portada = document.getElementById("portadaFinalizada");
         if (!portada) return;
 
-        const resumen = calcularResumenCompleto();
-
-        renovarGranFinal(portada, resumen);
-        renovarCifras(portada, resumen);
-        pintarFarolilloPalas(portada, resumen);
+        portada.dataset.disenoFinal = "unificado";
     }
 
     function esFinalizado() {
