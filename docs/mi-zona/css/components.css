@@ -737,3 +737,35 @@
     background: #0d1b27;
     box-shadow: var(--sombra);
 }
+
+.altaCodigoPanel {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid rgba(74,222,128,.24);
+    border-radius: 12px;
+    background: rgba(74,222,128,.045);
+}
+
+.altaCodigoEstado {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.altaCodigoEstado > span {
+    color: #86efac;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .06em;
+}
+
+.altaCodigoEstado > strong {
+    font-size: 13px;
+}
+
+.altaCodigoEstado > p {
+    margin: 0;
+    color: var(--suave);
+    font-size: 10px;
+    line-height: 1.45;
+}
