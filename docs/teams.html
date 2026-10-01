@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07131f">
+    <title>Teams · Sprint Pádel</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="teams/css/base.css">
+    <link rel="stylesheet" href="teams/css/layout.css">
+    <link rel="stylesheet" href="teams/css/components.css">
+    <link rel="stylesheet" href="teams/css/responsive.css">
+</head>
+<body>
+<header class="globalTopbar">
+    <a class="marcaSprint" href="index.html">🎾 <b>Sprint Pádel</b></a>
+    <nav aria-label="Navegación principal">
+        <a href="index.html">Inicio</a>
+        <a class="activo" href="index.html#portalCompeticiones">Competiciones</a>
+        <a href="index.html?pantalla=ranking&global=1">Ranking</a>
+        <a href="estadisticas.html">Estadísticas</a>
+        <a href="historia.html">Historia</a>
+        <a class="miZona" href="mi-zona.html">🔐 Mi Zona</a>
+    </nav>
+</header>
+
+<main class="teamsPagina">
+    <header class="teamsHero">
+        <div class="teamsHeroFila">
+            <div>
+                <span class="teamsEyebrow">⚔️ TEAMS · COPA POR EQUIPOS</span>
+                <h1 id="teamsNombre">Teams</h1>
+                <p id="teamsSubtitulo">Enfrentamientos, marcador y evolución de la Copa por Equipos.</p>
+            </div>
+            <span class="estadoGeneral estadoCargando" id="teamsEstado">Cargando…</span>
+        </div>
+    </header>
+
+    <section class="estadoPagina" id="teamsCargando" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Cargando Teams…</p>
+    </section>
+
+    <section class="estadoPagina estadoError oculto" id="teamsError" aria-live="polite">
+        <strong>No se pudo cargar Teams</strong>
+        <p id="teamsErrorTexto">Inténtalo de nuevo en unos segundos.</p>
+        <button type="button" id="teamsReintentar">Reintentar</button>
+    </section>
+
+    <div class="teamsContenido oculto" id="teamsContenido">
+        <section class="marcadorGeneral" id="teamsMarcador" aria-label="Marcador general"></section>
+
+        <section class="teamsBloque">
+            <div class="tituloBloque">
+                <div>
+                    <span>EQUIPOS</span>
+                    <h2>Plantillas</h2>
+                </div>
+                <p>Capitanes y jugadores de cada equipo.</p>
+            </div>
+            <div class="plantillasGrid" id="teamsPlantillas"></div>
+        </section>
+
+        <section class="teamsBloque">
+            <div class="tituloBloque">
+                <div>
+                    <span>ENFRENTAMIENTOS</span>
+                    <h2>Partidos</h2>
+                </div>
+                <p>Horarios, parejas, resultados y estado de cada duelo.</p>
+            </div>
+            <div class="partidosLista" id="teamsPartidos"></div>
+        </section>
+
+        <section class="teamsBloque teamsHistorial">
+            <div class="tituloBloque">
+                <div>
+                    <span>HISTORIAL</span>
+                    <h2>Ediciones de Teams</h2>
+                </div>
+                <p>Consulta la edición actual o recupera una anterior.</p>
+            </div>
+            <div class="edicionesLista" id="teamsEdiciones"></div>
+        </section>
+    </div>
+</main>
+
+<nav class="bottomNav" aria-label="Navegación inferior">
+    <a class="navBtn" href="index.html"><span>🏠</span><small>Inicio</small></a>
+    <a class="navBtn activo" href="index.html#portalCompeticiones"><span>🏆</span><small>Competiciones</small></a>
+    <a class="navBtn" href="estadisticas.html"><span>📊</span><small>Estadísticas</small></a>
+    <a class="navBtn" href="index.html?pantalla=ranking&global=1"><span>🏅</span><small>Ranking</small></a>
+    <a class="navBtn" href="mi-zona.html"><span>🔐</span><small>Mi Zona</small></a>
+</nav>
+
+<script type="module" src="teams/js/main.js"></script>
+</body>
+</html>
