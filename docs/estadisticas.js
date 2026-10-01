@@ -1059,40 +1059,27 @@ function configurarNavegacionEstadisticas() {
     ];
 
     configurarBotonNavegacionEstadisticas(
-        botones[0],
-        "🏠",
-        "Inicio",
-        "index.html?portal=1"
+        botones[0], "🏠", "Inicio", "index.html?portal=1"
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[1],
-        "🎾",
-        "Campeonato",
-        "index.html"
+        botones[1], "🏆", "Competiciones",
+        "index.html?portal=1#portalCompeticiones"
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[2],
-        "📊",
-        "Estadísticas",
-        "estadisticas.html",
-        false,
-        true
+        botones[2], "📊", "Estadísticas",
+        "estadisticas.html?ambito=global&seccion=resumen",
+        false, true
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[3],
-        "🏆",
-        "Ranking",
-        "index.html?pantalla=ranking"
+        botones[3], "🏅", "Ranking",
+        "index.html?pantalla=ranking&global=1"
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[4],
-        "☰",
-        "Más",
-        "index.html?pantalla=mas&nav=global"
+        botones[4], "🔐", "Mi Zona", "mi-zona.html"
     );
 }
 
