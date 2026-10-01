@@ -32,6 +32,16 @@ export const api = {
         p_id_jugador: jugador,
         p_pin: pin
     }),
+    activar: (jugador, codigo, pin) => rpc(RPC.activar, {
+        p_id_jugador: jugador,
+        p_codigo: codigo,
+        p_pin: pin
+    }),
+    cambiarPin: (token, pinActual, pinNuevo) => rpc(RPC.cambiarPin, {
+        p_token: token,
+        p_pin_actual: pinActual,
+        p_pin_nuevo: pinNuevo
+    }),
     logout: token => rpc(RPC.logout, { p_token: token }),
     zona: token => rpc(RPC.zona, { p_token: token }),
     disponibilidad: (token, teamId, jugadorId, disponible) =>
