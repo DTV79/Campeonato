@@ -1,7 +1,7 @@
-import { api } from "./api.js";
-import { enlazarZona } from "./actions.js";
-import { renderCargando, renderError, renderLogin, renderZona } from "./render.js";
-import { borrarToken, guardarToken, obtenerToken } from "./session.js";
+import { api } from "./api.js?v=20261001-1845";
+import { enlazarZona } from "./actions.js?v=20261001-1845";
+import { renderCargando, renderError, renderLogin, renderZona } from "./render.js?v=20261001-1845";
+import { borrarToken, guardarToken, obtenerToken } from "./session.js?v=20261001-1845";
 
 const app = document.getElementById("miZonaApp");
 
