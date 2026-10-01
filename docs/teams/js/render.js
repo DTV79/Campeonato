@@ -278,13 +278,13 @@ function htmlPartido(partido, equipoA, equipoB) {
 
             ${htmlAvisoResultado(resultado)}
 
-            <div class="partidoParejas">
-                ${htmlPareja("A", equipoA, alineacionA)}
-                <span class="versus">VS</span>
-                ${htmlPareja("B", equipoB, alineacionB)}
-            </div>
-
-            ${htmlSets(partido?.sets || [])}
+            ${htmlMarcadorPartido(
+                equipoA,
+                equipoB,
+                alineacionA,
+                alineacionB,
+                partido?.sets || []
+            )}
 
             ${finalizacion ? `
                 <div class="finalizacionPartido">${escaparHtml(finalizacion)}</div>
@@ -324,49 +324,92 @@ function htmlAvisoResultado(resultado) {
     return "";
 }
 
-function htmlPareja(lado, equipo, jugadores) {
-    const color = colorSeguro(equipo?.color, lado);
-    const nombres = jugadores.map(item => item?.jugador).filter(Boolean);
-
+function htmlMarcadorPartido(
+    equipoA,
+    equipoB,
+    alineacionA,
+    alineacionB,
+    sets
+) {
     return `
-        <div class="parejaPartido pareja${lado}" style="--equipo-color:${color}">
-            <span class="puntoEquipo" aria-hidden="true"></span>
-            <small>${escaparHtml(equipo?.nombre || `Equipo ${lado}`)}</small>
-            <strong>
-                ${nombres.length
-                    ? nombres.map(escaparHtml).join(" <span class=\"separadorPareja\">+</span> ")
-                    : "Pareja pendiente"}
-            </strong>
+        <div class="marcadorPartidoCompacto">
+            <div class="marcadorPartidoCabecera">
+                <span class="cabeceraPareja">PAREJA</span>
+                <span>SET 1</span>
+                <span>SET 2</span>
+                <span>SET 3</span>
+            </div>
+
+            ${htmlFilaEquipoPartido("A", equipoA, alineacionA, sets)}
+            ${htmlFilaEquipoPartido("B", equipoB, alineacionB, sets)}
         </div>
     `;
 }
 
-function htmlSets(sets) {
-    if (!Array.isArray(sets) || !sets.length) {
-        return '<div class="sinResultado">Resultado pendiente</div>';
+function htmlFilaEquipoPartido(lado, equipo, jugadores, sets) {
+    const color = colorSeguro(equipo?.color, lado);
+    const nombres = jugadores.map(item => item?.jugador).filter(Boolean);
+
+    return `
+        <div class="filaEquipoPartido filaEquipo${lado}" style="--equipo-color:${color}">
+            <div class="infoEquipoPartido">
+                <div class="nombreEquipoPartido">
+                    <span class="puntoEquipo" aria-hidden="true"></span>
+                    <span>
+                        <small>Equipo ${escaparHtml(lado)}</small>
+                        <b>${escaparHtml(equipo?.nombre || `Equipo ${lado}`)}</b>
+                    </span>
+                </div>
+
+                <strong class="nombresParejaPartido">
+                    ${nombres.length
+                        ? nombres.map(escaparHtml).join(' <span class="separadorPareja">+</span> ')
+                        : "Pareja pendiente"}
+                </strong>
+            </div>
+
+            ${[1, 2, 3]
+                .map(numero => htmlPuntuacionSet(sets, numero, lado))
+                .join("")}
+        </div>
+    `;
+}
+
+function htmlPuntuacionSet(sets, numero, lado) {
+    const set = Array.isArray(sets)
+        ? sets.find(item => Number(item?.numero) === numero)
+        : null;
+
+    if (!set) {
+        return `
+            <div class="puntuacionSet vacia">
+                <strong>–</strong>
+            </div>
+        `;
+    }
+
+    const esA = lado === "A";
+    const puntos = Number(esA ? set?.puntos_a : set?.puntos_b);
+    const puntosRival = Number(esA ? set?.puntos_b : set?.puntos_a);
+    const tie = esA ? set?.tiebreak_a : set?.tiebreak_b;
+    const tieRival = esA ? set?.tiebreak_b : set?.tiebreak_a;
+
+    let ganador = puntos > puntosRival;
+
+    if (
+        puntos === puntosRival &&
+        Number.isInteger(tie) &&
+        Number.isInteger(tieRival)
+    ) {
+        ganador = tie > tieRival;
     }
 
     return `
-        <div class="setsPartido">
-            ${sets.map(set => {
-                const tieA = set?.tiebreak_a;
-                const tieB = set?.tiebreak_b;
-                const tieneTie = Number.isInteger(tieA) && Number.isInteger(tieB);
-
-                return `
-                    <div class="setCaja">
-                        <small>SET ${Number(set?.numero || 0)}</small>
-                        <strong>
-                            <span>${Number(set?.puntos_a ?? 0)}</span>
-                            <i>–</i>
-                            <span>${Number(set?.puntos_b ?? 0)}</span>
-                        </strong>
-                        ${tieneTie
-                            ? `<em>TB ${tieA}–${tieB}</em>`
-                            : "<em>&nbsp;</em>"}
-                    </div>
-                `;
-            }).join("")}
+        <div class="puntuacionSet${ganador ? " ganadorSet" : ""}">
+            <strong>${puntos}</strong>
+            ${Number.isInteger(tie)
+                ? `<small>TB ${tie}</small>`
+                : "<small>&nbsp;</small>"}
         </div>
     `;
 }
