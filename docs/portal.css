@@ -85,3 +85,94 @@ body.modoPortal{background:#071019!important}.modoPortal>.contenedor,.modoPortal
         overflow-x:auto !important;
     }
 }
+
+
+/* =========================================================
+   PORTAL · EDICIONES DE CAMPEONATO
+========================================================= */
+.portalDatosCampeonato small{
+    color:#8fb0cc!important;
+    font-weight:800!important;
+}
+
+.portalDatosCampeonato strong{
+    color:#f8fbff!important;
+    font-weight:900!important;
+    overflow-wrap:anywhere;
+}
+
+.portalListaCampeonatos{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-top:12px;
+}
+
+.portalEdicionBtn{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:12px;
+    width:100%;
+    padding:15px 16px;
+    border:1px solid #294154;
+    border-radius:14px;
+    background:#0d1d2a;
+    color:#eef6ff;
+    text-align:left;
+    cursor:pointer;
+}
+
+.portalEdicionBtn:hover{
+    border-color:#3b82f6;
+    background:#102538;
+    transform:translateY(-1px);
+}
+
+.portalEdicionIcono{
+    font-size:22px;
+}
+
+.portalEdicionTexto{
+    display:grid;
+    gap:4px;
+    min-width:0;
+}
+
+.portalEdicionTexto strong{
+    color:#f8fbff;
+    font-size:14px;
+    line-height:1.25;
+}
+
+.portalEdicionTexto small{
+    color:#8ea7ba;
+    font-size:11px;
+    font-weight:700;
+}
+
+.portalEdicionFlecha{
+    color:#60a5fa;
+    font-size:18px;
+    font-weight:900;
+}
+
+.portalEdicionCargando{
+    grid-column:1/-1;
+    padding:14px;
+    border:1px dashed #294154;
+    border-radius:12px;
+    color:#8ea7ba;
+    text-align:center;
+    font-size:12px;
+}
+
+.portalAreaCampeonatos{
+    cursor:default;
+}
+
+@media(max-width:700px){
+    .portalListaCampeonatos{
+        grid-template-columns:1fr;
+    }
+}
