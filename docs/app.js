@@ -654,7 +654,7 @@ const faseSolicitada =
     parametros.get("fase") ||
     "";
 
-const rankingGlobalSolicitado = pantallaSolicitada === "ranking" && ["1","si","true"].includes(String(parametros.get("global")||"").toLowerCase());
+// Ranking e ISP son ahora secciones globales del portal. Cualquier acceso a ?pantalla=ranking usa el diseño global, aunque llegue desde un enlace antiguo sin &global=1.\nconst rankingGlobalSolicitado = pantallaSolicitada === "ranking";
 document.body.classList.toggle("modoRankingGlobal", rankingGlobalSolicitado);
 
 /*
