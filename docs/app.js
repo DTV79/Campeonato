@@ -239,6 +239,17 @@ async function cargarConfiguracionDesdeSupabase(datosJSON) {
 }
 
 async function obtenerCodigoCampeonatoActivo(codigoRespaldo) {
+    const solicitado = String(
+        new URLSearchParams(window.location.search).get("campeonato") || ""
+    ).trim();
+
+    if (
+        solicitado &&
+        /^[A-Za-z0-9_-]+$/.test(solicitado)
+    ) {
+        return solicitado;
+    }
+
     try {
         const respuesta = await fetch(
             `${SUPABASE_URL}/rest/v1/rpc/web_campeonato_activo`,
@@ -1079,9 +1090,33 @@ function gestionarClickGlobal(evento) {
     const scrollPortal=evento.target.closest("[data-portal-scroll]");
     if(scrollPortal){document.getElementById(scrollPortal.dataset.portalScroll)?.scrollIntoView({behavior:"smooth"});return;}
 
+    const edicionCampeonatoPortal =
+        evento.target.closest("[data-campeonato-codigo]");
+
+    if (edicionCampeonatoPortal) {
+        const codigo = String(
+            edicionCampeonatoPortal.dataset.campeonatoCodigo || ""
+        ).trim();
+
+        if (codigo) {
+            window.location.href =
+                "index.html?portal=0&campeonato=" +
+                encodeURIComponent(codigo);
+        }
+        return;
+    }
+
     const entrarCampeonatoPortal = evento.target.closest("[data-entrar-campeonato]");
     if (entrarCampeonatoPortal) {
-        window.location.href = "index.html?portal=0";
+        const codigo = String(
+            entrarCampeonatoPortal.dataset.campeonatoCodigo ||
+            obtenerConfiguracion()?.codigo_campeonato ||
+            ""
+        ).trim();
+
+        window.location.href =
+            "index.html?portal=0" +
+            (codigo ? "&campeonato=" + encodeURIComponent(codigo) : "");
         return;
     }
 
@@ -1816,9 +1851,12 @@ function nombreFormatoPublico(config = {}) {
 }
 
 function configurarEstadoTopbarGlobal(esCampeonato, esRanking) {
+    const enCompeticionesPortal =
+        window.location.hash === "#portalCompeticiones";
+
     const claveActiva = esRanking
         ? "ranking"
-        : esCampeonato
+        : esCampeonato || enCompeticionesPortal
             ? "competiciones"
             : "inicio";
 
@@ -1835,8 +1873,8 @@ function configurarEstadoTopbarGlobal(esCampeonato, esRanking) {
 function obtenerURLLocalEstadisticas() {
     const config = obtenerConfiguracion();
     const idCampeonato = String(
-        config.id_campeonato ||
         config.codigo_campeonato ||
+        config.id_campeonato ||
         ""
     ).trim();
 
@@ -1851,6 +1889,24 @@ function obtenerURLLocalEstadisticas() {
     }
 
     return `estadisticas.html?${parametros.toString()}`;
+}
+
+function obtenerURLNormativaLocal() {
+    const config = obtenerConfiguracion();
+    const codigo = String(
+        config.codigo_campeonato ||
+        ""
+    ).trim();
+
+    const parametros = new URLSearchParams({
+        origen: "campeonato"
+    });
+
+    if (codigo) {
+        parametros.set("campeonato", codigo);
+    }
+
+    return `normas.html?${parametros.toString()}`;
 }
 
 function salirModoPortal() {
@@ -1930,6 +1986,130 @@ function obtenerSituacionPortal() {
     return nombreFase(obtenerFaseActualCompeticion());
 }
 
+function normalizarEstadoPortal(valor) {
+    return String(valor || "")
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function nombreCampeonatoPortal(item) {
+    const nombre = String(item?.nombre || "").trim();
+    const anio = Number(item?.anio || 0);
+    const romano = nombre.match(/^([IVXLCDM]+)\s+Campeonato\b/i)?.[1];
+
+    if (romano && anio) {
+        return `${romano.toUpperCase()} Campeonato Sprint Pádel Año ${anio}`;
+    }
+
+    return nombre || (anio ? `Campeonato Sprint Pádel Año ${anio}` : "Campeonato Sprint Pádel");
+}
+
+function pintarListaCampeonatosPortal(lista) {
+    const contenedor = document.getElementById("portalListaCampeonatos");
+    if (!contenedor) return;
+
+    const campeonatos = Array.isArray(lista)
+        ? [...lista].sort((a, b) =>
+            Number(a?.anio || 0) - Number(b?.anio || 0) ||
+            String(a?.codigo_campeonato || "").localeCompare(
+                String(b?.codigo_campeonato || ""),
+                "es",
+                { numeric: true }
+            )
+        )
+        : [];
+
+    if (!campeonatos.length) {
+        contenedor.innerHTML =
+            '<div class="portalEdicionCargando">No hay campeonatos publicados.</div>';
+        return;
+    }
+
+    contenedor.innerHTML = campeonatos.map(item => {
+        const codigo = String(item?.codigo_campeonato || "").trim();
+        const estado = normalizarEstadoPortal(item?.estado).includes("FINALIZ")
+            ? "Finalizado"
+            : String(item?.estado || "Disponible").replaceAll("_", " ");
+        const fecha = item?.fecha_inicio
+            ? new Date(item.fecha_inicio + "T12:00:00").toLocaleDateString(
+                "es-ES",
+                { day: "2-digit", month: "2-digit", year: "numeric" }
+            )
+            : "";
+
+        return `
+            <button
+                type="button"
+                class="portalEdicionBtn"
+                data-campeonato-codigo="${escaparAtributo(codigo)}"
+            >
+                <span class="portalEdicionIcono">🏆</span>
+                <span class="portalEdicionTexto">
+                    <strong>${escaparHTML(nombreCampeonatoPortal(item))}</strong>
+                    <small>${escaparHTML([fecha, estado].filter(Boolean).join(" · "))}</small>
+                </span>
+                <span class="portalEdicionFlecha">→</span>
+            </button>
+        `;
+    }).join("");
+}
+
+async function cargarCampeonatosPublicosPortal() {
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_campeonatos_publicos`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const lista = await respuesta.json();
+        pintarListaCampeonatosPortal(lista);
+    } catch (error) {
+        console.warn("No se pudo cargar la lista pública de campeonatos.", error);
+        pintarListaCampeonatosPortal([]);
+    }
+}
+
+function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
+    const estados = [
+        normalizarEstadoPortal(estadoCampeonato),
+        normalizarEstadoPortal(estadoTeams)
+    ].filter(Boolean);
+
+    const hayEnJuego = estados.some(estado =>
+        !estado.includes("FINALIZ") &&
+        !estado.includes("CERRAD")
+    );
+
+    setText(
+        "portalAhoraEtiqueta",
+        hayEnJuego ? "EN JUEGO" : "FINALIZADAS"
+    );
+    setText(
+        "portalAhoraTitulo",
+        hayEnJuego ? "Ahora en Sprint Pádel" : "Últimas competiciones"
+    );
+    setText(
+        "portalAhoraTexto",
+        hayEnJuego
+            ? "Las competiciones activas, separadas y fáciles de seguir."
+            : "Consulta las últimas competiciones ya finalizadas."
+    );
+}
+
 async function pintarPortalGeneral() {
     const config = obtenerConfiguracion();
 
@@ -1976,12 +2156,23 @@ async function pintarPortalGeneral() {
         `).join("");
     }
 
+    const botonCampeonatoActual =
+        document.querySelector("[data-entrar-campeonato]");
+
+    if (botonCampeonatoActual) {
+        botonCampeonatoActual.dataset.campeonatoCodigo =
+            String(config.codigo_campeonato || "").trim();
+    }
+
+    let estadoTeamsPortal = "";
+
     try {
         const respuestaTeams = await fetch(SUPABASE_URL + "/rest/v1/rpc/web_teams_portal", {method:"POST",cache:"no-store",headers:{apikey:SUPABASE_PUBLISHABLE_KEY,"Content-Type":"application/json"},body:"{}"});
         if (respuestaTeams.ok) {
             const team = await respuestaTeams.json();
             const card = document.getElementById("portalTeamsActual");
             if (team && team.id) {
+                estadoTeamsPortal = String(team.estado || "");
                 setText("portalTeamsNombre", team.nombre || "Teams");
                 setText("portalTeamsEstado", String(team.estado||"").replaceAll("_"," "));
                 const equiposT = team.equipos || [], a=equiposT.find(e=>e.lado==="A"), b=equiposT.find(e=>e.lado==="B"), vict=team.victorias||{};
@@ -1995,6 +2186,10 @@ async function pintarPortalGeneral() {
             }
         }
     } catch(error){ console.warn("No se pudo cargar el resumen de Teams",error); }
+
+    await cargarCampeonatosPublicosPortal();
+    actualizarEstadoPortalAhora(estado, estadoTeamsPortal);
+
     document.body.classList.add("modoPortal");
     document.getElementById("portalSprintPadel")?.classList.remove("oculto");
 }
@@ -3315,7 +3510,7 @@ function configurarNavegacionPretorneo() {
         "📜",
         "Normativa",
         "",
-        "normas.html?origen=campeonato"
+        obtenerURLNormativaLocal()
     );
 
     botones[3]?.classList.toggle(
@@ -3750,7 +3945,7 @@ function pintarPantallaMasPretorneo() {
         opciones.push({
             icono: "📜",
             texto: "Normativa",
-            href: "normas.html?origen=campeonato"
+            href: obtenerURLNormativaLocal()
         });
     }
 
@@ -6633,7 +6828,7 @@ function pintarPantallaMas() {
         opciones.push({
             icono: "📜",
             texto: "Normativa",
-            href: "normas.html?origen=campeonato"
+            href: obtenerURLNormativaLocal()
         });
     }
 
