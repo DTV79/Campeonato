@@ -201,6 +201,24 @@
     .edicionesLista {
         grid-template-columns: 1fr;
     }
+
+    .caracteristicasTeams {
+        grid-template-columns: 1fr;
+    }
+
+    .convocatoriaPublicaCabecera {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .convocatoriaPublicaGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .convocatoriaGrupo + .convocatoriaGrupo {
+        border-top: 1px solid var(--borde);
+        border-left: 0;
+    }
 }
 
 @media (max-width: 420px) {
