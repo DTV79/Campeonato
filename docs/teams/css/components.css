@@ -114,8 +114,8 @@
 
 .estadisticaTeamsFila span {
     color: var(--texto-suave);
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
 }
 
 .marcadorPie {
