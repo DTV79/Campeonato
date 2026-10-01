@@ -1,6 +1,6 @@
-import { api } from "./api.js";
-import { fechaIsoDesdeInput } from "./model.js";
-import { borrarToken, obtenerToken } from "./session.js";
+import { api } from "./api.js?v=20261001-1845";
+import { fechaIsoDesdeInput } from "./model.js?v=20261001-1845";
+import { borrarToken, obtenerToken } from "./session.js?v=20261001-1845";
 
 function mensajeFormulario(form, texto, error = false) {
     const nodo = form?.querySelector("[data-form-mensaje]");
