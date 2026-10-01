@@ -37,7 +37,7 @@ async function iniciarNavegacionGeneral() {
         if (esWebPreviaNav(config)) {
             configurarNavegacionPrevia(config);
         } else if (esWebFinalizadaNav(config)) {
-            configurarNavegacionFinalizada();
+            configurarNavegacionFinalizada(config);
         } else {
             configurarNavegacionEnJuego(config);
         }
@@ -123,26 +123,67 @@ async function cargarConfiguracionSupabaseNav(datosJSON) {
 }
 
 
-function configurarNavegacionGlobal() {
+function configurarNavegacionGlobal(config = {}) {
+    const parametros = new URLSearchParams(window.location.search);
+    const origenCampeonato = parametros.get("origen") === "campeonato";
+
+    if (origenCampeonato) {
+        configurarNavegacionCampeonato(config);
+        return;
+    }
+
     const botones = obtenerBotonesNav();
     configurarEnlaceNav(botones[0],"🏠","Inicio","index.html",true,"inicio");
     configurarEnlaceNav(botones[1],"🏆","Competiciones","index.html#portalCompeticiones",true,"competiciones");
-    configurarEnlaceNav(botones[2],"📊","Estadísticas","estadisticas.html",true,"estadisticas");
-    configurarEnlaceNav(botones[3],"🏅","Ranking","index.html?pantalla=ranking&global=1",true,"ranking");
+    configurarEnlaceNav(botones[2],"🏅","Ranking","index.html?pantalla=ranking&global=1",true,"ranking");
+    configurarEnlaceNav(botones[3],"📊","Estadísticas","estadisticas.html",true,"estadisticas");
     configurarEnlaceNav(botones[4],"🔐","Mi Zona","mi-zona.html",true,"mizone");
     activarPaginaActual();
 }
 
-function configurarNavegacionEnJuego() {
-    configurarNavegacionGlobal();
+function configurarNavegacionCampeonato(config = {}) {
+    const botones = obtenerBotonesNav();
+
+    const idCampeonato = String(
+        config.id_campeonato ||
+        config.codigo_campeonato ||
+        ""
+    ).trim();
+
+    const parametrosEstadisticas = new URLSearchParams({
+        ambito: "campeonato",
+        seccion: "resumen",
+        origen: "campeonato"
+    });
+
+    if (idCampeonato) {
+        parametrosEstadisticas.set("campeonato", idCampeonato);
+    }
+
+    configurarEnlaceNav(botones[0],"🏆","Campeonato","index.html?portal=0",true,"campeonato");
+    configurarEnlaceNav(botones[1],"📊","Competición","index.html?portal=0&pantalla=competicion",true,"competicion");
+    configurarEnlaceNav(botones[2],"🎾","Partidos","index.html?portal=0&pantalla=partidos",true,"partidos");
+    configurarEnlaceNav(
+        botones[3],
+        "📈",
+        "Estadísticas",
+        "estadisticas.html?" + parametrosEstadisticas.toString(),
+        true,
+        "estadisticas-campeonato"
+    );
+    configurarEnlaceNav(botones[4],"☰","Más","index.html?portal=0&pantalla=mas",true,"mas");
 }
 
-function configurarNavegacionFinalizada() {
-    configurarNavegacionGlobal();
+function configurarNavegacionEnJuego(config = {}) {
+    configurarNavegacionGlobal(config);
 }
 
-function configurarNavegacionPrevia() {
-    configurarNavegacionGlobal();
+function configurarNavegacionFinalizada(config = {}) {
+    configurarNavegacionGlobal(config);
+}
+
+function configurarNavegacionPrevia(config = {}) {
+    configurarNavegacionGlobal(config);
 }
 
 function configurarEnlaceNav(
