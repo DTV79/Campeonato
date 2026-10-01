@@ -1070,7 +1070,7 @@ function gestionarClickGlobal(evento) {
     const scrollPortal=evento.target.closest("[data-portal-scroll]");
     if(scrollPortal){document.getElementById(scrollPortal.dataset.portalScroll)?.scrollIntoView({behavior:"smooth"});return;}
 
-    const entrarCampeonatoPortal = evento.target.closest("#portalEntrarCampeonato");
+    const entrarCampeonatoPortal = evento.target.closest("[data-entrar-campeonato]");
     if (entrarCampeonatoPortal) {
         // Ruta canónica del campeonato. El portal global se reserva para index.html.
         window.location.href = "index.html?portal=0";
