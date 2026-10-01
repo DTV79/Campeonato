@@ -31,6 +31,10 @@ async function cargarLogin(mensaje = "") {
                     form.elements.pin.value
                 );
 
+                if (respuesta?.error) {
+                    throw new Error(respuesta.error);
+                }
+
                 if (!respuesta?.token) {
                     throw new Error("No se pudo iniciar la sesión.");
                 }
@@ -78,6 +82,10 @@ async function cargarLogin(mensaje = "") {
                     formActivar.elements.codigo.value,
                     pin
                 );
+
+                if (respuesta?.error) {
+                    throw new Error(respuesta.error);
+                }
 
                 if (!respuesta?.token) {
                     throw new Error("No se pudo activar el acceso.");
