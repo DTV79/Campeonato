@@ -1,4 +1,4 @@
-import { TEAMS_CONFIG } from "./config.js?v=20261001-1910";
+import { TEAMS_CONFIG } from "./config.js?v=20261001-1945";
 
 async function rpc(nombre, payload = {}) {
     const controlador = new AbortController();
