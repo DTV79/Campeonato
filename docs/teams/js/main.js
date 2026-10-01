@@ -9,7 +9,7 @@ import {
     renderErrorTeams,
     renderSinTeams,
     mostrarCargandoTeams
-} from "./render.js?v=20261001-1910";
+} from "./render.js?v=20261001-1902";
 
 const estado = {
     detalle: null,
