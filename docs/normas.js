@@ -67,13 +67,18 @@ async function iniciarPaginaNormas() {
 
 async function cargarDatosNormas() {
     try {
-        const codigo = await llamarRPCNormas(
-            "web_campeonato_activo",
-            {}
-        ).then(resultado => textoSeguro(
-            resultado?.codigo_campeonato ||
-            CODIGO_CAMPEONATO_NORMAS_RESPALDO
-        ));
+        const codigoSolicitado = textoSeguro(
+            new URLSearchParams(window.location.search).get("campeonato")
+        );
+
+        const codigo = codigoSolicitado ||
+            await llamarRPCNormas(
+                "web_campeonato_activo",
+                {}
+            ).then(resultado => textoSeguro(
+                resultado?.codigo_campeonato ||
+                CODIGO_CAMPEONATO_NORMAS_RESPALDO
+            ));
 
         const [configuracion, reglas] = await Promise.all([
             llamarRPCNormas(
