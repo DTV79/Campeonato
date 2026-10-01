@@ -369,6 +369,15 @@ function htmlAccionHorario(team, partido, jugador) {
                     >Eliminar fecha</button>
                 </div>
 
+                <form class="formAccion oculto" data-form="pista" data-partido-id="${esc(partido.id)}">
+                    <label>
+                        <span>Club/pista · opcional</span>
+                        <input name="pista" value="${esc(partido?.pista || "")}" placeholder="Dejar vacío para borrar">
+                    </label>
+                    <button class="btnPrimario" type="submit">Guardar club/pista</button>
+                    <p class="mensajeForm" data-form-mensaje></p>
+                </form>
+
                 <form class="formAccion oculto" data-form="reprogramar" data-partido-id="${esc(partido.id)}">
                     <div class="dosCampos">
                         <label>
