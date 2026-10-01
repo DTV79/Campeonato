@@ -1049,6 +1049,11 @@ async function cargarConfiguracionSupabaseEstadisticas(estadoJSON) {
    según el estado del campeonato.
 ========================================================= */
 
+function esEstadisticasLocalesCampeonato() {
+    const parametros = new URLSearchParams(window.location.search);
+    return parametros.get("origen") === "campeonato";
+}
+
 function configurarNavegacionEstadisticas() {
     const botones = [
         document.getElementById("navEstadisticas1"),
@@ -1057,6 +1062,35 @@ function configurarNavegacionEstadisticas() {
         document.getElementById("navEstadisticas4"),
         document.getElementById("navEstadisticas5")
     ];
+
+    if (esEstadisticasLocalesCampeonato()) {
+        configurarBotonNavegacionEstadisticas(
+            botones[0], "🏆", "Campeonato", "index.html?portal=0"
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[1], "📊", "Competición",
+            "index.html?portal=0&pantalla=competicion"
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[2], "🎾", "Partidos",
+            "index.html?portal=0&pantalla=partidos"
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[3], "📈", "Estadísticas",
+            window.location.href,
+            false, true
+        );
+
+        configurarBotonNavegacionEstadisticas(
+            botones[4], "☰", "Más",
+            "index.html?portal=0&pantalla=mas"
+        );
+
+        return;
+    }
 
     configurarBotonNavegacionEstadisticas(
         botones[0], "🏠", "Inicio", "index.html"
@@ -1068,14 +1102,14 @@ function configurarNavegacionEstadisticas() {
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[2], "📊", "Estadísticas",
-        "estadisticas.html?ambito=global&seccion=resumen",
-        false, true
+        botones[2], "🏅", "Ranking",
+        "index.html?pantalla=ranking&global=1"
     );
 
     configurarBotonNavegacionEstadisticas(
-        botones[3], "🏅", "Ranking",
-        "index.html?pantalla=ranking&global=1"
+        botones[3], "📊", "Estadísticas",
+        "estadisticas.html?ambito=global&seccion=resumen",
+        false, true
     );
 
     configurarBotonNavegacionEstadisticas(
@@ -1220,8 +1254,12 @@ function inicializarEstadoVistaEstadisticas() {
     const pestanaSolicitada =
         parametros.get("seccion");
 
+    const modoLocalCampeonato =
+        parametros.get("origen") === "campeonato";
+
     if (
-        ambitoSolicitado === "campeonato" &&
+        (modoLocalCampeonato ||
+            ambitoSolicitado === "campeonato") &&
         campeonatos.length
     ) {
         estadoVistaEstadisticas.ambito =
@@ -1298,7 +1336,9 @@ function pintarCabeceraEstadisticas() {
 
     if (subtitulo) {
         subtitulo.textContent =
-            "Resultados, rendimiento y curiosidades";
+            esEstadisticasLocalesCampeonato()
+                ? "Estadísticas de este campeonato"
+                : "Resultados, rendimiento y curiosidades";
     }
 
     if (generado) {
@@ -1343,8 +1383,13 @@ function pintarPaginaEstadisticas() {
             "resumen";
     }
 
+    const selectorAmbito =
+        esEstadisticasLocalesCampeonato()
+            ? ""
+            : pintarSelectorAmbitoEstadisticas();
+
     contenido.innerHTML = `
-        ${pintarSelectorAmbitoEstadisticas()}
+        ${selectorAmbito}
         ${pintarSelectorPestanasEstadisticas(pestanas)}
         <div id="panelEstadisticas">
             ${pintarPanelEstadisticas()}
