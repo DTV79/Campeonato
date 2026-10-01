@@ -753,11 +753,7 @@
         if (!esFinalizado()) return;
 
         const parametros = new URLSearchParams(window.location.search);
-        const esRankingGlobal =
-            parametros.get("pantalla") === "ranking" &&
-            ["1", "si", "true"].includes(
-                String(parametros.get("global") || "").toLowerCase()
-            );
+        const esRankingGlobal = parametros.get("pantalla") === "ranking";
 
         /*
            finalizado.js observa cambios de la página y vuelve a ejecutar
@@ -1351,11 +1347,7 @@ const ultimo = finales.at(-1) || partidos.at(-1);
 
     function configurarRankingNavegacionFinal() {
         const parametros = new URLSearchParams(window.location.search);
-        const esRankingGlobal =
-            parametros.get("pantalla") === "ranking" &&
-            ["1", "si", "true"].includes(
-                String(parametros.get("global") || "").toLowerCase()
-            );
+        const esRankingGlobal = parametros.get("pantalla") === "ranking";
 
         /*
            El campeonato finalizado conserva su navegación propia,
