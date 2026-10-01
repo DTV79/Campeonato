@@ -39,6 +39,10 @@ export function renderError(mensaje, reintentar = true) {
 }
 
 export function renderLogin(jugadores = [], mensaje = "") {
+    const opciones = jugadores.map(j => `
+        <option value="${esc(j.id)}">${esc(j.nombre)}</option>
+    `).join("");
+
     app.innerHTML = `
         <section class="loginCard">
             <a class="volver" href="index.html">← Sprint Pádel</a>
@@ -46,8 +50,8 @@ export function renderLogin(jugadores = [], mensaje = "") {
             <p class="eyebrow">SPRINT PÁDEL</p>
             <h1>Mi Zona</h1>
             <p class="intro">
-                Tu espacio personal para Teams. Consulta tus partidos y gestiona
-                únicamente las acciones que te correspondan.
+                Entra con tu PIN personal o activa tu acceso por primera vez con
+                el código de un solo uso que te facilite el administrador.
             </p>
 
             <form class="loginForm" data-form="login">
@@ -55,9 +59,7 @@ export function renderLogin(jugadores = [], mensaje = "") {
                     <span>Jugador</span>
                     <select name="jugador" required>
                         <option value="">Selecciona tu nombre</option>
-                        ${jugadores.map(j => `
-                            <option value="${esc(j.id)}">${esc(j.nombre)}</option>
-                        `).join("")}
+                        ${opciones}
                     </select>
                 </label>
 
@@ -82,8 +84,69 @@ export function renderLogin(jugadores = [], mensaje = "") {
                 <button class="btnPrimario" type="submit">Entrar a Mi Zona</button>
             </form>
 
+            <details class="altaPanel">
+                <summary>¿Es tu primera vez? Crear mi acceso</summary>
+
+                <form class="loginForm altaForm" data-form="activar">
+                    <label>
+                        <span>Jugador</span>
+                        <select name="jugador" required>
+                            <option value="">Selecciona tu nombre</option>
+                            ${opciones}
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Código de alta</span>
+                        <input
+                            name="codigo"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            placeholder="6 cifras"
+                            required
+                        >
+                    </label>
+
+                    <div class="dosCampos">
+                        <label>
+                            <span>Elige tu PIN</span>
+                            <input
+                                name="pin"
+                                type="password"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                maxlength="8"
+                                placeholder="4–8 cifras"
+                                required
+                            >
+                        </label>
+                        <label>
+                            <span>Repite tu PIN</span>
+                            <input
+                                name="pin2"
+                                type="password"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                maxlength="8"
+                                placeholder="4–8 cifras"
+                                required
+                            >
+                        </label>
+                    </div>
+
+                    <p class="mensajeForm" data-activar-mensaje></p>
+                    <button class="btnPrimario" type="submit">Crear mi acceso</button>
+                </form>
+
+                <small class="notaLogin">
+                    El código solo sirve una vez y caduca a las 48 horas.
+                </small>
+            </details>
+
             <small class="notaLogin">
-                El PIN es personal. No lo compartas con otros jugadores.
+                ¿Has olvidado tu PIN? Pide al administrador que restablezca tu acceso
+                y te genere un nuevo código.
             </small>
         </section>
     `;
@@ -100,7 +163,53 @@ export function renderZona(datos) {
                 <h1>Hola, ${esc(jugador.nombre || "Jugador")}</h1>
                 <p>Equipos, partidos y acciones pendientes de Teams.</p>
             </div>
-            <button class="btnSalir" type="button" data-action="salir">Salir</button>
+            <div class="zonaHeroAcciones">
+                <details class="seguridadZona">
+                    <summary>🔐 Seguridad</summary>
+                    <form class="formAccion" data-form="cambiar-pin">
+                        <label>
+                            <span>PIN actual</span>
+                            <input
+                                name="pinActual"
+                                type="password"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                maxlength="8"
+                                required
+                            >
+                        </label>
+
+                        <div class="dosCampos">
+                            <label>
+                                <span>Nuevo PIN</span>
+                                <input
+                                    name="pinNuevo"
+                                    type="password"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    maxlength="8"
+                                    required
+                                >
+                            </label>
+                            <label>
+                                <span>Repite el nuevo PIN</span>
+                                <input
+                                    name="pinNuevo2"
+                                    type="password"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    maxlength="8"
+                                    required
+                                >
+                            </label>
+                        </div>
+
+                        <button class="btnPrimario" type="submit">Cambiar PIN</button>
+                        <p class="mensajeForm" data-form-mensaje></p>
+                    </form>
+                </details>
+                <button class="btnSalir" type="button" data-action="salir">Salir</button>
+            </div>
         </section>
 
         <section class="zonaContenido">
