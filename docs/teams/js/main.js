@@ -1,7 +1,8 @@
 import {
+    cargarConvocatoriaTeams,
     cargarDetalleTeams,
     cargarEdicionesTeams
-} from "./api.js?v=20261001-1910";
+} from "./api.js?v=20261001-1930";
 
 import {
     renderDetalleTeams,
@@ -28,10 +29,17 @@ async function iniciarTeams() {
     estado.teamId = parametros.get("teams") || null;
 
     try {
-        const [detalle, ediciones] = await Promise.all([
+        const [detalle, ediciones, convocatoria] = await Promise.all([
             cargarDetalleTeams(estado.teamId),
-            cargarEdicionesTeams()
+            cargarEdicionesTeams(),
+            cargarConvocatoriaTeams(estado.teamId)
         ]);
+
+        if (detalle) {
+            detalle.convocatoria = convocatoria?.personas || [];
+            detalle.asignacion_predeterminada =
+                convocatoria?.asignacion_predeterminada || null;
+        }
 
         estado.detalle = detalle;
         estado.ediciones = ediciones;
@@ -59,10 +67,17 @@ async function gestionarCambioEdicion(evento) {
     boton.disabled = true;
 
     try {
-        const detalle = await cargarDetalleTeams(teamId);
+        const [detalle, convocatoria] = await Promise.all([
+            cargarDetalleTeams(teamId),
+            cargarConvocatoriaTeams(teamId)
+        ]);
         if (!detalle) {
             throw new Error("La edición seleccionada no está disponible.");
         }
+
+        detalle.convocatoria = convocatoria?.personas || [];
+        detalle.asignacion_predeterminada =
+            convocatoria?.asignacion_predeterminada || null;
 
         estado.teamId = teamId;
         estado.detalle = detalle;
