@@ -116,14 +116,21 @@
                 <p>Los campeonatos se conservan por edición.</p>
             </div>
             <div class="portalDosColumnas">
-                <article class="portalArea grande portalAreaCampeonatos">
+                <button
+                    type="button"
+                    class="portalArea grande portalAreaCampeonatos"
+                    id="portalToggleCampeonatos"
+                    data-toggle-campeonatos
+                    aria-expanded="false"
+                    aria-controls="portalListaCampeonatos"
+                >
                     <i>🏆</i>
-                    <span><b>Campeonatos</b><small>Abre directamente una edición concreta</small></span>
-                    <em>↓</em>
-                </article>
+                    <span><b>Campeonatos</b><small>Elige la edición que quieres consultar</small></span>
+                    <em class="portalChevronCampeonatos">⌄</em>
+                </button>
                 <button class="portalArea grande" data-portal-href="teams.html"><i>⚔️</i><span><b>Teams</b><small>Copa por equipos, enfrentamientos y marcador</small></span><em>→</em></button>
             </div>
-            <div id="portalListaCampeonatos" class="portalListaCampeonatos" aria-live="polite">
+            <div id="portalListaCampeonatos" class="portalListaCampeonatos oculto" aria-live="polite">
                 <div class="portalEdicionCargando">Cargando campeonatos…</div>
             </div>
         </section>
