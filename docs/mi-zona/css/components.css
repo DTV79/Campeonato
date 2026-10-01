@@ -661,3 +661,79 @@
     text-align: center;
     font-size: 12px;
 }
+
+.altaPanel {
+    margin-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 14px;
+}
+
+.altaPanel > summary {
+    cursor: pointer;
+    color: #bfdbfe;
+    font-size: 11px;
+    font-weight: 800;
+    list-style: none;
+}
+
+.altaPanel > summary::-webkit-details-marker { display: none; }
+
+.altaPanel > summary::before {
+    content: "＋";
+    display: inline-block;
+    width: 18px;
+    color: var(--azul);
+}
+
+.altaPanel[open] > summary::before {
+    content: "−";
+}
+
+.altaForm {
+    margin-top: 14px;
+    padding: 14px;
+    border: 1px solid rgba(96,165,250,.18);
+    border-radius: 12px;
+    background: rgba(37,99,235,.05);
+}
+
+.zonaHeroAcciones {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.seguridadZona {
+    position: relative;
+}
+
+.seguridadZona > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: #152737;
+    color: #dbeafe;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.seguridadZona > summary::-webkit-details-marker { display: none; }
+
+.seguridadZona[open] {
+    z-index: 10;
+}
+
+.seguridadZona .formAccion {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 20;
+    width: min(360px, calc(100vw - 28px));
+    padding: 14px;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: #0d1b27;
+    box-shadow: var(--sombra);
+}
