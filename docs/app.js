@@ -2139,10 +2139,7 @@ function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
     if (hayPreparacion) {
         setText("portalAhoraEtiqueta", "EN PREPARACIÓN");
         setText("portalAhoraTitulo", "Próximamente en Sprint Pádel");
-        setText(
-            "portalAhoraTexto",
-            "Hay competiciones en preparación o con convocatoria abierta."
-        );
+        setText("portalAhoraTexto", "");
         return;
     }
 
