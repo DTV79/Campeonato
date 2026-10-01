@@ -1,0 +1,190 @@
+@media (max-width: 860px) {
+    .globalTopbar nav {
+        display: none;
+    }
+
+    .teamsPagina {
+        width: min(100% - 28px, 760px);
+        padding-top: 30px;
+        padding-bottom: 96px;
+    }
+
+    .plantillasGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .edicionesLista {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bottomNav {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 60;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        min-height: 66px;
+        padding: 6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        background: rgba(5, 15, 25, 0.94);
+        backdrop-filter: blur(16px);
+    }
+
+    .navBtn {
+        display: grid;
+        justify-items: center;
+        align-content: center;
+        gap: 2px;
+        min-width: 0;
+        border-radius: 11px;
+        color: var(--texto-tenue);
+    }
+
+    .navBtn span {
+        font-size: 17px;
+    }
+
+    .navBtn small {
+        font-size: 8px;
+        font-weight: 700;
+    }
+
+    .navBtn.activo {
+        background: rgba(56, 189, 248, 0.08);
+        color: #7dd3fc;
+    }
+}
+
+@media (max-width: 640px) {
+    .globalTopbar {
+        min-height: 56px;
+        padding: 0 16px;
+    }
+
+    .teamsHeroFila {
+        display: grid;
+        gap: 14px;
+    }
+
+    .teamsHero h1 {
+        font-size: 34px;
+    }
+
+    .tituloBloque {
+        display: block;
+    }
+
+    .tituloBloque p {
+        margin-top: 5px;
+        text-align: left;
+    }
+
+    .marcadorCabecera {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .marcadorDuelo {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 8px;
+        padding: 25px 13px;
+    }
+
+    .marcadorEquipo {
+        display: block;
+    }
+
+    .marcadorEquipoB {
+        text-align: right;
+    }
+
+    .marcadorEquipo .puntoEquipo {
+        margin-bottom: 8px;
+    }
+
+    .marcadorEquipoB .puntoEquipo {
+        margin-left: auto;
+    }
+
+    .marcadorEquipo strong {
+        font-size: 16px;
+        overflow-wrap: anywhere;
+    }
+
+    .marcadorEquipo > div > span {
+        font-size: 9px;
+    }
+
+    .marcadorCentro {
+        min-width: auto;
+        gap: 5px;
+    }
+
+    .marcadorNumero {
+        font-size: 42px;
+    }
+
+    .marcadorSeparador {
+        font-size: 20px;
+    }
+
+    .partidoCabecera {
+        align-items: flex-start;
+    }
+
+    .partidoParejas {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .versus {
+        text-align: center;
+    }
+
+    .parejaB {
+        text-align: left;
+        border-right: 1px solid rgba(255, 255, 255, 0.09);
+        border-left: 3px solid var(--equipo-color, var(--acento));
+    }
+
+    .setsPartido {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding-bottom: 2px;
+        scrollbar-width: thin;
+    }
+
+    .setCaja {
+        min-width: 88px;
+    }
+
+    .edicionesLista {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .teamsPagina {
+        width: calc(100% - 20px);
+    }
+
+    .partidoCard {
+        padding: 14px;
+    }
+
+    .partidoCabecera {
+        display: grid;
+        gap: 9px;
+    }
+
+    .estadoPartido {
+        width: fit-content;
+    }
+
+    .avisoResultado {
+        align-items: flex-start;
+    }
+}
