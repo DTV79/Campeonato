@@ -198,38 +198,20 @@ function obtenerBotonesNav() {
 
 
 function activarPaginaActual() {
-    const archivo =
-        window.location.pathname
-            .split("/")
-            .pop()
-            .toLowerCase() ||
-        "index.html";
+    const archivo = window.location.pathname.split("/").pop().toLowerCase() || "index.html";
+    const parametros = new URLSearchParams(window.location.search);
+    const pantalla = String(parametros.get("pantalla") || "").toLowerCase();
 
-    const mapa = {
-        "index.html": "inicio",
-        "historia.html": "inicio",
-        "normas.html": "competiciones",
-        "campeones.html": "inicio",
-        "mi-zona.html": "mizone",
-        "index.html?pantalla=ranking&global=1": "ranking",
-        "estadisticas.html": "estadisticas"
-    };
+    let actual = "";
+    if (archivo === "estadisticas.html") actual = "estadisticas";
+    else if (archivo === "mi-zona.html") actual = "mizone";
+    else if (archivo === "index.html" && pantalla === "ranking") actual = "ranking";
+    else if (archivo === "index.html") actual = "inicio";
 
-    const actual =
-        mapa[archivo] || "";
-
-    document
-        .querySelectorAll(
-            ".bottomNav .navBtn"
-        )
-        .forEach(boton => {
-            boton.classList.toggle(
-                "navActivo",
-                boton.dataset.nav === actual
-            );
-        });
+    document.querySelectorAll(".bottomNav .navBtn").forEach(boton => {
+        boton.classList.toggle("navActivo", boton.dataset.nav === actual);
+    });
 }
-
 
 function esWebPreviaNav(config) {
     const estado = normalizarNav(
