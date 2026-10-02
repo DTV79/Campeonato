@@ -15,16 +15,20 @@ Módulo privado e independiente dentro de Sprint Pádel.
 - `mi-zona/js/render/convocatorias.js`: convocatorias.
 - `mi-zona/js/render/preparacion.js`: capitanes e inicio.
 - `mi-zona/js/render/teams.js`: tarjeta de competición y plantilla.
-- `mi-zona/js/render/partidos.js`: partidos y acciones asociadas.
-- `mi-zona/js/actions.js`: acciones del jugador/capitán.
+- `mi-zona/js/render/partidos.js`: coordinador de la tarjeta de partido.
+- `mi-zona/js/render/accion-alineacion.js`: presentación de parejas.
+- `mi-zona/js/render/accion-horario.js`: propuestas y gestión de fecha.
+- `mi-zona/js/render/accion-resultado.js`: envío y confirmación del resultado.
+- `mi-zona/js/render/partido-resultado.js`: marcador mostrado en el partido.
+- `mi-zona/js/actions.js`: eventos y llamadas de las acciones del jugador/capitán.
 - `mi-zona/js/main.js`: ciclo de vida.
 - `mi-zona/css/*`: estilos separados por responsabilidad.
 
 ## Criterio de arquitectura
 
-`render.js` no contiene ya toda la interfaz. Actúa únicamente como coordinador
-y delega cada bloque funcional en su módulo. Los módulos de dominio y las
-acciones siguen separados del pintado de la interfaz.
+Los coordinadores no concentran ya toda la interfaz. Cada bloque funcional
+vive en un módulo propio, manteniendo las reglas de dominio, el acceso a datos
+y los eventos separados del renderizado.
 
 ## Permisos
 
