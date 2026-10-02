@@ -16,6 +16,7 @@ export const RPC = Object.freeze({
     preparacion: "web_teams_preparacion",
     votarCapitan: "web_teams_votar_capitan",
     capitanListo: "web_teams_capitan_listo",
+    campeonatos: "web_mi_zona_campeonatos",
     disponibilidad: "web_teams_cambiar_disponibilidad",
     alineacion: "web_teams_guardar_alineacion",
     proponerHorario: "web_teams_proponer_horario",
