@@ -27,9 +27,7 @@ const nodos = {
     convocatoria: document.getElementById("teamsConvocatoria"),
     marcador: document.getElementById("teamsMarcador"),
     plantillas: document.getElementById("teamsPlantillas"),
-    partidos: document.getElementById("teamsPartidos"),
-    ediciones: document.getElementById("teamsEdiciones"),
-    historial: document.querySelector(".teamsHistorial")
+    partidos: document.getElementById("teamsPartidos")
 };
 
 function mostrar(nodo, visible) {
@@ -126,7 +124,6 @@ export function renderDetalleTeams(detalle) {
     mostrar(nodos.marcador, !esPreparacion);
     mostrar(bloquePlantillas, !esPreparacion);
     mostrar(bloquePartidos, !esPreparacion);
-    mostrar(nodos.historial, !esPreparacion);
 
     if (esPreparacion) {
         renderPreparacion(detalle);
@@ -716,35 +713,4 @@ function htmlPuntuacionSet(sets, numero, lado) {
             </strong>
         </div>
     `;
-}
-
-export function renderEdicionesTeams(ediciones, activaId) {
-    if (!nodos.ediciones) return;
-
-    if (!Array.isArray(ediciones) || !ediciones.length) {
-        nodos.ediciones.innerHTML =
-            '<div class="vacio">Todavía no hay ediciones anteriores.</div>';
-        return;
-    }
-
-    nodos.ediciones.innerHTML = ediciones.map(edicion => {
-        const activa = edicion?.id === activaId;
-        const fecha = formatearFechaSolo(edicion?.fecha_inicio);
-
-        return `
-            <button
-                type="button"
-                class="edicionBoton${activa ? " activa" : ""}"
-                data-team-id="${escaparHtml(edicion?.id || "")}"
-                ${activa ? 'aria-current="page"' : ""}
-            >
-                <span>
-                    <small>${escaparHtml(etiquetaEstadoGeneral(edicion?.estado))}</small>
-                    <strong>${escaparHtml(edicion?.nombre || "Teams")}</strong>
-                </span>
-                <em>${escaparHtml(fecha || "")}</em>
-                <b>${activa ? "Actual" : "Ver →"}</b>
-            </button>
-        `;
-    }).join("");
 }
