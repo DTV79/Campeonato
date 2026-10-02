@@ -53,6 +53,19 @@ export const api = {
     logout: token => rpc(RPC.logout, { p_token: token }),
     zona: token => rpc(RPC.zona, { p_token: token }),
     convocatorias: token => rpc(RPC.convocatorias, { p_token: token }),
+    preparacion: token => rpc(RPC.preparacion, { p_token: token }),
+    votarCapitan: (token, teamId, candidatoId) =>
+        rpc(RPC.votarCapitan, {
+            p_token: token,
+            p_team_id: teamId,
+            p_candidato_id: candidatoId
+        }),
+    capitanListo: (token, teamId, listo) =>
+        rpc(RPC.capitanListo, {
+            p_token: token,
+            p_team_id: teamId,
+            p_listo: listo
+        }),
     responderConvocatoria: (token, teamId, estado, equipoId = null) =>
         rpc(RPC.responderConvocatoria, {
             p_token: token,
