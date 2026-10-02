@@ -195,9 +195,26 @@ function renderCaracteristicas(detalle) {
         detalle?.computa_isp ? "ISP" : ""
     ].filter(Boolean);
 
+    const capitanes = {
+        administrador: "Los elige el administrador",
+        predefinidos: "Definidos de antemano",
+        eleccion_equipo: "Los elige cada equipo",
+        sorteo: "Sorteo entre los jugadores"
+    }[detalle?.modo_designacion_capitanes] || "Los elige el administrador";
+
+    const inicioTeams = {
+        administrador: "Lo inicia el administrador",
+        capitanes: "Se inicia cuando ambos capitanes estén preparados",
+        programado: detalle?.inicio_programado_at
+            ? `Programado · ${new Date(detalle.inicio_programado_at).toLocaleString("es-ES")}`
+            : "Inicio programado"
+    }[detalle?.modo_inicio_teams] || "Lo inicia el administrador";
+
     const items = [
         ["Formato", modalidad],
         ["Formación", formacion],
+        ["Capitanes", capitanes],
+        ["Inicio", inicioTeams],
         ["Plantillas", `${Number(detalle?.jugadores_por_equipo || 0)} jugadores por equipo${Number(detalle?.reservas_por_equipo || 0) ? ` + ${Number(detalle.reservas_por_equipo)} reserva(s)` : ""}`],
         ["Participación", repeticionJugador],
         ["Parejas", parejas],
