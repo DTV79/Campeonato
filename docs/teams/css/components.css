@@ -827,3 +827,99 @@
     font-weight:800;
     text-align:right;
 }
+
+.propuestasPartidoPublico{
+    display:grid;
+    gap:8px;
+    margin:10px 0 12px;
+}
+
+.propuestaPartidoPublico{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:14px;
+    padding:11px 12px;
+    border:1px solid rgba(125,211,252,.16);
+    border-radius:11px;
+    background:rgba(14,35,50,.72);
+}
+
+.propuestaPartidoFecha{
+    display:grid;
+    gap:2px;
+}
+
+.propuestaPartidoFecha small{
+    color:#7dd3fc;
+    font-size:8px;
+    font-weight:900;
+    letter-spacing:.08em;
+}
+
+.propuestaPartidoFecha strong{
+    font-size:12px;
+}
+
+.propuestaPartidoFecha span{
+    color:var(--texto-tenue);
+    font-size:9px;
+}
+
+.aceptacionEquiposHorario{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    gap:6px;
+}
+
+.aceptacionEquiposHorario > span{
+    display:grid;
+    grid-template-columns:auto auto;
+    align-items:center;
+    gap:2px 5px;
+    min-width:94px;
+    padding:6px 8px;
+    border:1px solid rgba(248,250,252,.09);
+    border-radius:8px;
+    background:rgba(255,255,255,.025);
+}
+
+.aceptacionEquiposHorario i{
+    color:#94a3b8;
+    font-size:10px;
+    font-style:normal;
+}
+
+.aceptacionEquiposHorario b{
+    overflow:hidden;
+    font-size:9px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.aceptacionEquiposHorario small{
+    grid-column:2;
+    color:#94a3b8;
+    font-size:8px;
+}
+
+.aceptacionEquiposHorario > span.aceptado{
+    border-color:rgba(74,222,128,.24);
+    background:rgba(74,222,128,.07);
+}
+
+.aceptacionEquiposHorario > span.aceptado i,
+.aceptacionEquiposHorario > span.aceptado small{
+    color:#86efac;
+}
+
+@media(max-width:620px){
+    .propuestaPartidoPublico{
+        grid-template-columns:1fr;
+    }
+
+    .aceptacionEquiposHorario{
+        justify-content:flex-start;
+    }
+}
