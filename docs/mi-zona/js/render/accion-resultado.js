@@ -1,4 +1,4 @@
-import { esc, puedeIntroducirResultado } from "../model.js?v=20261002-1620";
+import { equiposPorLado, esc, puedeIntroducirResultado } from "../model.js?v=20261002-1635";
 
 export function htmlAccionResultado(team, partido) {
     if (!puedeIntroducirResultado(partido)) return "";
