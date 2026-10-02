@@ -2013,6 +2013,102 @@ function normalizarEstadoPortal(valor) {
         .replace(/[\u0300-\u036f]/g, "");
 }
 
+function formatearFechaHoraPortal(fechaISO) {
+    if (!fechaISO) return "";
+
+    const fecha = new Date(fechaISO);
+    if (Number.isNaN(fecha.getTime())) return "";
+
+    return fecha.toLocaleString("es-ES", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function pintarProximoPartidoTeamsPortal(team) {
+    const contenedor =
+        document.getElementById("portalTeamsProximo");
+
+    if (!contenedor) return;
+
+    const partido = team?.proximo_partido;
+
+    if (!partido || team?.estado !== "en_curso") {
+        contenedor.innerHTML = "";
+        contenedor.classList.add("oculto");
+        return;
+    }
+
+    const parejas = Array.isArray(partido?.parejas)
+        ? partido.parejas
+        : [];
+
+    const parejaA = parejas.find(item => item?.lado === "A");
+    const parejaB = parejas.find(item => item?.lado === "B");
+
+    const fechaProgramada =
+        formatearFechaHoraPortal(partido?.fecha_hora);
+    const fechaPropuesta =
+        !fechaProgramada
+            ? formatearFechaHoraPortal(partido?.fecha_propuesta)
+            : "";
+
+    const estado = normalizarEstadoPortal(partido?.estado);
+    let detalle = "Pendiente de acordar fecha";
+
+    if (estado.includes("ALINEACION")) {
+        detalle = "Parejas pendientes de presentar";
+    } else if (estado.includes("CONCERT")) {
+        detalle = fechaPropuesta
+            ? "Fecha propuesta"
+            : "Acordando fecha";
+    } else if (estado.includes("PROGRAM")) {
+        detalle = "Partido programado";
+    } else if (estado.includes("REVEL")) {
+        detalle = "Parejas publicadas";
+    }
+
+    const pista =
+        partido?.pista ||
+        partido?.pista_propuesta ||
+        "";
+
+    contenedor.innerHTML = `
+        <div class="portalTeamsProximoCabecera">
+            <span>PRÓXIMO PARTIDO</span>
+            <b>Partido ${Number(partido?.numero || 0)}</b>
+        </div>
+
+        ${parejaA?.pareja && parejaB?.pareja ? `
+            <strong class="portalTeamsProximoParejas">
+                ${escaparHTML(parejaA.pareja)}
+                <i>vs</i>
+                ${escaparHTML(parejaB.pareja)}
+            </strong>
+        ` : ""}
+
+        <div class="portalTeamsProximoFecha">
+            ${fechaProgramada
+                ? `<strong>📅 ${escaparHTML(fechaProgramada)}</strong>`
+                : fechaPropuesta
+                    ? `<strong>📅 ${escaparHTML(fechaPropuesta)}</strong>`
+                    : `<strong>${escaparHTML(detalle)}</strong>`
+            }
+            ${fechaProgramada || fechaPropuesta
+                ? `<small>${escaparHTML(detalle)}</small>`
+                : ""}
+            ${pista
+                ? `<small>📍 ${escaparHTML(pista)}</small>`
+                : ""}
+        </div>
+    `;
+
+    contenedor.classList.remove("oculto");
+}
+
 function nombreCampeonatoPortal(item) {
     const nombre = String(item?.nombre || "").trim();
     const anio = Number(item?.anio || 0);
@@ -2373,6 +2469,7 @@ async function pintarPortalGeneral() {
                         (team.apuntados || 0) + " apuntados · " +
                         (team.respuestas || 0) + " respuestas recibidas"
                     );
+                    pintarProximoPartidoTeamsPortal(team);
                 } else if (enDraft) {
                     setText("portalTeamsEstado", "formación de equipos");
                     setText("portalTeamsMarcador", "Equipos en formación");
@@ -2380,6 +2477,7 @@ async function pintarPortalGeneral() {
                         "portalTeamsResumen",
                         "La competición está preparando sus plantillas."
                     );
+                    pintarProximoPartidoTeamsPortal(team);
                 } else {
                     setText(
                         "portalTeamsEstado",
@@ -2416,11 +2514,13 @@ async function pintarPortalGeneral() {
                         (team.numero_partidos || 0) +
                         " partidos jugados"
                     );
+
+                    pintarProximoPartidoTeamsPortal(team);
                 }
 
                 card?.classList.remove("sinTeams");
             } else {
-                setText("portalTeamsNombre","Próximo Teams");setText("portalTeamsEstado","sin competición activa");setText("portalTeamsMarcador","—");setText("portalTeamsResumen","Cuando haya un Teams activo aparecerá aquí.");card?.classList.add("sinTeams");
+                setText("portalTeamsNombre","Próximo Teams");setText("portalTeamsEstado","sin competición activa");setText("portalTeamsMarcador","—");setText("portalTeamsResumen","Cuando haya un Teams activo aparecerá aquí.");pintarProximoPartidoTeamsPortal(null);card?.classList.add("sinTeams");
             }
         }
     } catch(error){ console.warn("No se pudo cargar el resumen de Teams",error); }
