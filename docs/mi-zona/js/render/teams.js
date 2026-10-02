@@ -1,5 +1,5 @@
 import { colorSeguro, esc, esCapitan } from "../model.js?v=20261002-1530";
-import { htmlPartido } from "./partidos.js?v=20261002-1620";
+import { htmlPartido } from "./partidos.js?v=20261002-1635";
 
 export function htmlTeam(team, jugador) {
     const equipo = team?.equipo || {};
