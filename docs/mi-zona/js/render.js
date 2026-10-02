@@ -17,6 +17,8 @@ import {
     resultadoVisible
 } from "./model.js?v=20261001-1945";
 
+import { htmlProximaAccion } from "./proxima-accion.js?v=20261002-1450";
+
 const app = document.getElementById("miZonaApp");
 
 export function renderCargando(texto = "Cargando Mi Zona…") {
@@ -272,6 +274,8 @@ export function renderZona(datos) {
             </div>
         </section>
 
+        ${htmlProximaAccion({ jugador, teams, convocatorias, preparacion })}
+
         <section class="zonaContenido">
             ${convocatorias.length ? htmlConvocatorias(convocatorias) : ""}
             ${preparacion.length ? htmlPreparacionTeams(preparacion) : ""}
@@ -286,7 +290,7 @@ export function renderZona(datos) {
 
 function htmlConvocatorias(convocatorias) {
     return `
-        <section class="convocatoriasZona">
+        <section class="convocatoriasZona" id="zona-convocatorias">
             <div class="convocatoriasZonaTitulo">
                 <div>
                     <span>CONVOCATORIA</span>
@@ -423,7 +427,7 @@ function formatoFechaConvocatoria(valor) {
 
 function htmlPreparacionTeams(lista) {
     return `
-        <section class="preparacionTeamsZona">
+        <section class="preparacionTeamsZona" id="zona-preparacion">
             <div class="convocatoriasZonaTitulo">
                 <div>
                     <span>PREPARACIÓN</span>
@@ -567,7 +571,7 @@ function htmlTeam(team, jugador) {
     const partidos = Array.isArray(team?.partidos) ? team.partidos : [];
 
     return `
-        <article class="teamCard" style="--equipo-color:${color}">
+        <article class="teamCard" id="zona-team-${esc(team.id)}" style="--equipo-color:${color}">
             <header class="teamCabecera">
                 <div>
                     <span class="teamEstado">${esc(String(team?.estado || "").replaceAll("_", " "))}</span>
@@ -669,7 +673,7 @@ function htmlPartido(team, partido, jugador) {
     const rivalPuedeConfirmar = resultadoPendiente && partido?.yo_juego && !introducidoPorMiEquipo;
 
     return `
-        <article class="partidoZona" data-partido-id="${esc(partido.id)}">
+        <article class="partidoZona" id="zona-partido-${esc(partido.id)}" data-partido-id="${esc(partido.id)}">
             <div class="partidoZonaCabecera">
                 <div>
                     <small>PARTIDO ${Number(partido?.numero || 0)}</small>
