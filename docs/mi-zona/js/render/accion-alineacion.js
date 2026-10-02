@@ -1,4 +1,4 @@
-import { esc, puedePresentar } from "../model.js?v=20261002-1620";
+import { esc, esCapitan, puedePresentar } from "../model.js?v=20261002-1635";
 
 export function htmlAccionAlineacion(team, partido) {
     if (!esCapitan(team)) return "";
