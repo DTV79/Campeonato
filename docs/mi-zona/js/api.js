@@ -1,4 +1,4 @@
-import { RPC, SUPABASE_KEY, SUPABASE_URL } from "./config.js?v=20261002-0835";
+import { RPC, SUPABASE_KEY, SUPABASE_URL } from "./config.js?v=20261002-1145";
 
 async function rpc(nombre, body = {}) {
     const respuesta = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${nombre}`, {
