@@ -3,7 +3,7 @@ import { htmlProximaAccion } from "./proxima-accion.js?v=20261002-1530";
 import { renderCargando, renderError, renderLogin } from "./render/core.js?v=20261002-1530";
 import { htmlConvocatorias } from "./render/convocatorias.js?v=20261002-1530";
 import { htmlPreparacionTeams } from "./render/preparacion.js?v=20261002-1530";
-import { htmlTeam } from "./render/teams.js?v=20261002-1620";
+import { htmlTeam } from "./render/teams.js?v=20261002-1635";
 
 const app = document.getElementById("miZonaApp");
 
