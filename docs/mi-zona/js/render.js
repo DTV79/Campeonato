@@ -619,12 +619,18 @@ function htmlPlantilla(team, jugador) {
                     <span>PLANTILLA</span>
                     <h3>${esc(team?.equipo?.nombre || "Tu equipo")}</h3>
                 </div>
-                <small>${capitan ? "Gestionas la disponibilidad" : "Tu disponibilidad"}</small>
+                <small>${team?.estado === "finalizado"
+                    ? "Edición finalizada"
+                    : capitan
+                        ? "Gestionas la disponibilidad"
+                        : "Tu disponibilidad"}</small>
             </div>
 
             <div class="plantillaMiZona">
                 ${companeros.map(miembro => {
-                    const puedeCambiar = capitan || miembro.id === jugador?.id;
+                    const puedeCambiar =
+                        team?.estado !== "finalizado" &&
+                        (capitan || miembro.id === jugador?.id);
                     return `
                         <div class="miembroFila">
                             <div>
