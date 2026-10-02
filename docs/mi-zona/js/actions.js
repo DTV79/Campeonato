@@ -1,4 +1,4 @@
-import { api } from "./api.js?v=20261001-1945";
+import { api } from "./api.js?v=20261002-0835";
 import { fechaIsoDesdeInput } from "./model.js?v=20261001-1945";
 import { borrarToken, obtenerToken } from "./session.js?v=20261001-1945";
 
