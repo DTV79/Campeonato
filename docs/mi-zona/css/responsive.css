@@ -181,6 +181,7 @@
     }
 
     .seguridadZona > summary,
+    .btnCompeticionDirecta,
     .btnSalir {
         width: 100%;
         text-align: center;
