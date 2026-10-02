@@ -97,6 +97,28 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
         }
 
         try {
+            if (accion === "votar-capitan") {
+                boton.disabled = true;
+                await api.votarCapitan(
+                    token,
+                    boton.dataset.teamId,
+                    boton.dataset.candidatoId
+                );
+                await recargar();
+                return;
+            }
+
+            if (accion === "capitan-listo") {
+                boton.disabled = true;
+                await api.capitanListo(
+                    token,
+                    boton.dataset.teamId,
+                    boton.dataset.listo === "1"
+                );
+                await recargar();
+                return;
+            }
+
             if (accion === "convocatoria") {
                 const contenedor = boton.closest(".convocatoriaCard");
                 contenedor?.querySelectorAll('[data-action="convocatoria"]').forEach(b => {
@@ -167,7 +189,7 @@ export function enlazarZona({ app, recargar, cerrarSesion }) {
         } catch (error) {
             boton.disabled = false;
             boton.textContent = boton.dataset.textoOriginal || boton.textContent;
-            const contenedor = boton.closest(".accionPanel,.confirmacionResultado,.miembroFila,.convocatoriaCard");
+            const contenedor = boton.closest(".accionPanel,.confirmacionResultado,.miembroFila,.convocatoriaCard,.preparacionTeamCard");
             let aviso = contenedor?.querySelector(".errorAccion");
             if (!aviso && contenedor) {
                 aviso = document.createElement("p");
