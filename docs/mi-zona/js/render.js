@@ -188,15 +188,42 @@ export function renderZona(datos) {
     const teams = Array.isArray(datos?.teams) ? datos.teams : [];
     const convocatorias = Array.isArray(datos?.convocatorias) ? datos.convocatorias : [];
     const preparacion = Array.isArray(datos?.preparacion) ? datos.preparacion : [];
+    const campeonatos = Array.isArray(datos?.campeonatos) ? datos.campeonatos : [];
+
+    const teamDirecto = [...preparacion,...teams].find(team =>
+        !["finalizado","cancelado"].includes(String(team?.estado || "").toLowerCase())
+    );
+
+    const accesosDirectos = [
+        teamDirecto?.id
+            ? {
+                href: "teams.html?team=" + encodeURIComponent(teamDirecto.id),
+                icono: "⚔️",
+                texto: "Ver Teams"
+              }
+            : null,
+        campeonatos[0]?.codigo
+            ? {
+                href: "index.html?portal=0&campeonato=" + encodeURIComponent(campeonatos[0].codigo),
+                icono: "🏆",
+                texto: "Ver campeonato"
+              }
+            : null
+    ].filter(Boolean);
 
     app.innerHTML = `
         <section class="zonaHero">
             <div>
                 <p class="eyebrow">MI ZONA</p>
                 <h1>Hola, ${esc(jugador.nombre || "Jugador")}</h1>
-                <p>Equipos, partidos y acciones pendientes de Teams.</p>
+                <p>Tus competiciones, partidos y acciones pendientes.</p>
             </div>
             <div class="zonaHeroAcciones">
+                ${accesosDirectos.map(acceso => `
+                    <a class="btnCompeticionDirecta" href="${esc(acceso.href)}">
+                        ${acceso.icono} ${esc(acceso.texto)}
+                    </a>
+                `).join("")}
                 <details class="seguridadZona">
                     <summary>🔐 Seguridad</summary>
                     <form class="formAccion" data-form="cambiar-pin">
