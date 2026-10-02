@@ -39,6 +39,18 @@ async function iniciarTeams() {
             detalle.convocatoria = convocatoria?.personas || [];
             detalle.asignacion_predeterminada =
                 convocatoria?.asignacion_predeterminada || null;
+            detalle.modo_designacion_capitanes =
+                convocatoria?.modo_designacion_capitanes || "administrador";
+            detalle.modo_inicio_teams =
+                convocatoria?.modo_inicio_teams || "administrador";
+            detalle.inicio_programado_at =
+                convocatoria?.inicio_programado_at || null;
+            detalle.modo_designacion_capitanes =
+                convocatoria?.modo_designacion_capitanes || "administrador";
+            detalle.modo_inicio_teams =
+                convocatoria?.modo_inicio_teams || "administrador";
+            detalle.inicio_programado_at =
+                convocatoria?.inicio_programado_at || null;
         }
 
         estado.detalle = detalle;
