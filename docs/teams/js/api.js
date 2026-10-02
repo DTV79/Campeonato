@@ -79,3 +79,13 @@ export async function cargarConvocatoriaTeams(teamId = null) {
         personas: Array.isArray(datos.personas) ? datos.personas : []
     };
 }
+
+
+export async function cargarHorariosTeams(teamId = null) {
+    const datos = await rpc(
+        TEAMS_CONFIG.rpcHorarios,
+        { p_team_id: teamId || null }
+    );
+
+    return Array.isArray(datos) ? datos : [];
+}
