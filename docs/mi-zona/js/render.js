@@ -824,12 +824,12 @@ function htmlAccionHorario(team, partido, jugador) {
         <details class="accionPanel" open>
             <summary>
                 <span>🗓️ Concertar partido</span>
-                <b>Cualquiera de los 4</b>
+                <b>1 aceptación por equipo</b>
             </summary>
 
             <div class="propuestasLista">
                 ${propuestas.length
-                    ? propuestas.map(p => htmlPropuesta(p, jugador)).join("")
+                    ? propuestas.map(p => htmlPropuesta(p, team, partido, jugador)).join("")
                     : '<div class="miniVacio">Todavía no hay propuestas de fecha.</div>'}
             </div>
 
@@ -851,9 +851,13 @@ function htmlAccionHorario(team, partido, jugador) {
     `;
 }
 
-function htmlPropuesta(propuesta, jugador) {
+function htmlPropuesta(propuesta, team, partido, jugador) {
     const respuesta = respuestaJugador(propuesta, jugador?.id);
-    const favorables = (propuesta?.respuestas || []).filter(r => r.disponible).length;
+    const respuestas = Array.isArray(propuesta?.respuestas) ? propuesta.respuestas : [];
+    const idsPropios = new Set((partido?.mi_alineacion || []).map(j => j?.id).filter(Boolean));
+    const idsRivales = new Set((partido?.alineacion_rival || []).map(j => j?.id).filter(Boolean));
+    const aceptaPropio = respuestas.some(r => r?.disponible === true && idsPropios.has(r?.id_jugador));
+    const aceptaRival = respuestas.some(r => r?.disponible === true && idsRivales.has(r?.id_jugador));
 
     return `
         <div class="propuestaHorario">
@@ -863,25 +867,39 @@ function htmlPropuesta(propuesta, jugador) {
                     ${propuesta?.pista ? "📍 " + esc(propuesta.pista) + " · " : ""}
                     Propone ${esc(propuesta?.propuesta_por_nombre || "un jugador")}
                 </span>
+                <div class="propuestaEquiposEstado">
+                    <span class="${aceptaPropio ? "aceptado" : ""}">
+                        ${aceptaPropio ? "✓" : "○"} ${esc(team?.equipo?.nombre || "Tu equipo")}
+                        <small>${aceptaPropio ? "Aceptada" : "Pendiente"}</small>
+                    </span>
+                    <span class="${aceptaRival ? "aceptado" : ""}">
+                        ${aceptaRival ? "✓" : "○"} ${esc(team?.rival?.nombre || "Rival")}
+                        <small>${aceptaRival ? "Aceptada" : "Pendiente"}</small>
+                    </span>
+                </div>
             </div>
             <div class="propuestaEstado">
-                <b>${favorables}/4 disponibles</b>
-                <div>
-                    <button
-                        type="button"
-                        class="btnMini ${respuesta?.disponible === true ? "activo" : ""}"
-                        data-action="responder-horario"
-                        data-propuesta-id="${esc(propuesta.id)}"
-                        data-disponible="1"
-                    >✓ Me viene bien</button>
-                    <button
-                        type="button"
-                        class="btnMini ${respuesta?.disponible === false ? "activo no" : ""}"
-                        data-action="responder-horario"
-                        data-propuesta-id="${esc(propuesta.id)}"
-                        data-disponible="0"
-                    >✕ No puedo</button>
-                </div>
+                ${aceptaPropio ? `
+                    <b class="equipoYaAcepto">Tu equipo ya ha aceptado esta fecha</b>
+                ` : `
+                    <b>Falta una aceptación de tu equipo</b>
+                    <div>
+                        <button
+                            type="button"
+                            class="btnMini ${respuesta?.disponible === true ? "activo" : ""}"
+                            data-action="responder-horario"
+                            data-propuesta-id="${esc(propuesta.id)}"
+                            data-disponible="1"
+                        >✓ Nos viene bien</button>
+                        <button
+                            type="button"
+                            class="btnMini ${respuesta?.disponible === false ? "activo no" : ""}"
+                            data-action="responder-horario"
+                            data-propuesta-id="${esc(propuesta.id)}"
+                            data-disponible="0"
+                        >✕ No puedo</button>
+                    </div>
+                `}
             </div>
         </div>
     `;
