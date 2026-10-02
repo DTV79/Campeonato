@@ -55,6 +55,8 @@ export function etiquetaEstadoPartido(partido) {
         pendiente_alineaciones: "Pendiente de parejas",
         alineaciones_listas: "Parejas preparadas",
         pendiente_programacion: "Pendiente de fecha",
+        revelado: "Parejas publicadas",
+        concertando: "Concertando fecha",
         programado: "Programado",
         pendiente_resultado: "Pendiente de resultado",
         pendiente_confirmacion: "Resultado provisional",
