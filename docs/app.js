@@ -2102,15 +2102,162 @@ async function cargarCampeonatosPublicosPortal() {
     }
 }
 
-function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
-    const estados = [
-        normalizarEstadoPortal(estadoCampeonato),
-        normalizarEstadoPortal(estadoTeams)
-    ].filter(Boolean);
+function etiquetaEstadoCampeonatoActual(estado) {
+    const normalizado = normalizarEstadoPortal(estado);
 
-    const esFinalizado = estado =>
-        estado.includes("FINALIZ") ||
-        estado.includes("CERRAD");
+    if (normalizado.includes("INSCRIP")) return "INSCRIPCIONES ABIERTAS";
+    if (normalizado.includes("PRETORNEO")) return "PRETORNEO";
+    if (normalizado.includes("EN_JUEGO") || normalizado.includes("EN JUEGO")) {
+        return "EN JUEGO";
+    }
+
+    return String(estado || "ACTUAL").replaceAll("_", " ").toUpperCase();
+}
+
+function resumenCampeonatoActual(item) {
+    const estado = normalizarEstadoPortal(item?.estado);
+    const inscritos = Number(item?.inscripciones || 0);
+    const jugados = Number(item?.jugados || 0);
+    const partidos = Number(item?.partidos || 0);
+
+    if (estado.includes("INSCRIP")) {
+        return `${inscritos} inscritos · Inscripciones abiertas`;
+    }
+
+    if (estado.includes("PRETORNEO")) {
+        return "La edición está en preparación.";
+    }
+
+    if (estado.includes("EN_JUEGO") || estado.includes("EN JUEGO")) {
+        return partidos
+            ? `${jugados} de ${partidos} partidos jugados`
+            : "La competición está en juego.";
+    }
+
+    return "";
+}
+
+function pintarCampeonatosActualesPortal(lista) {
+    const contenedor =
+        document.getElementById("portalCampeonatosActuales");
+
+    if (!contenedor) return [];
+
+    const campeonatos = Array.isArray(lista) ? lista : [];
+
+    contenedor.innerHTML = campeonatos.map(item => {
+        const codigo = String(item?.codigo_campeonato || "").trim();
+        const tipo = String(
+            item?.tipo_campeonato ||
+            item?.estructura_primera_fase ||
+            "Campeonato"
+        ).replaceAll("_", " ");
+        const fecha = item?.fecha_inicio
+            ? new Date(item.fecha_inicio + "T12:00:00").toLocaleDateString(
+                "es-ES",
+                {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                }
+            )
+            : "";
+        const lugar = String(item?.lugar || "").trim();
+        const partidos = Number(item?.partidos || 0);
+        const jugados = Number(item?.jugados || 0);
+
+        return `
+            <article class="portalCompeticionCard portalCampeonatoCard">
+                <div class="portalCardTipo">
+                    <span>🏆 CAMPEONATO</span>
+                    <b>${escaparHTML(etiquetaEstadoCampeonatoActual(item?.estado))}</b>
+                </div>
+
+                <h3>${escaparHTML(item?.nombre || "Campeonato Sprint Pádel")}</h3>
+
+                <p>${escaparHTML(resumenCampeonatoActual(item))}</p>
+
+                <div class="portalDatosCampeonato">
+                    <div>
+                        <small>Inscritos</small>
+                        <strong>${Number(item?.inscripciones || 0)}</strong>
+                    </div>
+                    <div>
+                        <small>Equipos</small>
+                        <strong>${Number(item?.equipos || 0)}</strong>
+                    </div>
+                    <div>
+                        <small>Partidos</small>
+                        <strong>${partidos}</strong>
+                    </div>
+                    <div>
+                        <small>Jugados</small>
+                        <strong>${partidos ? `${jugados}/${partidos}` : "—"}</strong>
+                    </div>
+                </div>
+
+                <div class="portalMetaCampeonato">
+                    ${fecha ? `<span>📅 ${escaparHTML(fecha)}</span>` : ""}
+                    ${lugar ? `<span>📍 ${escaparHTML(lugar)}</span>` : ""}
+                    <span>🏷️ ${escaparHTML(tipo)}</span>
+                </div>
+
+                <button
+                    type="button"
+                    class="portalBotonPrincipal"
+                    data-campeonato-codigo="${escaparAtributo(codigo)}"
+                >
+                    Entrar al campeonato
+                </button>
+            </article>
+        `;
+    }).join("");
+
+    return campeonatos;
+}
+
+async function cargarCampeonatosActualesPortal() {
+    try {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/web_campeonatos_actuales_portal`,
+            {
+                method: "POST",
+                cache: "no-store",
+                headers: {
+                    apikey: SUPABASE_PUBLISHABLE_KEY,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error(`Supabase HTTP ${respuesta.status}`);
+        }
+
+        const lista = await respuesta.json();
+        return pintarCampeonatosActualesPortal(lista);
+    } catch (error) {
+        console.warn(
+            "No se pudieron cargar los campeonatos actuales.",
+            error
+        );
+        return pintarCampeonatosActualesPortal([]);
+    }
+}
+
+function actualizarEstadoPortalAhora(estadosCampeonato, estadoTeams) {
+    const listaCampeonatos = Array.isArray(estadosCampeonato)
+        ? estadosCampeonato
+        : [estadosCampeonato];
+
+    const estados = [
+        ...listaCampeonatos,
+        estadoTeams
+    ]
+        .map(normalizarEstadoPortal)
+        .filter(Boolean);
 
     const esPreparacion = estado =>
         estado.includes("PREPAR") ||
@@ -2120,8 +2267,9 @@ function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
         estado.includes("INSCRIP");
 
     const hayEnJuego = estados.some(estado =>
-        !esFinalizado(estado) &&
-        !esPreparacion(estado)
+        !esPreparacion(estado) &&
+        !estado.includes("FINALIZ") &&
+        !estado.includes("CERRAD")
     );
 
     const hayPreparacion = estados.some(esPreparacion);
@@ -2140,19 +2288,13 @@ function actualizarEstadoPortalAhora(estadoCampeonato, estadoTeams) {
         setText("portalAhoraEtiqueta", "EN PREPARACIÓN");
         setText("portalAhoraTitulo", "Próximamente en Sprint Pádel");
         setText("portalAhoraTexto", "");
-        return;
     }
-
-    setText("portalAhoraEtiqueta", "FINALIZADAS");
-    setText("portalAhoraTitulo", "Últimas competiciones");
-    setText(
-        "portalAhoraTexto",
-        "Consulta las últimas competiciones ya finalizadas."
-    );
 }
 
 async function pintarPortalGeneral() {
     const config = obtenerConfiguracion();
+    const campeonatosActuales =
+        await cargarCampeonatosActualesPortal();
 
     const nombre = String(
         config.nombre_campeonato ||
@@ -2285,41 +2427,39 @@ async function pintarPortalGeneral() {
 
     await cargarCampeonatosPublicosPortal();
 
-    const estadoCampeonatoPortal = normalizarEstadoPortal(estado);
-    const estadoTeamsPortalNormalizado = normalizarEstadoPortal(estadoTeamsPortal);
-    const campeonatoFinalizado =
-        estadoCampeonatoPortal.includes("FINALIZ") ||
-        estadoCampeonatoPortal.includes("CERRAD");
+    const estadoTeamsPortalNormalizado =
+        normalizarEstadoPortal(estadoTeamsPortal);
     const teamsFinalizado =
         estadoTeamsPortalNormalizado.includes("FINALIZ") ||
         estadoTeamsPortalNormalizado.includes("CERRAD");
-    const hayCampeonatoActual = Boolean(estadoCampeonatoPortal) && !campeonatoFinalizado;
-    const hayTeamsActual = Boolean(estadoTeamsPortalNormalizado) && !teamsFinalizado;
-    const hayCompeticionActual = hayCampeonatoActual || hayTeamsActual;
+    const hayTeamsActual =
+        Boolean(estadoTeamsPortalNormalizado) &&
+        !teamsFinalizado;
+    const hayCampeonatoActual =
+        campeonatosActuales.length > 0;
+    const hayCompeticionActual =
+        hayCampeonatoActual || hayTeamsActual;
 
-    const cardCampeonatoPortal =
-        document.querySelector(".portalCampeonatoCard");
     const cardTeamsPortal =
         document.getElementById("portalTeamsActual");
+    const bloqueActualidad =
+        document.querySelector(".portalAhora");
+
+    cardTeamsPortal?.classList.toggle(
+        "oculto",
+        !hayTeamsActual
+    );
+    bloqueActualidad?.classList.toggle(
+        "oculto",
+        !hayCompeticionActual
+    );
 
     if (hayCompeticionActual) {
-        cardCampeonatoPortal?.classList.toggle(
-            "oculto",
-            !hayCampeonatoActual
-        );
-        cardTeamsPortal?.classList.toggle(
-            "oculto",
-            !hayTeamsActual
-        );
-    } else {
-        cardCampeonatoPortal?.classList.remove("oculto");
-        cardTeamsPortal?.classList.toggle(
-            "oculto",
-            !estadoTeamsPortalNormalizado
+        actualizarEstadoPortalAhora(
+            campeonatosActuales.map(item => item?.estado),
+            hayTeamsActual ? estadoTeamsPortal : ""
         );
     }
-
-    actualizarEstadoPortalAhora(estado, estadoTeamsPortal);
 
     document.body.classList.add("modoPortal");
     document.getElementById("portalSprintPadel")?.classList.remove("oculto");
