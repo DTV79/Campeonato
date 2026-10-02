@@ -49,9 +49,10 @@ function accionDeTeams(teams = []) {
 
         if (["revelado","concertando"].includes(estado) && partido?.yo_juego) {
             const propuestas = (partido?.propuestas || []).filter(p => p?.estado === "propuesta");
+            const miEquipoYaAcepto = propuestas.some(p => miEquipoAcepto(p, partido));
             const pendientes = propuestas.filter(p => !miEquipoAcepto(p, partido));
 
-            if (pendientes.length) {
+            if (pendientes.length && !miEquipoYaAcepto) {
                 return {
                     tipo: "pendiente",
                     icono: "🗓️",
@@ -190,7 +191,10 @@ function accionDeConvocatoria(convocatorias = []) {
             };
         }
 
-        if (!respuesta || respuesta === "pendiente") {
+        if (
+            !respuesta ||
+            (respuesta === "pendiente" && convocatoria?.origen !== "web")
+        ) {
             return {
                 tipo: "pendiente",
                 icono: "📝",
