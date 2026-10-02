@@ -923,3 +923,24 @@
         justify-content:flex-start;
     }
 }
+
+.partidoMeta .fechaPartidoDestacada{
+    flex-basis:100%;
+    width:fit-content;
+    padding:9px 12px;
+    border:1px solid rgba(56,189,248,.28);
+    border-radius:10px;
+    background:rgba(56,189,248,.09);
+    color:#e0f2fe;
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:-.015em;
+    line-height:1.15;
+}
+
+.propuestaPartidoFecha strong{
+    color:#e0f2fe;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:-.01em;
+}
