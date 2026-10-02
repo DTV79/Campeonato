@@ -2375,7 +2375,7 @@ function actualizarEstadoPortalAhora(estadosCampeonato, estadoTeams) {
         setText("portalAhoraTitulo", "Ahora en Sprint Pádel");
         setText(
             "portalAhoraTexto",
-            "Las competiciones activas, separadas y fáciles de seguir."
+            "Lo que se está jugando ahora."
         );
         return;
     }
@@ -2383,7 +2383,7 @@ function actualizarEstadoPortalAhora(estadosCampeonato, estadoTeams) {
     if (hayPreparacion) {
         setText("portalAhoraEtiqueta", "EN PREPARACIÓN");
         setText("portalAhoraTitulo", "Próximamente en Sprint Pádel");
-        setText("portalAhoraTexto", "");
+        setText("portalAhoraTexto", "Lo que se está jugando ahora.");
     }
 }
 
