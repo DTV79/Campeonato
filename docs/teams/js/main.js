@@ -1,26 +1,22 @@
 import {
     cargarConvocatoriaTeams,
-    cargarDetalleTeams,
-    cargarEdicionesTeams
+    cargarDetalleTeams
 } from "./api.js?v=20261002-0845";
 
 import {
     renderDetalleTeams,
-    renderEdicionesTeams,
     renderErrorTeams,
     renderSinTeams,
     mostrarCargandoTeams
-} from "./render.js?v=20261002-0845";
+} from "./render.js?v=20261002-1000";
 
 const estado = {
     detalle: null,
-    ediciones: [],
     teamId: null
 };
 
 document.addEventListener("DOMContentLoaded", iniciarTeams, { once: true });
 document.getElementById("teamsReintentar")?.addEventListener("click", iniciarTeams);
-document.getElementById("teamsEdiciones")?.addEventListener("click", gestionarCambioEdicion);
 
 async function iniciarTeams() {
     mostrarCargandoTeams();
@@ -29,9 +25,8 @@ async function iniciarTeams() {
     estado.teamId = parametros.get("teams") || null;
 
     try {
-        const [detalle, ediciones, convocatoria] = await Promise.all([
+        const [detalle, convocatoria] = await Promise.all([
             cargarDetalleTeams(estado.teamId),
-            cargarEdicionesTeams(),
             cargarConvocatoriaTeams(estado.teamId)
         ]);
 
@@ -45,67 +40,19 @@ async function iniciarTeams() {
                 convocatoria?.modo_inicio_teams || "administrador";
             detalle.inicio_programado_at =
                 convocatoria?.inicio_programado_at || null;
-            detalle.modo_designacion_capitanes =
-                convocatoria?.modo_designacion_capitanes || "administrador";
-            detalle.modo_inicio_teams =
-                convocatoria?.modo_inicio_teams || "administrador";
-            detalle.inicio_programado_at =
-                convocatoria?.inicio_programado_at || null;
         }
 
         estado.detalle = detalle;
-        estado.ediciones = ediciones;
 
         if (!detalle) {
-            renderSinTeams(ediciones);
+            renderSinTeams();
             return;
         }
 
         renderDetalleTeams(detalle);
-        renderEdicionesTeams(ediciones, detalle.id);
     } catch (error) {
         console.error("No se pudo cargar Teams.", error);
         renderErrorTeams(error);
-    }
-}
-
-async function gestionarCambioEdicion(evento) {
-    const boton = evento.target.closest("[data-team-id]");
-    if (!boton) return;
-
-    const teamId = boton.dataset.teamId || "";
-    if (!teamId || teamId === estado.detalle?.id) return;
-
-    boton.disabled = true;
-
-    try {
-        const [detalle, convocatoria] = await Promise.all([
-            cargarDetalleTeams(teamId),
-            cargarConvocatoriaTeams(teamId)
-        ]);
-        if (!detalle) {
-            throw new Error("La edición seleccionada no está disponible.");
-        }
-
-        detalle.convocatoria = convocatoria?.personas || [];
-        detalle.asignacion_predeterminada =
-            convocatoria?.asignacion_predeterminada || null;
-
-        estado.teamId = teamId;
-        estado.detalle = detalle;
-
-        const url = new URL(window.location.href);
-        url.searchParams.set("teams", teamId);
-        window.history.pushState({}, "", url);
-
-        renderDetalleTeams(detalle);
-        renderEdicionesTeams(estado.ediciones, detalle.id);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error) {
-        console.error("No se pudo cambiar de edición.", error);
-        renderErrorTeams(error);
-    } finally {
-        boton.disabled = false;
     }
 }
 
