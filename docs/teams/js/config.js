@@ -5,5 +5,6 @@ export const TEAMS_CONFIG = Object.freeze({
     rpcEdiciones: "web_teams_ediciones_publicas",
     rpcConvocatoria: "web_teams_convocatoria_publica",
     rpcHorarios: "web_teams_horarios_publicos",
+    rpcEstadoParejas: "web_teams_estado_parejas_publico",
     timeoutMs: 7000
 });
