@@ -2,7 +2,7 @@ import {
     cargarConvocatoriaTeams,
     cargarDetalleTeams,
     cargarEdicionesTeams
-} from "./api.js?v=20261001-1945";
+} from "./api.js?v=20261002-0845";
 
 import {
     renderDetalleTeams,
@@ -10,7 +10,7 @@ import {
     renderErrorTeams,
     renderSinTeams,
     mostrarCargandoTeams
-} from "./render.js?v=20261001-1945";
+} from "./render.js?v=20261002-0845";
 
 const estado = {
     detalle: null,
