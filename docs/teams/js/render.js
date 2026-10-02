@@ -555,9 +555,18 @@ function htmlPartido(partido, equipoA, equipoB) {
         : [];
 
     const meta = [
-        fecha ? `🗓️ ${escaparHtml(fecha)}` : "",
-        pista ? `📍 ${escaparHtml(pista)}` : "",
-        duracion > 0 ? `⏱️ ${duracion} min` : ""
+        fecha ? {
+            clase: "fechaPartidoDestacada",
+            texto: `🗓️ ${escaparHtml(fecha)}`
+        } : null,
+        pista ? {
+            clase: "",
+            texto: `📍 ${escaparHtml(pista)}`
+        } : null,
+        duracion > 0 ? {
+            clase: "",
+            texto: `⏱️ ${duracion} min`
+        } : null
     ].filter(Boolean);
 
     return `
@@ -574,7 +583,7 @@ function htmlPartido(partido, equipoA, equipoB) {
 
             ${meta.length ? `
                 <div class="partidoMeta">
-                    ${meta.map(item => `<span>${item}</span>`).join("")}
+                    ${meta.map(item => `<span class="${item.clase}">${item.texto}</span>`).join("")}
                 </div>
             ` : ""}
 
