@@ -332,9 +332,15 @@ function renderMarcador(detalle) {
     const victoriasB = victoriasEquipo(detalle, equipoB.id);
     const jugados = Number(detalle?.jugados_confirmados || 0);
     const total = Number(detalle?.numero_partidos || 0);
-    const progreso = total > 0
-        ? Math.min(100, Math.max(0, (jugados / total) * 100))
-        : 0;
+    const finalizado = detalle?.estado === "finalizado";
+    const progreso = finalizado
+        ? 100
+        : total > 0
+            ? Math.min(100, Math.max(0, (jugados / total) * 100))
+            : 0;
+    const resumenPartidos = finalizado
+        ? `${jugados} ${jugados === 1 ? "partido confirmado" : "partidos confirmados"} · serie finalizada`
+        : `${jugados} de ${total || "—"} partidos confirmados`;
 
     const ganador = ganadorTeams(detalle);
     let cierre = "La Copa está en juego.";
@@ -350,7 +356,7 @@ function renderMarcador(detalle) {
     nodos.marcador.innerHTML = `
         <div class="marcadorCabecera">
             <span>MARCADOR GENERAL</span>
-            <strong>${jugados} de ${total || "—"} partidos confirmados</strong>
+            <strong>${resumenPartidos}</strong>
         </div>
 
         <div class="marcadorDuelo">
