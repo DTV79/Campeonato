@@ -10,13 +10,10 @@ import {
     parejaTexto,
     resultadoVisible
 } from "../model.js?v=20261002-1610";
-import {
-    htmlAccionAlineacion,
-    htmlAccionHorario,
-    htmlAccionResultado,
-    htmlConfirmacion
-} from "./partido-acciones.js?v=20261002-1610";
-import { htmlResultado } from "./partido-resultado.js?v=20261002-1610";
+import { htmlAccionAlineacion } from "./accion-alineacion.js?v=20261002-1620";
+import { htmlAccionHorario } from "./accion-horario.js?v=20261002-1620";
+import { htmlAccionResultado, htmlConfirmacion } from "./accion-resultado.js?v=20261002-1620";
+import { htmlResultado } from "./partido-resultado.js?v=20261002-1620";
 
 export function htmlPartido(team, partido, jugador) {
     const equipos = equiposPorLado(team);
