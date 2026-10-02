@@ -550,6 +550,9 @@ function htmlPartido(partido, equipoA, equipoB) {
     const pista = String(partido?.pista || "").trim();
     const duracion = Number(partido?.duracion_min || 0);
     const finalizacion = resumenFinalizacion(partido?.finalizacion);
+    const propuestas = Array.isArray(partido?.propuestas)
+        ? partido.propuestas.filter(p => p?.estado === "propuesta")
+        : [];
 
     const meta = [
         fecha ? `🗓️ ${escaparHtml(fecha)}` : "",
@@ -575,6 +578,10 @@ function htmlPartido(partido, equipoA, equipoB) {
                 </div>
             ` : ""}
 
+            ${propuestas.length
+                ? htmlPropuestasPartidoPublico(propuestas, equipoA, equipoB)
+                : ""}
+
             ${htmlAvisoResultado(resultado)}
 
             ${htmlMarcadorPartido(
@@ -589,6 +596,39 @@ function htmlPartido(partido, equipoA, equipoB) {
                 <div class="finalizacionPartido">${escaparHtml(finalizacion)}</div>
             ` : ""}
         </article>
+    `;
+}
+
+function htmlPropuestasPartidoPublico(propuestas, equipoA, equipoB) {
+    return `
+        <div class="propuestasPartidoPublico">
+            ${propuestas.map(propuesta => `
+                <div class="propuestaPartidoPublico">
+                    <div class="propuestaPartidoFecha">
+                        <small>FECHA PROPUESTA</small>
+                        <strong>${escaparHtml(formatearFechaHora(propuesta?.fecha_hora) || "Fecha pendiente")}</strong>
+                        ${propuesta?.pista
+                            ? `<span>📍 ${escaparHtml(propuesta.pista)}</span>`
+                            : ""}
+                    </div>
+
+                    <div class="aceptacionEquiposHorario">
+                        ${htmlEstadoAceptacionEquipo(equipoA, propuesta?.acepta_a)}
+                        ${htmlEstadoAceptacionEquipo(equipoB, propuesta?.acepta_b)}
+                    </div>
+                </div>
+            `).join("")}
+        </div>
+    `;
+}
+
+function htmlEstadoAceptacionEquipo(equipo, aceptado) {
+    return `
+        <span class="${aceptado ? "aceptado" : ""}">
+            <i>${aceptado ? "✓" : "○"}</i>
+            <b>${escaparHtml(equipo?.nombre || "Equipo")}</b>
+            <small>${aceptado ? "Aceptada" : "Pendiente"}</small>
+        </span>
     `;
 }
 
