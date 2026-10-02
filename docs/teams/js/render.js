@@ -538,11 +538,11 @@ function renderPartidos(detalle) {
     }
 
     nodos.partidos.innerHTML = partidos
-        .map(partido => htmlPartido(partido, equipoA, equipoB))
+        .map(partido => htmlPartido(partido, equipoA, equipoB, detalle))
         .join("");
 }
 
-function htmlPartido(partido, equipoA, equipoB) {
+function htmlPartido(partido, equipoA, equipoB, detalle) {
     const alineacionA = alineacionPorLado(partido, "A");
     const alineacionB = alineacionPorLado(partido, "B");
     const resultado = tipoResultado(partido);
@@ -598,7 +598,9 @@ function htmlPartido(partido, equipoA, equipoB) {
                 equipoB,
                 alineacionA,
                 alineacionB,
-                partido?.sets || []
+                partido?.sets || [],
+                partido,
+                detalle
             )}
 
             ${finalizacion ? `
@@ -677,7 +679,9 @@ function htmlMarcadorPartido(
     equipoB,
     alineacionA,
     alineacionB,
-    sets
+    sets,
+    partido,
+    detalle
 ) {
     return `
         <div class="marcadorPartidoCompacto">
@@ -688,15 +692,27 @@ function htmlMarcadorPartido(
                 <span>SET 3</span>
             </div>
 
-            ${htmlFilaEquipoPartido("A", equipoA, alineacionA, sets)}
-            ${htmlFilaEquipoPartido("B", equipoB, alineacionB, sets)}
+            ${htmlFilaEquipoPartido("A", equipoA, alineacionA, sets, partido, detalle)}
+            ${htmlFilaEquipoPartido("B", equipoB, alineacionB, sets, partido, detalle)}
         </div>
     `;
 }
 
-function htmlFilaEquipoPartido(lado, equipo, jugadores, sets) {
+function htmlFilaEquipoPartido(
+    lado,
+    equipo,
+    jugadores,
+    sets,
+    partido,
+    detalle
+) {
     const color = colorSeguro(equipo?.color, lado);
     const nombres = jugadores.map(item => item?.jugador).filter(Boolean);
+    const pareja = nombres.length
+        ? nombres.map(escaparHtml).join(
+            ' <span class="separadorPareja">/</span> '
+        )
+        : htmlEstadoParejaOculta(partido, detalle, equipo, lado);
 
     return `
         <div class="filaEquipoPartido filaEquipo${lado}" style="--equipo-color:${color}">
@@ -710,9 +726,7 @@ function htmlFilaEquipoPartido(lado, equipo, jugadores, sets) {
                 </div>
 
                 <strong class="nombresParejaPartido">
-                    ${nombres.length
-                        ? nombres.map(escaparHtml).join(' <span class="separadorPareja">/</span> ')
-                        : "Pareja pendiente"}
+                    ${pareja}
                 </strong>
             </div>
 
@@ -720,6 +734,78 @@ function htmlFilaEquipoPartido(lado, equipo, jugadores, sets) {
                 .map(numero => htmlPuntuacionSet(sets, numero, lado))
                 .join("")}
         </div>
+    `;
+}
+
+function htmlEstadoParejaOculta(
+    partido,
+    detalle,
+    equipo,
+    lado
+) {
+    const estados = Array.isArray(partido?.estado_parejas)
+        ? partido.estado_parejas
+        : [];
+
+    const propio = estados.find(item =>
+        item?.equipo_id === equipo?.id ||
+        String(item?.lado || "").toUpperCase() === lado
+    );
+
+    const rival = estados.find(item =>
+        item?.equipo_id !== propio?.equipo_id
+    );
+
+    const presentada = propio?.presentada === true;
+    const rivalPresentada = rival?.presentada === true;
+
+    if (presentada) {
+        return `
+            <span class="estadoParejaOculta parejaPresentada">
+                <span>✓ Pareja presentada</span>
+                <small>${rivalPresentada
+                    ? "Se mostrará cuando corresponda"
+                    : "Esperando al equipo rival"
+                }</small>
+            </span>
+        `;
+    }
+
+    const sistema =
+        String(detalle?.sistema_eleccion_parejas || "");
+    const primeroId =
+        partido?.presenta_primero_equipo_id || null;
+
+    let detalleEstado = "";
+
+    if (
+        sistema !== "secreto" &&
+        primeroId
+    ) {
+        const esPrimero =
+            String(equipo?.id || "") ===
+            String(primeroId);
+
+        const primero = estados.find(item =>
+            String(item?.equipo_id || "") ===
+            String(primeroId)
+        );
+
+        if (esPrimero || primero?.presentada === true) {
+            detalleEstado = "Le corresponde presentar ahora";
+        } else {
+            detalleEstado = "Esperando al equipo rival";
+        }
+    }
+
+    return `
+        <span class="estadoParejaOculta parejaPendiente">
+            <span>⏳ Pendiente de presentar</span>
+            ${detalleEstado
+                ? `<small>${escaparHtml(detalleEstado)}</small>`
+                : ""
+            }
+        </span>
     `;
 }
 
