@@ -1,4 +1,4 @@
-import { colorSeguro, esc } from "../model.js?v=20261002-1610";
+import { equiposPorLado, esc } from "../model.js?v=20261002-1635";
 
 export function htmlResultado(team, partido) {
     const equipos = equiposPorLado(team);
