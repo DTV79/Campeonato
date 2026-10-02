@@ -178,16 +178,18 @@ async function cargarZona() {
     renderCargando();
 
     try {
-        const [datos, convocatorias, preparacion] = await Promise.all([
+        const [datos, convocatorias, preparacion, campeonatos] = await Promise.all([
             api.zona(token),
             api.convocatorias(token),
-            api.preparacion(token)
+            api.preparacion(token),
+            api.campeonatos(token)
         ]);
 
         renderZona({
             ...(datos || {}),
             convocatorias: Array.isArray(convocatorias) ? convocatorias : [],
-            preparacion: Array.isArray(preparacion) ? preparacion : []
+            preparacion: Array.isArray(preparacion) ? preparacion : [],
+            campeonatos: Array.isArray(campeonatos) ? campeonatos : []
         });
         enlazarZona({
             app,
