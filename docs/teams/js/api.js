@@ -1,4 +1,4 @@
-import { TEAMS_CONFIG } from "./config.js?v=20261002-1135";
+import { TEAMS_CONFIG } from "./config.js?v=20261002-1320";
 
 async function rpc(nombre, payload = {}) {
     const controlador = new AbortController();
@@ -84,6 +84,16 @@ export async function cargarConvocatoriaTeams(teamId = null) {
 export async function cargarHorariosTeams(teamId = null) {
     const datos = await rpc(
         TEAMS_CONFIG.rpcHorarios,
+        { p_team_id: teamId || null }
+    );
+
+    return Array.isArray(datos) ? datos : [];
+}
+
+
+export async function cargarEstadoParejasTeams(teamId = null) {
+    const datos = await rpc(
+        TEAMS_CONFIG.rpcEstadoParejas,
         { p_team_id: teamId || null }
     );
 
