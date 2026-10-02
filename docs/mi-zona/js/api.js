@@ -66,6 +66,7 @@ export const api = {
             p_team_id: teamId,
             p_listo: listo
         }),
+    campeonatos: token => rpc(RPC.campeonatos, { p_token: token }),
     responderConvocatoria: (token, teamId, estado, equipoId = null) =>
         rpc(RPC.responderConvocatoria, {
             p_token: token,
