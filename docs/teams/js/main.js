@@ -1,15 +1,16 @@
 import {
     cargarConvocatoriaTeams,
     cargarDetalleTeams,
+    cargarEstadoParejasTeams,
     cargarHorariosTeams
-} from "./api.js?v=20261002-1135";
+} from "./api.js?v=20261002-1320";
 
 import {
     renderDetalleTeams,
     renderErrorTeams,
     renderSinTeams,
     mostrarCargandoTeams
-} from "./render.js?v=20261002-1120";
+} from "./render.js?v=20261002-1320";
 
 const estado = {
     detalle: null,
@@ -23,13 +24,17 @@ async function iniciarTeams() {
     mostrarCargandoTeams();
 
     const parametros = new URLSearchParams(window.location.search);
-    estado.teamId = parametros.get("teams") || null;
+    estado.teamId =
+        parametros.get("team") ||
+        parametros.get("teams") ||
+        null;
 
     try {
-        const [detalle, convocatoria, horarios] = await Promise.all([
+        const [detalle, convocatoria, horarios, estadoParejas] = await Promise.all([
             cargarDetalleTeams(estado.teamId),
             cargarConvocatoriaTeams(estado.teamId),
-            cargarHorariosTeams(estado.teamId)
+            cargarHorariosTeams(estado.teamId),
+            cargarEstadoParejasTeams(estado.teamId)
         ]);
 
         if (detalle) {
@@ -46,10 +51,24 @@ async function iniciarTeams() {
             const horariosPorPartido = new Map(
                 (horarios || []).map(item => [item.partido_id, item.propuestas || []])
             );
-            detalle.partidos = (detalle.partidos || []).map(partido => ({
-                ...partido,
-                propuestas: horariosPorPartido.get(partido.id) || []
-            }));
+            const parejasPorPartido = new Map(
+                (estadoParejas || []).map(item => [item.partido_id, item])
+            );
+
+            detalle.partidos = (detalle.partidos || []).map(partido => {
+                const estadoPareja = parejasPorPartido.get(partido.id) || {};
+
+                return {
+                    ...partido,
+                    propuestas: horariosPorPartido.get(partido.id) || [],
+                    presenta_primero_equipo_id:
+                        estadoPareja.presenta_primero_equipo_id || null,
+                    estado_parejas:
+                        Array.isArray(estadoPareja.equipos)
+                            ? estadoPareja.equipos
+                            : []
+                };
+            });
         }
 
         estado.detalle = detalle;
