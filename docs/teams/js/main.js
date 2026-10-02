@@ -1,7 +1,8 @@
 import {
     cargarConvocatoriaTeams,
-    cargarDetalleTeams
-} from "./api.js?v=20261002-0845";
+    cargarDetalleTeams,
+    cargarHorariosTeams
+} from "./api.js?v=20261002-1115";
 
 import {
     renderDetalleTeams,
@@ -25,9 +26,10 @@ async function iniciarTeams() {
     estado.teamId = parametros.get("teams") || null;
 
     try {
-        const [detalle, convocatoria] = await Promise.all([
+        const [detalle, convocatoria, horarios] = await Promise.all([
             cargarDetalleTeams(estado.teamId),
-            cargarConvocatoriaTeams(estado.teamId)
+            cargarConvocatoriaTeams(estado.teamId),
+            cargarHorariosTeams(estado.teamId)
         ]);
 
         if (detalle) {
@@ -40,6 +42,14 @@ async function iniciarTeams() {
                 convocatoria?.modo_inicio_teams || "administrador";
             detalle.inicio_programado_at =
                 convocatoria?.inicio_programado_at || null;
+
+            const horariosPorPartido = new Map(
+                (horarios || []).map(item => [item.partido_id, item.propuestas || []])
+            );
+            detalle.partidos = (detalle.partidos || []).map(partido => ({
+                ...partido,
+                propuestas: horariosPorPartido.get(partido.id) || []
+            }));
         }
 
         estado.detalle = detalle;
