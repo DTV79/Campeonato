@@ -9,7 +9,12 @@ Módulo privado e independiente dentro de Sprint Pádel.
 - `mi-zona/js/api.js`: comunicación con Supabase.
 - `mi-zona/js/session.js`: sesión local.
 - `mi-zona/js/model.js`: reglas y utilidades de dominio.
-- `mi-zona/js/proxima-accion.js`: cálculo y tarjeta "Tu próxima acción".
+- `mi-zona/js/proxima-accion.js`: orquestador de "Tu próxima acción".
+- `mi-zona/js/proxima-accion/teams.js`: acciones y estados derivados de partidos Teams.
+- `mi-zona/js/proxima-accion/preparacion.js`: acciones previas al inicio.
+- `mi-zona/js/proxima-accion/convocatorias.js`: acciones de convocatoria.
+- `mi-zona/js/proxima-accion/render.js`: tarjeta visual.
+- `mi-zona/js/proxima-accion/utils.js`: utilidades puras.
 - `mi-zona/js/render.js`: coordinador de render.
 - `mi-zona/js/render/core.js`: carga, errores y acceso.
 - `mi-zona/js/render/convocatorias.js`: convocatorias.
@@ -22,7 +27,9 @@ Módulo privado e independiente dentro de Sprint Pádel.
 - `mi-zona/js/render/partido-resultado.js`: marcador mostrado en el partido.
 - `mi-zona/js/actions.js`: eventos y llamadas de las acciones del jugador/capitán.
 - `mi-zona/js/main.js`: ciclo de vida.
-- `mi-zona/css/*`: estilos separados por responsabilidad.
+- `mi-zona/css/components.css`: componentes generales.
+- `mi-zona/css/proxima-accion.css`: estilos exclusivos de la tarjeta "Tu próxima acción".
+- `mi-zona/css/*`: resto de estilos separados por responsabilidad.
 
 ## Criterio de arquitectura
 
