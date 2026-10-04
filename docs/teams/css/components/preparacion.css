@@ -1,0 +1,35 @@
+.teamsPreparacion {
+    display: grid;
+    gap: 18px;
+}
+
+.caracteristicasTeams {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 10px;
+}
+
+.caracteristicaTeam {
+    padding: 13px 14px;
+    border: 1px solid var(--borde);
+    border-radius: 14px;
+    background: rgba(255,255,255,.025);
+}
+
+.caracteristicaTeam small {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--texto-tenue);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.caracteristicaTeam strong {
+    display: block;
+    color: var(--texto);
+    font-size: 12px;
+    line-height: 1.4;
+}
+

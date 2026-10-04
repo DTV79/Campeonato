@@ -1,0 +1,244 @@
+.estadoGeneral {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 7px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--texto-suave);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.estadoEnJuego {
+    border-color: rgba(74, 222, 128, 0.35);
+    background: rgba(74, 222, 128, 0.09);
+    color: #86efac;
+}
+
+.estadoFinalizadoGeneral {
+    border-color: rgba(56, 189, 248, 0.32);
+    background: rgba(56, 189, 248, 0.08);
+    color: #7dd3fc;
+}
+
+.marcadorGeneral {
+    overflow: hidden;
+    border: 1px solid var(--borde-fuerte);
+    border-radius: 24px;
+    background:
+        linear-gradient(135deg, rgba(56, 189, 248, 0.07), transparent 38%),
+        var(--panel);
+    box-shadow: var(--sombra);
+}
+
+.marcadorCabecera,
+
+.estadisticasTeams {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(4, 13, 22, 0.3);
+}
+
+.estadisticasTeamsTitulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 10px;
+}
+
+.estadisticasTeamsTitulo span {
+    color: #7dd3fc;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.estadisticasTeamsTitulo small {
+    color: var(--texto-tenue);
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.estadisticasTeamsCabecera,
+.estadisticaTeamsFila {
+    display: grid;
+    grid-template-columns: minmax(86px, 1fr) minmax(150px, 1.2fr) minmax(86px, 1fr);
+    align-items: center;
+    text-align: center;
+}
+
+.estadisticasTeamsCabecera {
+    padding: 0 18px 8px;
+}
+
+.estadisticasTeamsCabecera strong {
+    overflow: hidden;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.estadisticasTeamsCabecera strong:first-child {
+    text-align: left;
+}
+
+.estadisticasTeamsCabecera strong:last-child {
+    text-align: right;
+}
+
+.estadisticasTeamsFilas {
+    padding: 0 18px 14px;
+}
+
+.estadisticaTeamsFila {
+    min-height: 38px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.estadisticaTeamsFila b {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.estadisticaTeamsFila b:first-child {
+    text-align: left;
+}
+
+.estadisticaTeamsFila b:last-child {
+    text-align: right;
+}
+
+.estadisticaTeamsFila span {
+    color: var(--texto-suave);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.marcadorPie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 20px;
+}
+
+.marcadorCabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 42px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--borde);
+    box-sizing: border-box;
+}
+
+.marcadorCabecera span {
+    color: #7dd3fc;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.marcadorCabecera strong {
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+.marcadorDuelo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 22px;
+    padding: 34px 28px;
+}
+
+.marcadorEquipo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.marcadorEquipoB {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+.puntoEquipo {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--equipo-color, var(--acento));
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--equipo-color, var(--acento)) 16%, transparent);
+}
+
+.marcadorEquipo small,
+.plantillaTitulo small {
+    display: block;
+    color: var(--texto-tenue);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.marcadorEquipo strong {
+    display: block;
+    margin-top: 3px;
+    font-size: clamp(18px, 2.5vw, 28px);
+    line-height: 1.08;
+}
+
+.marcadorEquipo > div > span {
+    display: block;
+    margin-top: 6px;
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+.marcadorCentro {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 170px;
+    justify-content: center;
+}
+
+.marcadorNumero {
+    font-size: clamp(44px, 8vw, 74px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.06em;
+}
+
+.marcadorSeparador {
+    color: var(--texto-tenue);
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.barraProgreso {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.barraProgreso span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #4ade80);
+    transition: width 0.25s ease;
+}
+
+.marcadorPie {
+    min-height: 50px;
+    color: var(--texto-suave);
+    font-size: 13px;
+}
+
+.plantillaCard,

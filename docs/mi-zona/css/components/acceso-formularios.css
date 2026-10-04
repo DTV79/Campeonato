@@ -1,0 +1,112 @@
+.eyebrow {
+    margin: 8px 0;
+    color: var(--azul);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .16em;
+}
+
+.volver {
+    color: #91a8bd;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.loginIcono {
+    margin-top: 22px;
+    font-size: 38px;
+}
+
+.loginCard h1 {
+    margin: 3px 0 7px;
+    font-size: 34px;
+}
+
+.intro {
+    margin: 0;
+    color: var(--suave);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.loginForm,
+.formAccion {
+    display: grid;
+    gap: 13px;
+}
+
+.loginForm { margin-top: 24px; }
+
+.loginForm label,
+.formAccion label {
+    display: grid;
+    gap: 6px;
+}
+
+.loginForm label > span,
+.formAccion label > span {
+    color: #b7c7d5;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.notaLogin {
+    display: block;
+    margin-top: 16px;
+    color: var(--tenue);
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.btnPrimario,
+.btnSecundario,
+.btnPeligro,
+.btnConfirmar,
+.btnSalir,
+.btnMini {
+    border: 0;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.btnPrimario {
+    min-height: 42px;
+    padding: 10px 14px;
+    background: var(--azul-fuerte);
+    color: #fff;
+}
+
+.btnSecundario,
+.btnSalir {
+    padding: 9px 12px;
+    background: #152737;
+    color: #dbeafe;
+}
+
+.btnPeligro {
+    padding: 9px 12px;
+    background: rgba(248,113,113,.12);
+    color: #fecaca;
+}
+
+.btnConfirmar {
+    padding: 10px 13px;
+    background: rgba(74,222,128,.14);
+    color: #86efac;
+}
+
+.btnSalir {
+    flex: 0 0 auto;
+}
+
+.mensajeForm {
+    display: none;
+    margin: 0;
+    color: #86efac;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.mensajeForm.visible { display: block; }
+.mensajeForm.error { color: #fca5a5; }
+

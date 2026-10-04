@@ -1,0 +1,181 @@
+.preparacionTeamsZona{
+    display:grid;
+    gap:12px;
+}
+
+.preparacionTeamCard{
+    overflow:hidden;
+    border:1px solid rgba(96,165,250,.22);
+    border-radius:16px;
+    background:linear-gradient(145deg,rgba(37,99,235,.08),rgba(9,20,31,.94) 58%);
+    box-shadow:var(--sombra);
+}
+
+.preparacionTeamCard > header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:15px 16px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.preparacionTeamCard > header span{
+    display:block;
+    color:var(--azul);
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.1em;
+}
+
+.preparacionTeamCard > header h3{
+    margin:3px 0 0;
+    font-size:18px;
+}
+
+.preparacionTeamCard > header em{
+    padding:5px 8px;
+    border-radius:999px;
+    background:rgba(96,165,250,.09);
+    color:#bfdbfe;
+    font-size:9px;
+    font-style:normal;
+    font-weight:800;
+}
+
+.preparacionResumenFila{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:3px 12px;
+    padding:13px 16px;
+    border-bottom:1px solid rgba(255,255,255,.055);
+}
+
+.preparacionResumenFila > span{
+    align-self:center;
+    color:var(--tenue);
+    font-size:9px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.preparacionResumenFila strong{
+    font-size:12px;
+    text-align:right;
+}
+
+.preparacionResumenFila small{
+    grid-column:2;
+    color:var(--tenue);
+    font-size:9px;
+    text-align:right;
+}
+
+.preparacionAccion{
+    display:grid;
+    gap:11px;
+    padding:15px 16px;
+    border-bottom:1px solid rgba(255,255,255,.055);
+}
+
+.preparacionAccion:last-child{
+    border-bottom:0;
+}
+
+.preparacionAccion > div:first-child small{
+    color:var(--azul);
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:.08em;
+}
+
+.preparacionAccion > div:first-child strong{
+    display:block;
+    margin-top:3px;
+    font-size:13px;
+}
+
+.preparacionAccion > div:first-child p{
+    margin:4px 0 0;
+    color:var(--tenue);
+    font-size:9px;
+    line-height:1.45;
+}
+
+.votacionCapitanMiZona{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+}
+
+.votacionCapitanMiZona button{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    min-height:38px;
+    padding:8px 10px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:9px;
+    background:rgba(255,255,255,.03);
+    color:#dbeafe;
+    font-size:10px;
+    font-weight:800;
+    text-align:left;
+}
+
+.votacionCapitanMiZona button.activo{
+    border-color:rgba(74,222,128,.35);
+    background:rgba(74,222,128,.1);
+    color:#86efac;
+}
+
+.votacionCapitanMiZona button span{
+    flex:0 0 auto;
+    color:#86efac;
+    font-size:8px;
+}
+
+.estadoCapitanesListos{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+}
+
+.estadoCapitanesListos span{
+    padding:6px 8px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:999px;
+    background:rgba(255,255,255,.025);
+    color:#9db1c1;
+    font-size:9px;
+    font-weight:800;
+}
+
+.estadoCapitanesListos span.listo{
+    border-color:rgba(74,222,128,.28);
+    background:rgba(74,222,128,.08);
+    color:#86efac;
+}
+
+@media(max-width:560px){
+    .preparacionTeamCard > header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .votacionCapitanMiZona{
+        grid-template-columns:1fr;
+    }
+
+    .preparacionResumenFila{
+        grid-template-columns:1fr;
+    }
+
+    .preparacionResumenFila strong,
+    .preparacionResumenFila small{
+        grid-column:auto;
+        text-align:left;
+    }
+}
+

@@ -25,9 +25,13 @@ Módulo privado e independiente dentro de Sprint Pádel.
 - `mi-zona/js/render/accion-horario.js`: propuestas y gestión de fecha.
 - `mi-zona/js/render/accion-resultado.js`: envío y confirmación del resultado.
 - `mi-zona/js/render/partido-resultado.js`: marcador mostrado en el partido.
-- `mi-zona/js/actions.js`: eventos y llamadas de las acciones del jugador/capitán.
+- `mi-zona/js/actions.js`: enlace de los eventos delegados.
+- `mi-zona/js/actions/click.js`: acciones de los botones.
+- `mi-zona/js/actions/submit.js`: envío de los formularios.
+- `mi-zona/js/actions/formulario.js`: mensajes, bloqueo y ejecución.
+- `mi-zona/js/actions/sets.js`: lectura de los marcadores.
 - `mi-zona/js/main.js`: ciclo de vida.
-- `mi-zona/css/components.css`: componentes generales.
+- `mi-zona/css/components.css`: índice de los bloques de `mi-zona/css/components/`, en el orden original.
 - `mi-zona/css/proxima-accion.css`: estilos exclusivos de la tarjeta "Tu próxima acción".
 - `mi-zona/css/*`: resto de estilos separados por responsabilidad.
 

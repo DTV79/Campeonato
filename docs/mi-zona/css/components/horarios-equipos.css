@@ -1,0 +1,56 @@
+.propuestaEquiposEstado{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:8px;
+}
+
+.propuestaEquiposEstado > span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 7px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    background:rgba(255,255,255,.025);
+    color:#a7b7c5;
+    font-size:9px;
+    font-weight:800;
+}
+
+.propuestaEquiposEstado > span small{
+    color:#8194a4;
+    font-size:8px;
+    font-weight:700;
+}
+
+.propuestaEquiposEstado > span.aceptado{
+    border-color:rgba(74,222,128,.28);
+    background:rgba(74,222,128,.08);
+    color:#86efac;
+}
+
+.propuestaEquiposEstado > span.aceptado small{
+    color:#86efac;
+}
+
+.equipoYaAcepto{
+    color:#86efac!important;
+}
+
+.citaProgramada strong{
+    color:#e0f2fe;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:-.01em;
+}
+
+.citaProgramada{
+    border:1px solid rgba(56,189,248,.18);
+}
+
+.propuestaDatos strong{
+    color:#e0f2fe;
+    font-size:14px;
+    font-weight:900;
+}
