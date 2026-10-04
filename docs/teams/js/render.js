@@ -2,7 +2,7 @@ import { etiquetaEstadoGeneral, formatearFechaSolo } from "./model.js?v=20261002
 import { renderPreparacion } from "./render/preparacion.js?v=20261002-1545";
 import { renderMarcador } from "./render/marcador.js?v=20261002-1545";
 import { renderPlantillas } from "./render/plantillas.js?v=20261002-1545";
-import { renderPartidos } from "./render/partidos.js?v=20261002-1545";
+import { renderPartidos } from "./render/partidos.js?v=20261004-1845";
 
 const nodos = {
     nombre: document.getElementById("teamsNombre"),
