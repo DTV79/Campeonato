@@ -14,7 +14,7 @@ import {
     victoriasEquipo
 } from "../model.js?v=20261002-1545";
 
-const partidos = document.getElementById("teamsPartidos");
+const nodoPartidos = document.getElementById("teamsPartidos");
 
 export function renderPartidos(detalle) {
     const partidos = detalle?.partidos || [];
@@ -22,12 +22,12 @@ export function renderPartidos(detalle) {
     const equipoB = equipoPorLado(detalle, "B");
 
     if (!partidos.length) {
-        partidos.innerHTML =
+        nodoPartidos.innerHTML =
             '<div class="vacio">Todavía no hay partidos creados.</div>';
         return;
     }
 
-    partidos.innerHTML = partidos
+    nodoPartidos.innerHTML = partidos
         .map(partido => htmlPartido(partido, equipoA, equipoB, detalle))
         .join("");
 }
