@@ -22,7 +22,8 @@ Módulo público independiente dentro de Sprint Pádel.
 
 - `css/base.css`: variables, reset y navegación base.
 - `css/layout.css`: estructura general y rejillas.
-- `css/components.css`: componentes.
+- `css/components.css`: componentes generales.
+- `css/estado-parejas.css`: estado público de parejas antes de revelar nombres.
 - `css/responsive.css`: comportamiento móvil.
 
 ## Criterio de arquitectura
