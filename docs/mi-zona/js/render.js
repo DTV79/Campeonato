@@ -1,5 +1,5 @@
 import { esc } from "./model.js?v=20261002-1530";
-import { htmlProximaAccion } from "./proxima-accion.js?v=20261002-1530";
+import { htmlProximaAccion } from "./proxima-accion.js?v=20261004-1045";
 import { renderCargando, renderError, renderLogin } from "./render/core.js?v=20261002-1530";
 import { htmlConvocatorias } from "./render/convocatorias.js?v=20261002-1530";
 import { htmlPreparacionTeams } from "./render/preparacion.js?v=20261002-1530";
