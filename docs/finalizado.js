@@ -785,7 +785,6 @@
         sincronizarNavegacionFinal();
         limpiarPantallaMasFinal();
         agregarEquiposPantallaMas();
-        agregarGruposPantallaMas();
 
         const portada = document.getElementById("portadaFinalizada");
         if (!portada) return;
@@ -1357,7 +1356,7 @@ const ultimo = finales.at(-1) || partidos.at(-1);
     /* =====================================================
        NAVEGACIÓN FINALIZADA
        Inicio · Partidos · Estadísticas · Ranking · Más.
-       Grupos y Equipos quedan disponibles dentro de Más.
+       Equipos queda disponible dentro de Más; Competición mantiene su acceso principal.
     ===================================================== */
 
     function configurarRankingNavegacionFinal() {
@@ -1465,7 +1464,7 @@ const ultimo = finales.at(-1) || partidos.at(-1);
         if (
             !lista ||
             lista.querySelector(
-                "#opcionEquiposMasFinal"
+                '[data-destino-pantalla="equipos"]'
             )
         ) {
             return;
@@ -1485,53 +1484,16 @@ const ultimo = finales.at(-1) || partidos.at(-1);
         lista.prepend(boton);
     }
 
-    function agregarGruposPantallaMas() {
-        if (
-            typeof estadoUI === "undefined" ||
-            estadoUI.pantalla !== "mas"
-        ) {
-            return;
-        }
-
-        const lista = document.querySelector(
-            "#contenidoDetalle .listaOpcionesMas"
-        );
-
-        if (!lista || lista.querySelector("#opcionGruposMasFinal")) {
-            return;
-        }
-
-        const boton = document.createElement("button");
-        boton.id = "opcionGruposMasFinal";
-        boton.className = "opcionMas opcionGruposMasFinal";
-        boton.type = "button";
-        boton.dataset.destinoPantalla = "competicion";
-        boton.dataset.destinoFase =
-            typeof obtenerFaseClasificacionPrincipal === "function"
-                ? obtenerFaseClasificacionPrincipal()
-                : "grupos";
-        boton.innerHTML = `
-            <span>📊</span>
-            <strong>Grupos</strong>
-        `;
-
-        lista.prepend(boton);
-    }
-
     function gestionarClickNavegacionFinal(evento) {
         const ranking = evento.target.closest(
             '.bottomNav .navBtn[data-pantalla="ranking"]'
         );
 
         const equipos = evento.target.closest(
-            "#opcionEquiposMasFinal"
+            '[data-destino-pantalla="equipos"]'
         );
 
-        const grupos = evento.target.closest(
-            "#opcionGruposMasFinal"
-        );
-
-        if (!ranking && !equipos && !grupos) return;
+        if (!ranking && !equipos) return;
 
         window.setTimeout(
             sincronizarNavegacionFinal,
@@ -1553,10 +1515,16 @@ const ultimo = finales.at(-1) || partidos.at(-1);
             return;
         }
 
-        if (
-            pantalla === "equipos" ||
-            pantalla === "competicion"
-        ) {
+        if (pantalla === "competicion") {
+            activarBotonNavegacionFinal(
+                document.querySelector(
+                    '.bottomNav .navBtn[data-pantalla="competicion"]'
+                )
+            );
+            return;
+        }
+
+        if (pantalla === "equipos") {
             activarBotonNavegacionFinal(
                 document.querySelector(
                     '.bottomNav .navBtn[data-pantalla="mas"]'
