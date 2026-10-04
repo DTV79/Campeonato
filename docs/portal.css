@@ -604,3 +604,33 @@ body.modoPortal{background:#071019!important}.modoPortal>.contenedor,.modoPortal
         flex-basis:31px;
     }
 }
+
+/* La lista pertenece a Campeonatos; en escritorio conserva el ancho completo. */
+.portalSelectorCompeticiones > .portalAreaCampeonatos{
+    grid-column:1;
+    grid-row:1;
+}
+
+.portalSelectorCompeticiones > .portalAccesoTeams{
+    grid-column:2;
+    grid-row:1;
+}
+
+.portalSelectorCompeticiones > .portalListaCampeonatos{
+    grid-column:1 / -1;
+    grid-row:2;
+    margin-top:-4px;
+}
+
+@media(max-width:820px){
+    .portalSelectorCompeticiones > .portalAreaCampeonatos,
+    .portalSelectorCompeticiones > .portalAccesoTeams,
+    .portalSelectorCompeticiones > .portalListaCampeonatos{
+        grid-column:1;
+        grid-row:auto;
+    }
+
+    .portalSelectorCompeticiones > .portalListaCampeonatos{
+        margin-top:0;
+    }
+}
