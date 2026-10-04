@@ -1,0 +1,29 @@
+/* Estado público de parejas antes de revelar los nombres */
+.estadoParejaOculta{
+    display:inline-flex;
+    flex-direction:column;
+    gap:2px;
+    font-weight:800;
+    line-height:1.25;
+}
+
+.estadoParejaOculta > span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+}
+
+.estadoParejaOculta small{
+    color:var(--texto-tenue);
+    font-size:10px;
+    font-weight:600;
+    line-height:1.25;
+}
+
+.estadoParejaOculta.parejaPresentada > span{
+    color:#86efac;
+}
+
+.estadoParejaOculta.parejaPendiente > span{
+    color:#fbbf24;
+}
