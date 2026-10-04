@@ -940,8 +940,7 @@ function pintarPantallaMantenimiento() {
             "Sprint Pádel Tui"
         ).trim();
 
-    document.title =
-        titulo;
+    document.title = "Sprint Pádel";
 
     document.body.classList.remove(
         "appCargando"
@@ -1708,9 +1707,7 @@ function pintarIdentidadCampeonato() {
         .filter(Boolean)
         .join(" - ");
 
-    document.title = partes
-        .filter(Boolean)
-        .join(" · ");
+    document.title = "Sprint Pádel";
 
     setTextClase(
         "tituloSuperior",
