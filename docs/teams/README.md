@@ -39,3 +39,9 @@ no se exponen hasta que corresponde publicarlas.
 
 Los resultados impugnados pueden mostrarse como provisionales, pero el motivo
 de la incidencia no se expone en la web pública.
+
+## Estilos de componentes
+
+`css/components.css` conserva el punto de entrada y carga los bloques de
+`css/components/` en el orden original: estado y marcador, partidos,
+preparación, convocatoria y horarios. Las reglas se conservan literalmente.

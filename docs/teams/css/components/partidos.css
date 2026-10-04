@@ -1,0 +1,396 @@
+.partidoCard {
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    background: var(--panel-suave);
+}
+
+.plantillaCard {
+    overflow: hidden;
+    border-top: 3px solid var(--equipo-color, var(--acento));
+}
+
+.plantillaTitulo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 18px 18px 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.plantillaTitulo h3 {
+    margin: 2px 0 0;
+    font-size: 18px;
+}
+
+.jugadoresLista {
+    padding: 7px 14px 12px;
+}
+
+.jugadorFila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 42px;
+    padding: 7px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.jugadorFila:last-child {
+    border-bottom: 0;
+}
+
+.jugadorNombre {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.jugadorEtiquetas {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.jugadorEtiquetas em {
+    padding: 4px 7px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-style: normal;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.etiquetaCapitan {
+    background: rgba(250, 204, 21, 0.12);
+    color: #fde047;
+}
+
+.etiquetaReserva {
+    background: rgba(148, 163, 184, 0.12);
+    color: #cbd5e1;
+}
+
+.partidoCard {
+    padding: 17px;
+}
+
+.partidoCabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.partidoCabecera small {
+    display: block;
+    margin-bottom: 4px;
+    color: #7dd3fc;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.partidoCabecera strong {
+    font-size: 14px;
+}
+
+.estadoPartido {
+    flex: 0 0 auto;
+    padding: 6px 9px;
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.estadoFinalizado {
+    border-color: rgba(74, 222, 128, 0.3);
+    color: #86efac;
+}
+
+.estadoProgramado {
+    border-color: rgba(56, 189, 248, 0.28);
+    color: #7dd3fc;
+}
+
+.estadoProvisional {
+    border-color: rgba(251, 146, 60, 0.34);
+    color: #fdba74;
+}
+
+.estadoImpugnado,
+.estadoIncidencia {
+    border-color: rgba(250, 204, 21, 0.34);
+    color: #fde047;
+}
+
+.partidoMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 11px;
+    color: var(--texto-suave);
+    font-size: 11px;
+}
+
+.avisoResultado {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: 11px;
+    font-size: 11px;
+}
+
+.avisoImpugnado {
+    border: 1px solid rgba(250, 204, 21, 0.28);
+    background: rgba(250, 204, 21, 0.08);
+    color: #fde68a;
+}
+
+.avisoImpugnado .simboloAviso {
+    color: #facc15;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.avisoProvisional {
+    border: 1px solid rgba(251, 146, 60, 0.25);
+    background: rgba(251, 146, 60, 0.07);
+    color: #fdba74;
+}
+
+.avisoDefinitivo {
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    background: rgba(74, 222, 128, 0.055);
+    color: #86efac;
+}
+
+.marcadorPartidoCompacto {
+    overflow: hidden;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 14px;
+    background: rgba(3, 12, 20, 0.35);
+}
+
+.marcadorPartidoCabecera,
+.filaEquipoPartido {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(3, 86px);
+    align-items: stretch;
+}
+
+.marcadorPartidoCabecera {
+    min-height: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.marcadorPartidoCabecera span {
+    display: grid;
+    place-items: center;
+    padding: 7px 5px;
+    color: var(--texto-tenue);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.marcadorPartidoCabecera .cabeceraPareja {
+    justify-content: start;
+    padding-left: 18px;
+}
+
+.filaEquipoPartido {
+    position: relative;
+    min-height: 82px;
+    border-left: 4px solid var(--equipo-color, var(--acento));
+    background: color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 4%,
+        transparent
+    );
+}
+
+.filaEquipoA {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+}
+
+.infoEquipoPartido {
+    min-width: 0;
+    padding: 13px 16px 12px 14px;
+}
+
+.nombreEquipoPartido {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+.nombreEquipoPartido .puntoEquipo {
+    width: 9px;
+    height: 9px;
+    box-shadow: 0 0 0 3px color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 15%,
+        transparent
+    );
+}
+
+.nombreEquipoPartido span:last-child {
+    min-width: 0;
+}
+
+.nombreEquipoPartido small {
+    display: block;
+    color: var(--texto-tenue);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.nombreEquipoPartido b {
+    display: block;
+    overflow: hidden;
+    margin-top: 1px;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nombresParejaPartido {
+    display: block;
+    overflow-wrap: anywhere;
+    margin-top: 7px;
+    color: var(--texto);
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+.separadorPareja {
+    color: var(--texto-tenue);
+    font-weight: 500;
+}
+
+.puntuacionSet {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    min-width: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.075);
+    background: rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.puntuacionSet strong {
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    font-size: 27px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.puntuacionSet .tiebreakSuperindice {
+    position: relative;
+    top: -2px;
+    margin-left: 1px;
+    color: #facc15;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+.puntuacionSet.ganadorSet {
+    background: color-mix(
+        in srgb,
+        var(--equipo-color, var(--acento)) 11%,
+        rgba(0, 0, 0, 0.08)
+    );
+}
+
+.puntuacionSet.ganadorSet strong {
+    color: var(--equipo-color, var(--texto));
+    font-weight: 900;
+}
+
+.puntuacionSet.vacia strong {
+    color: rgba(174, 191, 206, 0.36);
+    font-weight: 500;
+}
+
+.finalizacionPartido {
+    margin-top: 10px;
+    color: var(--texto-suave);
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.edicionBoton {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 5px 12px;
+    min-height: 86px;
+    padding: 14px;
+    border: 1px solid var(--borde);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.025);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.edicionBoton:hover {
+    transform: translateY(-1px);
+    border-color: var(--borde-fuerte);
+    background: rgba(255, 255, 255, 0.045);
+}
+
+.edicionBoton.activa {
+    border-color: rgba(56, 189, 248, 0.35);
+    background: rgba(56, 189, 248, 0.07);
+}
+
+.edicionBoton span {
+    min-width: 0;
+}
+
+.edicionBoton small {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--texto-tenue);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.edicionBoton strong {
+    display: block;
+    overflow: hidden;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.edicionBoton em {
+    align-self: start;
+    color: var(--texto-suave);
+    font-size: 10px;
+    font-style: normal;
+}
+
+.edicionBoton b {
+    grid-column: 1 / -1;
+    color: #7dd3fc;
+    font-size: 10px;
+}
+

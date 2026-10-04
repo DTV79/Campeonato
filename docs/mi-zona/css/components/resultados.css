@@ -1,0 +1,87 @@
+.resultadoCabeceraForm,
+.filaResultadoForm {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) repeat(3,72px);
+    gap: 6px;
+    align-items: center;
+}
+
+.resultadoCabeceraForm {
+    color: var(--tenue);
+    font-size: 8px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.resultadoCabeceraForm span { text-align: left; }
+
+.filaResultadoForm > strong {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inputSet {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+}
+
+.inputSet input {
+    min-width: 0;
+    min-height: 38px;
+    padding: 6px 4px;
+    text-align: center;
+}
+
+.inputSet input:nth-child(2) {
+    border-color: rgba(250,204,21,.25);
+    color: #fde68a;
+    font-size: 10px;
+}
+
+.ayudaTie {
+    margin: 0;
+    color: var(--tenue);
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.confirmacionResultado {
+    display: grid;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(251,146,60,.2);
+    border-radius: 11px;
+    background: rgba(251,146,60,.055);
+}
+
+.confirmacionResultado strong {
+    display: block;
+    font-size: 11px;
+}
+
+.confirmacionResultado span {
+    display: block;
+    margin-top: 3px;
+    color: var(--suave);
+    font-size: 9px;
+}
+
+.confirmacionResultado .botonesAccion { padding: 0; }
+
+.impugnarPanel summary {
+    color: #fca5a5;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.impugnarPanel .formAccion {
+    margin-top: 8px;
+    padding: 10px 0 0;
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+

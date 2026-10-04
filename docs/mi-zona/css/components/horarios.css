@@ -1,0 +1,73 @@
+.propuestasLista {
+    display: grid;
+    gap: 7px;
+    padding: 0 12px 12px;
+}
+
+.propuestaHorario {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 10px;
+    background: rgba(255,255,255,.02);
+}
+
+.propuestaDatos strong {
+    display: block;
+    font-size: 11px;
+}
+
+.propuestaDatos span {
+    display: block;
+    margin-top: 3px;
+    color: var(--tenue);
+    font-size: 8px;
+}
+
+.propuestaEstado {
+    text-align: right;
+}
+
+.propuestaEstado > b {
+    display: block;
+    margin-bottom: 5px;
+    color: #7dd3fc;
+    font-size: 8px;
+}
+
+.propuestaEstado > div {
+    display: flex;
+    gap: 4px;
+}
+
+.btnMini {
+    padding: 5px 7px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: #132231;
+    color: #aebfce;
+    font-size: 8px;
+}
+
+.btnMini.activo {
+    border-color: rgba(74,222,128,.25);
+    background: rgba(74,222,128,.1);
+    color: #86efac;
+}
+
+.btnMini.activo.no {
+    border-color: rgba(248,113,113,.25);
+    background: rgba(248,113,113,.08);
+    color: #fca5a5;
+}
+
+.miniVacio {
+    padding: 11px;
+    border: 1px dashed rgba(255,255,255,.1);
+    border-radius: 10px;
+    color: var(--tenue);
+    font-size: 9px;
+    text-align: center;
+}
+

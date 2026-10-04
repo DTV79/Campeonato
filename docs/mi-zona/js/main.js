@@ -1,5 +1,5 @@
 import { api } from "./api.js?v=20261002-1145";
-import { enlazarZona } from "./actions.js?v=20261002-0835";
+import { enlazarZona } from "./actions.js?v=20261004-1345";
 import { renderCargando, renderError, renderLogin, renderZona } from "./render.js?v=20261004-1045";
 import { borrarToken, guardarToken, obtenerToken } from "./session.js?v=20261001-1945";
 

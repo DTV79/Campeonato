@@ -1,0 +1,149 @@
+.partidoZona {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px;
+    background: rgba(255,255,255,.022);
+}
+
+.partidoZonaCabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px;
+}
+
+.partidoZonaCabecera small {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--azul);
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .1em;
+}
+
+.partidoZonaCabecera strong { font-size: 13px; }
+
+.badgeEstado {
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.estadoOk { color: #86efac; border-color: rgba(74,222,128,.25); }
+.estadoAviso { color: #fde68a; border-color: rgba(250,204,21,.27); }
+.estadoPendiente { color: #fdba74; border-color: rgba(251,146,60,.28); }
+.estadoProgramado { color: #7dd3fc; border-color: rgba(56,189,248,.26); }
+.estadoNeutro { color: #b6c6d4; }
+
+.citaProgramada {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 14px 12px;
+    padding: 11px 12px;
+    border-radius: 11px;
+    background: rgba(56,189,248,.07);
+}
+
+.citaProgramada span {
+    display: block;
+    color: #7dd3fc;
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.citaProgramada strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+}
+
+.citaProgramada em {
+    color: var(--suave);
+    font-size: 9px;
+    font-style: normal;
+}
+
+.parejasZona {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 14px 14px;
+}
+
+.parejaZona {
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-left: 3px solid var(--pareja-color);
+    border-radius: 10px;
+    background: rgba(0,0,0,.1);
+}
+
+.parejaZona span {
+    display: block;
+    color: var(--tenue);
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.parejaZona b {
+    display: block;
+    margin-top: 1px;
+    font-size: 10px;
+}
+
+.parejaZona strong {
+    display: block;
+    overflow-wrap: anywhere;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.resultadoZona {
+    margin: 0 14px 14px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 11px;
+}
+
+.resultadoFila {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) repeat(3,52px);
+    align-items: center;
+    min-height: 48px;
+}
+
+.resultadoFila + .resultadoFila {
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.resultadoFila > strong {
+    overflow: hidden;
+    padding: 0 11px;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.resultadoFila > span {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    border-left: 1px solid rgba(255,255,255,.07);
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.scoreSet sup {
+    margin-left: 1px;
+    color: var(--amarillo);
+    font-size: 9px;
+}
+
